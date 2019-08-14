@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="未来简史,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="春节期间如预期完成了两个计划：1、读完了《Android系统源代码情景分析》并给大部分章节写了读书笔记，当然这个目标大部分是利用了2016年的业余时间完成的，春节只是给他画了个句号。2、读完了《未来简史》，这是用五天的时间读完的。">
+<meta name="keywords" content="未来简史">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《未来简史》读书笔记">
+<meta property="og:url" content="http://palanceli.github.io/2017/02/01/2017/0201HomoDeus1/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="春节期间如预期完成了两个计划：1、读完了《Android系统源代码情景分析》并给大部分章节写了读书笔记，当然这个目标大部分是利用了2016年的业余时间完成的，春节只是给他画了个句号。2、读完了《未来简史》，这是用五天的时间读完的。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/01/2017/0201HomoDeus1/img1.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.800Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《未来简史》读书笔记">
+<meta name="twitter:description" content="春节期间如预期完成了两个计划：1、读完了《Android系统源代码情景分析》并给大部分章节写了读书笔记，当然这个目标大部分是利用了2016年的业余时间完成的，春节只是给他画了个句号。2、读完了《未来简史》，这是用五天的时间读完的。">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/02/01/2017/0201HomoDeus1/img1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/02/01/2017/0201HomoDeus1/">
+
+
+
+
+
+  <title>《未来简史》读书笔记 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/02/01/2017/0201HomoDeus1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《未来简史》读书笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-01T22:49:00+08:00">
+                2017-02-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">读书笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/01/2017/0201HomoDeus1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/01/2017/0201HomoDeus1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>春节期间如预期完成了两个计划：1、读完了《Android系统源代码情景分析》并给大部分章节写了读书笔记，当然这个目标大部分是利用了2016年的业余时间完成的，春节只是给他画了个句号。2、读完了《未来简史》，这是用五天的时间读完的。<a id="more"></a><br><img src="/2017/02/01/2017/0201HomoDeus1/img1.png" alt="未来简史"><br>《未来简史》这本书很好读，思路清晰。他首先分析了现代人类赋予自身的意义，然后又逐个分析这些意义存在的基础，进而推导出对未来的一种猜想——所有的意义终将烟消云散，数据将成世界的主宰。有些推导的必然性值得反复品味，反正仅凭一次阅读，我也没有想明白。其中很多思考问题的方向，我觉得是很有意思的。这里随便举几个印象深刻的例子。</p>
+<p>《未来简史》说研究历史的目的，是为了挣脱过去的桎梏，让我们能看向不同的方向，并开始注意到前人无法想象或过去不希望我们想象到的可能性。这与司马光的“以史为鉴”有些不同。“以史为鉴”是把历史当作一种指导，让我们免于踩坑或者看到机会。比如知道“双十一”的历史，你知道初期商家为了讲故事、造节日，确实下了本，当全民培养起“双十一血拼”的习惯以后，降价、打折就成了传说，这种好事是很难抢到的，知道这个可以指导你以后双十一前天晚上不必再痴痴守夜。而《简史》的观念则是通过长焦镜头看待这段历史，让你知道“双十一”、“情人节”、“钻石”、“名牌”……这些都只是人造故事而已，当你对一件事情痴迷而无法自拔的时候，仔细想想是不是又深陷到了某个人造故事里。这类故事如“文革”、如“纳粹”一样，经历也许不用太久的时间洗礼，就会变得非常可笑。那么我该如何选择，还对对它那么痴迷吗？</p>
+<p>《未来简史》说智人统治世界，是因为只有智人能编织出互为主体的意义之网。我们每个人，每分每秒都活在这张网里。有的时候这张网就是你的牢笼，有的时候你又要依靠这张网给你赋能。比如你的工作、你的职位、你的家庭、你的银行账户等等。节前跟一位朋友聊天，聊到了假离婚卖房这事儿，我还嘲笑他太死脑筋。我和我老婆的关系，只有我俩最清楚，我们不需要也没有人有资格裁决它。我们只是利用“有关部门”开具一张纸，用来向另外一些“有关部门”办事的时候方便，才办了结婚证。而不是婚姻脆弱到需要用那张纸来保护和证明。有没有那张纸，我们都是夫妻，这就跟有没有出生证明，我家闺女都来到世上一样。需要毛的证明！既然这张纸的作用是让办事方便，那现在我要买房，这么正经的事儿，那张纸当然要为这事儿大开绿灯，难得有几次用它的时候！即使如此，我依然在“婚姻”这张网之内，“婚姻”也是智人编制出的意义之网，不是嘛。</p>
+<p>《未来简史》说人只是肉做的计算机而已，其内部运行的是生化算法。你感觉到疼是因为大脑回路的开合，你感觉到开心是因为大脑回路的开合，你想吃饭是因为大脑回路的开合，你选择特朗普当总统依然是因为大脑回路的开合。所谓的“主观意识”不存在，“你以为”不过是当下科技还未触达的某个大脑回路的开合。这与马克思说“人的本质是其一切社会关系的总和”相去甚远，“一切社会关系”只不过是数据。把人的本质说成“在其肉体之上一切算法的总和”倒更贴切《未来简史》的观点。如果这个观点成立，那真地细思极恐了。幸福是什么？人活着的意义是什么？人类社会发展的脉络如果是朝着算法越来越有效率演进，那么当机器比肉体运算更快更有效率，那块肉还有存在的必要么？</p>
+<p>这个春节没有回家，我已经连着两个年都是待在家里一周看书学习，消除内心对匮乏的焦虑。读了《未来简史》之后，感觉内心更加荒凉了。小的时候正月十五之前集市、商店都不开张，所有人都会“慌年”，赶在过年之前储备足够多吃的，妈妈会在头一天晚上给我赶做好新衣服，全家围在一起看春晚。直到现在，我家宝宝过年那天给在老家的妈妈微信的时候，我妈还问“有没有新衣服”。到了公元2017年的今天，过年超市、饭店不打烊，需要什么随时去；一年四季需要添衣服了都懒得出门，点点手机就给你送到家；美剧、大片、赛事每天不断，“晚会”已经成了上一个世纪的词汇。我们的生活越来越有效率，也越来越平淡——人类正放弃意义而换取力量——这也是《未来简史》中提到的“现代性”契约。</p>
+<p>好不希望这个预言是真的，但它貌似就在一点一点地发生。我和父母一起经历过那些意义，好歹一些语言、行为还能心领神会。等到我的女儿长大，也许过年进一步蜕变成位于地球两端的两个app之间几秒钟的电信号而已……哎，一声叹息。</p>
+<p>不过也有好消息——研究历史的目的，是为了挣脱过去的桎梏，让我们能看向不同的方向，并开始注意到前人无法想象或过去不希望我们想象到的可能性:) 未来我要努力给自己的生活营造出意义，给自己也给我的家人。因为过往的幸福感来自意义，来自故事。虽然这个想法远没有达到挣脱桎梏的境界，但我认为能够看到历史，能够理解未来的发展脉络，至少就已经不是梦中人，能让自己思考如何打破桎梏，这是读《未来简史》的收获。</p>
+<p>2017我还会反复读《未来简史》这本书，并把细品出的味道写成读书笔记。桌上还有两本刚到的《王阳明——一切心法》我隐约感受它和《未来简史》之间是有一些关联的。2017惟愿自己自由！</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/未来简史/" rel="tag"># 未来简史</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/31/2017/0131MessageQueue5/" rel="next" title="消息循环几个常用类">
+                <i class="fa fa-chevron-left"></i> 消息循环几个常用类
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/07/2017/0207CreatingAnInputMethod/" rel="prev" title="在Android下创建输入法（译）">
+                在Android下创建输入法（译） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/02/01/2017/0201HomoDeus1/" data-title="《未来简史》读书笔记" data-url="http://palanceli.github.io/2017/02/01/2017/0201HomoDeus1/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

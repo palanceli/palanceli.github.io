@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="原文来自Android Delelopers开发官网：Creating an Input Method。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Android下创建输入法（译）">
+<meta property="og:url" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="原文来自Android Delelopers开发官网：Creating an Input Method。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img1.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img2.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img3.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img4.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img7.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img8.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img9.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.803Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Android下创建输入法（译）">
+<meta name="twitter:description" content="原文来自Android Delelopers开发官网：Creating an Input Method。">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/img1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/">
+
+
+
+
+
+  <title>在Android下创建输入法（译） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在Android下创建输入法（译）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-07T23:07:00+08:00">
+                2017-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Android开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/07/2017/0207CreatingAnInputMethod/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/07/2017/0207CreatingAnInputMethod/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>原文来自Android Delelopers开发官网：<a href="https://developer.android.com/guide/topics/text/creating-input-method.html" target="_blank" rel="noopener">Creating an Input Method</a>。<a id="more"></a></p>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>输入法是用来输入文字的组件。基于安卓的输入法框架开发出新的输入法，可以使应用程序向用户提供可选的、统一的输入法，这些输入法可基于触屏键盘也可基于语音等。用户可以自主安装，在系统设置里选择为默认，然后就能使用了。同一时刻只能使用一个输入法。</p>
+<p>在安卓系统里创建输入法，首先应该从<code>InputMethodService</code>派生子类并实现它，通常还需要创建一个设置activity，用来设置输入法开关。此外，还可以定义一个展现在系统设置界面中的输入法设置界面。</p>
+<p>本文下面的部分将覆盖如下主题：</p>
+<ul>
+<li>输入法生命周期</li>
+<li>在manifest文件中声明输入法组件</li>
+<li>输入法API</li>
+<li>设计输入法UI</li>
+<li>从输入法向应用程序上屏文字</li>
+<li>输入法子类</li>
+</ul>
+<p>如果之前没有接触过输入法，建议先阅读<a href="http://android-developers.blogspot.com/2009/04/updating-applications-for-on-screen.html" target="_blank" rel="noopener">《触屏输入法》</a>这篇介绍性文章。SDK中包含了一个例子<a href="https://android.googlesource.com/platform/development/+/master/samples/SoftKeyboard/" target="_blank" rel="noopener">SoftKeyboard</a>也是学习编写输入法不错的参考。</p>
+<h1 id="输入法生命周期（The-IME-Lifecycle）"><a href="#输入法生命周期（The-IME-Lifecycle）" class="headerlink" title="输入法生命周期（The IME Lifecycle）"></a>输入法生命周期（The IME Lifecycle）</h1><p>下图展示了输入法的生命周期：<br><img src="/2017/02/07/2017/0207CreatingAnInputMethod/img1.png" alt="输入法的生命周期"></p>
+<p>本文剩下的部分将按照该生命周期介绍如何实现输入法的界面和编码。</p>
+<h1 id="在Manifest文件中声明输入法组件（Declaring-IME-Components-in-the-Manifest）"><a href="#在Manifest文件中声明输入法组件（Declaring-IME-Components-in-the-Manifest）" class="headerlink" title="在Manifest文件中声明输入法组件（Declaring IME Components in the Manifest）"></a>在Manifest文件中声明输入法组件（Declaring IME Components in the Manifest）</h1><p>在安卓系统中，输入法是一类包含IME服务的特殊应用。需要在manifest文件中声明该服务和必要的权限，提供匹配<code>action.view.InputMethod</code>的intent filter，提供定义输入法特征的元数据。定义主设置界面以及能从系统设置界面中启动的输入法设置界面。</p>
+<p>下面的代码段声明了一个输入法服务。它包含：申请BIND_INPUT_METHOD权限，该权限允许本服务将输入法连接到系统；创建匹配<code>android.view.InputMethod</code>的intent filter，并定义元数据：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 定义IME 服务 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">service</span> <span class="attr">android:name</span>=<span class="string">"FastInputIME"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:label</span>=<span class="string">"@string/fast_input_label"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:permission</span>=<span class="string">"android.permission.BIND_INPUT_METHOD"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.view.InputMethod"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">"android.view.im"</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">android:resource</span>=<span class="string">"@xml/method"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>下面的代码段声明了输入法的设置activity。它在<code>intent filter</code>中指定了<code>ACTION_MAIN</code>，表明该activity是输入法应用的主入口。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 可选设置: 控制输入法设置的Activity --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">"FastInputIMESettings"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:label</span>=<span class="string">"@string/fast_input_settings"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.MAIN"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>应该在输入法键盘界面里提供打开输入法设置的入口。</p>
+<h1 id="输入法相关的API（The-Input-Method-API）"><a href="#输入法相关的API（The-Input-Method-API）" class="headerlink" title="输入法相关的API（The Input Method API）"></a>输入法相关的API（The Input Method API）</h1><p>在包<a href="https://developer.android.com/reference/android/inputmethodservice/package-summary.html" target="_blank" rel="noopener">android.inputmethodservice</a>和<a href="https://developer.android.com/reference/android/view/inputmethod/package-summary.html" target="_blank" rel="noopener">android.view.inputmethod</a>中可以找到和输入法相关的类。class <a href="https://developer.android.com/reference/android/view/KeyEvent.html" target="_blank" rel="noopener">KeyEvent</a>用来处理键盘数据。</p>
+<p>输入法的核心部分是从<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html" target="_blank" rel="noopener">InputMethodService</a>派生的一个服务组件。除了要实现普通服务的生命周期以外，该类还为输入法UI绘制、用户输入处理、上屏文字等提供了相应的回调函数。<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html" target="_blank" rel="noopener">InputMethodService</a>已经实现了大部分管理输入法状态、是否可见以及和输入区域交互的默认行为。</p>
+<p>下面还有一些比较重要的类：</p>
+<ul>
+<li><p><a href="https://developer.android.com/reference/android/view/inputmethod/BaseInputConnection.html" target="_blank" rel="noopener">BaseInputConnection</a><br>定义从<a href="https://developer.android.com/reference/android/view/inputmethod/InputMethod.html" target="_blank" rel="noopener">InputMethod</a>回调宿主的通道。使用该类可以读取光标附近的文字，上屏输入法写作、候选窗中文本，把原始的按键事件发送给应用程序。应用程序应该扩展该类，而不只是实现<a href="https://developer.android.com/reference/android/view/inputmethod/InputConnection.html" target="_blank" rel="noopener">InputConnection</a>的接口。</p>
+</li>
+<li><p><a href="https://developer.android.com/reference/android/inputmethodservice/KeyboardView.html" target="_blank" rel="noopener">KeyboardView</a><br>提供键盘布局并响应按键事件的<a href="https://developer.android.com/reference/android/view/View.html" target="_blank" rel="noopener">View</a>。可以通过xml文件定义<a href="https://developer.android.com/reference/android/inputmethodservice/Keyboard.html" target="_blank" rel="noopener">keyboard</a>，它用来描述一个键盘布局。</p>
+</li>
+</ul>
+<h1 id="设计输入法界面（Designing-the-Input-Method-UI）"><a href="#设计输入法界面（Designing-the-Input-Method-UI）" class="headerlink" title="设计输入法界面（Designing the Input Method UI）"></a>设计输入法界面（Designing the Input Method UI）</h1><p>输入法有两个可以看到的界面元素：输入窗和候选窗。他们提供了大部分默认的行为，只需要实现和输入法相关的元素即可。</p>
+<h2 id="输入窗（Input-view）"><a href="#输入窗（Input-view）" class="headerlink" title="输入窗（Input view）"></a>输入窗（Input view）</h2><p>输入窗是用户输入文字的区域，可以是键盘、手写或手势。当输入法首次显示的时候，系统将回调<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html#onCreateInputView" target="_blank" rel="noopener">onCreateInputView()</a>函数。在实现该函数的时候，应当创建你希望在输入法窗体上展现的布局，并将此布局返回给系统。下面是一个<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html#onCreateInputView\(\" target="_blank" rel="noopener">onCreateInputView()</a>)函数的例程：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">onCreateInputView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    MyKeyboardView inputView =</span><br><span class="line">        (MyKeyboardView) getLayoutInflater().inflate( R.layout.input, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">    inputView.setOnKeyboardActionListener(<span class="keyword">this</span>);</span><br><span class="line">    inputView.setKeyboard(mLatinKeyboard);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> mInputView;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在这个例子中，MyKeyboardView是一个自定义的<a href="https://developer.android.com/reference/android/inputmethodservice/Keyboard.html" target="_blank" rel="noopener">keyboard</a>实例，它实现了<a href="https://developer.android.com/reference/android/inputmethodservice/KeyboardView.html" target="_blank" rel="noopener">KeyboardView</a>接口，如果要创建一个传统的QWERT键盘，请参见<a href="https://android.googlesource.com/platform/development/+/master/samples/SoftKeyboard/%3E%20%20%20%20SoftKeyboard%3C/a%3E%20sample%20app%20for%20an%20example%20of%20how%20to%20extend%20the%20%3Ccode%3E%3Ca%20href=" target="_blank" rel="noopener">KeyboardView</a>类。</p>
+<h2 id="候选窗（Candidates-view）"><a href="#候选窗（Candidates-view）" class="headerlink" title="候选窗（Candidates view）"></a>候选窗（Candidates view）</h2><p>候选窗用来显示输入法的候选或联想文字。在输入法的生命周期里，当要显示候选窗时，系统将回调<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html#onCreateCandidatesView(" target="_blank" rel="noopener">onCreateCandidatesView()</a>)函数。在该函数中应当返回显示候选文字的布局，如果没有要显示的内容则返回null，这也是该函数的默认返回值。</p>
+<p>在<a href="https://android.googlesource.com/platform/development/+/master/samples/SoftKeyboard/" target="_blank" rel="noopener">SoftKeyboard</a>例程中，演示了如何候选窗。</p>
+<h2 id="界面设计（UI-design-considerations）"><a href="#界面设计（UI-design-considerations）" class="headerlink" title="界面设计（UI design considerations）"></a>界面设计（UI design considerations）</h2><p>本节讲述关于输入法特殊的UI设计考虑。</p>
+<h3 id="处理不同的屏幕尺寸"><a href="#处理不同的屏幕尺寸" class="headerlink" title="处理不同的屏幕尺寸"></a>处理不同的屏幕尺寸</h3><p>输入法界面必须能适配不同的屏幕尺寸，还要处理横竖屏。在非全屏输入法模式下，要为应用程序留出足够的空间显示上屏文字以及上下文，因此输入法不要占用超过一半的屏幕高度。全屏输入法模式则不存在此问题，现在几乎所有的输入法产品都是半屏模式。</p>
+<h3 id="处理不同的输入类型"><a href="#处理不同的输入类型" class="headerlink" title="处理不同的输入类型"></a>处理不同的输入类型</h3><p>在安卓系统下，文本输入区域允许设置一个“输入类型”的属性，比如文本、数字、URL、email地址或者搜索串。当实现一个输入法时，需要探测当前的输入类型，并提供与之对应的界面。不过你不必通过输入法检查用户输入的合法性——这是应用程序应该干的事儿。</p>
+<p>比如，下面是针对输入区域是普通文本和数字的输入法截图：<br><img src="/2017/02/07/2017/0207CreatingAnInputMethod/img2.png" alt="输入区域为普通文本"><br><img src="/2017/02/07/2017/0207CreatingAnInputMethod/img3.png" alt="输入区域为数字"></p>
+<p>当输入区域获得焦点，系统会调用函数<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html#onStartInputView(android.view.inputmethod.EditorInfo, boolean" target="_blank" rel="noopener">onStartInputView()</a>)启动输入法，并传入一个<a href="https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html" target="_blank" rel="noopener">EditorInfo</a>对象，该对象包含了输入区域的输入类型等相关属性，其<a href="https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#inputType" target="_blank" rel="noopener">inputType</a>成员就表示输入区域的输入类型。</p>
+<p><a href="https://developer.android.com/reference/android/view/inputmethod/EditorInfo.html#inputType" target="_blank" rel="noopener">inputType</a>字段是一个整型值，它是由代表不同输入类型的位“逻辑或”起来的数值。可以将该值与<a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_MASK_CLASS" target="_blank" rel="noopener">TYPE_MASK_CLASS</a>求逻辑与，如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inputType &amp; InputType.TYPE_MASK_CLASS</span><br></pre></td></tr></table></figure></p>
+<p>可有如下几种取值：</p>
+<ul>
+<li><a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_CLASS_NUMBER" target="_blank" rel="noopener">TYPE_CLASS_NUMBER</a><br>  需要输入数字。如前文所示，Latin IME此时在键盘区域显示数字键盘。</li>
+<li><a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_CLASS_DATETIME" target="_blank" rel="noopener">TYPE_CLASS_DATETIME</a><br>  需要输入日期和时间。</li>
+<li><a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_CLASS_PHONE" target="_blank" rel="noopener">TYPE_CLASS_PHONE</a><br>  需要输入电话号码。</li>
+<li><a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_CLASS_TEXT" target="_blank" rel="noopener">TYPE_CLASS_TEXT</a><br>  可以输入所有字符。</li>
+</ul>
+<p>这些常量在<a href="https://developer.android.com/reference/android/text/InputType.html" target="_blank" rel="noopener">InputType</a>的参考手册中有详细描述。此外，<a href="https://developer.android.com/reference/android/text/InputType.html" target="_blank" rel="noopener">InputType</a>字段还包含输入区域的其他属性，如：</p>
+<ul>
+<li><a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_TEXT_VARIATION_PASSWORD" target="_blank" rel="noopener">TYPE_TEXT_VARIATION_PASSWORD</a><br>  在<a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_CLASS_TEXT" target="_blank" rel="noopener">TYPE_CLASS_TEXT</a>类型下表示输入区域为密码，此时输入法不要明文显示输入内容</li>
+<li><a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_TEXT_VARIATION_URI" target="_blank" rel="noopener">TYPE_TEXT_VARIATION_URI</a><br>  在<a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_CLASS_TEXT" target="_blank" rel="noopener">TYPE_CLASS_TEXT</a>类型下表示输入区域为URL或者URI(Uniform Resource Identifiers)。</li>
+<li><a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_TEXT_FLAG_AUTO_COMPLETE" target="_blank" rel="noopener">TYPE_TEXT_FLAG_AUTO_COMPLETE</a><br>  在<a href="https://developer.android.com/reference/android/text/InputType.html#TYPE_CLASS_TEXT" target="_blank" rel="noopener">TYPE_CLASS_TEXT</a>类型下表示输入的文本会被应用程序实现自动补全，宿主程序会根据字典、搜索结果或其它机制完成自动补全。</li>
+</ul>
+<p>注意：当输入法在密码区域输入时，在输入窗和候选窗中都不要显示明文，但在上屏时，发送给输入区域的应该是明文，此处应当注意。切记不要在磁盘上保存曾经输入过的密码。参考<a href="https://developer.android.com/guide/practices/security.html" target="_blank" rel="noopener">安全设计</a>，可以了解更多和安全相关的主题。</p>
+<h1 id="上屏文字到应用程序（Sending-Text-to-the-Application）"><a href="#上屏文字到应用程序（Sending-Text-to-the-Application）" class="headerlink" title="上屏文字到应用程序（Sending Text to the Application）"></a>上屏文字到应用程序（Sending Text to the Application）</h1><p>当用户点击输入法按键，输入法通过发送按键事件向应用程序发送文字，也可以编辑输入区域中光标附近的文本。两种情况下，都是通过一个<a href="https://developer.android.com/reference/android/view/inputmethod/InputConnection.html" target="_blank" rel="noopener">InputConnection</a>的实例来传递文本的。调用静态函数<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html#getCurrentInputConnection(" target="_blank" rel="noopener">InputMethodService.getCurrentInputConnection()</a>)可获得该实例。</p>
+<h2 id="编辑光标附近的文本（Editing-the-text-around-the-cursor）"><a href="#编辑光标附近的文本（Editing-the-text-around-the-cursor）" class="headerlink" title="编辑光标附近的文本（Editing the text around the cursor）"></a>编辑光标附近的文本（Editing the text around the cursor）</h2><p>当要操作编辑输入区域已存在的文字时，<a href="https://developer.android.com/reference/android/view/inputmethod/BaseInputConnection.html" target="_blank" rel="noopener">BaseInputConnection</a>的方法会很有用：</p>
+<ul>
+<li><a href="https://developer.android.com/reference/android/view/inputmethod/BaseInputConnection.html#getTextBeforeCursor(int, int" target="_blank" rel="noopener">getTextBeforeCursor()</a>)<br>  返回一个<a href="https://developer.android.com/reference/java/lang/CharSequence.html" target="_blank" rel="noopener">CharSequence</a>对象，包含光标前指定数量的字符串序列。</li>
+<li><a href="https://developer.android.com/reference/android/view/inputmethod/BaseInputConnection.html#getTextAfterCursor(int, int" target="_blank" rel="noopener">getTextAfterCursor()</a>)<br>  返回一个<a href="https://developer.android.com/reference/java/lang/CharSequence.html" target="_blank" rel="noopener">CharSequence</a>对象，包含光标后指定数量的字符串序列。</li>
+<li><a href="https://developer.android.com/reference/android/view/inputmethod/BaseInputConnection.html#deleteSurroundingText(int, int" target="_blank" rel="noopener">deleteSurroundingText()</a>)<br>  删除光标前/后指定数量的字符串。</li>
+<li><a href="https://developer.android.com/reference/android/view/inputmethod/BaseInputConnection.html#commitText(java.lang.CharSequence, int" target="_blank" rel="noopener">commitText()</a>)<br>  向输入区域上屏一个<a href="https://developer.android.com/reference/java/lang/CharSequence.html" target="_blank" rel="noopener">CharSequence</a>对象，并设置新的光标位置。</li>
+</ul>
+<p>下面代码段演示了如何将光标左边的四个字符替换为”Hello!”：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">InputConnection ic = getCurrentInputConnection();</span><br><span class="line">ic.deleteSurroundingText(<span class="number">4</span>, <span class="number">0</span>);</span><br><span class="line">ic.commitText(<span class="string">"Hello"</span>, <span class="number">1</span>);</span><br><span class="line">ic.commitText(<span class="string">"!"</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure></p>
+<h2 id="上屏前组织写作串（Composing-text-before-committing）"><a href="#上屏前组织写作串（Composing-text-before-committing）" class="headerlink" title="上屏前组织写作串（Composing text before committing）"></a>上屏前组织写作串（Composing text before committing）</h2><p>如果输入法要做文本预测或者需要多步才能组织成象形文字或短语，可以在写作窗显示暂时的组织过程，用户选择提交文字会使用候选串替代部分写作串。调用函数<a href="https://developer.android.com/reference/android/view/inputmethod/InputConnection.html#setComposingText(java.lang.CharSequence, int" target="_blank" rel="noopener">setComposingText()</a>)添加一个文本片段。</p>
+<p>下面的代码演示如何在文本区显示输入过程：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">    InputConnection ic = getCurrentInputConnection();</span><br><span class="line">    ic.setComposingText(<span class="string">"Composi"</span>, <span class="number">1</span>);</span><br><span class="line">...</span><br><span class="line">    ic.setComposingText(<span class="string">"Composin"</span>, <span class="number">1</span>);</span><br><span class="line">...</span><br><span class="line">    ic.commitText(<span class="string">"Composing "</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure></p>
+<p>下面的截图演示了用户看到的这个过程：<br><img src="/2017/02/07/2017/0207CreatingAnInputMethod/img4.png" alt="输入文本组织过程1"></p>
+<h2 id="监听硬键盘事件（Intercepting-hardware-key-events）"><a href="#监听硬键盘事件（Intercepting-hardware-key-events）" class="headerlink" title="监听硬键盘事件（Intercepting hardware key events）"></a>监听硬键盘事件（Intercepting hardware key events）</h2><p>尽管输入法窗口不会获得输入焦点，它依然是首先收到硬键盘事件的窗口。收到事件后，它可以选择吃掉并处理该事件或者转发出去使得应用程序可以收到它。比如，可以通过方向键来选择候选，这样在输入期间，方向键就被输入法吃掉了。可以同样的方式处理back按键来取消来自输入法的弹出窗口。</p>
+<p>如果要监听硬键盘事件，需要覆盖函数<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html#onKeyDown(int, android.view.KeyEvent" target="_blank" rel="noopener">onKeyDown()</a>)和<a href="https://developer.android.com/reference/android/inputmethodservice/InputMethodService.html#onKeyUp(int, android.view.KeyEvent" target="_blank" rel="noopener">onKeyUp()</a>)。例程<a href="https://android.googlesource.com/platform/development/+/master/samples/SoftKeyboard/" target="_blank" rel="noopener">SoftKeyboard</a>中有示例。对于不打算处理的事件，记得调用<code>super()</code>方法，这样该事件就能被继续转发给应用程序。</p>
+<h1 id="创建输入法子类（Creating-an-IME-Subtype）"><a href="#创建输入法子类（Creating-an-IME-Subtype）" class="headerlink" title="创建输入法子类（Creating an IME Subtype）"></a>创建输入法子类（Creating an IME Subtype）</h1><p>通过创建子类，输入法可以暴露多种输入模式和语言，一个子类可以表示：</p>
+<ul>
+<li>一个语种如en_US或fr_FR</li>
+<li>一种输入模式如：语音、键盘或手写</li>
+<li>更多的输入风格、形式或者特性，比如10键或QWERTY键盘布局</li>
+</ul>
+<p>通常用一个字串来表示这些模式，比如”keyboard”, “voice”等等。输入子类可以是这些模式的组合。</p>
+<p>子类信息会在通知栏的输入法切换面板中被用到，也会在输入法设置界面上被用到。这些信息令系统框架可以直接提供指定的子类。在构建自己的输入法时，应尽量使用子类机制，因为它有助于让用户在不同的输入法语言和模式下定位和切换。</p>
+<p>可以在输入法XML资源文件中使用<code>&lt;subtype&gt;</code>元素来定义子类。下面的片段定义了两个子类：一个是英文键盘，一个是法语键盘：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input-method</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:settingsActivity</span>=<span class="string">"com.example.softkeyboard.Settings"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:icon</span>=<span class="string">"@drawable/ime_icon"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">subtype</span> <span class="attr">android:name</span>=<span class="string">"@string/display_name_english_keyboard_ime"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:icon</span>=<span class="string">"@drawable/subtype_icon_english_keyboard_ime"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:imeSubtypeLanguage</span>=<span class="string">"en_US"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:imeSubtypeMode</span>=<span class="string">"keyboard"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:imeSubtypeExtraValue</span>=<span class="string">"somePrivateOption=true"</span></span></span><br><span class="line"><span class="tag">    /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">subtype</span> <span class="attr">android:name</span>=<span class="string">"@string/display_name_french_keyboard_ime"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:icon</span>=<span class="string">"@drawable/subtype_icon_french_keyboard_ime"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:imeSubtypeLanguage</span>=<span class="string">"fr_FR"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:imeSubtypeMode</span>=<span class="string">"keyboard"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:imeSubtypeExtraValue</span>=<span class="string">"foobar=30,someInternalOption=false"</span></span></span><br><span class="line"><span class="tag">    /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">subtype</span> <span class="attr">android:name</span>=<span class="string">"@string/display_name_german_keyboard_ime"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">...</span></span></span><br><span class="line"><span class="tag">    /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">input-method</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>为确保你的子类能在界面上正确显示出来，应使用%s来获得子类字串，这样获得的字串显示子类的语种标签是一致的。下面的代码段演示了输入法XML部分：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">subtype</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:label</span>=<span class="string">"@string/label_subtype_generic"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:imeSubtypeLocale</span>=<span class="string">"en_US"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:icon</span>=<span class="string">"@drawable/icon_en_us"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:imeSubtypeMode</span>=<span class="string">"keyboard"</span> /&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>下面的代码是输入法的string.xml部分。字串资源中定义了<code>label_subtype_generic</code>，用于在输入法界面中显示子类标签，定义如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">"label_subtype_generic"</span>&gt;</span>%s<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>该设置会让输入法显示的子类名称和系统语种设置相匹配。例如对于英文语种，显示名称为”English (United States)”。</p>
+<h2 id="从通知栏选择输入法子类（Choosing-IME-subtypes-from-the-notification-bar）"><a href="#从通知栏选择输入法子类（Choosing-IME-subtypes-from-the-notification-bar）" class="headerlink" title="从通知栏选择输入法子类（Choosing IME subtypes from the notification bar）"></a>从通知栏选择输入法子类（Choosing IME subtypes from the notification bar）</h2><p>安卓系统会管理所有输入法暴露出来的所有子类。每个子类隶属于一个具体输入法，是该输入法的一种模式。用户可以在通知栏选择当前输入法的子类，如下图：<br><img src="/2017/02/07/2017/0207CreatingAnInputMethod/img7.png" alt="从通知栏选择子类"><br><img src="/2017/02/07/2017/0207CreatingAnInputMethod/img8.png" alt="从系统设置中选择子类"></p>
+<h2 id="从系统设置中选择输入法子类（Choosing-IME-subtypes-from-System-Settings）"><a href="#从系统设置中选择输入法子类（Choosing-IME-subtypes-from-System-Settings）" class="headerlink" title="从系统设置中选择输入法子类（Choosing IME subtypes from System Settings）"></a>从系统设置中选择输入法子类（Choosing IME subtypes from System Settings）</h2><p>用户可以在系统的“语言和输入法”设置面板中选择子类。在例程<a href="https://android.googlesource.com/platform/development/+/master/samples/SoftKeyboard/" target="_blank" rel="noopener">SoftKeyboard</a>中，文件<code>InputMethodSettingsFragment.java</code>实现了输入法设置中的子类机制。在安卓SDK中可以找到<a href="https://android.googlesource.com/platform/development/+/master/samples/SoftKeyboard/" target="_blank" rel="noopener">SoftKeyboard</a>，更多细节可以参考该例程。<br><img src="/2017/02/07/2017/0207CreatingAnInputMethod/img9.png" alt="选择输入法支持的一个语言"></p>
+<h1 id="在输入法子类中切换（Switching-among-IME-Subtypes）"><a href="#在输入法子类中切换（Switching-among-IME-Subtypes）" class="headerlink" title="在输入法子类中切换（Switching among IME Subtypes）"></a>在输入法子类中切换（Switching among IME Subtypes）</h1><p>应该在键盘里提供子类的切换入口，如提供小地球图标，用户可以方便地切换。这么做可以提高键盘的易用性，可以帮助用户避免困惑。按照如下步骤可以让输入法长出此开关：</p>
+<ol>
+<li><p>在输入法的xml资源文件中声明<code>supportsSwitchingToNextInputMethod = &quot;true&quot;</code>，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;input-method xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">        android:settingsActivity=<span class="string">"com.example.softkeyboard.Settings"</span></span><br><span class="line">        android:icon=<span class="string">"@drawable/ime_icon"</span></span><br><span class="line">        android:supportsSwitchingToNextInputMethod=<span class="string">"true"</span>&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用函数<a href="https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#shouldOfferSwitchingToNextInputMethod(android.os.IBinder" target="_blank" rel="noopener">shouldOfferSwitchingToNextInputMethod()</a>)</p>
+</li>
+<li>如果该方法返回true，显示一个切换键</li>
+<li>当用户点击了切换键，调用<a href="https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder, boolean" target="_blank" rel="noopener">switchToNextInputMethod()</a>)，给第二个参数传入false。false会在不同输入法之间切换各种子类；指定true，系统会在当前输入法内切换所有子类。</li>
+</ol>
+<p>注意：在Android5.0(API 21)之前，函数<a href="https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder, boolean" target="_blank" rel="noopener">switchToNextInputMethod()</a>)是不知道有<code>supportsSwitchingToNextInputMethod</code> 属性的。如果用户切入了某个不带切换键的输入法，他将进入死胡同，因为不能方便地切到别的输入法。</p>
+<h1 id="实现通用输入法还需要考虑什么（General-IME-Considerations）"><a href="#实现通用输入法还需要考虑什么（General-IME-Considerations）" class="headerlink" title="实现通用输入法还需要考虑什么（General IME Considerations）"></a>实现通用输入法还需要考虑什么（General IME Considerations）</h1><p>这里还有一些实现输入法时需要考虑的其它问题：</p>
+<ul>
+<li>要在输入法键盘上提供入口，可以进入输入法设置界面</li>
+<li>由于设备里可能同时安装了多个输入法，应该在输入法界面里提供切到其他输入法的入口</li>
+<li>尽可能快地切出输入法。让较大数据块的加载放到后台执行，这样用户在点击可输入区域后立刻就能看到键盘切出。如果后面还会频繁使用一些资源，应该把它们缓存起来。</li>
+<li>当输入法窗口隐藏后，应当尽快释放大块内存，以便应用程序有足够的内存可运行。应当考虑使用<code>delayed message</code>来释放资源，以便输入法处于隐藏状态一段时间后，不再继续占用资源。</li>
+<li>针对当前的语言和语种，保证用户可以输入尽可能多的字符。切记：用户可能在账号或密码中输入标点符号，因此输入法应当在密码框中给用户提供足够多的字符。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/01/2017/0201HomoDeus1/" rel="next" title="《未来简史》读书笔记">
+                <i class="fa fa-chevron-left"></i> 《未来简史》读书笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/11/2017/0211CMakeDemo1/" rel="prev" title="CMake Demo （一）构建可执行文件的基本步骤">
+                CMake Demo （一）构建可执行文件的基本步骤 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/02/07/2017/0207CreatingAnInputMethod/" data-title="在Android下创建输入法（译）" data-url="http://palanceli.github.io/2017/02/07/2017/0207CreatingAnInputMethod/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#输入法生命周期（The-IME-Lifecycle）"><span class="nav-number">2.</span> <span class="nav-text">输入法生命周期（The IME Lifecycle）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在Manifest文件中声明输入法组件（Declaring-IME-Components-in-the-Manifest）"><span class="nav-number">3.</span> <span class="nav-text">在Manifest文件中声明输入法组件（Declaring IME Components in the Manifest）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#输入法相关的API（The-Input-Method-API）"><span class="nav-number">4.</span> <span class="nav-text">输入法相关的API（The Input Method API）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设计输入法界面（Designing-the-Input-Method-UI）"><span class="nav-number">5.</span> <span class="nav-text">设计输入法界面（Designing the Input Method UI）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#输入窗（Input-view）"><span class="nav-number">5.1.</span> <span class="nav-text">输入窗（Input view）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#候选窗（Candidates-view）"><span class="nav-number">5.2.</span> <span class="nav-text">候选窗（Candidates view）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#界面设计（UI-design-considerations）"><span class="nav-number">5.3.</span> <span class="nav-text">界面设计（UI design considerations）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#处理不同的屏幕尺寸"><span class="nav-number">5.3.1.</span> <span class="nav-text">处理不同的屏幕尺寸</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理不同的输入类型"><span class="nav-number">5.3.2.</span> <span class="nav-text">处理不同的输入类型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#上屏文字到应用程序（Sending-Text-to-the-Application）"><span class="nav-number">6.</span> <span class="nav-text">上屏文字到应用程序（Sending Text to the Application）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑光标附近的文本（Editing-the-text-around-the-cursor）"><span class="nav-number">6.1.</span> <span class="nav-text">编辑光标附近的文本（Editing the text around the cursor）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上屏前组织写作串（Composing-text-before-committing）"><span class="nav-number">6.2.</span> <span class="nav-text">上屏前组织写作串（Composing text before committing）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监听硬键盘事件（Intercepting-hardware-key-events）"><span class="nav-number">6.3.</span> <span class="nav-text">监听硬键盘事件（Intercepting hardware key events）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建输入法子类（Creating-an-IME-Subtype）"><span class="nav-number">7.</span> <span class="nav-text">创建输入法子类（Creating an IME Subtype）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从通知栏选择输入法子类（Choosing-IME-subtypes-from-the-notification-bar）"><span class="nav-number">7.1.</span> <span class="nav-text">从通知栏选择输入法子类（Choosing IME subtypes from the notification bar）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从系统设置中选择输入法子类（Choosing-IME-subtypes-from-System-Settings）"><span class="nav-number">7.2.</span> <span class="nav-text">从系统设置中选择输入法子类（Choosing IME subtypes from System Settings）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在输入法子类中切换（Switching-among-IME-Subtypes）"><span class="nav-number">8.</span> <span class="nav-text">在输入法子类中切换（Switching among IME Subtypes）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现通用输入法还需要考虑什么（General-IME-Considerations）"><span class="nav-number">9.</span> <span class="nav-text">实现通用输入法还需要考虑什么（General IME Considerations）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

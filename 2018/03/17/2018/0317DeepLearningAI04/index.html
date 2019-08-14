@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《神经网络和深度学习》第四周《深层神经网络》。本节的题目是深层神经网络，只是把网络的层数延展为变量。使用的方法还是前两节的方法——梯度下降、正向传播、反向传播。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（三）">
+<meta property="og:url" content="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《神经网络和深度学习》第四周《深层神经网络》。本节的题目是深层神经网络，只是把网络的层数延展为变量。使用的方法还是前两节的方法——梯度下降、正向传播、反向传播。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/img05.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.197Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（三）">
+<meta name="twitter:description" content="《神经网络和深度学习》第四周《深层神经网络》。本节的题目是深层神经网络，只是把网络的层数延展为变量。使用的方法还是前两节的方法——梯度下降、正向传播、反向传播。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（三） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（三）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T10:00:00+08:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/17/2018/0317DeepLearningAI04/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/17/2018/0317DeepLearningAI04/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《神经网络和深度学习》第四周《深层神经网络》。<br>本节的题目是深层神经网络，只是把网络的层数延展为变量。使用的方法还是前两节的方法——梯度下降、正向传播、反向传播。<br><a id="more"></a></p>
+<h1 id="4-1-深层神经网络"><a href="#4-1-深层神经网络" class="headerlink" title="4.1 深层神经网络"></a>4.1 深层神经网络</h1><p>本节内容是在上一节双层神经网络的基础上将网络层数扩展为变量。讨论L层神经网络的正向和反向传播算法，因此也并没有引入什么新知识。<br>在命名体系中引入了L表示神经网络的层数，$n^{[l]}$表示第l层节点的个数，$a^{[l]}$表示第l层的激活函数。<br>在下图中：<br><img src="/2018/03/17/2018/0317DeepLearningAI04/img01.png" alt><br>L=4， $n^{[1]}=5, n^{[2]}=5, n^{[3]}=3, n{[4]}=1$</p>
+<h1 id="4-2-深层神经网络的前向传播"><a href="#4-2-深层神经网络的前向传播" class="headerlink" title="4.2 深层神经网络的前向传播"></a>4.2 深层神经网络的前向传播</h1><p>输入X：<br>$\begin{cases}z^{[1]}=w^{[1]}·x + b^{[1]}=w^{[1]}·a^{[0]} + b^{[1]} \<br>a^{[1]} = g^{[1]}(z^{[1]}) \end{cases}\<br>\begin{cases}z^{[2]}=w^{[2]}·a^{[1]} + b^{[2]} \<br>a^{[2]} = g^{[2]}(z^{[2]})\end{cases}\<br>… \<br>\begin{cases}z^{[L]}=w^{[L]}·a^{[L-1]} + b^{[L]} \<br>a^{[L]} = g^{[L]}(z^{[L]})=ŷ\end{cases}$  </p>
+<p>向量化后：<br>$\begin{cases}Z^{[1]}=W^{[1]}·X + b^{[1]}=W^{[1]}·A^{[0]} + b^{[1]} \<br>A^{[1]} = g^{[1]}(Z^{[1]}) \end{cases}\<br>\begin{cases}Z^{[2]}=W^{[2]}·A^{[1]} + b^{[2]} \<br>A^{[2]} = g^{[2]}(Z^{[2]})\end{cases}\<br>… \<br>\begin{cases}Z^{[L]}=W^{[L]}·A^{[L-1]} + b^{[L]} \<br>A^{[L]} = g^{[L]}(Z^{[L]})=Ŷ\end{cases}$  </p>
+<h1 id="4-3-核对矩阵的维数"><a href="#4-3-核对矩阵的维数" class="headerlink" title="4.3 核对矩阵的维数"></a>4.3 核对矩阵的维数</h1><p>$X=\begin{bmatrix}x<em>{1}\x</em>{2}\\cdots\x<em>{(n^{[0]})}\end{bmatrix}\in\mathbb{R}^{n^{[0]}×1}，\; W^{[1]}=\begin{bmatrix}—w</em>{1}^{[1]}— \cr —w<em>{2}^{[1]}— \cr … \cr —w</em>{n^{[1]}}^{[1]}— \end{bmatrix}\in\mathbb{R}^{n^{[1]}×n^{[0]}}，\; b^{[1]}\in\mathbb{R}^{n^{[1]}×1}\<br>于是W^{[1]}·X\in\mathbb{R}^{n^{[1]}×1} ，\; Z^{[1]}=W^{[1]}·X + b^{[1]}\in\mathbb{R}^{n^{[1]}×1} ，\; A^{[1]}\in\mathbb{R}^{n^{[1]}×1}$<br>$W^{[2]}=\begin{bmatrix}—w<em>{1}^{[2]}— \cr —w</em>{2}^{[2]}— \cr … \cr —w_{n^{[2]}}^{[2]}— \end{bmatrix}\in\mathbb{R}^{n^{[2]}×n^{[1]}}，\; b^{[2]}\in\mathbb{R}^{n^{[2]}×1}\<br>于是W^{[2]}·A^{[1]}\in\mathbb{R}^{n^{[2]}×1} ，\; Z^{[2]}=W^{[2]}·A^{[1]} + b^{[2]}\in\mathbb{R}^{n^{[2]}×1} ，\; A^{[2]}\in\mathbb{R}^{n^{[2]}×1}$<br>$同理W^{[l]}·A^{[l]}\in\mathbb{R}^{n^{[l]}×1} ，\; Z^{[l]}=W^{[l]}·A^{[l-1]} + b^{[l]}\in\mathbb{R}^{n^{[l]}×1} ，\; A^{[l]}\in\mathbb{R}^{n^{[l]}×1}$</p>
+<h1 id="4-4-为什么使用深层表示"><a href="#4-4-为什么使用深层表示" class="headerlink" title="4.4 为什么使用深层表示"></a>4.4 为什么使用深层表示</h1><p>本节以图像识别为例，神经网络中，浅层神经元反映的是图像的细部特征，比如棱角、边缘，越往深层，越反应图像的整体特征，例如无关、以及再往深了反映出相貌特征。<br>所以直观地理解，如果识别“图像是关于人、狗、还是猫”，可能是用较浅层的神经网络即可，如果要识别具体是哪个人、哪条狗，则需要更深层网络。<br>不过我觉得这个解释依然是骗直觉的。为什么层次越深越能抽象整体特征？以及究竟需要多深，本文并没有给出解释。</p>
+<h1 id="4-5-搭建深层神经网络块"><a href="#4-5-搭建深层神经网络块" class="headerlink" title="4.5 搭建深层神经网络块"></a>4.5 搭建深层神经网络块</h1><p>根据本节4.2已经得出正向传播：<br>$\begin{cases}Z^{[l]}=W^{[l]}·A^{[l-1]} + b^{[l]}  …①\<br>A^{[l]} = g^{[l]}(Z^{[l]}) 　　　　…②\end{cases}$</p>
+<p>再看反向传播，回顾在<a href="/2018/03/11/2018/0311DeepLearningAI02/#逻辑回归的损失函数和成本函数">逻辑回归的损失函数和成本函数</a>中引入的损失函数：<br>$L(ŷ, y)=-(y\logŷ + (1-y)\log(1-ŷ))$<br>因此对于L层神经网络来说，损失函数是关于y和输出层的函数：<br>$L(a, y)=-(y\log{a} + (1-y)\log{(1-a)})$<br>其中a即$A^{[L]}$的结果，由<a href="http://localhost:4000/2018/03/11/2018/0311DeepLearningAI02/#逻辑回归中的梯度下降法" target="_blank" rel="noopener">逻辑回归中的梯度下降法</a>可知：<br>$da^{[L]}=-\frac{y}{a^{[L]}} + \frac{(1-y)}{(1-a^{[L]}}$<br>$dZ^{[L]}=\frac{dL}{da^{[L]}}·\frac{da^{[L]}}{dZ^{[L]}}=da^{[L]}·g^{[L]}\prime(Z^{[L]})　　后半部分是根据②得出$<br>$dW^{[L]}=\frac{dL}{dZ^{[L]}}·\frac{dZ^{[L]}}{dW^{[L]}}=\frac{1}{m}dZ^{[L]}·A^{[L-1]}　　后半部分是根据①得出$<br>$db^{[L]}=\frac{1}{m}np.sum(dZ^{[L]}, axis=1, keepdims=True)$<br>$dA^{[L-1]}$怎么求呢？它是$\frac{dL}{dA^{[L-1]}}$的缩写，可是dL是关于$A^{[L]}$的函数，看不出与$A^{[L]}$的关系，但是由①和②可得到$A^{[L]}和A^{[L-1]}$的关系，根据链式法则：<br>$dA^{[L-1]}=\frac{dL}{dA^{[L]}}·\frac{dA^{[L]}}{dA^{[L-1]}}\<br>=\frac{dL}{dA^{[L]}}·\frac{dA^{[L]}}{dZ^{[L]}}·\frac{dZ^{[L]}}{dA^{[L-1]}}　　根据②\<br>=\frac{dL}{dZ^{[L]}}·\frac{dZ^{[L]}}{dA^{[L-1]}}　　合并前两项\<br>=dZ^{[L]}·W^{[L]}　　根据①\$  </p>
+<p>反向传播总结如下：<br>$\begin{cases}dZ^{[l]}=da^{[l]}·g^{[l]}\prime(Z^{[l]})\<br>dW^{[l]}=\frac{1}{m}dZ^{[l]}·A^{[l-1]} \<br>db^{[l]}=\frac{1}{m}np.sum(dZ^{[l]}, axis=1, keepdims=True)\<br>dA^{[l-1]}=dZ^{[l]}·W^{[l]}\end{cases}$  </p>
+<p>正向传播算法就是构造Z和A的形式，反向传播算法就是根据Z、A计算dW和db的形式，神经网络的算法主体则是根据超参数循环计算W和b：<br><img src="/2018/03/17/2018/0317DeepLearningAI04/img02.png" alt></p>
+<h1 id="4-6-前向传播和反向传播"><a href="#4-6-前向传播和反向传播" class="headerlink" title="4.6 前向传播和反向传播"></a>4.6 前向传播和反向传播</h1><p>上一节已经把两向传播算法推导出来了。</p>
+<h1 id="4-7-参数VS超参数"><a href="#4-7-参数VS超参数" class="headerlink" title="4.7 参数VS超参数"></a>4.7 参数VS超参数</h1><p>在神经网络算法中，参数是指：$W^{[1]}、b^{[1]}、W^{[2]}、b^{[2]}……$<br>超参数是指：学习率α、迭代次数#iterations、隐藏层数 #hidden layers、激活函数</p>
+<h1 id="4-8-这和大脑有什么关系"><a href="#4-8-这和大脑有什么关系" class="headerlink" title="4.8 这和大脑有什么关系"></a>4.8 这和大脑有什么关系</h1><p>本节解释了神经网络中的神经元与大脑神经元的形似之处，但Andrew也提到这种形似被越来越少得提及，因为人脑的神经元是如何工作的，至今并未完全弄清楚。“神经网络”只是一个听起来很高大上的名字，其实与人脑并没有太大关系。</p>
+<h1 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h1><h2 id="神经网络算法的基本框架"><a href="#神经网络算法的基本框架" class="headerlink" title="神经网络算法的基本框架"></a>神经网络算法的基本框架</h2><p><img src="/2018/03/17/2018/0317DeepLearningAI04/img03.png" alt></p>
+<ul>
+<li>第一步，初始化参数W和b</li>
+<li>第二步，完成正向传播，计算各层的Z和A：<br>$Z^{[l]}=W^{[l]}·A^{[l-1]}，\; A^{[l]}=g^{[l]}(Z^{[l]})$  </li>
+<li>第三步，计算成本函数，$cost=-\sum(Y\log{A^{[L]} + (1 - Y)log{(1-A^{[L]})}}$</li>
+<li>第四步，完成反向传播，计算各层的dW、db和后一层dA：<br>$dW^{[l]}=\frac{1}{m}dZ^{[l]}， \; db^{[l]}=\frac{1}{m}np.sum(dZ^{[l]})， \; dA^{[l-1]}=dZ^{[l]}· W^{[l]}$ </li>
+<li>第五步，更新W和b：<br>$W := W - α·dW， \; b := b - α· db$  </li>
+<li>第六步，跳到第二步不断循环，直到成本函数的变化率低于某个阈值</li>
+<li>第七步，使用迭代训练出的W和b，输入待预测的数据，计算输出层，得到预测结果。</li>
+</ul>
+<p>其中，第二步正向传播算法的目的是为了从输入层到输出层逐层计算出各层各节点的A，以便在下一步计算出成本函数。计算成本函数的目的是为了比较两次迭代的成本函数的变化率，以决定是否可以停止学习。反向传播算法的目的是为了从输出层到输入层逐层计算各层各节点的dW和db，以便计算出下一轮迭代的W和b。</p>
+<h2 id="参数初始化"><a href="#参数初始化" class="headerlink" title="参数初始化"></a>参数初始化</h2><p>该函数传入各层节点的个数，生成各层节点的W、b的初始化值：<br><img src="/2018/03/17/2018/0317DeepLearningAI04/img04.png" alt><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">initialize_parameters_deep</span><span class="params">(self, layer_dims)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Arguments:</span></span><br><span class="line"><span class="string">    layer_dims -- 每一层的节点个数[n0, n1, ..., nl]</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">    parameters -- &#123;'W1':n1×n0的数组, 'b1':n1×1的数组, 'W2':n2×n1的数组, 'b2':n2×1的数组, ...&#125;</span></span><br><span class="line"><span class="string">                    W数组使用randn*0.01填充，b数组使用0填充</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    </span><br><span class="line">    np.random.seed(<span class="number">3</span>)</span><br><span class="line">    parameters = &#123;&#125;</span><br><span class="line">    L = len(layer_dims)            <span class="comment"># number of layers in the network</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> l <span class="keyword">in</span> range(<span class="number">1</span>, L):</span><br><span class="line">        parameters[<span class="string">'W'</span> + str(l)] = np.random.randn(layer_dims[l],layer_dims[l<span class="number">-1</span>]) * <span class="number">0.01</span></span><br><span class="line">        parameters[<span class="string">'b'</span> + str(l)] = np.zeros((layer_dims[l], <span class="number">1</span>))</span><br><span class="line">        ... </span><br><span class="line">    <span class="keyword">return</span> parameters</span><br></pre></td></tr></table></figure></p>
+<h2 id="前向传播"><a href="#前向传播" class="headerlink" title="前向传播"></a>前向传播</h2><p>前向传播算法由三个函数完成：<code>linear_forward</code>、<code>linear_activation_forward</code>、<code>L_model_forward</code>。<br><code>L_model_forward</code>是前向传播的主函数，它接收输入层参数X和各层W、b，从左向右遍历，根据前一层的A计算后一层的A，并缓存各层(Z、W和b)：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">L_model_forward</span><span class="params">(self, X, parameters)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    实现前向算法，根据输入层X和各层W、b计算各层Z、A。隐藏层使用RELU、输出层使用sigmoid。</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Arguments:</span></span><br><span class="line"><span class="string">    X -- 输入层</span></span><br><span class="line"><span class="string">    parameters -- 各层W和b</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">    AL -- 输出层A</span></span><br><span class="line"><span class="string">    caches -- 各层(Z, prev_A, W, b)</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    caches = []</span><br><span class="line">    A = X</span><br><span class="line">    L = len(parameters) // <span class="number">2</span>                  <span class="comment"># number of layers in the neural network</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Implement [LINEAR -&gt; RELU]*(L-1). Add "cache" to the "caches" list.</span></span><br><span class="line">    <span class="keyword">for</span> l <span class="keyword">in</span> range(<span class="number">1</span>, L):</span><br><span class="line">        A_prev = A </span><br><span class="line">        ...</span><br><span class="line">        A, cache = self.linear_activation_forward(A_prev, parameters[<span class="string">"W"</span> + str(l)], parameters[<span class="string">"b"</span> + str(l)], activation = <span class="string">'relu'</span>)</span><br><span class="line">        caches.append(cache)</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">    AL, cache = self.linear_activation_forward(A, parameters[<span class="string">"W"</span> + str(L)], parameters[<span class="string">"b"</span> + str(L)], activation = <span class="string">'sigmoid'</span>)</span><br><span class="line">    caches.append(cache)</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> AL, caches</span><br></pre></td></tr></table></figure></p>
+<p>隐藏层使用的是RELU激活函数，在输出层使用sigmoid作为激活函数，最后返回输出层的A和各层(Z, prev_A, W, b)</p>
+<h2 id="成本函数"><a href="#成本函数" class="headerlink" title="成本函数"></a>成本函数</h2><p>成本函数是连接前向传播和后向传播的枢纽，因为梯度下降的核心就是通过迭代<br>$W:=W-α·dW \<br>b:=b-α·db$<br>不断计算成本函数$cost = -Σ(Y\log{A^{[L]}} + (1-Y)\log{(1-A^{[L]})})$是指变化率达到某个阈值以下。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">compute_cost</span><span class="params">(self, AL, Y)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    m = Y.shape[<span class="number">1</span>]</span><br><span class="line">    ...</span><br><span class="line">    cost = -np.sum(np.multiply(Y, np.log(AL)) + np.multiply(<span class="number">1</span>-Y, np.log(<span class="number">1</span>-AL))) / m</span><br><span class="line">    </span><br><span class="line">    cost = np.squeeze(cost)      </span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> cost</span><br></pre></td></tr></table></figure></p>
+<h2 id="后向传播"><a href="#后向传播" class="headerlink" title="后向传播"></a>后向传播</h2><p>后向传播的核心算法就是，从右向左逐层遍历，根据各层$dA^{[l]}$计算$dW^{[l]}、db^{[l]}和dA^{[l-1]}$。根据成本函数可知：<br>$dA^{L} = -\frac{Y}{A^{L}} - \frac{1-Y}{1-A^{L}}$<br>在后向传播中要使用的公式是：<br>$dW^{[l]} = \frac{1}{m}dZ^{[l]}·A^{[l-1]}$<br>$db^{[l]} = \frac{1}{m}np.sum(dZ^{[l]})$<br>$dA^{[l-1]} = dZ^{[l]}·W^{[l]}$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">L_model_backward</span><span class="params">(self, AL, Y, caches)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    根据AL和Y计算各层dA、dW和db</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    grads = &#123;&#125;</span><br><span class="line">    L = len(caches) <span class="comment"># the number of layers</span></span><br><span class="line">    m = AL.shape[<span class="number">1</span>]</span><br><span class="line">    Y = Y.reshape(AL.shape) <span class="comment"># after this line, Y is the same shape as AL</span></span><br><span class="line"></span><br><span class="line">    dAL = - (np.divide(Y, AL) - np.divide(<span class="number">1</span> - Y, <span class="number">1</span> - AL))</span><br><span class="line">    ...</span><br><span class="line">    current_cache = caches[L - <span class="number">1</span>]</span><br><span class="line">    grads[<span class="string">"dA"</span> + str(L)], grads[<span class="string">"dW"</span> + str(L)], grads[<span class="string">"db"</span> + str(L)] = self.linear_activation_backward(dAL, current_cache, activation = <span class="string">"sigmoid"</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 从右到左，逐层遍历，计算每一层的dA、dW和db</span></span><br><span class="line">    <span class="keyword">for</span> l <span class="keyword">in</span> reversed(range(L - <span class="number">1</span>)):</span><br><span class="line">        ...</span><br><span class="line">        current_cache = caches[l]</span><br><span class="line">        dA_prev_temp, dW_temp, db_temp = self.linear_activation_backward(grads[<span class="string">"dA"</span> + str(l + <span class="number">2</span>)], current_cache, activation = <span class="string">"relu"</span>)</span><br><span class="line">        grads[<span class="string">"dA"</span> + str(l + <span class="number">1</span>)] = dA_prev_temp</span><br><span class="line">        grads[<span class="string">"dW"</span> + str(l + <span class="number">1</span>)] = dW_temp</span><br><span class="line">        grads[<span class="string">"db"</span> + str(l + <span class="number">1</span>)] = db_temp</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> grads</span><br></pre></td></tr></table></figure>
+<p>前向传播和后向传播的主逻辑都很清晰，这里就不再往子函数里深入了。<br><img src="/2018/03/17/2018/0317DeepLearningAI04/img05.png" alt></p>
+<font color="red">在计算dAL时使用了矩阵的除法，这是怎么算的呢？</font>
+
+<h2 id="更新参数"><a href="#更新参数" class="headerlink" title="更新参数"></a>更新参数</h2><p>正向传播+反向传播完成一轮的最终目的是为了更新参数：$W:=W-α·dW ，\; b:=b-α·db$<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">update_parameters</span><span class="params">(self, parameters, grads, learning_rate)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    L = len(parameters) // <span class="number">2</span> <span class="comment"># number of layers in the neural network</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">for</span> l <span class="keyword">in</span> range(L):</span><br><span class="line">        parameters[<span class="string">"W"</span> + str(l+<span class="number">1</span>)] = parameters[<span class="string">"W"</span> + str(l+<span class="number">1</span>)] - learning_rate * grads[<span class="string">"dW"</span> + str(l+<span class="number">1</span>)]</span><br><span class="line">        parameters[<span class="string">"b"</span> + str(l+<span class="number">1</span>)] = parameters[<span class="string">"b"</span> + str(l+<span class="number">1</span>)] - learning_rate * grads[<span class="string">"db"</span> + str(l+<span class="number">1</span>)]</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> parameters</span><br></pre></td></tr></table></figure></p>
+<h2 id="模型主体逻辑"><a href="#模型主体逻辑" class="headerlink" title="模型主体逻辑"></a>模型主体逻辑</h2><p>模型的主体逻辑非常简单和清晰：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">L_layer_model</span><span class="params">(self, X, Y, layers_dims, learning_rate = <span class="number">0.0075</span>, num_iterations = <span class="number">3000</span>, print_cost=False)</span>:</span><span class="comment">#lr was 0.009</span></span><br><span class="line">    np.random.seed(<span class="number">1</span>)</span><br><span class="line">    costs = []                         <span class="comment"># keep track of cost</span></span><br><span class="line">    <span class="comment"># 初始化参数</span></span><br><span class="line">    parameters = self.initialize_parameters_deep(layers_dims)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 经过num_iterations轮的梯度下降</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, num_iterations):</span><br><span class="line">        <span class="comment"># 前向传播</span></span><br><span class="line">        AL, caches = self.L_model_forward(X, parameters)</span><br><span class="line">        <span class="comment"># 成本函数</span></span><br><span class="line">        cost = self.compute_cost(AL, Y)</span><br><span class="line">        <span class="comment"># 后向传播</span></span><br><span class="line">        grads = self.L_model_backward(AL, Y, caches)</span><br><span class="line">        <span class="comment"># 更新参数</span></span><br><span class="line">        parameters = self.update_parameters(parameters, grads, learning_rate)     </span><br><span class="line">        ...     </span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> parameters</span><br></pre></td></tr></table></figure></p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>由此可见，神经网络算法其实和业务逻辑并没有太大关联，他要做的就是按照固定的算法，选择超参数，喂入数据。<br>一段代码，一劳永逸！但是别高兴太早了，也正因为此，跑这样的代码总感觉有点像撞大运，如果得不到预期的结果，完全不知道从何下手来改进。</p>
+<p>我最初跑这段代码得到的结果如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">$ python3 -m mywork Coding1_3.tc3</span><br><span class="line">Cost after iteration 0: 0.693148</span><br><span class="line">Cost after iteration 100: 0.678011</span><br><span class="line">Cost after iteration 200: 0.667600</span><br><span class="line">Cost after iteration 300: 0.660422</span><br><span class="line">Cost after iteration 400: 0.655458</span><br><span class="line">Cost after iteration 500: 0.652013</span><br><span class="line">Cost after iteration 600: 0.649616</span><br><span class="line">Cost after iteration 700: 0.647942</span><br><span class="line">Cost after iteration 800: 0.646770</span><br><span class="line">Cost after iteration 900: 0.645947</span><br><span class="line">Cost after iteration 1000: 0.645368</span><br><span class="line">Cost after iteration 1100: 0.644961</span><br><span class="line">Cost after iteration 1200: 0.644673</span><br><span class="line">Cost after iteration 1300: 0.644469</span><br><span class="line">Cost after iteration 1400: 0.644325</span><br><span class="line">Cost after iteration 1500: 0.644223</span><br><span class="line">Cost after iteration 1600: 0.644151</span><br><span class="line">Cost after iteration 1700: 0.644100</span><br><span class="line">Cost after iteration 1800: 0.644063</span><br><span class="line">Cost after iteration 1900: 0.644037</span><br><span class="line">Cost after iteration 2000: 0.644019</span><br><span class="line">Cost after iteration 2100: 0.644006</span><br><span class="line">Cost after iteration 2200: 0.643997</span><br><span class="line">Cost after iteration 2300: 0.643990</span><br><span class="line">Cost after iteration 2400: 0.643985</span><br><span class="line">21:33 1236 INFO     Accuracy: 0.655502392344</span><br><span class="line">21:33 1236 INFO     Accuracy: 0.34</span><br></pre></td></tr></table></figure></p>
+<p>成本死活下不去，我尝试调整学习率和迭代次数，收效甚微。好在我跑jupyter notebook版本的assignment4_2的时候能得到正确的结果。<br>我最初想到的debug方法是给我的代码灌入和jupyter版本一样的初始参数值，理论上应该得出一样的结果。但是参数太多，迭代的次数也很多，一一比较非常麻烦。<br>后来我尝试用jupyter版中的初始化函数、前向传播、后向传播等模块替换我的代码中的模块，因为神经网络的每个模块非常独立，这种替换是很方便的。果然很快发现问题：我发现在assignment4_1中在初始化W时是这么写的：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parameters[<span class="string">'W'</span> + str(l)] = </span><br><span class="line">np.random.randn(layer_dims[l],layer_dims[l<span class="number">-1</span>]) * <span class="number">0.01</span></span><br></pre></td></tr></table></figure></p>
+<p>而在assignment4_2中改成了酱紫：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parameters[<span class="string">'W'</span> + str(l)] = </span><br><span class="line">np.random.randn(layer_dims[l], layer_dims[l<span class="number">-1</span>]) / np.sqrt(layer_dims[l<span class="number">-1</span>])</span><br></pre></td></tr></table></figure></p>
+<p>前者也是比较小的数，而且比后者更小，后者是在标准正态分布的随机数上除以layer_dims[l-1]的开方，为什么后者学习效率高出这么多？本例是有一个正确的示范告诉我怎么做，如果是我自己来解这个问题，遇到学习效率太低的情况，该怎么解决呢？</p>
+<p>修改完成后，效果立刻显现出来了：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">$ python3 -m mywork Coding1_3.Main</span><br><span class="line">Cost after iteration 0: 0.715732</span><br><span class="line">Cost after iteration 100: 0.674738</span><br><span class="line">Cost after iteration 200: 0.660337</span><br><span class="line">Cost after iteration 300: 0.646289</span><br><span class="line">Cost after iteration 400: 0.629813</span><br><span class="line">Cost after iteration 500: 0.606006</span><br><span class="line">Cost after iteration 600: 0.569004</span><br><span class="line">Cost after iteration 700: 0.519797</span><br><span class="line">Cost after iteration 800: 0.464157</span><br><span class="line">Cost after iteration 900: 0.408420</span><br><span class="line">Cost after iteration 1000: 0.373155</span><br><span class="line">Cost after iteration 1100: 0.305724</span><br><span class="line">Cost after iteration 1200: 0.268102</span><br><span class="line">Cost after iteration 1300: 0.238725</span><br><span class="line">Cost after iteration 1400: 0.206323</span><br><span class="line">Cost after iteration 1500: 0.179439</span><br><span class="line">Cost after iteration 1600: 0.157987</span><br><span class="line">Cost after iteration 1700: 0.142404</span><br><span class="line">Cost after iteration 1800: 0.128652</span><br><span class="line">Cost after iteration 1900: 0.112443</span><br><span class="line">Cost after iteration 2000: 0.085056</span><br><span class="line">Cost after iteration 2100: 0.057584</span><br><span class="line">Cost after iteration 2200: 0.044568</span><br><span class="line">Cost after iteration 2300: 0.038083</span><br><span class="line">Cost after iteration 2400: 0.034411</span><br><span class="line">22:05 1238 INFO     Accuracy: 0.995215311005</span><br><span class="line">22:05 1238 INFO     Accuracy: 0.78</span><br></pre></td></tr></table></figure></p>
+<p>初始值的选取对于训练结果有着决定性的作用！该怎么调参、优化？继续学习吧！</p>
+<blockquote>
+<p>本节作业可参见<a href="https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py" target="_blank" rel="noopener">https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py</a><code>class Coding1_3</code>。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/12/2018/0312DeepLearningAI03/" rel="next" title="DeepLearning.ai笔记（二）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/22/2018/0322DeepLearningAI05/" rel="prev" title="DeepLearning.ai笔记（四）">
+                DeepLearning.ai笔记（四） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/03/17/2018/0317DeepLearningAI04/" data-title="DeepLearning.ai笔记（三）" data-url="http://palanceli.github.io/2018/03/17/2018/0317DeepLearningAI04/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#4-1-深层神经网络"><span class="nav-number">1.</span> <span class="nav-text">4.1 深层神经网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-2-深层神经网络的前向传播"><span class="nav-number">2.</span> <span class="nav-text">4.2 深层神经网络的前向传播</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-3-核对矩阵的维数"><span class="nav-number">3.</span> <span class="nav-text">4.3 核对矩阵的维数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-4-为什么使用深层表示"><span class="nav-number">4.</span> <span class="nav-text">4.4 为什么使用深层表示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-5-搭建深层神经网络块"><span class="nav-number">5.</span> <span class="nav-text">4.5 搭建深层神经网络块</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-6-前向传播和反向传播"><span class="nav-number">6.</span> <span class="nav-text">4.6 前向传播和反向传播</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-7-参数VS超参数"><span class="nav-number">7.</span> <span class="nav-text">4.7 参数VS超参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-8-这和大脑有什么关系"><span class="nav-number">8.</span> <span class="nav-text">4.8 这和大脑有什么关系</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作业"><span class="nav-number">9.</span> <span class="nav-text">作业</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络算法的基本框架"><span class="nav-number">9.1.</span> <span class="nav-text">神经网络算法的基本框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参数初始化"><span class="nav-number">9.2.</span> <span class="nav-text">参数初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前向传播"><span class="nav-number">9.3.</span> <span class="nav-text">前向传播</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#成本函数"><span class="nav-number">9.4.</span> <span class="nav-text">成本函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后向传播"><span class="nav-number">9.5.</span> <span class="nav-text">后向传播</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新参数"><span class="nav-number">9.6.</span> <span class="nav-text">更新参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模型主体逻辑"><span class="nav-number">9.7.</span> <span class="nav-text">模型主体逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">9.8.</span> <span class="nav-text">问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

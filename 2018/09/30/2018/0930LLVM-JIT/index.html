@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文做了一个最简单的JIT Demo，测试其时空性能。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLVM之JIT">
+<meta property="og:url" content="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本文做了一个最简单的JIT Demo，测试其时空性能。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/img01.jpeg">
+<meta property="og:image" content="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.493Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LLVM之JIT">
+<meta name="twitter:description" content="本文做了一个最简单的JIT Demo，测试其时空性能。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/img01.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/">
+
+
+
+
+
+  <title>LLVM之JIT | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LLVM之JIT</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-30T14:00:00+08:00">
+                2018-09-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术随笔/" itemprop="url" rel="index">
+                    <span itemprop="name">技术随笔</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/09/30/2018/0930LLVM-JIT/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/09/30/2018/0930LLVM-JIT/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文做了一个最简单的JIT Demo，测试其时空性能。<br><img src="/2018/09/30/2018/0930LLVM-JIT/img01.jpeg" alt></p>
+<a id="more"></a>
+<h1 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h1><p>代码放在了<a href="https://github.com/palanceli/llvm_examples/tree/master/Kaleidoscope/BuildingAJIT/ChapterA" target="_blank" rel="noopener">https://github.com/palanceli/llvm_examples/tree/master/Kaleidoscope/BuildingAJIT/ChapterA</a><br>结构如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">llvm_examples</span><br><span class="line">├── Kaleidoscope</span><br><span class="line">│   └── BuildingAJIT</span><br><span class="line">│       └── ChapterA</span><br><span class="line">│           ├── CMakeLists.txt</span><br><span class="line">│           ├── KaleidoscopeJIT.h</span><br><span class="line">│           ├── setupenv.sh        # 将test/test/main.m编译成IR文件</span><br><span class="line">│           ├── test               # 被测试的OC源码</span><br><span class="line">│           │   └── test</span><br><span class="line">│           │       └── main.m</span><br><span class="line">│           └── toy.cpp            # JIT主要代码</span><br><span class="line">├── FindClassDecls</span><br><span class="line">└── setupenv.sh</span><br></pre></td></tr></table></figure></p>
+<p>与本文相关的代码主要在Kaleidoscope，它分两部分：1、<code>ChapterA/test</code>是被测试的OC源码；2、其余部分是用C++写的JIT  </p>
+<p><code>llvm_examples/setupenv.sh</code>负责和llvm_src建立软链关系：<br><img src="/2018/09/30/2018/0930LLVM-JIT/img02.png" alt><br>不把代码直接放到<code>llvm_src</code>里面是便于<code>llvm_examples</code>的独立维护。</p>
+<p><code>Kaleidoscope/ChapterA/setupenv.sh</code>执行clang命令，将OC源码生成LLVM IR：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang -fobjc-arc -emit-llvm -S test/test/main.m -o test/test/main.ll</span><br></pre></td></tr></table></figure></p>
+<h1 id="被测试OC源码"><a href="#被测试OC源码" class="headerlink" title="被测试OC源码"></a>被测试OC源码</h1><p>在<code>main.m</code>中执行了100万次数学运算：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> testEntry()&#123;</span><br><span class="line">  <span class="keyword">float</span> x = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>; i&lt;<span class="number">1000000</span>; i++)&#123;</span><br><span class="line">    <span class="keyword">if</span>(i % <span class="number">3</span> == <span class="number">0</span>)&#123;</span><br><span class="line">      x = x * i;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="number">7</span> == <span class="number">0</span>)&#123;</span><br><span class="line">      x = x / i;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(i % <span class="number">11</span> == <span class="number">0</span>)&#123;</span><br><span class="line">      x = x - i;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">      x = x + i;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> * argv[]) &#123;</span><br><span class="line">  <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">    <span class="keyword">double</span> time_begin = <span class="built_in">CFAbsoluteTimeGetCurrent</span>();</span><br><span class="line">    testEntry();</span><br><span class="line">    <span class="keyword">double</span> time_end = <span class="built_in">CFAbsoluteTimeGetCurrent</span>();</span><br><span class="line">    <span class="built_in">NSInteger</span> time_interval = <span class="number">1000</span> * (time_end - time_begin);  <span class="comment">//单位毫秒	</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"time_interval: %ld. \n"</span>, time_interval);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="JIT代码"><a href="#JIT代码" class="headerlink" title="JIT代码"></a>JIT代码</h1><p><code>Kaleidoscope/BuildingAJIT/ChapterA/toy.cpp</code>负责初始化JIT，并执行OC源码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">……</span><br><span class="line">SMDiagnostic SMD;</span><br><span class="line">LLVMContext context;</span><br><span class="line"><span class="keyword">const</span> <span class="built_in">string</span> llPath = ...; <span class="comment">// main.mm的路径</span></span><br><span class="line"><span class="keyword">const</span> <span class="built_in">string</span> funcName = <span class="string">"testEntry"</span>;</span><br><span class="line"><span class="function">EngineBuilder <span class="title">EB</span><span class="params">(parseIRFile(llPath, SMD,context))</span></span>;</span><br><span class="line">EB.setEngineKind(EngineKind::Interpreter);</span><br><span class="line">...</span><br><span class="line">ExecutionEngine* EE = EB.create();</span><br><span class="line"></span><br><span class="line">EE-&gt;runStaticConstructorsDestructors(<span class="literal">false</span>);</span><br><span class="line">Function* func=EE-&gt;FindFunctionNamed(funcName);   <span class="comment">// 查找函数入口testEntry</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">tvBegin</span>, <span class="title">tvEnd</span>;</span></span><br><span class="line">gettimeofday(&amp;tvBegin, <span class="literal">NULL</span>);  <span class="comment">// 开始计时</span></span><br><span class="line"></span><br><span class="line">EE-&gt;runFunction(func,ArrayRef&lt;GenericValue&gt;());   <span class="comment">// 执行函数</span></span><br><span class="line"></span><br><span class="line">gettimeofday(&amp;tvEnd, <span class="literal">NULL</span>);    <span class="comment">// 结束计时</span></span><br><span class="line"><span class="comment">// 计算耗时</span></span><br><span class="line"><span class="keyword">double</span> dDuration = <span class="number">1000</span> * (tvEnd.tv_sec - tvBegin.tv_sec) + ((tvEnd.tv_usec - tvBegin.tv_usec) / <span class="number">1000.0</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"dDuration=%.2f ms. \n"</span>, dDuration);</span><br></pre></td></tr></table></figure></p>
+<h1 id="编译执行"><a href="#编译执行" class="headerlink" title="编译执行"></a>编译执行</h1><ol>
+<li>JIT代码由于依赖LLVM，必须结合LLVM一起编译，在CMake时应该打开开关<code>LLVM_ENABLE_FFI</code>：<br><img src="/2018/09/30/2018/0930LLVM-JIT/img03.png" alt><br>打开该开关后，如果被解释执行的代码使用了外部函数，LLVM解释器将链接到外部对应的函数库上去。比如<code>NSLog</code>就依赖<code>Fundation</code>库，如果不打开该开关，在执行JIT时会提示错误：<br><code>LLVM ERROR: Tried to execute an unknown external function: NSLog</code></li>
+<li><p>在JIT代码中，应当<code>dlopen</code>被使用的库文件，例如OC源码中为了计时，调用了函数<code>CFAbsoluteTimeGetCurrent()</code>，故JIT代码中应当调用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> *handle = dlopen(<span class="string">"/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation"</span>, RTLD_LAZY|RTLD_GLOBAL);</span><br></pre></td></tr></table></figure>
+<p>既然前面已经开启了<code>LLVM_ENABLE_FFI</code>开关，为什么代码里还要显示打开呢？这是因为开关只管要不要链接，即记录导入函数及来源，并不负责外部库的加载。<br>此处还有一个细节：如果在xcode中直接执行，不调用<code>dlopen（...)</code>也没问题，因为xcode的调试器帮你加载了很多库，如果在命令行下执行，就必须显式调用了。</p>
+</li>
+</ol>
+<h1 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h1><p>编译出来的JIT代码有18.9M，仅比lli23.8M小了5M，如果想拿来嵌入到app里支持热更新显然是太大了。<br>再看时间开销：如果使用JIT的执行时间是<code>750ms</code>，如果编译成机器码直接执行只有<code>6ms</code>的开销，相差100倍！</p>
+<p>看来如果想支持热更新，LLVM自带的JIT是不行的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/23/2018/0923LLVM/" rel="next" title="LLVM">
+                <i class="fa fa-chevron-left"></i> LLVM
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/01/2018/1001CLang/" rel="prev" title="CLang">
+                CLang <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/09/30/2018/0930LLVM-JIT/" data-title="LLVM之JIT" data-url="http://palanceli.github.io/2018/09/30/2018/0930LLVM-JIT/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#代码结构"><span class="nav-number">1.</span> <span class="nav-text">代码结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#被测试OC源码"><span class="nav-number">2.</span> <span class="nav-text">被测试OC源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JIT代码"><span class="nav-number">3.</span> <span class="nav-text">JIT代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译执行"><span class="nav-number">4.</span> <span class="nav-text">编译执行</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#执行结果"><span class="nav-number">5.</span> <span class="nav-text">执行结果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

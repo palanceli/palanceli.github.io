@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一节基于四则运算的计算器，引入了词法分析器、语法分析器和解释运行器的概念，他们分工明确，相互协作，根据语法规则完成源代码的解释执行。本节将这一规则应用到实际的编程语言中，以Pascal为例完成编译和解析。从业务跨度上，本节相比上一节是一次跨越，但从底层技术来说，不过是上一节基本概念的又一次应用而已。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编写编译器和解释器二">
+<meta property="og:url" content="http://palanceli.github.io/2018/06/19/2018/0619BuildASimpleInterpreter2/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="上一节基于四则运算的计算器，引入了词法分析器、语法分析器和解释运行器的概念，他们分工明确，相互协作，根据语法规则完成源代码的解释执行。本节将这一规则应用到实际的编程语言中，以Pascal为例完成编译和解析。从业务跨度上，本节相比上一节是一次跨越，但从底层技术来说，不过是上一节基本概念的又一次应用而已。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/06/19/2018/0619BuildASimpleInterpreter2/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.350Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编写编译器和解释器二">
+<meta name="twitter:description" content="上一节基于四则运算的计算器，引入了词法分析器、语法分析器和解释运行器的概念，他们分工明确，相互协作，根据语法规则完成源代码的解释执行。本节将这一规则应用到实际的编程语言中，以Pascal为例完成编译和解析。从业务跨度上，本节相比上一节是一次跨越，但从底层技术来说，不过是上一节基本概念的又一次应用而已。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/06/19/2018/0619BuildASimpleInterpreter2/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/06/19/2018/0619BuildASimpleInterpreter2/">
+
+
+
+
+
+  <title>编写编译器和解释器二 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/06/19/2018/0619BuildASimpleInterpreter2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">编写编译器和解释器二</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-19T14:00:00+08:00">
+                2018-06-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/编译器/" itemprop="url" rel="index">
+                    <span itemprop="name">编译器</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/19/2018/0619BuildASimpleInterpreter2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/06/19/2018/0619BuildASimpleInterpreter2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一节基于四则运算的计算器，引入了词法分析器、语法分析器和解释运行器的概念，他们分工明确，相互协作，根据语法规则完成源代码的解释执行。本节将这一规则应用到实际的编程语言中，以Pascal为例完成编译和解析。从业务跨度上，本节相比上一节是一次跨越，但从底层技术来说，不过是上一节基本概念的又一次应用而已。 </p>
+<a id="more"></a>
+<h1 id="支持Pascal语法规则"><a href="#支持Pascal语法规则" class="headerlink" title="支持Pascal语法规则"></a>支持Pascal语法规则</h1><p>给一门新语言写解释器，完成它的语法规则是难度最大也是应该最先完成的工作。本节引入的Pascal语法描述为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">program : compound_statement DOT</span><br><span class="line"></span><br><span class="line">compond_statement   : BEGIN statement_list END</span><br><span class="line"></span><br><span class="line">statement_list  : statement</span><br><span class="line">                | statement SEMI statement_list</span><br><span class="line"></span><br><span class="line">statement   : compound_statement</span><br><span class="line">            | assignment_statement</span><br><span class="line">            | empty</span><br><span class="line"></span><br><span class="line">assignment_statement    : variable ASSIGN expr</span><br><span class="line"></span><br><span class="line">empty   :</span><br><span class="line"></span><br><span class="line">expr    : term((PLUS | MINUS) term)*</span><br><span class="line"></span><br><span class="line">term    : factor ((MUL |DIV) factor)*</span><br><span class="line"></span><br><span class="line">factor  : PLUS factor</span><br><span class="line">        | MINUS factor</span><br><span class="line">        | INTEGER</span><br><span class="line">        | LPAREN expr RPAREN</span><br><span class="line">        | variable</span><br><span class="line"></span><br><span class="line">variable    : ID</span><br></pre></td></tr></table></figure></p>
+<p>在<code>statement_list</code>规则中也可写作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">statement _list : statement | (statement SEMI)*</span><br></pre></td></tr></table></figure></p>
+<p>有了上一节词法解析器、语法解析器和解释器的分工，接下来只需考虑在每个职责上应做的变化。</p>
+<h2 id="词法解析"><a href="#词法解析" class="headerlink" title="词法解析"></a>词法解析</h2><p>词法分析的中枢是<code>Lexer::get_next_token()</code>，和四则运算的词法分析器相比，Pascal的词法分析器只是多了几种符号的解析，包括①变量；②长度大于1的保留符号<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lexer</span><span class="params">(object)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_id</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""Handle identifiers and reserved keywords"""</span></span><br><span class="line">        result = <span class="string">''</span></span><br><span class="line">        <span class="keyword">while</span> self.current_char <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> self.current_char.isalnum():</span><br><span class="line">            result += self.current_char</span><br><span class="line">            self.advance()</span><br><span class="line"></span><br><span class="line">        token = RESERVED_KEYWORDS.get(result, Token(ID, result))</span><br><span class="line">        <span class="keyword">return</span> token</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_next_token</span><span class="params">(self)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">while</span> self.current_char <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">if</span> self.current_char.isalpha(): <span class="comment"># ①</span></span><br><span class="line">                <span class="keyword">return</span> self._id()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> self.current_char.isdigit():</span><br><span class="line">                <span class="keyword">return</span> Token(INTEGER, self.integer())</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> self.current_char == <span class="string">':'</span> <span class="keyword">and</span> self.peek() == <span class="string">'='</span>: <span class="comment"># ②</span></span><br><span class="line">                self.advance()</span><br><span class="line">                self.advance()</span><br><span class="line">                <span class="keyword">return</span> Token(ASSIGN, <span class="string">':='</span>)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> self.current_char == <span class="string">';'</span>:</span><br><span class="line">                ...</span><br><span class="line">            <span class="keyword">if</span> self.current_char == <span class="string">'+'</span>:</span><br><span class="line">                ...</span><br><span class="line">            <span class="keyword">if</span> self.current_char == <span class="string">'-'</span>:</span><br><span class="line">                ...</span><br><span class="line">            ...</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Token(EOF, <span class="literal">None</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="语法分析"><a href="#语法分析" class="headerlink" title="语法分析"></a>语法分析</h2><p>结合上一节<a href="/2018/06/18/2018/0618BuildASimpleInterpreter1/#从语法到代码的映射">从语法到代码的映射</a>，将每条规则写成一个函数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parser</span><span class="params">(object)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">program</span><span class="params">(self)</span>:</span> <span class="comment"># 这里是语法解析的起点</span></span><br><span class="line">        <span class="string">""" program : compound_statement DOT """</span></span><br><span class="line">        node = self.compound_statement()</span><br><span class="line">        self.eat(DOT)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compound_statement</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" compound_statement: BEGIN statement_list END """</span></span><br><span class="line">        self.eat(BEGIN)</span><br><span class="line">        nodes = self.statement_list()</span><br><span class="line">        self.eat(END)</span><br><span class="line"></span><br><span class="line">        root = Compound()</span><br><span class="line">        <span class="keyword">for</span> node <span class="keyword">in</span> nodes:</span><br><span class="line">            root.children.append(node)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">statement_list</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" statement_list : statement | (statement SEMI)* """</span></span><br><span class="line">        node = self.statement()</span><br><span class="line"></span><br><span class="line">        results = [node]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> self.current_token.type == SEMI:</span><br><span class="line">            self.eat(SEMI)</span><br><span class="line">            results.append(self.statement())</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> results</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">statement</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" statement : compound_statement</span></span><br><span class="line"><span class="string">                  | assignment_statement</span></span><br><span class="line"><span class="string">                  | empty</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> self.current_token.type == BEGIN:</span><br><span class="line">            node = self.compound_statement()</span><br><span class="line">        <span class="keyword">elif</span> self.current_token.type == ID:</span><br><span class="line">            node = self.assignment_statement()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            node = self.empty()</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">assignment_statement</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" assignment_statement : variable ASSIGN expr """</span></span><br><span class="line">        left = self.variable()</span><br><span class="line">        token = self.current_token</span><br><span class="line">        self.eat(ASSIGN)</span><br><span class="line">        right = self.expr()</span><br><span class="line">        node = Assign(left, token, right)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">variable</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" variable : ID """</span></span><br><span class="line">        node = Var(self.current_token)</span><br><span class="line">        self.eat(ID)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">empty</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""An empty production"""</span></span><br><span class="line">        <span class="keyword">return</span> NoOp()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">expr</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" expr : term ((PLUS | MINUS) term)* """</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">term</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" term : factor ((MUL | DIV) factor)* """</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">factor</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" factor : PLUS factor | MINUS factor | INTEGER</span></span><br><span class="line"><span class="string">                  | LPAREN expr RPAREN | variable</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        node = self.program()</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> node</span><br></pre></td></tr></table></figure></p>
+<p>在AST节点选取上，叶子节点是由终结符组成，根据Pascal的语法表，还需要添加变量variable；非叶子节点的选取，我认为有不同的选法，因为语法规则的左部引入了<code>compound_statement</code>、<code>statement_list</code>、<code>statement</code>和<code>assignment_statement</code>，而在Part9中仅引入了<code>Compound</code>、<code>Assign</code>和<code>Var</code>，它在<code>Compound</code>中保存了<code>statement</code>的集合：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AST</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BinOp</span><span class="params">(AST)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, left, op, right)</span>:</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Num</span><span class="params">(AST)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, token)</span>:</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnaryOp</span><span class="params">(AST)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, op, expr)</span>:</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compound</span><span class="params">(AST)</span>:</span></span><br><span class="line">    <span class="string">"""Represents a 'BEGIN ... END' block"""</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.children = []</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Assign</span><span class="params">(AST)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, left, op, right)</span>:</span></span><br><span class="line">        self.left = left</span><br><span class="line">        self.token = self.op = op</span><br><span class="line">        self.right = right</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Var</span><span class="params">(AST)</span>:</span></span><br><span class="line">    <span class="string">"""The Var node is constructed out of ID token."""</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, token)</span>:</span></span><br><span class="line">        self.token = token</span><br><span class="line">        self.value = token.value</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NoOp</span><span class="params">(AST)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="解释执行"><a href="#解释执行" class="headerlink" title="解释执行"></a>解释执行</h2><p>解释器的执行是根据语法分析器产出的节点类型，配套对应的访问函数。显然他必须增加对<code>Compound</code>、<code>Assign</code>和<code>Var</code>的访问，需要注意Var可能出现在赋值语句的左侧，此时的作用是提领，也可能出现在右侧，此时的作用是取值。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NodeVisitor</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        method_name = <span class="string">'visit_'</span> + type(node).__name__</span><br><span class="line">        visitor = getattr(self, method_name, self.generic_visit)</span><br><span class="line">        <span class="keyword">return</span> visitor(node)</span><br><span class="line">    ...</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Interpreter</span><span class="params">(NodeVisitor)</span>:</span></span><br><span class="line"></span><br><span class="line">    GLOBAL_SCOPE = &#123;&#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Compound</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> child <span class="keyword">in</span> node.children:</span><br><span class="line">            self.visit(child)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Assign</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        var_name = node.left.value <span class="comment"># 左部是Var，但不再走visit_Var逻辑</span></span><br><span class="line">        self.GLOBAL_SCOPE[var_name] = self.visit(node.right)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Var</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        var_name = node.value</span><br><span class="line">        val = self.GLOBAL_SCOPE.get(var_name)</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> val</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_NoOp</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">interpret</span><span class="params">(self)</span>:</span></span><br><span class="line">        tree = self.parser.parse()</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> self.visit(tree)</span><br></pre></td></tr></table></figure></p>
+<p>这里引入了一个GLOBAL_SCOPE用来保存符号表，符号表示用来跟踪源代码中各种符号的抽象数据类型，目前只是用一个字典保存了变量。</p>
+<h1 id="增强版Pascal语法规则"><a href="#增强版Pascal语法规则" class="headerlink" title="增强版Pascal语法规则"></a>增强版Pascal语法规则</h1><p>Part10支持了更完备的Pascal语法规则，包括：  </p>
+<ol>
+<li>PROGRAM头，  </li>
+<li>变量声明，  </li>
+<li>引入DIV作为整除运算符，/作为浮点除法运算符，  </li>
+<li>支持注释。</li>
+</ol>
+<p>语法表为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">program : PROGRAM variable SEMI block DOT                   ①</span><br><span class="line"></span><br><span class="line">block   : declarations compound_statement                   ②</span><br><span class="line"></span><br><span class="line">declarations    : VAR (variable_declaration SEMI) +         ③</span><br><span class="line">                | empty</span><br><span class="line"></span><br><span class="line">variable_declaration    : ID (COMMA ID)* COLON type_spec    ④</span><br><span class="line"></span><br><span class="line">type_spec   : INTEGER</span><br><span class="line"></span><br><span class="line">compound_statement  : BEGIN statement_list END              ⑤</span><br><span class="line"></span><br><span class="line">statement_list  : statement</span><br><span class="line">                | statement SEMI statement_list</span><br><span class="line"></span><br><span class="line">statement   : compound_statement</span><br><span class="line">            | assignment_statement</span><br><span class="line">            | empty</span><br><span class="line"></span><br><span class="line">assignment_statement    : variable ASSIGN expr</span><br><span class="line"></span><br><span class="line">empty   :</span><br><span class="line"></span><br><span class="line">expr    : term ((PLUS |MINUS) term)*</span><br><span class="line"></span><br><span class="line">term    : factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*</span><br><span class="line"></span><br><span class="line">factor  : PLUS factor</span><br><span class="line">        | MINUS factor</span><br><span class="line">        | INTEGER_CONST</span><br><span class="line">        | REAL_CONST</span><br><span class="line">        | LPAREN expr RPAREN</span><br><span class="line">        | variable</span><br><span class="line"></span><br><span class="line">variable : ID</span><br></pre></td></tr></table></figure></p>
+<p>对应一段代码<br><figure class="highlight pascal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PROGRAM</span> Part10;     <span class="comment">&#123;①&#125;</span></span><br><span class="line"><span class="keyword">VAR</span>                 <span class="comment">&#123;②③&#125;</span></span><br><span class="line">    number      :INTEGER;   <span class="comment">&#123;④&#125;</span></span><br><span class="line">    a, b, c, x  : INTEGER;  </span><br><span class="line">    y           : REAL;</span><br><span class="line"></span><br><span class="line"><span class="keyword">BEGIN</span> <span class="comment">&#123;Part10&#125;</span>      <span class="comment">&#123;⑤&#125;</span></span><br><span class="line">    <span class="keyword">BEGIN</span></span><br><span class="line">        number := <span class="number">2</span>;</span><br><span class="line">        a := number;</span><br><span class="line">        b := <span class="number">10</span> * <span class="number">1</span> + <span class="number">10</span> * number <span class="keyword">DIV</span> <span class="number">4</span>;</span><br><span class="line">        c := a - - b</span><br><span class="line">    <span class="keyword">END</span>;</span><br><span class="line">    x := <span class="number">11</span>;</span><br><span class="line">    y := <span class="number">20</span> / <span class="number">7</span> + <span class="number">3.14</span>;</span><br><span class="line"><span class="keyword">END</span>. <span class="comment">&#123;Part10&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>看起来复杂了很多，接下来是流程化的工作，依次修改词法分析、语法分析和解释器。</p>
+<h2 id="词法分析"><a href="#词法分析" class="headerlink" title="词法分析"></a>词法分析</h2><p>代码越来越多，但复杂度其实没有增加，在词法分析部分的更改是：  </p>
+<ol>
+<li>增加新的保留字。识别变量的<code>Lexer::_id()</code>逻辑没有变，只是在<code>RESERVED_KEYWORDS</code>中添加了新的item</li>
+<li><code>Lexer::skip_comment()</code>处理注释，逻辑非常简单，类似<code>Lexer::skip_whitespace()</code></li>
+<li>解析数字，支持浮点型数字。逻辑也不过是用<code>.</code>分两截解析数字。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">RESERVED_KEYWORDS = &#123;</span><br><span class="line">    <span class="string">'PROGRAM'</span>: Token(<span class="string">'PROGRAM'</span>, <span class="string">'PROGRAM'</span>),</span><br><span class="line">    <span class="string">'VAR'</span>: Token(<span class="string">'VAR'</span>, <span class="string">'VAR'</span>),</span><br><span class="line">    <span class="string">'DIV'</span>: Token(<span class="string">'INTEGER_DIV'</span>, <span class="string">'DIV'</span>),</span><br><span class="line">    <span class="string">'INTEGER'</span>: Token(<span class="string">'INTEGER'</span>, <span class="string">'INTEGER'</span>),</span><br><span class="line">    <span class="string">'REAL'</span>: Token(<span class="string">'REAL'</span>, <span class="string">'REAL'</span>),</span><br><span class="line">    <span class="string">'BEGIN'</span>: Token(<span class="string">'BEGIN'</span>, <span class="string">'BEGIN'</span>),</span><br><span class="line">    <span class="string">'END'</span>: Token(<span class="string">'END'</span>, <span class="string">'END'</span>),</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Lexer</span><span class="params">(object)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">skip_comment</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> self.current_char != <span class="string">'&#125;'</span>:</span><br><span class="line">            self.advance()</span><br><span class="line">        self.advance()  <span class="comment"># the closing curly brace</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">number</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""Return a (multidigit) integer or float consumed from the input."""</span></span><br><span class="line">        result = <span class="string">''</span></span><br><span class="line">        <span class="keyword">while</span> self.current_char <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> self.current_char.isdigit():</span><br><span class="line">            result += self.current_char</span><br><span class="line">            self.advance()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.current_char == <span class="string">'.'</span>:</span><br><span class="line">            result += self.current_char</span><br><span class="line">            self.advance()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span> (</span><br><span class="line">                self.current_char <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span></span><br><span class="line">                self.current_char.isdigit()</span><br><span class="line">            ):</span><br><span class="line">                result += self.current_char</span><br><span class="line">                self.advance()</span><br><span class="line"></span><br><span class="line">            token = Token(<span class="string">'REAL_CONST'</span>, float(result))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            token = Token(<span class="string">'INTEGER_CONST'</span>, int(result))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> token</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_id</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""Handle identifiers and reserved keywords"""</span></span><br><span class="line">        result = <span class="string">''</span></span><br><span class="line">        <span class="keyword">while</span> self.current_char <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> self.current_char.isalnum():</span><br><span class="line">            result += self.current_char</span><br><span class="line">            self.advance()</span><br><span class="line"></span><br><span class="line">        token = RESERVED_KEYWORDS.get(result, Token(ID, result))</span><br><span class="line">        <span class="keyword">return</span> token</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_next_token</span><span class="params">(self)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">while</span> self.current_char <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">if</span> self.current_char == <span class="string">'&#123;'</span>:</span><br><span class="line">                self.advance()</span><br><span class="line">                self.skip_comment()</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> self.current_char.isalpha():</span><br><span class="line">                <span class="keyword">return</span> self._id()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> self.current_char.isdigit():</span><br><span class="line">                <span class="keyword">return</span> self.number()</span><br><span class="line">        ...</span><br></pre></td></tr></table></figure>
+<h2 id="语法分析-1"><a href="#语法分析-1" class="headerlink" title="语法分析"></a>语法分析</h2><p>在Part10的介绍中，每次更新语法分析器都是从添加AST开始的，但我认为从语法到函数的映射转换更自然，因为这个转换规则几乎是固定的，而最终选取哪些节点来创建AST数据结构也是根据转换后的代码需要确定。<br>本节对语法规则修改比较大，因此按照新的语法表重新实现语法分析。语法分析的主逻辑在<code>Parser::parse()</code>，起点是<code>Parser::program()</code>。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parser</span><span class="params">(object)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">program</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" program : PROGRAM variable SEMI block DOT """</span></span><br><span class="line">        self.eat(PROGRAM)</span><br><span class="line">        var_node = self.variable()</span><br><span class="line">        prog_name = var_node.value</span><br><span class="line">        self.eat(SEMI)</span><br><span class="line">        block_node = self.block()</span><br><span class="line">        program_node = Program(prog_name, block_node)</span><br><span class="line">        self.eat(DOT)</span><br><span class="line">        <span class="keyword">return</span> program_node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">block</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" block : declarations compound_statement """</span></span><br><span class="line">        declaration_nodes = self.declarations()</span><br><span class="line">        compound_statement_node = self.compound_statement()</span><br><span class="line">        node = Block(declaration_nodes, compound_statement_node)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">declarations</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" declarations : VAR (variable_declaration SEMI)+ | empty """</span></span><br><span class="line">        declarations = []</span><br><span class="line">        <span class="keyword">if</span> self.current_token.type == VAR:</span><br><span class="line">            self.eat(VAR)</span><br><span class="line">            <span class="keyword">while</span> self.current_token.type == ID:</span><br><span class="line">                var_decl = self.variable_declaration()</span><br><span class="line">                declarations.extend(var_decl)</span><br><span class="line">                self.eat(SEMI)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> declarations</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">variable_declaration</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" variable_declaration : ID (COMMA ID)* COLON type_spec """</span></span><br><span class="line">        var_nodes = [Var(self.current_token)]  <span class="comment"># first ID</span></span><br><span class="line">        self.eat(ID)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> self.current_token.type == COMMA:</span><br><span class="line">            self.eat(COMMA)</span><br><span class="line">            var_nodes.append(Var(self.current_token))</span><br><span class="line">            self.eat(ID)</span><br><span class="line"></span><br><span class="line">        self.eat(COLON)</span><br><span class="line"></span><br><span class="line">        type_node = self.type_spec()</span><br><span class="line">        var_declarations = [</span><br><span class="line">            VarDecl(var_node, type_node)</span><br><span class="line">            <span class="keyword">for</span> var_node <span class="keyword">in</span> var_nodes</span><br><span class="line">        ]</span><br><span class="line">        <span class="keyword">return</span> var_declarations</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">type_spec</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" type_spec : INTEGER | REAL """</span></span><br><span class="line">        token = self.current_token</span><br><span class="line">        <span class="keyword">if</span> self.current_token.type == INTEGER:</span><br><span class="line">            self.eat(INTEGER)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.eat(REAL)</span><br><span class="line">        node = Type(token)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compound_statement</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" compound_statement: BEGIN statement_list END """</span></span><br><span class="line">        self.eat(BEGIN)</span><br><span class="line">        nodes = self.statement_list()</span><br><span class="line">        self.eat(END)</span><br><span class="line"></span><br><span class="line">        root = Compound()</span><br><span class="line">        <span class="keyword">for</span> node <span class="keyword">in</span> nodes:</span><br><span class="line">            root.children.append(node)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">statement_list</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" statement_list : statement | statement SEMI statement_list """</span></span><br><span class="line">        node = self.statement()</span><br><span class="line"></span><br><span class="line">        results = [node]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> self.current_token.type == SEMI:</span><br><span class="line">            self.eat(SEMI)</span><br><span class="line">            results.append(self.statement())</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> results</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">statement</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" statement : compound_statement | assignment_statement | empty """</span></span><br><span class="line">        <span class="keyword">if</span> self.current_token.type == BEGIN:</span><br><span class="line">            node = self.compound_statement()</span><br><span class="line">        <span class="keyword">elif</span> self.current_token.type == ID:</span><br><span class="line">            node = self.assignment_statement()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            node = self.empty()</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">assignment_statement</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" assignment_statement : variable ASSIGN expr """</span></span><br><span class="line">        left = self.variable()</span><br><span class="line">        token = self.current_token</span><br><span class="line">        self.eat(ASSIGN)</span><br><span class="line">        right = self.expr()</span><br><span class="line">        node = Assign(left, token, right)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">variable</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">""" variable : ID """</span></span><br><span class="line">        node = Var(self.current_token)</span><br><span class="line">        self.eat(ID)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span><span class="params">(self)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        node = self.program()</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> node</span><br></pre></td></tr></table></figure></p>
+<p>在本节的具体实现中，凡是非集合类的返回值，都为它创建了AST节点。创建的AST结构如下：<br><img src="/2018/06/19/2018/0619BuildASimpleInterpreter2/img01.png" alt></p>
+<h2 id="解释执行-1"><a href="#解释执行-1" class="headerlink" title="解释执行"></a>解释执行</h2><p>解释器的逻辑是紧随语法分析器的产出结果的——生成什么节点，就需要有对该节点的解释模块。这里就不再赘述了。<br>经过本节两轮的练习，可以发现一个编译器的核心工作其实在书写语法规则表上，根据语法规则表中的终结符写出对应每个符号的词法分析器；根据语法规则写出语法分析器，这几乎是一一对应的，再根据语法分析器的生成结果，确定用哪些AST节点来表示；最后根据生成的AST类型写出对应的解释模块，这就是解释器了。</p>
+<h1 id="构建符号表"><a href="#构建符号表" class="headerlink" title="构建符号表"></a>构建符号表</h1><p>在Part11之前的章节已经引入了<code>Interpreter::GLOBAL_SCOPE</code>符号表，它的作用仅仅是为了记录每个变量对应的值，构建符号表还要履行如下职责：</p>
+<ul>
+<li>当为变量赋值时，确保类型是正确的</li>
+<li>确保变量在使用前被声明</li>
+</ul>
+<p>本文实现的思路是再为AST构建一个visitor，类似解释器同样执行后序遍历，只是它在遍历的过程中为变量声明创建符号记录，为变量的使用检查是否存在符号记录，为变量的赋值检查类型是否匹配。这样无需改变已有逻辑，只需要添加一个新模块，在解释运行前执行访问逻辑，即可完成符号跟踪的职责。<br>我们为该符号跟踪器取名为<code>SymbolTableBuilder</code>：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SymbolTableBuilder</span><span class="params">(NodeVisitor)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.symtab = SymbolTable()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 对于运算类的节点，只需要确保后序遍历即可</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Block</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> declaration <span class="keyword">in</span> node.declarations:</span><br><span class="line">            self.visit(declaration)</span><br><span class="line">        self.visit(node.compound_statement)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Program</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_BinOp</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Num</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_UnaryOp</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Compound</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_NoOp</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_VarDecl</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="string">''' 对于声明语句，在symtab中创建一条VarSymbol记录 '''</span></span><br><span class="line">        type_name = node.type_node.value</span><br><span class="line">        type_symbol = self.symtab.lookup(type_name)</span><br><span class="line">        var_name = node.var_node.value</span><br><span class="line">        var_symbol = VarSymbol(var_name, type_symbol)</span><br><span class="line">        self.symtab.define(var_symbol)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Assign</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="string">''' 对于赋值语句，确保symtab中能查到左值，并继续访问右值 '''</span></span><br><span class="line">        var_name = node.left.value</span><br><span class="line">        var_symbol = self.symtab.lookup(var_name)</span><br><span class="line">        <span class="keyword">if</span> var_symbol <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">raise</span> NameError(repr(var_name))</span><br><span class="line"></span><br><span class="line">        self.visit(node.right)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">visit_Var</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="string">''' 对于取值语句，确保symtab中能查到该变量 '''</span></span><br><span class="line">        var_name = node.value</span><br><span class="line">        var_symbol = self.symtab.lookup(var_name)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> var_symbol <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">raise</span> NameError(repr(var_name))</span><br></pre></td></tr></table></figure></p>
+<p><code>SymbolTableBuilder::symtab</code>的类型为<code>SymbolTable</code>，内部维护着一个字典，字典的数据部分为<code>Symbol</code>的子类：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Symbol</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name, type=None)</span>:</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.type = type</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">VarSymbol</span><span class="params">(Symbol)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name, type)</span>:</span></span><br><span class="line">        super(VarSymbol, self).__init__(name, type)</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BuiltinTypeSymbol</span><span class="params">(Symbol)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name)</span>:</span></span><br><span class="line">        super(BuiltinTypeSymbol, self).__init__(name)</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure></p>
+<p>在使用时，会为内置类型符号创建固定的<code>BuiltinTypeSymbol</code>变量，为变量创建<code>VarSymbol</code>变量：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int_type = BuiltinTypeSymbol(<span class="string">'INTEGER'</span>)</span><br><span class="line">real_type = BuiltinTypeSymbol(<span class="string">'REAL'</span>)</span><br><span class="line">var_x_symbol = VarSymbol(<span class="string">'x'</span>, int_type)</span><br><span class="line">var_y_symbol = VarSymbol(<span class="string">'y'</span>, real_type)</span><br></pre></td></tr></table></figure></p>
+<p>在最上层逻辑中，完成了词法分析、语法分析之后，解释执行之前，完成符号跟踪：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    lexer = Lexer(source_code)</span><br><span class="line">    parser = Parser(lexer)</span><br><span class="line">    tree = parser.parse()</span><br><span class="line">    symtab_builder = SymbolTableBuilder()</span><br><span class="line">    symtab_builder.visit(tree)  <span class="comment"># 执行符号跟踪</span></span><br><span class="line">    ...</span><br><span class="line">    interpreter = Interpreter(tree)</span><br><span class="line">    result = interpreter.interpret()</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure></p>
+<h1 id="支持过程声明"><a href="#支持过程声明" class="headerlink" title="支持过程声明"></a>支持过程声明</h1><p>在Part12中加入对过程的支持，Pascal代码结构类似这样：<br><figure class="highlight pascal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PROGRAM</span> Test;</span><br><span class="line"><span class="keyword">VAR</span> </span><br><span class="line">    a   : INTEGER;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">PROCEDURE</span> <span class="title">P1</span>;</span></span><br><span class="line"><span class="keyword">BEGIN</span>   <span class="comment">&#123;P1&#125;</span></span><br><span class="line"><span class="keyword">END</span>;    <span class="comment">&#123;P1&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">PROCEDURE</span> <span class="title">P1A</span>;</span></span><br><span class="line"><span class="keyword">BEGIN</span>   <span class="comment">&#123;P1A&#125;</span></span><br><span class="line"><span class="keyword">END</span>;    <span class="comment">&#123;P1A&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">BEGIN</span>   <span class="comment">&#123;Test&#125;</span></span><br><span class="line">    a := <span class="number">10</span>;</span><br><span class="line"><span class="keyword">END</span>.    <span class="comment">&#123;Test&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>修改语法表为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">program : PROGRAM variable SEMI block DOT                   </span><br><span class="line"></span><br><span class="line">block   : declarations compound_statement                   </span><br><span class="line"></span><br><span class="line">declarations    : VAR (variable_declaration SEMI) +  </span><br><span class="line">                | (PROCEDURE ID SEMI block SEMI)*   # 添加PROCEDURE       </span><br><span class="line">                | empty</span><br><span class="line"></span><br><span class="line">variable_declaration    : ID (COMMA ID)* COLON type_spec    </span><br><span class="line"></span><br><span class="line">type_spec   : INTEGER</span><br><span class="line"></span><br><span class="line">compound_statement  : BEGIN statement_list END              </span><br><span class="line"></span><br><span class="line">statement_list  : statement</span><br><span class="line">                | statement SEMI statement_list</span><br><span class="line"></span><br><span class="line">statement   : compound_statement</span><br><span class="line">            | assignment_statement</span><br><span class="line">            | empty</span><br><span class="line"></span><br><span class="line">assignment_statement    : variable ASSIGN expr</span><br><span class="line"></span><br><span class="line">empty   :</span><br><span class="line"></span><br><span class="line">expr    : term ((PLUS |MINUS) term)*</span><br><span class="line"></span><br><span class="line">term    : factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*</span><br><span class="line"></span><br><span class="line">factor  : PLUS factor</span><br><span class="line">        | MINUS factor</span><br><span class="line">        | INTEGER_CONST</span><br><span class="line">        | REAL_CONST</span><br><span class="line">        | LPAREN expr RPAREN</span><br><span class="line">        | variable</span><br><span class="line"></span><br><span class="line">variable : ID</span><br></pre></td></tr></table></figure></p>
+<p>对应的在词法分析中添加对<code>PROCEDURE</code>关键词的解析，在语法分析中添加对应的规则，在解释器中遇到PROCEDURE的声明则直接跳过，具体代码就不写了。</p>
+<h1 id="语义分析"><a href="#语义分析" class="headerlink" title="语义分析"></a>语义分析</h1><p>在Part13中引入了语义分析，文章给语义分析下的定义是：在完成AST构建后，基于该树执行的错误检查过程，是为了检查语法正确但语义错误的点，例如：没有声明就是用的变量，重复定义等。下面这段代码就是语法正确，语义错误的例子：<br><figure class="highlight pascal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PROGRAM</span> Main;</span><br><span class="line">    <span class="keyword">VAR</span> x   :INTEGER;</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    x := x + y;     <span class="comment">&#123;y在使用前没有定义&#125;</span></span><br><span class="line"><span class="keyword">END</span></span><br></pre></td></tr></table></figure></p>
+<p>不过看Part13的代码，其实和Part11差异不大，只不过它把Part11中的<code>SymbolTableBuilder</code>改为符合概念的<code>SemanticAnalyzer</code>，内部逻辑做了一些小修补，比如重复定义——在变量声明时下查看是否已经存在该符号。如此而已。  </p>
+<p>到此，一个解释器的完整过程在概念上就呈现完了：</p>
+<ul>
+<li>词法分析，提取合法的单词</li>
+<li>语法分析，根据语法表构造AST</li>
+<li>语义分析，根据AST检查符合语法但语义无意义的错误</li>
+<li>解释执行</li>
+</ul>
+<h2 id="增强版语义分析"><a href="#增强版语义分析" class="headerlink" title="增强版语义分析"></a>增强版语义分析</h2><p>Part13中的语义分析还是一个很弱的版本，甚至不合基本的使用需求。因为他在检查变量声明和重复定义时，没有生命期的概念。过程可以嵌套，不同层次过程的变量可以重名，基本原则是：1、如果在本层过程中找不到的符号，可以层层向上搜索，直到命中，如果到最上层都没有找到，则语义分析错误。2、如果发现符号在多层中均有定义，取最近一层。<br>Part14中给出的支持方案是采用<code>ScopedSymbolTable</code>栈，进入一层就创建一个新的<code>ScopedSymbolTable</code>对象，离开当前层次后，销毁其对应的<code>ScopedSymbolTable</code>对象，当访问符号时，从栈顶向栈底依次遍历。<br>具体代码就不在这堆了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>我认为这篇文章极具启发性，其实主题不是那么重要。我相信在大部分领域，背后都能从业务需求提炼出数学模型，这才是支撑其设计的理想架构。设计模式也不过是实现该模型的手段。如果模型的提炼工作做得不通透，哪怕通篇处处使用设计模式，也很难让代码简洁起来——这是很多低阶的设计所犯的通病。  </p>
+<p>好的设计是要分层、分模块，但分层分模块是理解了业务逻辑，抽象出简单规则后的结果，而不是设计目标。以本文为例，词法分析、语法分析、语义分析和解释执行是基于业务的理解和抽象提炼出的阶段分割，尤其是最最关键的一步是确定语言的语法表，从语法表到代码的映射规则确定后，工程的难度就确定了。语法表就是对业务的格式化解释。  </p>
+<p>还有很关键的一步文章没有解释——那就是为什么BNF是有效的，为什么语法表到代码的映射规则是有效的？我想这应该是文末列出的参考书目解释的问题：<br><a href="https://www.amazon.com/gp/product/193435645X/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=193435645X&amp;linkCode=as2&amp;tag=russblo0b-20&amp;linkId=5d5ca8c07bff5452ea443d8319e7703d" target="_blank" rel="noopener">《Language Implementation Patterns: Create Your Own Domain - Specific and General Programming Languages》</a><br><a href="https://www.amazon.com/gp/product/012088478X/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=012088478X&amp;linkCode=as2&amp;tag=russblo0b-20&amp;linkId=74578959d7d04bee4050c7bff1b7d02e" target="_blank" rel="noopener">《Engineering: A Compiler 2nd Edition》</a><br><a href="https://www.amazon.com/gp/product/0124104096/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0124104096&amp;linkCode=as2&amp;tag=russblo0b-20&amp;linkId=8db1da254b12fe6da1379957dda717fc" target="_blank" rel="noopener">《Programming Language Pragmatics, Fourth Edition》</a><br><a href="https://www.amazon.com/gp/product/0321486811/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0321486811&amp;linkCode=as2&amp;tag=russblo0b-20&amp;linkId=31743d76157ef1377153dba78c54e177" target="_blank" rel="noopener">《Compilers: Principles, Techniques, and Tools (2nd Edition)》</a><br><a href="https://www.amazon.com/gp/product/0470177071/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0470177071&amp;linkCode=as2&amp;tag=russblo0b-20&amp;linkId=542d1267e34a529e0f69027af20e27f3" target="_blank" rel="noopener">《Writing Compilers and Interpreters: A Software Engineering Approach 3rd Edition》</a>  </p>
+<p>试想，如果没有理论为基础，直接从0到1运用工程技术去生写，哪怕也会有迭代改进，最终产出的代码：1、没有深度，缺少更高一阶的改进空间；2、难免出现一些tricky和补丁。我见过维护了十年的这类项目，不同的人，不同的想法叠加在上面，很多代码你能读懂他做了什么，却无法理解当初为什么这么做。从结果来看，它的确解决了问题，而且很出色，但是程序员做的很没有成就感。回到本文的上下文中，深刻理解编译原理，才能成为这个领域的专家，进一步理解编译原理背后更普遍的原理，并尝试应用到其他领域，才能在扩宽技术视野的同时，让每一步走得更坚实。这是我认为程序员成长的理想路径，而不只是天天接需求，把它翻译成代码。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/18/2018/0618BuildASimpleInterpreter1/" rel="next" title="编写编译器和解释器一">
+                <i class="fa fa-chevron-left"></i> 编写编译器和解释器一
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/22/2018/0622Finance/" rel="prev" title="使用现金流贴现法算算几家美国公司的绝对估值">
+                使用现金流贴现法算算几家美国公司的绝对估值 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/06/19/2018/0619BuildASimpleInterpreter2/" data-title="编写编译器和解释器二" data-url="http://palanceli.github.io/2018/06/19/2018/0619BuildASimpleInterpreter2/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#支持Pascal语法规则"><span class="nav-number">1.</span> <span class="nav-text">支持Pascal语法规则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#词法解析"><span class="nav-number">1.1.</span> <span class="nav-text">词法解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语法分析"><span class="nav-number">1.2.</span> <span class="nav-text">语法分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释执行"><span class="nav-number">1.3.</span> <span class="nav-text">解释执行</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#增强版Pascal语法规则"><span class="nav-number">2.</span> <span class="nav-text">增强版Pascal语法规则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#词法分析"><span class="nav-number">2.1.</span> <span class="nav-text">词法分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语法分析-1"><span class="nav-number">2.2.</span> <span class="nav-text">语法分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解释执行-1"><span class="nav-number">2.3.</span> <span class="nav-text">解释执行</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构建符号表"><span class="nav-number">3.</span> <span class="nav-text">构建符号表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#支持过程声明"><span class="nav-number">4.</span> <span class="nav-text">支持过程声明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#语义分析"><span class="nav-number">5.</span> <span class="nav-text">语义分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#增强版语义分析"><span class="nav-number">5.1.</span> <span class="nav-text">增强版语义分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

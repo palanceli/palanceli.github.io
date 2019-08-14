@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="iOS下自定义键盘的创建方法在《Custom Keyboard（译）》中有详细描述，它生成的键盘只是一个白板。这里我们继续把它完善成为一个输入法的样子。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS下开发Custom Keyboard">
+<meta property="og:url" content="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="iOS下自定义键盘的创建方法在《Custom Keyboard（译）》中有详细描述，它生成的键盘只是一个白板。这里我们继续把它完善成为一个输入法的样子。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.811Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS下开发Custom Keyboard">
+<meta name="twitter:description" content="iOS下自定义键盘的创建方法在《Custom Keyboard（译）》中有详细描述，它生成的键盘只是一个白板。这里我们继续把它完善成为一个输入法的样子。">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/">
+
+
+
+
+
+  <title>iOS下开发Custom Keyboard | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS下开发Custom Keyboard</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-11T23:33:00+08:00">
+                2017-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/11/2017/0311iOSCKImeSample/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/11/2017/0311iOSCKImeSample/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>iOS下自定义键盘的创建方法在<a href="http://palanceli.com/2017/03/07/2017/0307CustomKeyboard/#使用Xcode自定义键盘模板" target="_blank" rel="noopener">《Custom Keyboard（译）》</a>中有详细描述，它生成的键盘只是一个白板。这里我们继续把它完善成为一个输入法的样子。<a id="more"></a><br>项目的名称为<code>iOSCKImeSample</code>，这也是容器app的名字。键盘的Target name为<code>CKbd</code>。</p>
+<h1 id="在容器app中添加可输入对象"><a href="#在容器app中添加可输入对象" class="headerlink" title="在容器app中添加可输入对象"></a>在容器app中添加可输入对象</h1><p>如图，在容器app中添加两个控件，以便验证键盘：<br><img src="/2017/03/11/2017/0311iOSCKImeSample/img01.png" alt="添加输入控件"></p>
+<h1 id="Xcode模板生成的键盘"><a href="#Xcode模板生成的键盘" class="headerlink" title="Xcode模板生成的键盘"></a>Xcode模板生成的键盘</h1><p>先来看看Xcode默认生成的输入法的样子：<br><img src="/2017/03/11/2017/0311iOSCKImeSample/img02.png" alt="Xcode默认生成的键盘"><br>在<code>iOSCKImeSampleCKbd/KeyboardViewController.m</code>中，<br><code>KeyboardViewController::viewDidLoad</code>代码如下：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">  [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 生成方形圆角按钮</span></span><br><span class="line">  <span class="keyword">self</span>.nextKeyboardButton = [<span class="built_in">UIButton</span> buttonWithType:<span class="built_in">UIButtonTypeSystem</span>];</span><br><span class="line">  <span class="comment">// 设置标题，和状态</span></span><br><span class="line">  [<span class="keyword">self</span>.nextKeyboardButton setTitle:</span><br><span class="line">   <span class="built_in">NSLocalizedString</span>(<span class="string">@"Next Keyboard"</span>,</span><br><span class="line">                     <span class="string">@"Title for 'Next Keyboard' button"</span>)</span><br><span class="line">                           forState:<span class="built_in">UIControlStateNormal</span>];</span><br><span class="line">  <span class="comment">// 按钮尺寸为能容纳内容的最小化尺寸</span></span><br><span class="line">  [<span class="keyword">self</span>.nextKeyboardButton sizeToFit];</span><br><span class="line">  <span class="keyword">self</span>.nextKeyboardButton.translatesAutoresizingMaskIntoConstraints = <span class="literal">NO</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 设置响应：长按显示输入法列表，短按切换输入法</span></span><br><span class="line">  [<span class="keyword">self</span>.nextKeyboardButton addTarget:<span class="keyword">self</span> action:<span class="keyword">@selector</span>(handleInputModeListFromView:withEvent:) forControlEvents:<span class="built_in">UIControlEventAllTouchEvents</span>];</span><br><span class="line">  <span class="comment">// 将按钮添加为view的子视图</span></span><br><span class="line">  [<span class="keyword">self</span>.view addSubview:<span class="keyword">self</span>.nextKeyboardButton];</span><br><span class="line">  <span class="comment">// 将按钮左/下边缘对齐到view的左下边缘</span></span><br><span class="line">  [<span class="keyword">self</span>.nextKeyboardButton.leftAnchor constraintEqualToAnchor:<span class="keyword">self</span>.view.leftAnchor].active = <span class="literal">YES</span>;</span><br><span class="line">  [<span class="keyword">self</span>.nextKeyboardButton.bottomAnchor constraintEqualToAnchor:<span class="keyword">self</span>.view.bottomAnchor].active = <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>它直接在主视图上生成了一个<code>Next Keyboard</code>按钮，并响应点击事件。完善该键盘，只需要在主视图上长出完整的键盘按钮，并响应点击事件即可。</p>
+<h1 id="Step1-创建按键布局"><a href="#Step1-创建按键布局" class="headerlink" title="Step1 创建按键布局"></a>Step1 创建按键布局</h1><p>为<code>KeyboardViewController</code>添加函数<code>createCKbdUI</code>，并在<code>KeyboardViewController::viewDidLoad</code>中调用它：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">  [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">  [<span class="keyword">self</span> createCKbdUI]; <span class="comment">// 创建键盘布局</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Step1-1-createCKbdUI"><a href="#Step1-1-createCKbdUI" class="headerlink" title="Step1.1 createCKbdUI"></a>Step1.1 createCKbdUI</h2><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)createCKbdUI&#123;</span><br><span class="line">  <span class="keyword">self</span>.allButtons= [<span class="built_in">NSMutableArray</span> array];</span><br><span class="line">  <span class="keyword">self</span>.isPressShiftKey= <span class="literal">NO</span>;</span><br><span class="line">  <span class="comment">// 定义每一行的键帽字符</span></span><br><span class="line">  <span class="built_in">NSArray</span> *titles = @[@[<span class="string">@"q"</span>,<span class="string">@"w"</span>,<span class="string">@"e"</span>,<span class="string">@"r"</span>,<span class="string">@"t"</span>,<span class="string">@"y"</span>,<span class="string">@"u"</span>,<span class="string">@"i"</span>,<span class="string">@"o"</span>,<span class="string">@"p"</span>],</span><br><span class="line">                      @[<span class="string">@"a"</span>,<span class="string">@"s"</span>,<span class="string">@"d"</span>,<span class="string">@"f"</span>,<span class="string">@"g"</span>,<span class="string">@"h"</span>,<span class="string">@"j"</span>,<span class="string">@"k"</span>,<span class="string">@"l"</span>],</span><br><span class="line">                      @[<span class="string">@"shift"</span>,<span class="string">@"z"</span>,<span class="string">@"x"</span>,<span class="string">@"c"</span>,<span class="string">@"v"</span>,<span class="string">@"b"</span>,<span class="string">@"n"</span>,<span class="string">@"m"</span>,<span class="string">@"bksp"</span>],</span><br><span class="line">                      @[<span class="string">@"123"</span>,<span class="string">@"next"</span>,<span class="string">@"space"</span>,<span class="string">@"return"</span>]];</span><br><span class="line">  <span class="comment">// 为每一行创建视图，并加入主视图</span></span><br><span class="line">  <span class="built_in">NSMutableArray</span> *rowViews = [<span class="built_in">NSMutableArray</span> array];</span><br><span class="line">  <span class="keyword">for</span>(<span class="built_in">NSArray</span> *rowTitle <span class="keyword">in</span> titles)&#123;</span><br><span class="line">    <span class="built_in">UIView</span>* view = [<span class="keyword">self</span> createRowOfButtons:rowTitle]; <span class="comment">// 🏁</span></span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:view];</span><br><span class="line">    [rowViews addObject:view];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 为每行视图添加约束</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="built_in">UIView</span> *rowView <span class="keyword">in</span> rowViews) &#123;</span><br><span class="line">    <span class="built_in">NSInteger</span> index = [rowViews indexOfObject:rowView];</span><br><span class="line">    rowView.translatesAutoresizingMaskIntoConstraints = <span class="literal">NO</span>;</span><br><span class="line">    <span class="comment">// 左右都与主视图的左右边缘对齐</span></span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *rightConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                           constraintWithItem:rowView</span><br><span class="line">                                           attribute:<span class="built_in">NSLayoutAttributeRight</span></span><br><span class="line">                                           relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                           toItem:<span class="keyword">self</span>.view</span><br><span class="line">                                           attribute:<span class="built_in">NSLayoutAttributeRight</span></span><br><span class="line">                                           multiplier:<span class="number">1.0</span> constant:<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *leftConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                          constraintWithItem:rowView</span><br><span class="line">                                          attribute:<span class="built_in">NSLayoutAttributeLeft</span></span><br><span class="line">                                          relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                          toItem:<span class="keyword">self</span>.view</span><br><span class="line">                                          attribute:<span class="built_in">NSLayoutAttributeLeft</span></span><br><span class="line">                                          multiplier:<span class="number">1.0</span> constant:<span class="number">0</span>];</span><br><span class="line">    <span class="comment">// 首行view与主视图上边缘对齐，之后的与上邻view下边缘对齐</span></span><br><span class="line">    <span class="keyword">id</span> toItem = <span class="keyword">self</span>.view;</span><br><span class="line">    <span class="built_in">NSLayoutAttribute</span> toItemAttribute = <span class="built_in">NSLayoutAttributeTop</span>;</span><br><span class="line">    <span class="keyword">if</span>(index &gt; <span class="number">0</span>)&#123;</span><br><span class="line">      toItem = rowViews[index - <span class="number">1</span>];</span><br><span class="line">      toItemAttribute = <span class="built_in">NSLayoutAttributeBottom</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *topConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                         constraintWithItem:rowView</span><br><span class="line">                                         attribute:<span class="built_in">NSLayoutAttributeTop</span></span><br><span class="line">                                         relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                         toItem:toItem</span><br><span class="line">                                         attribute:toItemAttribute</span><br><span class="line">                                         multiplier:<span class="number">1.0</span> constant:<span class="number">0</span>];</span><br><span class="line">    <span class="comment">// 末行view与主视图下边缘对齐，之前的与下邻view上边缘对齐</span></span><br><span class="line">    toItem = <span class="keyword">self</span>.view;</span><br><span class="line">    toItemAttribute = <span class="built_in">NSLayoutAttributeBottom</span>;</span><br><span class="line">    <span class="keyword">if</span>(index &lt; rowViews.count - <span class="number">1</span>)&#123;</span><br><span class="line">      toItem = rowViews[index +<span class="number">1</span>];</span><br><span class="line">      toItemAttribute = <span class="built_in">NSLayoutAttributeTop</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *buttomConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                            constraintWithItem:rowView</span><br><span class="line">                                            attribute:<span class="built_in">NSLayoutAttributeBottom</span></span><br><span class="line">                                            relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                            toItem:toItem</span><br><span class="line">                                            attribute:toItemAttribute</span><br><span class="line">                                            multiplier:<span class="number">1.0</span> constant:<span class="number">0</span>];</span><br><span class="line">    <span class="comment">// 等高约束</span></span><br><span class="line">    <span class="built_in">UIView</span> *firstRow = rowViews[<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *heightConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                            constraintWithItem:firstRow</span><br><span class="line">                                            attribute:<span class="built_in">NSLayoutAttributeHeight</span></span><br><span class="line">                                            relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                            toItem:rowView</span><br><span class="line">                                            attribute:<span class="built_in">NSLayoutAttributeHeight</span></span><br><span class="line">                                            multiplier:<span class="number">1.0</span></span><br><span class="line">                                            constant:<span class="number">0</span>];</span><br><span class="line">    [<span class="keyword">self</span>.view addConstraint:heightConstraint];</span><br><span class="line">    [<span class="keyword">self</span>.view addConstraints:@[leftConstraint,rightConstraint,topConstraint,buttomConstraint]];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Step1-2-createRowOfButtons"><a href="#Step1-2-createRowOfButtons" class="headerlink" title="Step1.2 createRowOfButtons"></a>Step1.2 createRowOfButtons</h2><p>根据buttonTitles创建包含一排按键的视图<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">UIView</span>* )createRowOfButtons:(<span class="built_in">NSArray</span>*)buttonTitles&#123;</span><br><span class="line">  <span class="comment">// 为每行按键创建一个view</span></span><br><span class="line">  <span class="built_in">UIView</span> *keyBoardRowView = [[<span class="built_in">UIView</span> alloc]initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">320</span>, <span class="number">50</span>)];</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">NSMutableArray</span> *buttons = [<span class="built_in">NSMutableArray</span> array];</span><br><span class="line">  <span class="comment">//遍历title，依次创建按键，并加入到keyBoardRowView</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="built_in">NSString</span> *title <span class="keyword">in</span> buttonTitles) &#123;</span><br><span class="line">    <span class="built_in">UIButton</span> *btn = [<span class="built_in">UIButton</span> buttonWithType:(<span class="built_in">UIButtonTypeSystem</span>)];</span><br><span class="line">    btn.frame = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">30</span>);</span><br><span class="line">    [btn setTitle:title forState:(<span class="built_in">UIControlStateNormal</span>)];</span><br><span class="line">    [btn sizeToFit];</span><br><span class="line">    [btn.layer setBorderWidth:<span class="number">1.0</span>];</span><br><span class="line">    btn.titleLabel.font = [<span class="built_in">UIFont</span> systemFontOfSize:<span class="number">15</span>];</span><br><span class="line">    [btn setTranslatesAutoresizingMaskIntoConstraints:<span class="literal">false</span>];</span><br><span class="line">    [btn setTitleColor:[<span class="built_in">UIColor</span> darkGrayColor]</span><br><span class="line">              forState:(<span class="built_in">UIControlStateNormal</span>)];</span><br><span class="line">    <span class="comment">// 指定响应函数</span></span><br><span class="line">    [btn addTarget:<span class="keyword">self</span> action:<span class="keyword">@selector</span>(didTapButton:)</span><br><span class="line">              forControlEvents:(<span class="built_in">UIControlEventTouchUpInside</span>)]; <span class="comment">// 🏁</span></span><br><span class="line">    [buttons addObject:btn];</span><br><span class="line">    [<span class="keyword">self</span>.allButtons addObject:btn];</span><br><span class="line">    [keyBoardRowView addSubview:btn];</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 遍历每一个按键，设置约束</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="built_in">UIButton</span> *button <span class="keyword">in</span> buttons) &#123;</span><br><span class="line">    <span class="built_in">NSInteger</span> space = <span class="number">1</span>; <span class="comment">// 边距</span></span><br><span class="line">    <span class="built_in">NSInteger</span> index = [buttons indexOfObject:button];</span><br><span class="line">    <span class="comment">//关闭button自动翻译约束的功能</span></span><br><span class="line">    button.translatesAutoresizingMaskIntoConstraints = <span class="literal">NO</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// button 顶部与keyboardView顶部对齐</span></span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *topConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                         constraintWithItem:button</span><br><span class="line">                                         attribute:<span class="built_in">NSLayoutAttributeTop</span></span><br><span class="line">                                         relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                         toItem:keyBoardRowView</span><br><span class="line">                                         attribute:<span class="built_in">NSLayoutAttributeTop</span></span><br><span class="line">                                         multiplier:<span class="number">1.0</span></span><br><span class="line">                                         constant:space];</span><br><span class="line">    <span class="comment">// button 底部与keyboardView底部对齐</span></span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *bottomConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                            constraintWithItem:button</span><br><span class="line">                                            attribute:<span class="built_in">NSLayoutAttributeBottom</span></span><br><span class="line">                                            relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                            toItem:keyBoardRowView</span><br><span class="line">                                            attribute:<span class="built_in">NSLayoutAttributeBottom</span></span><br><span class="line">                                            multiplier:<span class="number">1.0</span> constant:-space];</span><br><span class="line">    <span class="comment">// 行首button与keyboardView左侧对齐，之后的与左邻button右边缘对齐</span></span><br><span class="line">    <span class="keyword">id</span> toItem = keyBoardRowView;</span><br><span class="line">    <span class="built_in">NSLayoutAttribute</span> toItemAttribute = <span class="built_in">NSLayoutAttributeLeft</span>;</span><br><span class="line">    <span class="keyword">if</span> (index &gt; <span class="number">0</span>)&#123;</span><br><span class="line">      toItem = buttons[index - <span class="number">1</span>];</span><br><span class="line">      toItemAttribute = <span class="built_in">NSLayoutAttributeRight</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *leftConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                          constraintWithItem:button</span><br><span class="line">                                          attribute:<span class="built_in">NSLayoutAttributeLeft</span></span><br><span class="line">                                          relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                          toItem:toItem</span><br><span class="line">                                          attribute:toItemAttribute</span><br><span class="line">                                          multiplier:<span class="number">1.0</span> constant:space];</span><br><span class="line">    <span class="comment">// 行末button与keyboardView右侧对齐，之前的与右邻button左边缘对齐</span></span><br><span class="line">    toItem = keyBoardRowView;</span><br><span class="line">    toItemAttribute = <span class="built_in">NSLayoutAttributeRight</span>;</span><br><span class="line">    <span class="keyword">if</span>(index &lt; buttons.count - <span class="number">1</span>)&#123;</span><br><span class="line">      toItem = buttons[index + <span class="number">1</span>];</span><br><span class="line">      toItemAttribute = <span class="built_in">NSLayoutAttributeLeft</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *rightConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                           constraintWithItem:button</span><br><span class="line">                                           attribute:<span class="built_in">NSLayoutAttributeRight</span></span><br><span class="line">                                           relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                           toItem:toItem</span><br><span class="line">                                           attribute:toItemAttribute</span><br><span class="line">                                           multiplier:<span class="number">1.0</span> constant:-space];</span><br><span class="line">    <span class="comment">// 每个按键都等宽</span></span><br><span class="line">    <span class="built_in">UIButton</span> *firstButton = buttons[<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">NSLayoutConstraint</span> *widthConstraint = [<span class="built_in">NSLayoutConstraint</span></span><br><span class="line">                                           constraintWithItem:firstButton</span><br><span class="line">                                           attribute:<span class="built_in">NSLayoutAttributeWidth</span></span><br><span class="line">                                           relatedBy:<span class="built_in">NSLayoutRelationEqual</span></span><br><span class="line">                                           toItem:button</span><br><span class="line">                                           attribute:<span class="built_in">NSLayoutAttributeWidth</span></span><br><span class="line">                                           multiplier:<span class="number">1.0</span> constant:<span class="number">0</span>];</span><br><span class="line">    [keyBoardRowView addConstraint:widthConstraint];</span><br><span class="line">    [keyBoardRowView addConstraints:@[topConstraint,bottomConstraint,rightConstraint,leftConstraint]];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> keyBoardRowView;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行后能看到键盘布局如下：<br><img src="/2017/03/11/2017/0311iOSCKImeSample/img03.png" alt="键盘布局"></p>
+<h1 id="Step2-指定键盘响应函数"><a href="#Step2-指定键盘响应函数" class="headerlink" title="Step2 指定键盘响应函数"></a>Step2 指定键盘响应函数</h1><p>在Step1.2创建每个按键后，调用addTarget为之指定响应函数<code>didTapButton:</code><br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)didTapButton:(<span class="built_in">UIButton</span>*)sender&#123;</span><br><span class="line">  <span class="comment">//获取被点击按钮的title</span></span><br><span class="line">  <span class="built_in">NSString</span> *title = [sender titleForState:(<span class="built_in">UIControlStateNormal</span>)];</span><br><span class="line">  <span class="keyword">if</span>([title caseInsensitiveCompare:<span class="string">@"shift"</span>] == <span class="built_in">NSOrderedSame</span>)&#123;</span><br><span class="line">    <span class="keyword">self</span>.isPressShiftKey = !<span class="keyword">self</span>.isPressShiftKey;</span><br><span class="line">    [<span class="keyword">self</span> onShift]; <span class="comment">// 切换大小写</span></span><br><span class="line">  &#125;<span class="keyword">else</span> <span class="keyword">if</span>([title caseInsensitiveCompare:<span class="string">@"bksp"</span>] == <span class="built_in">NSOrderedSame</span>)&#123;</span><br><span class="line">    [<span class="keyword">self</span>.textDocumentProxy deleteBackward];</span><br><span class="line">  &#125;<span class="keyword">else</span> <span class="keyword">if</span>([title caseInsensitiveCompare:<span class="string">@"space"</span>] == <span class="built_in">NSOrderedSame</span>)&#123;</span><br><span class="line">    [<span class="keyword">self</span>.textDocumentProxy insertText:<span class="string">@" "</span>];</span><br><span class="line">  &#125;<span class="keyword">else</span> <span class="keyword">if</span>([title caseInsensitiveCompare:<span class="string">@"return"</span>] == <span class="built_in">NSOrderedSame</span>)&#123;</span><br><span class="line">    [<span class="keyword">self</span>.textDocumentProxy insertText:<span class="string">@"\n"</span>];</span><br><span class="line">  &#125;<span class="keyword">else</span> <span class="keyword">if</span>([title caseInsensitiveCompare:<span class="string">@"next"</span>] == <span class="built_in">NSOrderedSame</span>)&#123;</span><br><span class="line">    [<span class="keyword">self</span> advanceToNextInputMode];</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    [<span class="keyword">self</span>.textDocumentProxy insertText:title];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)onShift&#123;</span><br><span class="line">  <span class="comment">// 遍历每一个按键，切换键帽大小写</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="built_in">UIButton</span> *button <span class="keyword">in</span> <span class="keyword">self</span>.allButtons) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *title = [button titleForState:<span class="built_in">UIControlStateNormal</span>];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.isPressShiftKey) &#123;</span><br><span class="line">      title = [title uppercaseString];</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">      title = [title lowercaseString];</span><br><span class="line">    &#125;</span><br><span class="line">    [button setTitle:title forState:(<span class="built_in">UIControlStateNormal</span>)];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>参见<a href="http://localhost:4000/2017/03/07/2017/0307CustomKeyboard/#自定义键盘API" target="_blank" rel="noopener">《自定义键盘之：自定义键盘API》</a>，这里有键盘与输入对象之间交互的API，这也是输入法处理按键主要调用的API。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>到此一个简单的可处理按键事件的自定义键盘就完成了。和Windows的IMM框架相比，iOS的Custom Keyboard体系让输入法能最小化运行起来，要简单太多了。我分析原因如下：</p>
+<ul>
+<li>手机上的按键输入事件来自键盘界面；而Windows的IMM则来自系统，因此Windows须定义一套协议让按键从IMM传递给输入法，这就是那十几个Imexxx的导出函数。</li>
+<li>而且Windows处理每个按键不是一个导出函数就能完成，而需要<code>ImeProcessKey</code>和<code>ImeToAsciiEx</code>两次调用，这是我一直不理解的地方。</li>
+<li>iOS下处理按键是由键盘视图驱动，处理完成后直接调用视图方法更新界面；而Windows处理完按键之后，不能直接调用界面更新，而是把待更新的内容转换成消息，通知输入法UI窗口，UI窗口再把消息翻译成更新的内容展现到子窗口上。这相当于系统有定义了一层WM_IME_xxx的消息协议。为什么不能直接控制界面呢？应该是怕卡死主进程，试想一般的Windows UI程序，假设要定时刷新界面，不是在定时器里直接绘制，而是在定时器里设置无效区域，在WM_PAINT消息中处理绘制。</li>
+<li>Windows的IMC是每线程一份，这么做的好处是在不同的进程或线程之间切换焦点，可以保持上次的输入状态和内容，但也让数据和对这些数据的处理必须分离开；而iOS的上下文信息则与输入app无关，当输入焦点切换，上下文信息也就丢失了。这么做的好处是输入法不必负责根据上下文恢复当前状态，省去了逻辑的复杂性。当然，如果在Windows下状态机做得漂亮，这个复杂度倒也不大，这需要付出更大的设计成本。</li>
+<li>iOS底层一定有更便利的进程间通信机制，让输入法可以和输入进程通信；这是Windows所不具备的。iOS这个机制让输入法更方便、准确地获得输入上下文，从而可以提供更好的联想候选。</li>
+</ul>
+<p>协议为两个模块之间的交互提供了一个抽象层，使得两个模块之间解除了耦合，但同时也增加了学习成本，如果原本就是一个模块，其内部调用也用协议来隔离，那就会把事情复杂化。Windows的Imexxx导出函数这层协议是必要的，但这十几个函数中必须的也就四五个，其它大部分用不到；WM_IME_xxx这层协议就把事情弄复杂了，但又不得不这么做。Windows每线程一份的IMC却对设计提出更高的要求，并没有带来多大的好处，，比如macOS下也没有基于进程或线程的输入上下文，也不觉得缺憾。以上就是Windows的IMM框架比iOS复杂的原因。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/07/2017/0307CustomKeyboard/" rel="next" title="iOS下的自定义键盘（译）">
+                <i class="fa fa-chevron-left"></i> iOS下的自定义键盘（译）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/23/2017/0323macOSIMKSample2/" rel="prev" title="macOS下基于IMK的输入法（二）——处理流程">
+                macOS下基于IMK的输入法（二）——处理流程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/03/11/2017/0311iOSCKImeSample/" data-title="iOS下开发Custom Keyboard" data-url="http://palanceli.github.io/2017/03/11/2017/0311iOSCKImeSample/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#在容器app中添加可输入对象"><span class="nav-number">1.</span> <span class="nav-text">在容器app中添加可输入对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Xcode模板生成的键盘"><span class="nav-number">2.</span> <span class="nav-text">Xcode模板生成的键盘</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-创建按键布局"><span class="nav-number">3.</span> <span class="nav-text">Step1 创建按键布局</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Step1-1-createCKbdUI"><span class="nav-number">3.1.</span> <span class="nav-text">Step1.1 createCKbdUI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step1-2-createRowOfButtons"><span class="nav-number">3.2.</span> <span class="nav-text">Step1.2 createRowOfButtons</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-指定键盘响应函数"><span class="nav-number">4.</span> <span class="nav-text">Step2 指定键盘响应函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

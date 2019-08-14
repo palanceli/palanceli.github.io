@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="键盘消息处理学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="再回过头来看《键盘消息处理学习笔记（三）》中InputReaderThread的启动Step2中，mEventHub-&amp;gt;getEvents(...)从所有输入设备读取一轮IO事件，如果有IO事件发生，mEventHub-&amp;gt;getEvents(…)就会返回，接着由InputReader::processEventsLocked(...)来处理这些IO事件。本文以该函数为起点研究键盘事件的">
+<meta name="keywords" content="键盘消息处理学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="键盘消息处理学习笔记（九）InputReader获得键盘事件">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning9/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="再回过头来看《键盘消息处理学习笔记（三）》中InputReaderThread的启动Step2中，mEventHub-&amp;gt;getEvents(...)从所有输入设备读取一轮IO事件，如果有IO事件发生，mEventHub-&amp;gt;getEvents(…)就会返回，接着由InputReader::processEventsLocked(...)来处理这些IO事件。本文以该函数为起点研究键盘事件的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning9/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.750Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="键盘消息处理学习笔记（九）InputReader获得键盘事件">
+<meta name="twitter:description" content="再回过头来看《键盘消息处理学习笔记（三）》中InputReaderThread的启动Step2中，mEventHub-&amp;gt;getEvents(...)从所有输入设备读取一轮IO事件，如果有IO事件发生，mEventHub-&amp;gt;getEvents(…)就会返回，接着由InputReader::processEventsLocked(...)来处理这些IO事件。本文以该函数为起点研究键盘事件的">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning9/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning9/">
+
+
+
+
+
+  <title>键盘消息处理学习笔记（九）InputReader获得键盘事件 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">键盘消息处理学习笔记（九）InputReader获得键盘事件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-03T23:17:40+08:00">
+                2016-10-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/03/2016/1002KeyboardLearning9/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/03/2016/1002KeyboardLearning9/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>再回过头来看《键盘消息处理学习笔记（三）》中<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning3/#Step2-InputReader-loopOnce" target="_blank" rel="noopener">InputReaderThread的启动Step2</a>中，<code>mEventHub-&gt;getEvents(...)</code>从所有输入设备读取一轮IO事件，如果有IO事件发生，mEventHub-&gt;getEvents(…)就会返回，接着由<code>InputReader::processEventsLocked(...)</code>来处理这些IO事件。本文以该函数为起点研究键盘事件的处理。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.cpp:272</span></span><br><span class="line"><span class="keyword">void</span> InputReader::loopOnce() &#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">int32_t</span> timeoutMillis;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">size_t</span> count = mEventHub-&gt;getEvents(timeoutMillis, mEventBuffer, EVENT_BUFFER_SIZE);    <span class="comment">// 从所有输入设备读取一轮IO事件，保存到mEventBuffer</span></span><br><span class="line">    ... ...</span><br><span class="line">        <span class="keyword">if</span> (count) &#123;</span><br><span class="line">            processEventsLocked(mEventBuffer, count); <span class="comment">// 🏁</span></span><br><span class="line">        &#125;</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h1 id="Step1-InputReader-processEventsLocked-…"><a href="#Step1-InputReader-processEventsLocked-…" class="headerlink" title="Step1: InputReader::processEventsLocked(…)"></a>Step1: InputReader::processEventsLocked(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.cpp:336</span></span><br><span class="line"><span class="keyword">void</span> InputReader::processEventsLocked(<span class="keyword">const</span> RawEvent* rawEvents, <span class="keyword">size_t</span> count) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> RawEvent* rawEvent = rawEvents; count;) &#123;</span><br><span class="line">        <span class="keyword">int32_t</span> type = rawEvent-&gt;type;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">size_t</span> batchSize = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (type &lt; EventHubInterface::FIRST_SYNTHETIC_EVENT) &#123;</span><br><span class="line">            <span class="keyword">int32_t</span> deviceId = rawEvent-&gt;deviceId;</span><br><span class="line">            <span class="comment">// 扫描rawEvent之后，相同设备id连续的键盘事件个数</span></span><br><span class="line">            <span class="keyword">while</span> (batchSize &lt; count) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rawEvent[batchSize].type &gt;= EventHubInterface::FIRST_SYNTHETIC_EVENT</span><br><span class="line">                        || rawEvent[batchSize].deviceId != deviceId) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                batchSize += <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 🏁批量处理这些IO事件</span></span><br><span class="line">            processEventsForDeviceLocked(deviceId, rawEvent, batchSize);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 处理非键盘事件，如设备的增、删、查事件</span></span><br><span class="line">            ... ...</span><br><span class="line">        &#125;</span><br><span class="line">        count -= batchSize;</span><br><span class="line">        rawEvent += batchSize;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step2-InputReader-processEventsForDevicedLocked-…"><a href="#Step2-InputReader-processEventsForDevicedLocked-…" class="headerlink" title="Step2: InputReader::processEventsForDevicedLocked(…)"></a>Step2: InputReader::processEventsForDevicedLocked(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.cpp:503</span></span><br><span class="line"><span class="keyword">void</span> InputReader::processEventsForDeviceLocked(<span class="keyword">int32_t</span> deviceId,</span><br><span class="line">        <span class="keyword">const</span> RawEvent* rawEvents, <span class="keyword">size_t</span> count) &#123;</span><br><span class="line">    <span class="keyword">ssize_t</span> deviceIndex = mDevices.indexOfKey(deviceId);</span><br><span class="line">    ... ... <span class="comment">// 获取发生键盘事件的输入设备</span></span><br><span class="line">    InputDevice* device = mDevices.valueAt(deviceIndex);</span><br><span class="line">    ... ...</span><br><span class="line">    device-&gt;process(rawEvents, count);  <span class="comment">// 🏁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step3-InputDevice-process-…"><a href="#Step3-InputDevice-process-…" class="headerlink" title="Step3: InputDevice::process(…)"></a>Step3: InputDevice::process(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.cpp:1027</span></span><br><span class="line"><span class="keyword">void</span> InputDevice::process(<span class="keyword">const</span> RawEvent* rawEvents, <span class="keyword">size_t</span> count) &#123;</span><br><span class="line">    <span class="comment">// 让本设备的所有InputMapper有机会处理每一个键盘事件</span></span><br><span class="line">    <span class="keyword">size_t</span> numMappers = mMappers.size();</span><br><span class="line">    <span class="comment">// 遍历每一个IO事件</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> RawEvent* rawEvent = rawEvents; count--; rawEvent++) &#123;</span><br><span class="line">... ...</span><br><span class="line">            <span class="comment">// 遍历每一个InputMapper对象，找到和事件匹配的对象，处理</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; numMappers; i++) &#123;</span><br><span class="line">                InputMapper* mapper = mMappers[i];</span><br><span class="line">                mapper-&gt;process(rawEvent);  <span class="comment">// 🏁</span></span><br><span class="line">            &#125;</span><br><span class="line">... ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每一种类型的的IO事件都由一个InputMapper对象来处理，尽管在第二个for循环中遍历了所有的InputMapper对象，而实际只有一个InputMapper对象会对和自己匹配的事件进行处理。此处我们关心的是键盘事件，因此我们只需要关注处理键盘事件的mapper——KeyboardInputMapper。</p>
+<h1 id="Step4-KeyboardInputMapper-process-…"><a href="#Step4-KeyboardInputMapper-process-…" class="headerlink" title="Step4: KeyboardInputMapper::process(…)"></a>Step4: KeyboardInputMapper::process(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.cpp:2172</span></span><br><span class="line"><span class="keyword">void</span> KeyboardInputMapper::process(<span class="keyword">const</span> RawEvent* rawEvent) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (rawEvent-&gt;type) &#123;</span><br><span class="line">    <span class="keyword">case</span> EV_KEY: &#123;</span><br><span class="line">        <span class="keyword">int32_t</span> scanCode = rawEvent-&gt;code; <span class="comment">// 获得扫描码</span></span><br><span class="line">        <span class="keyword">int32_t</span> usageCode = mCurrentHidUsage;</span><br><span class="line">        mCurrentHidUsage = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 检查该扫描码是否对应一个合法按键</span></span><br><span class="line">        <span class="keyword">if</span> (isKeyboardOrGamepadKey(scanCode)) &#123;</span><br><span class="line">            processKey(rawEvent-&gt;when, rawEvent-&gt;value != <span class="number">0</span>, </span><br><span class="line">                        scanCode, usageCode);  <span class="comment">// 🏁</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>简单介绍一下扫描码的概念：</p>
+<blockquote>
+<p>○ 当用户按下键盘上的一个键时，键盘内的芯片会检测到这个动作，并把这个信号传送到计算机。如何区别是哪一个键被按下了呢？键盘上的所有按键都有一个编码，称作键盘扫描码。当你按下一个键时，这个键的扫描码就被传给系统。扫描码是跟具体的硬件相关的，同一个键，在不同键盘上的扫描码有可能不同。键盘控制器就是将这个扫描码传给计算机，然后交给键盘驱动程序。键盘驱动程序会完成相关的工作，并把这个扫描码转换为键盘虚拟码。<br>○ 与扫描码相对的还有一个虚拟码。因为扫描码与硬件相关，不具有通用性，为了统一键盘上所有键的编码，于是就提出了虚拟码概念。无论什么键盘，同一个按键的虚拟码总是相同的，这样程序就可以识别了。简单点说，虚拟码就是我们经常可以看到的像VK_A,VK_B这样的常数，比如键A的虚拟码是65，写成16进制就是0x41。<br>○ 当键盘驱动程序把扫描码转换为虚拟码后，会把这个键盘操作的扫描码和虚拟码还有其它信息一起传递给操作系统。然后操作系统则会把这些信息封装在一个消息中，并把这个键盘消息插入到消息列队。</p>
+</blockquote>
+<h1 id="Step5-KeyboardInputMapper-processKey-…"><a href="#Step5-KeyboardInputMapper-processKey-…" class="headerlink" title="Step5: KeyboardInputMapper::processKey(…)"></a>Step5: KeyboardInputMapper::processKey(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.cpp:2205</span></span><br><span class="line"><span class="keyword">void</span> KeyboardInputMapper::processKey(<span class="keyword">nsecs_t</span> when, <span class="keyword">bool</span> down, <span class="keyword">int32_t</span> scanCode,</span><br><span class="line">        <span class="keyword">int32_t</span> usageCode) &#123;</span><br><span class="line">    <span class="keyword">int32_t</span> keyCode;</span><br><span class="line">    <span class="keyword">int32_t</span> keyMetaState;</span><br><span class="line">    <span class="keyword">uint32_t</span> policyFlags;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (down) &#123;</span><br><span class="line">        <span class="comment">// Rotate key codes according to orientation if needed.</span></span><br><span class="line">        <span class="comment">// 当屏幕旋转了，同一个DPAD按键对应的keyCode是不同的，此处完成转换</span></span><br><span class="line">        <span class="keyword">if</span> (mParameters.orientationAware &amp;&amp; mParameters.hasAssociatedDisplay) &#123;</span><br><span class="line">            keyCode = rotateKeyCode(keyCode, mOrientation);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Add key down.</span></span><br><span class="line">        <span class="comment">// 当前按下的键之前是否已经被按下了，如果是，keyDownIndex为非负</span></span><br><span class="line">        <span class="keyword">ssize_t</span> keyDownIndex = findKeyDown(scanCode);</span><br><span class="line">        <span class="keyword">if</span> (keyDownIndex &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// key repeat, be sure to use same keycode as before in case of rotation</span></span><br><span class="line">            <span class="comment">// mKeyDowns保存着已经被按下的按键集合，如果当前按键之前已经被按下了，</span></span><br><span class="line">            <span class="comment">// 则keyCode保持之前的含义，不要受屏幕旋转的影响。</span></span><br><span class="line">            keyCode = mKeyDowns.itemAt(keyDownIndex).keyCode;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 把当前按下的按键存入mKeyDowns</span></span><br><span class="line">            mKeyDowns.push();</span><br><span class="line">            KeyDown&amp; keyDown = mKeyDowns.editTop();</span><br><span class="line">            keyDown.keyCode = keyCode;</span><br><span class="line">            keyDown.scanCode = scanCode;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mDownTime = when;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Remove key down. 检查当前松开的按键之前处于被按下的状态</span></span><br><span class="line">        <span class="keyword">ssize_t</span> keyDownIndex = findKeyDown(scanCode);</span><br><span class="line">        <span class="keyword">if</span> (keyDownIndex &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// key up, be sure to use same keycode as before in case of rotation</span></span><br><span class="line">            <span class="comment">// 将该按键从mKeyDowns中删除</span></span><br><span class="line">            keyCode = mKeyDowns.itemAt(keyDownIndex).keyCode;</span><br><span class="line">            mKeyDowns.removeAt(<span class="keyword">size_t</span>(keyDownIndex));</span><br><span class="line">        &#125; ... ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int32_t</span> oldMetaState = mMetaState;</span><br><span class="line">    <span class="comment">// 取出组合键信息（如Alt、Shift）保存在newMetaState中，如果发生变化则更新mMetaState</span></span><br><span class="line">    <span class="keyword">int32_t</span> newMetaState = updateMetaState(keyCode, down, oldMetaState);</span><br><span class="line">    <span class="keyword">bool</span> metaStateChanged = oldMetaState != newMetaState;</span><br><span class="line">    <span class="keyword">if</span> (metaStateChanged) &#123;</span><br><span class="line">        mMetaState = newMetaState;</span><br><span class="line">        updateLedState(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If global meta state changed send it along with the key.</span></span><br><span class="line">        <span class="comment">// If it has not changed then we'll use what keymap gave us,</span></span><br><span class="line">        <span class="comment">// since key replacement logic might temporarily reset a few</span></span><br><span class="line">        <span class="comment">// meta bits for given key.</span></span><br><span class="line">        keyMetaState = newMetaState;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">nsecs_t</span> downTime = mDownTime;</span><br><span class="line"></span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    <span class="function">NotifyKeyArgs <span class="title">args</span><span class="params">(when, getDeviceId(), mSource, policyFlags,</span></span></span><br><span class="line"><span class="function"><span class="params">            down ? AKEY_EVENT_ACTION_DOWN : AKEY_EVENT_ACTION_UP,</span></span></span><br><span class="line"><span class="function"><span class="params">            AKEY_EVENT_FLAG_FROM_SYSTEM, keyCode, scanCode, keyMetaState, downTime)</span></span>;</span><br><span class="line">    getListener()-&gt;notifyKey(&amp;args);    <span class="comment">// 🏁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码中的keyCode就是前面讲的虚拟码的概念，DPAD按键就是手机上的方向键：<br><img src="/2016/10/03/2016/1002KeyboardLearning9/img01.png" alt="DPAD按键"><br>同一个按键，当手机旋转后，尽管扫描码是相同的，可是按键的逻辑含义发生变化了，因此需要把keyCode作相应的转换，如原先的“上下左右”顺时针旋转90°后就变成了“右下左上”。</p>
+<p>这一大段的代码主要是来微调keyCode以及更新组合键信息，最后把这些信息打包到NotifyKeyArgs中，由getListener()-&gt;notifyKey(…)来处理。函数KeyboardInputMapper::getListener()继承自基类InputMapper：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.h:1012</span></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> InputListenerInterface* <span class="title">getListener</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> mContext-&gt;getListener(); &#125;</span><br></pre></td></tr></table></figure></p>
+<p>mContext是在构造函数中传入的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputReader.cpp:1823</span></span><br><span class="line">InputMapper::InputMapper(InputDevice* device) :</span><br><span class="line">        mDevice(device), mContext(device-&gt;getContext()) &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><font color="red">KeyboardInputMapper在构造的时候传入的InputDevice是谁？该设备的context又是谁？这些都是抽象类，从静态代码查找很困难。可以暂时搁置，日后调试进来再看。</font><br>一个简单的静态方法是从notifyKey入手，在Android源码根目录查找”::notifyKey”：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ find . -name <span class="string">"*.cpp"</span> |xargs grep <span class="string">"::notifyKey"</span></span><br><span class="line">appledeiMac:android-6.0.1_r11 palance$ find . -name <span class="string">"*.cpp"</span> |xargs grep <span class="string">"::notifyKey"</span></span><br><span class="line">./frameworks/native/services/inputflinger/InputDispatcher.cpp:void InputDispatcher::notifyKey(const NotifyKeyArgs* args) &#123;</span><br><span class="line">./frameworks/native/services/inputflinger/InputListener.cpp:void QueuedInputListener::notifyKey(const NotifyKeyArgs* args) &#123;</span><br><span class="line">./system/core/fingerprintd/FingerprintDaemonProxy.cpp:void FingerprintDaemonProxy::notifyKeystore(const uint8_t *auth_token, const size_t auth_token_length) &#123;</span><br></pre></td></tr></table></figure></p>
+<p>找到比较靠谱的代码就是InputDispatcher.cpp了，进入InputDispatcher的地界说明：在这里从InputReader的接收键盘事件的阶段进入到了分发键盘事件阶段。</p>
+<h1 id="Step6-InputDispatcher-notifyKey-…"><a href="#Step6-InputDispatcher-notifyKey-…" class="headerlink" title="Step6: InputDispatcher::notifyKey(…)"></a>Step6: InputDispatcher::notifyKey(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputDispatcher.cpp:2359</span></span><br><span class="line"><span class="keyword">void</span> InputDispatcher::notifyKey(<span class="keyword">const</span> NotifyKeyArgs* args) &#123;</span><br><span class="line">... ...</span><br><span class="line">    <span class="keyword">uint32_t</span> policyFlags = args-&gt;policyFlags;</span><br><span class="line">    <span class="keyword">int32_t</span> flags = args-&gt;flags;</span><br><span class="line">    <span class="keyword">int32_t</span> metaState = args-&gt;metaState;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">bool</span> needWake;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">int32_t</span> repeatCount = <span class="number">0</span>;</span><br><span class="line">        KeyEntry* newEntry = <span class="keyword">new</span> KeyEntry(args-&gt;eventTime,</span><br><span class="line">                args-&gt;deviceId, args-&gt;source, policyFlags,</span><br><span class="line">                args-&gt;action, flags, keyCode, args-&gt;scanCode,</span><br><span class="line">                metaState, repeatCount, args-&gt;downTime);</span><br><span class="line">        <span class="comment">// 将键盘事件添加到待分发队列</span></span><br><span class="line">        needWake = enqueueInboundEventLocked(newEntry); </span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (needWake) &#123;</span><br><span class="line">        mLooper-&gt;wake(); <span class="comment">// 见《笔记（四）》，向默认Fd写入信号</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我省略的代码比较多，因为一些按键的微调、过滤在这里都不是主要逻辑，此处的主流是将键盘事件封装成KeyEntry，添加到待分发队列，并唤醒Looper。<br>来看向待分发队列插入KeyEntry：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputDispatcher.cpp:408</span></span><br><span class="line"><span class="keyword">bool</span> InputDispatcher::enqueueInboundEventLocked(EventEntry* entry) &#123;</span><br><span class="line">    <span class="comment">// 如果之前队列为空，则新来一个事件需要立刻唤醒InputDispatcher来处理</span></span><br><span class="line">    <span class="keyword">bool</span> needWake = mInboundQueue.isEmpty();</span><br><span class="line">    mInboundQueue.enqueueAtTail(entry); <span class="comment">// 将entry进队</span></span><br><span class="line">    traceInboundQueueLengthLocked();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (entry-&gt;type) &#123;</span><br><span class="line">    <span class="keyword">case</span> EventEntry::TYPE_KEY: &#123;</span><br><span class="line">        ... ...</span><br><span class="line">        KeyEntry* keyEntry = <span class="keyword">static_cast</span>&lt;KeyEntry*&gt;(entry);</span><br><span class="line">        <span class="comment">// 键盘事件与应用程序窗口切换操作相关，如Home键，</span></span><br><span class="line">        <span class="comment">// 在抬起时应立刻唤醒InputDispatcher来处理</span></span><br><span class="line">        <span class="keyword">if</span> (isAppSwitchKeyEventLocked(keyEntry)) &#123; </span><br><span class="line">            <span class="keyword">if</span> (keyEntry-&gt;action == AKEY_EVENT_ACTION_DOWN) &#123;</span><br><span class="line">                mAppSwitchSawKeyDown = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (keyEntry-&gt;action == AKEY_EVENT_ACTION_UP) &#123;</span><br><span class="line">                <span class="keyword">if</span> (mAppSwitchSawKeyDown) &#123;</span><br><span class="line">                    ... ...</span><br><span class="line">                    mAppSwitchDueTime = keyEntry-&gt;eventTime + APP_SWITCH_TIMEOUT;</span><br><span class="line">                    mAppSwitchSawKeyDown = <span class="literal">false</span>;</span><br><span class="line">                    needWake = <span class="literal">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> needWake;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>InputDispatcher::mInboundQueue维护一个待分发键盘事件队列，队列中的事件都是需要分发给系统当前活动窗口来处理的。函数enqueueInboundEventLocked(…)除了让事件进队，还会返回是否立刻唤醒InputDispatcher，以分发队列中的键盘事件。<br>如果需要唤醒InputDispatcher，则在InputDispatcher::notifyKey(…)的尾部调用mLooper()-&gt;wake()。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文的起点是任何一个输入设备有IO事件发生，这将会唤醒InputReader，它收到这个事件后，把事件做了简单封装，插入待分发队列中，然后唤醒Dispatcher。回顾《键盘消息处理学习笔记（三）》之<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning3/#InputDispatcherThread的启动" target="_blank" rel="noopener">InputDispatcherThread的启动</a>一节中，InputDispatcher启动后就等待在<code>mLooper-&gt;pollOnce(timeoutMillis);</code>，InputReader接收到键盘事件后，完成筛选、封装，交给InputDispatcher，在经过合法性检查，却是需要分发，就会调用<code>mLooper()-&gt;wake()</code>把InputDispatcher的等待唤醒。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/键盘消息处理学习笔记/" rel="tag"># 键盘消息处理学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/03/2016/1002KeyboardLearning8/" rel="next" title="键盘消息处理学习笔记（八）注册Client端InputChannel">
+                <i class="fa fa-chevron-left"></i> 键盘消息处理学习笔记（八）注册Client端InputChannel
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/04/2016/1004KeyboardLearning10/" rel="prev" title="键盘消息处理学习笔记（十）InputDispatcher分发键盘事件">
+                键盘消息处理学习笔记（十）InputDispatcher分发键盘事件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/03/2016/1002KeyboardLearning9/" data-title="键盘消息处理学习笔记（九）InputReader获得键盘事件" data-url="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning9/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-InputReader-processEventsLocked-…"><span class="nav-number">1.</span> <span class="nav-text">Step1: InputReader::processEventsLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-InputReader-processEventsForDevicedLocked-…"><span class="nav-number">2.</span> <span class="nav-text">Step2: InputReader::processEventsForDevicedLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-InputDevice-process-…"><span class="nav-number">3.</span> <span class="nav-text">Step3: InputDevice::process(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-KeyboardInputMapper-process-…"><span class="nav-number">4.</span> <span class="nav-text">Step4: KeyboardInputMapper::process(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step5-KeyboardInputMapper-processKey-…"><span class="nav-number">5.</span> <span class="nav-text">Step5: KeyboardInputMapper::processKey(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step6-InputDispatcher-notifyKey-…"><span class="nav-number">6.</span> <span class="nav-text">Step6: InputDispatcher::notifyKey(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

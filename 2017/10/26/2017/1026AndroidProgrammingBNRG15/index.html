@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章本章要点：  在字符串资源中定义格式化字符 使用隐式Intents">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记十五">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/26/2017/1026AndroidProgrammingBNRG15/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章本章要点：  在字符串资源中定义格式化字符 使用隐式Intents">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.128Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记十五">
+<meta name="twitter:description" content="本章本章要点：  在字符串资源中定义格式化字符 使用隐式Intents">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/26/2017/1026AndroidProgrammingBNRG15/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记十五 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/26/2017/1026AndroidProgrammingBNRG15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记十五</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-26T20:00:00+08:00">
+                2017-10-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/26/2017/1026AndroidProgrammingBNRG15/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/26/2017/1026AndroidProgrammingBNRG15/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章<br>本章要点：</p>
+<ul>
+<li>在字符串资源中定义格式化字符</li>
+<li>使用隐式Intents<a id="more"></a>
+</li>
+</ul>
+<h1 id="在资源文件中定义格式化字符串"><a href="#在资源文件中定义格式化字符串" class="headerlink" title="在资源文件中定义格式化字符串"></a>在资源文件中定义格式化字符串</h1><p>在strings.xml中有如下定义：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">"crime_report"</span>&gt;</span>%1$s!</span><br><span class="line">The crime was discovered on %2$s. %3$s, and %4$s</span><br><span class="line"><span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>它使用%1$s、%2$s作为字符串参数的占位符。这些参数在运行时才能确定具体值，使用它的java代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String report = getString(R.string.crime_report, mCrime.getTitle(), dateString, solvedString, suspect);</span><br></pre></td></tr></table></figure></p>
+<h1 id="使用隐式Intents"><a href="#使用隐式Intents" class="headerlink" title="使用隐式Intents"></a>使用隐式Intents</h1><h2 id="显式Intents-vs-隐式Intents"><a href="#显式Intents-vs-隐式Intents" class="headerlink" title="显式Intents vs 隐式Intents"></a>显式Intents vs 隐式Intents</h2><p>使用显式Intents时，需要指定待启动Activity的名称，如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(getActivity(), CrimePagerActivity.class);</span><br><span class="line">intent.putExtra(EXTRA_CRIME_ID, crimeId);</span><br><span class="line">startActivity(intent);</span><br></pre></td></tr></table></figure></p>
+<p>使用隐式Intent时，需要向OS描述要完成什么工作，例如浏览网页、发送数据等。</p>
+<h2 id="定义隐式Intent"><a href="#定义隐式Intent" class="headerlink" title="定义隐式Intent"></a>定义隐式Intent</h2><p>使用隐式Intent来描述要完成的工作，需要指定几个关键信息：</p>
+<ul>
+<li>要执行的动作（action）。这是由<code>class Intent</code>定义的一些常量。例如，浏览一个URL，可以使用<code>Intent.ACTION_VIEW</code>；发送数据，可以使用<code>Intent.ACTION_SEND</code>。</li>
+<li>数据的位置。这些数据可能不在本地，例如网页，但是它仍然可以使用URI来指向一个文件，或者指向ContentProvider的一条记录。</li>
+<li>action所服务的数据的类型。这是一个MINE类型，如text/html or audio/mpeg3。如果intent包含数据的位置，则该类型通常是来自该数据。</li>
+<li>分类（categories）。action是用来描述要做什么，category则用来描述在哪、什么时间或者怎样使用Activity。例如：android.intent.category.LAUNCHER指定一个Activity作为应用程序的启动项；android.intent.category.INFO指定一个Activity向用户提供包信息。</li>
+</ul>
+<h2 id="匹配Intent的过程"><a href="#匹配Intent的过程" class="headerlink" title="匹配Intent的过程"></a>匹配Intent的过程</h2><p>一个用于浏览网页的隐式intent需要指定：action为Intent.ACTION_VIEW 和 网页的Uri。基于这些信息，操作系统将匹配合适的应用以及合适的的Activity（如果匹配到多个，则询问用户选择）。</p>
+<p>Activity会在其manifest文件中通过intent filter向操作系统宣告自己适配ACTION_VIEW操作。例如，浏览器应用就需要在其manifest文件中注明：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">".BrowserActivity"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:label</span>=<span class="string">"@string/app_name"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:name</span>=<span class="string">"android.intent.action.VIEW"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">category</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:name</span>=<span class="string">"android.intent.category.DEFAULT"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">data</span> <span class="attr">android:scheme</span>=<span class="string">"http"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:host</span>=<span class="string">"www.bignerdranch.com"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>需要给category定义为DEFAULT，才能让该Activity响应隐式intent。action告诉操作系统该activity可以处理什么工作，DEFAULT category则告诉操作系统当OS为某一任务匹配备选时，应当考虑本Activity。</p>
+<h2 id="本节处理隐式Intent的代码"><a href="#本节处理隐式Intent的代码" class="headerlink" title="本节处理隐式Intent的代码"></a>本节处理隐式Intent的代码</h2><h3 id="请求发送数据"><a href="#请求发送数据" class="headerlink" title="请求发送数据"></a>请求发送数据</h3><p>本节在CrimeFragment长出了一个<code>crime report</code>按钮，点击后将发起一个隐式Intent请求<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeFragment.java</span></span><br><span class="line">    mReportButton = (Button)v.findViewById(R.id.crime_report);</span><br><span class="line">    mReportButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">            Intent i = <span class="keyword">new</span> Intent(Intent.ACTION_SEND);</span><br><span class="line">            i.setType(<span class="string">"text/plain"</span>);</span><br><span class="line">            i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());</span><br><span class="line">            i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_suspect));</span><br><span class="line">            i = Intent.createChooser(i, getString(R.string.send_report));</span><br><span class="line">            startActivity(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>如果系统找到多个可处理ACTION_SEND的应用，就会弹出选择窗口；如果没有弹出选择窗口，有两种可能：1、系统只有一个应用能处理ACTION_SEND；2、系统为隐式Intent设置了默认app。<br>当有多个备选应用可用时，如果希望总是向用户弹出选择询问窗口，可以如上面代码中调用<code>Intent.createChooser(...)</code>。<br>不过我没有找到系统设置的入口:(</p>
+<h3 id="请求通讯录并接收返回数据"><a href="#请求通讯录并接收返回数据" class="headerlink" title="请求通讯录并接收返回数据"></a>请求通讯录并接收返回数据</h3><p>和请求发送数据不同，请求通讯录后需要从通讯录得到选中的联系人，在请求代码处需要调用<code>startActivityForResult(...)</code>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeFragment.java</span></span><br><span class="line">    mSuspectButton = (Button)v.findViewById(R.id.crime_suspect);</span><br><span class="line">    mSuspectButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">            Intent i = <span class="keyword">new</span> Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);</span><br><span class="line">            startActivityForResult(i, REQUEST_CONTACT);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>在<a href="http://localhost:4000/2016/10/16/2017/1016AndroidProgrammingBNRG05/#从启动的Activity返回数据" target="_blank" rel="noopener">笔记五·从启动的Activity返回数据</a>中提到过，当被启动的Activity返回后，启动方Activity会收到<code>onActivityResult(...)</code>回调，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeFragment.java</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(resultCode != Activity.RESULT_OK)&#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(requestCode == REQUEST_DATE)&#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(requestCode == REQUEST_CONTACT &amp;&amp; data != <span class="keyword">null</span>)&#123;</span><br><span class="line">            Uri contactUri = data.getData();</span><br><span class="line"></span><br><span class="line">            String[] queryFields = <span class="keyword">new</span> String[]&#123;    <span class="comment">// 待查询字段</span></span><br><span class="line">                    ContactsContract.Contacts.DISPLAY_NAME</span><br><span class="line">            &#125;;</span><br><span class="line">            <span class="comment">// 查询</span></span><br><span class="line">            Cursor cursor = getActivity().getContentResolver()</span><br><span class="line">                    .query(contactUri, queryFields, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(cursor.getCount() == <span class="number">0</span>)&#123;</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 得到第1行第1列数据</span></span><br><span class="line">                cursor.moveToFirst();</span><br><span class="line">                String suspect = cursor.getString(<span class="number">0</span>);</span><br><span class="line">                mCrime.setSuspect(suspect);</span><br><span class="line">                mSuspectButton.setText(suspect);</span><br><span class="line">            &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">                cursor.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>考虑到通用性，通讯录的Activity只返回被选中联系人的uri，需要通过ContentResolver查询到该联系人的具体信息，查询方法同SQLite。</p>
+<h3 id="通讯录访问权限"><a href="#通讯录访问权限" class="headerlink" title="通讯录访问权限"></a>通讯录访问权限</h3><p>只有得到contact app的授权才能访问通讯录数据，contact app具备访问联系人数据库的所有权限，当contact app向父activity返回URI时，它会注明Intent.FLAG_GRANT_READ_URI_PERMISSION，这是一个临时访问权限，确保父Activity只能访问一次数据，有效防止越权读取联系人数据库。</p>
+<h3 id="请求隐式Intent先检查是否有可响应的包"><a href="#请求隐式Intent先检查是否有可响应的包" class="headerlink" title="请求隐式Intent先检查是否有可响应的包"></a>请求隐式Intent先检查是否有可响应的包</h3><p>前面提到过，如果有多个应用可以响应隐式Intent，系统会弹出询问窗口供用户选择；但是有可能不存在候选应用——谁都无法处理该隐式Intent，此时如果直接调用<code>startActivity(...)</code>会导致崩溃，解决的办法是先检查是否有候选应用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeFragment.java</span></span><br><span class="line">    mSuspectButton = (Button)v.findViewById(R.id.crime_suspect);</span><br><span class="line">    Intent pickContact = <span class="keyword">new</span> Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);</span><br><span class="line">    mSuspectButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">            startActivityForResult(i, REQUEST_CONTACT);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    PackageManager packageManager = getActivity().getPackageManager();</span><br><span class="line">    <span class="comment">// 如果没有匹配的应用，把按钮置灰</span></span><br><span class="line">    <span class="keyword">if</span>(packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == <span class="keyword">null</span>)&#123;</span><br><span class="line">        mSuspectButton.setEnabled(<span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>PackageManager知道所有安装在本地设备上的应用，调用其<code>resolveActivity(...)</code>方法会查找与Intent匹配的Activity，参数<code>MATCH_DEFAULT_ONLY</code>把搜索限制在有<code>CATEGORY_DEFAULT</code>标志的Activity，确保和<code>startActivity(Intent)</code>的逻辑一致。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/25/2017/1025AndroidProgrammingBNRG14/" rel="next" title="《Android Programming BNRG》笔记十四">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记十四
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/27/2017/1027AndroidProgrammingBNRG16/" rel="prev" title="《Android Programming BNRG》笔记十六">
+                《Android Programming BNRG》笔记十六 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/26/2017/1026AndroidProgrammingBNRG15/" data-title="《Android Programming BNRG》笔记十五" data-url="http://palanceli.github.io/2017/10/26/2017/1026AndroidProgrammingBNRG15/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#在资源文件中定义格式化字符串"><span class="nav-number">1.</span> <span class="nav-text">在资源文件中定义格式化字符串</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用隐式Intents"><span class="nav-number">2.</span> <span class="nav-text">使用隐式Intents</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#显式Intents-vs-隐式Intents"><span class="nav-number">2.1.</span> <span class="nav-text">显式Intents vs 隐式Intents</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义隐式Intent"><span class="nav-number">2.2.</span> <span class="nav-text">定义隐式Intent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#匹配Intent的过程"><span class="nav-number">2.3.</span> <span class="nav-text">匹配Intent的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本节处理隐式Intent的代码"><span class="nav-number">2.4.</span> <span class="nav-text">本节处理隐式Intent的代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求发送数据"><span class="nav-number">2.4.1.</span> <span class="nav-text">请求发送数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求通讯录并接收返回数据"><span class="nav-number">2.4.2.</span> <span class="nav-text">请求通讯录并接收返回数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通讯录访问权限"><span class="nav-number">2.4.3.</span> <span class="nav-text">通讯录访问权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求隐式Intent先检查是否有可响应的包"><span class="nav-number">2.4.4.</span> <span class="nav-text">请求隐式Intent先检查是否有可响应的包</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

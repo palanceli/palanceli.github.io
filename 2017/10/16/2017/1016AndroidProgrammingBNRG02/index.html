@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章加入了问答题目列表，点击Next会轮询问题。本章要点：  AndroidStudio的一些基础操作 介绍Android的MVC结构 为不同密度屏添加资源">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记二">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章加入了问答题目列表，点击Next会轮询问题。本章要点：  AndroidStudio的一些基础操作 介绍Android的MVC结构 为不同密度屏添加资源">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img12.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img11.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.062Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记二">
+<meta name="twitter:description" content="本章加入了问答题目列表，点击Next会轮询问题。本章要点：  AndroidStudio的一些基础操作 介绍Android的MVC结构 为不同密度屏添加资源">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/img12.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记二 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记二</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-16T20:00:00+08:00">
+                2017-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG02/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/16/2017/1016AndroidProgrammingBNRG02/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章加入了问答题目列表，点击Next会轮询问题。<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img12.png" alt><br>本章要点：</p>
+<ul>
+<li>AndroidStudio的一些基础操作</li>
+<li>介绍Android的MVC结构</li>
+<li>为不同密度屏添加资源<a id="more"></a>
+</li>
+</ul>
+<h1 id="AndroidStudio的基础操作"><a href="#AndroidStudio的基础操作" class="headerlink" title="AndroidStudio的基础操作"></a>AndroidStudio的基础操作</h1><h2 id="添加Java类的步骤"><a href="#添加Java类的步骤" class="headerlink" title="添加Java类的步骤"></a>添加Java类的步骤</h2><p>在<code>app/java/[包名]</code>右键，<code>New &gt; Java Class</code><br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img01.png" alt><br>在弹出的窗口中填写新创建的java类的相关信息：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img02.png" alt></p>
+<h2 id="让AS自动生成getter-setter"><a href="#让AS自动生成getter-setter" class="headerlink" title="让AS自动生成getter/setter"></a>让AS自动生成getter/setter</h2><p>在要生成代码的地方右键，选择Generate…<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img03.png" alt><br>选择Getter/Setter：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img04.png" alt><br>选择要生成的成员变量：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img05.png" alt><br>AndroidStudio默认会为mTextResId生成getMTextResID()。<br>可以在AndroidStudio设置中告诉它成员函数的前缀，这样在生成getter/setter函数的时候就会忽略该前缀了：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img06.png" alt><br>再执行上面的操作，AndroidStudio会给mTextResId生成getTextResID()，而不是getmTextResID()了。</p>
+<h1 id="Android下的MVC结构以及和iOS的差异"><a href="#Android下的MVC结构以及和iOS的差异" class="headerlink" title="Android下的MVC结构以及和iOS的差异"></a>Android下的MVC结构以及和iOS的差异</h1><p>这是本章应用的MVC结构，M和V与iOS下没有区别，不同的是C在Android下是Activity，在iOS下是Controller。<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img07.png" alt><br>书中提到Model叫做业务逻辑（business logic），Controller叫做应用逻辑（application logic），我觉得很有道理。以前我把Controller叫做业务逻辑，它包含业务逻辑，但比业务逻辑更广泛，它还包含交互逻辑，比如按下什么按钮导致什么窗体如何响应，这其实是独立于业务逻辑的。Model是更纯粹的业务逻辑。</p>
+<p>扩展到更广泛的Android应用，MVC表述如下，这张图和iOS的很像<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img08.png" alt></p>
+<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><h2 id="打开调试模式"><a href="#打开调试模式" class="headerlink" title="打开调试模式"></a>打开调试模式</h2><p>Android设备需要打开USB调试模式后才能在上面调试应用。具体步骤：<br>先让开发者选项可见：进入系统设置 &gt; 关于 连击7次Build号，之后就能看到开发者选项，进入后打开USB调试模式。</p>
+<h1 id="不同密度屏的显示"><a href="#不同密度屏的显示" class="headerlink" title="不同密度屏的显示"></a>不同密度屏的显示</h1><h2 id="dpi的含义"><a href="#dpi的含义" class="headerlink" title="?dpi的含义"></a>?dpi的含义</h2><p>在res/下，和屏幕分辨率相关的资源会后缀-mdpi、-hdpi、-xhdpi和-xxhdpi，他们表示：<br>-mdpi        中密度屏（dedium-density screens）~160dpi<br>-hdpi        高密度屏（high-density screens） ~240dip<br>-xhdpi        超高密度屏（extra-high-density screens）~320dpi<br>-xxhdpi    超超高密度屏（extra-extra-high-density screens）~480dpi<br>应用在运行时，Android系统会根据设备的情况选择最匹配的资源。</p>
+<h2 id="如何添加不同密度屏的资源"><a href="#如何添加不同密度屏的资源" class="headerlink" title="如何添加不同密度屏的资源"></a>如何添加不同密度屏的资源</h2><p>以drawable-?dpi为例，在Project Files视图中，app/src/main/res中创建drawable-?dpi文件夹，把对应的文件拷贝到这里，如下：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img09.png" alt><br>在Android视图里，会体现在app/res/drawable下，隐藏了不同密度屏的信息：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img10.png" alt><br>添加了资源后，AndroidStudio会自动为资源分配ID，但是需要注意：文件名必须为小写且不带空格。自动分配的ID和屏密度无关，因此在写代码的时候不用关心设备的适配问题。</p>
+<h1 id="如何为按钮添加图片"><a href="#如何为按钮添加图片" class="headerlink" title="如何为按钮添加图片"></a>如何为按钮添加图片</h1><p>在xml文件的Button定义中，可以为之设置<code>android:drawableRight</code>和<code>android:drawablePadding</code>属性：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/next_button"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:text</span>=<span class="string">"@string/next_button"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:drawableRight</span>=<span class="string">"@drawable/arrow_right"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:drawablePadding</span>=<span class="string">"4dp"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintStart_toStartOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintEnd_toEndOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintTop_toBottomOf</span>=<span class="string">"@id/false_button"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>按钮张这样：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG02/img11.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/01/2017/1001opencvpy/" rel="next" title="opencv python的使用">
+                <i class="fa fa-chevron-left"></i> opencv python的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG03/" rel="prev" title="《Android Programming BNRG》笔记三">
+                《Android Programming BNRG》笔记三 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/16/2017/1016AndroidProgrammingBNRG02/" data-title="《Android Programming BNRG》笔记二" data-url="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG02/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AndroidStudio的基础操作"><span class="nav-number">1.</span> <span class="nav-text">AndroidStudio的基础操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#添加Java类的步骤"><span class="nav-number">1.1.</span> <span class="nav-text">添加Java类的步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#让AS自动生成getter-setter"><span class="nav-number">1.2.</span> <span class="nav-text">让AS自动生成getter/setter</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Android下的MVC结构以及和iOS的差异"><span class="nav-number">2.</span> <span class="nav-text">Android下的MVC结构以及和iOS的差异</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其它"><span class="nav-number">3.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#打开调试模式"><span class="nav-number">3.1.</span> <span class="nav-text">打开调试模式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#不同密度屏的显示"><span class="nav-number">4.</span> <span class="nav-text">不同密度屏的显示</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dpi的含义"><span class="nav-number">4.1.</span> <span class="nav-text">?dpi的含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何添加不同密度屏的资源"><span class="nav-number">4.2.</span> <span class="nav-text">如何添加不同密度屏的资源</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何为按钮添加图片"><span class="nav-number">5.</span> <span class="nav-text">如何为按钮添加图片</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

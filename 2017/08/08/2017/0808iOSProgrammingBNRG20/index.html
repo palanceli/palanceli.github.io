@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章又是一个新的板块，它从web server上获取json数据，并把响应数据中的图片展现出来。本章要点：  访问控制 iOS上的HTTP编程 json数据的解析">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记二十">
+<meta property="og:url" content="http://palanceli.github.io/2017/08/08/2017/0808iOSProgrammingBNRG20/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章又是一个新的板块，它从web server上获取json数据，并把响应数据中的图片展现出来。本章要点：  访问控制 iOS上的HTTP编程 json数据的解析">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/08/2017/0808iOSProgrammingBNRG20/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.023Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记二十">
+<meta name="twitter:description" content="本章又是一个新的板块，它从web server上获取json数据，并把响应数据中的图片展现出来。本章要点：  访问控制 iOS上的HTTP编程 json数据的解析">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/08/08/2017/0808iOSProgrammingBNRG20/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/08/08/2017/0808iOSProgrammingBNRG20/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记二十 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/08/08/2017/0808iOSProgrammingBNRG20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记二十</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T23:00:00+08:00">
+                2017-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/08/2017/0808iOSProgrammingBNRG20/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/08/2017/0808iOSProgrammingBNRG20/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章又是一个新的板块，它从web server上获取json数据，并把响应数据中的图片展现出来。<br>本章要点：</p>
+<ul>
+<li>访问控制</li>
+<li>iOS上的HTTP编程</li>
+<li>json数据的解析<a id="more"></a>
+</li>
+</ul>
+<h1 id="1-访问控制"><a href="#1-访问控制" class="headerlink" title="1 访问控制"></a>1 访问控制</h1><h2 id="1-1-访问控制的几种类型和含义"><a href="#1-1-访问控制的几种类型和含义" class="headerlink" title="1.1 访问控制的几种类型和含义"></a>1.1 访问控制的几种类型和含义</h2><p>· open<br>· public<br>· internal<br>· fileprivate<br>· private</p>
+<font color="red">他们的含义是什么？</font>
+
+<h1 id="2-iOS端的HTTP编程"><a href="#2-iOS端的HTTP编程" class="headerlink" title="2 iOS端的HTTP编程"></a>2 iOS端的HTTP编程</h1><h2 id="2-1-如何组装请求和接收应答"><a href="#2-1-如何组装请求和接收应答" class="headerlink" title="2.1 如何组装请求和接收应答"></a>2.1 如何组装请求和接收应答</h2><p>一、通过<code>URLComponents</code>和<code>URLQueryItem</code>共同完成URL的组装<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">private <span class="keyword">static</span> func filckURL(method: Method, parameters: [String:String]?) -&gt; URL&#123;</span><br><span class="line">    <span class="comment">// 构造url路径</span></span><br><span class="line">    var components = URLComponents(string: <span class="string">"https://api.flickr.com/services/rest"</span>)!</span><br><span class="line">    var queryItems = [URLQueryItem]() <span class="comment">// 每个URLQueryItem是一个kv对</span></span><br><span class="line">    <span class="comment">// 组装参数</span></span><br><span class="line">    let baseParam = [</span><br><span class="line">    <span class="string">"method"</span>: method.rawValue,</span><br><span class="line">    <span class="string">"format"</span>: <span class="string">"json"</span>,</span><br><span class="line">    <span class="string">"nojsoncallback"</span>: <span class="string">"1"</span>,</span><br><span class="line">    <span class="string">"api_key"</span>: apiKey</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">for</span> (key, value) <span class="keyword">in</span> baseParam&#123;</span><br><span class="line">        let item = URLQueryItem(name: key, value: value)</span><br><span class="line">        queryItems.append(item)</span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">    components.queryItems = queryItems	<span class="comment">// 设置参数</span></span><br><span class="line">    <span class="keyword">return</span> components.url!</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>二、使用URLSessionTask发送请求并接收应答<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建URLSession实例，后面要用它生成URLSessionTask</span></span><br><span class="line">private let session : URLSession = &#123;	</span><br><span class="line">    let config = URLSessionConfiguration.default</span><br><span class="line">    <span class="keyword">return</span> URLSession(configuration: config)</span><br><span class="line">&#125;()</span><br><span class="line"></span><br><span class="line">func fetchInterestingPhotoes()&#123;</span><br><span class="line">    let url = FlickrAPI.interestingPhotoesURL   <span class="comment">// 这是一个URL变量，可以通过第一步创建</span></span><br><span class="line">    let request = URLRequest(url: url)      <span class="comment">// 使用URL构造URLRequest</span></span><br><span class="line">    <span class="comment">// 使用request和completionHandler构造URLSessionTask，在completionHandler中处理应答数据</span></span><br><span class="line">    let task = session.dataTask(with: request, completionHandler:&#123;	</span><br><span class="line">        (data, response, error) -&gt; Void <span class="keyword">in</span></span><br><span class="line">        <span class="keyword">if</span> let jsonData = data&#123;</span><br><span class="line">            <span class="keyword">if</span> let jsonString = String(data: jsonData, encoding: .utf8)&#123;</span><br><span class="line">                print(jsonString)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> let requestError = error&#123;</span><br><span class="line">            print(<span class="string">"Error fetching interesting photoes: \(requestError)"</span>)</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            print(<span class="string">"Unexpected error with the request"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    task.resume()		<span class="comment">// 启动task，完成发送请求和接收应答</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>URLSessionTask分三类：<br><code>URLSessionDataTask</code> 从server端接收数据，并保存到内存的Data数据结构中；<br><code>URLSessionDownloadTask</code> 从server端接收数据，并保存到文件；<br><code>URLSessionUploadTask</code> 向server发送数据。</p>
+<p>通过URLSession的工厂方法：<br><code>func dataTask(with: URL)</code><br><code>func downloadTask(with: URL)</code><br><code>func uploadTask(with: URLRequest, from: Data)</code><br>可以生成这三类的实例，这三个方法还有不同的变种。</p>
+<p>在创建URLSession实例的时候传入一个配置，用来指定公用的设置，这些公用设置在通过工厂方法生成的URLSessionTask实例中都会生效。一个URLSession实例可以通过工厂方法生成多个URLSessionTask。</p>
+<p>在本例中工厂方法除了设置request以外，第二个参数是应答响应处理闭包，在这里处理收到的应答数据。</p>
+<p>通过调用task.resume()发送请求。</p>
+<h2 id="2-2-主线程和后台线程"><a href="#2-2-主线程和后台线程" class="headerlink" title="2.2 主线程和后台线程"></a>2.2 主线程和后台线程</h2><p>主线程又称为UI线程，因为所有改变UI的代码都发生在这个线程内。默认情况下，URLSessionDataTask是在后台线程里跑完成处理代码，如果这部分代码是刷新UI界面的，应该放到主线程来完成。使用OperationQueue可以实现这一点：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">func fetchInterestingPhotoes(completion: @escaping(PhotoesResult) -&gt; Void)&#123;</span><br><span class="line">    let url = FlickrAPI.interestingPhotoesURL</span><br><span class="line">    let request = URLRequest(url: url)</span><br><span class="line"></span><br><span class="line">    let task = session.dataTask(with: request, completionHandler:&#123;</span><br><span class="line">        (data, response, error) -&gt; Void <span class="keyword">in</span></span><br><span class="line">        let result = <span class="keyword">self</span>.processPhotoesRequest(data: data, error: error)</span><br><span class="line">        OperationQueue.main.addOperation &#123;	<span class="comment">// 将这段代码放到主线程执行</span></span><br><span class="line">            completion(result)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    task.resume()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="3-JSON数据"><a href="#3-JSON数据" class="headerlink" title="3 JSON数据"></a>3 JSON数据</h1><h2 id="3-1-如何解析JSON数据"><a href="#3-1-如何解析JSON数据" class="headerlink" title="3.1 如何解析JSON数据"></a>3.1 如何解析JSON数据</h2><p>使用JSONSerialization从json文本创建json对象：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span>&#123;</span><br><span class="line">    let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])</span><br><span class="line">    print(jsonObject)</span><br><span class="line">&#125;catch let error&#123;</span><br><span class="line">    print(<span class="string">"Error creating JSON object: \(error)"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-2-打印jsonObject对象长什么样？"><a href="#3-2-打印jsonObject对象长什么样？" class="headerlink" title="3.2 打印jsonObject对象长什么样？"></a>3.2 打印jsonObject对象长什么样？</h2><p>对于一段这样的json文本：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"photos"</span>:</span><br><span class="line">&#123;<span class="attr">"page"</span>:<span class="number">1</span>,<span class="attr">"pages"</span>:<span class="number">5</span>,<span class="attr">"perpage"</span>:<span class="number">100</span>,<span class="attr">"total"</span>:<span class="number">500</span>,<span class="attr">"photo"</span>:</span><br><span class="line">[</span><br><span class="line">    &#123;<span class="attr">"id"</span>:<span class="string">"36350085092"</span>,<span class="attr">"owner"</span>:<span class="string">"43432513@N02"</span>,<span class="attr">"secret"</span>:<span class="string">"1bde6ffc70"</span>,<span class="attr">"server"</span>:<span class="string">"4401"</span>,<span class="attr">"farm"</span>:<span class="number">5</span>,<span class="attr">"title"</span>:<span class="string">"Night Storm IV: Anvil Crawler"</span>,<span class="attr">"ispublic"</span>:<span class="number">1</span>,<span class="attr">"isfriend"</span>:<span class="number">0</span>,<span class="attr">"isfamily"</span>:<span class="number">0</span>,<span class="attr">"datetaken"</span>:<span class="string">"2017-05-16 21:12:42"</span>,<span class="attr">"datetakengranularity"</span>:<span class="string">"0"</span>,<span class="attr">"datetakenunknown"</span>:<span class="string">"0"</span>,<span class="attr">"url_h"</span>:<span class="string">"https:\/\/farm5.staticflickr.com\/4401\/36350085092_9a12da6e8e_h.jpg"</span>,<span class="attr">"height_h"</span>:<span class="number">1130</span>,<span class="attr">"width_h"</span>:<span class="string">"1600"</span>&#125;,</span><br><span class="line">... ... ... ...</span><br><span class="line">    &#123;<span class="attr">"id"</span>:<span class="string">"36517793505"</span>,<span class="attr">"owner"</span>:<span class="string">"142252072@N06"</span>,<span class="attr">"secret"</span>:<span class="string">"0d5323572e"</span>,<span class="attr">"server"</span>:<span class="string">"4387"</span>,<span class="attr">"farm"</span>:<span class="number">5</span>,<span class="attr">"title"</span>:<span class="string">"Roe Deer"</span>,<span class="attr">"ispublic"</span>:<span class="number">1</span>,<span class="attr">"isfriend"</span>:<span class="number">0</span>,<span class="attr">"isfamily"</span>:<span class="number">0</span>,<span class="attr">"datetaken"</span>:<span class="string">"2017-08-11 20:11:19"</span>,<span class="attr">"datetakengranularity"</span>:<span class="string">"0"</span>,<span class="attr">"datetakenunknown"</span>:<span class="string">"0"</span>,<span class="attr">"url_h"</span>:<span class="string">"https:\/\/farm5.staticflickr.com\/4387\/36517793505_bf91f54cf1_h.jpg"</span>,<span class="attr">"height_h"</span>:<span class="number">1067</span>,<span class="attr">"width_h"</span>:<span class="string">"1600"</span>&#125;</span><br><span class="line">]&#125;,</span><br><span class="line"><span class="attr">"stat"</span>:<span class="string">"ok"</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p>转成jsonObject，打印如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    photos =     &#123;</span><br><span class="line">        page = 1;</span><br><span class="line">        pages = 5;</span><br><span class="line">        perpage = 100;</span><br><span class="line">        photo = (</span><br><span class="line">            &#123;</span><br><span class="line">                datetaken = "2017-07-03 20:40:20";</span><br><span class="line">                datetakengranularity = 0;</span><br><span class="line">                datetakenunknown = 0;</span><br><span class="line">                farm = 5;</span><br><span class="line">                id = 36507389026;</span><br><span class="line">                isfamily = 0;</span><br><span class="line">                isfriend = 0;</span><br><span class="line">                ispublic = 1;</span><br><span class="line">                owner = "26156338@N07";</span><br><span class="line">                secret = 1f53fe13dd;</span><br><span class="line">                server = 4372;</span><br><span class="line">                title = "Scarborough Bluffs";</span><br><span class="line">            &#125;,</span><br><span class="line">		……</span><br><span class="line">            &#123;</span><br><span class="line">                datetaken = "2017-08-13 19:20:32";</span><br><span class="line">                datetakengranularity = 0;</span><br><span class="line">                datetakenunknown = 0;</span><br><span class="line">                farm = 5;</span><br><span class="line">                "height_h" = 1600;</span><br><span class="line">                id = 36568626865;</span><br><span class="line">                isfamily = 0;</span><br><span class="line">                isfriend = 0;</span><br><span class="line">                ispublic = 1;</span><br><span class="line">                owner = "130293714@N07";</span><br><span class="line">                secret = d162b2493e;</span><br><span class="line">                server = 4363;</span><br><span class="line">                title = "Portrait d'une (petite) grenouille";</span><br><span class="line">                "url_h" = "https://farm5.staticflickr.com/4363/36568626865_c01dd04131_h.jpg";</span><br><span class="line">                "width_h" = 1600;</span><br><span class="line">            &#125;</span><br><span class="line">        );</span><br><span class="line">        total = 500;</span><br><span class="line">    &#125;;</span><br><span class="line">    stat = ok;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-3-如何解析上面的数据结构"><a href="#3-3-如何解析上面的数据结构" class="headerlink" title="3.3 如何解析上面的数据结构"></a>3.3 如何解析上面的数据结构</h2><p>完整代码如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> FlickrAPI &#123;</span><br><span class="line">    ……</span><br><span class="line">    private <span class="keyword">static</span> func photo(fromJSON json: [String: Any]) -&gt; Photo?&#123;</span><br><span class="line">        guard</span><br><span class="line">        let photoID = json[<span class="string">"id"</span>] as? String,</span><br><span class="line">        let title = json[<span class="string">"title"</span>] as? String,</span><br><span class="line">        let dateString = json[<span class="string">"datetaken"</span>] as? String,</span><br><span class="line">        let photoURLString = json[<span class="string">"url_h"</span>] as? String,</span><br><span class="line">            let url = URL(string: photoURLString),</span><br><span class="line">            let dateTaken = dateFormatter.date(from: dateString)<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Photo(title: title, photoID: photoID, remoteURL: url, dateTaken: dateTaken)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> func photoes(fromJSON data: Data) -&gt; PhotoesResult&#123;</span><br><span class="line">        <span class="keyword">do</span>&#123;</span><br><span class="line">            <span class="comment">// 读取json文本</span></span><br><span class="line">            let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])  </span><br><span class="line">            guard</span><br><span class="line">                <span class="comment">// 得到根节点</span></span><br><span class="line">                let jsonDictionary = jsonObject as? [AnyHashable:Any],	</span><br><span class="line">                <span class="comment">// 得到/photos节点			</span></span><br><span class="line">                let photoes = jsonDictionary[<span class="string">"photos"</span>] as? [String:Any],</span><br><span class="line">                <span class="comment">// 得到/photos/photo节点				</span></span><br><span class="line">                let photoesArray = photoes[<span class="string">"photo"</span>] as? [[String: Any]] <span class="keyword">else</span>&#123;		</span><br><span class="line">                    <span class="keyword">return</span> .failure(FlickrError.invalidJSONData)</span><br><span class="line">            &#125;</span><br><span class="line">            var finalPhotoes = [Photo]()</span><br><span class="line">            <span class="keyword">for</span> photoJSON <span class="keyword">in</span> photoesArray&#123;</span><br><span class="line">                <span class="comment">// 解析/protos/photo/下的每个子节点</span></span><br><span class="line">                <span class="keyword">if</span> let photo = photo(fromJSON: photoJSON)&#123;  </span><br><span class="line">                    finalPhotoes.append(photo)												</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> finalPhotoes.isEmpty &amp;&amp; !photoesArray.isEmpty&#123;</span><br><span class="line">                <span class="keyword">return</span> .failure(FlickrError.invalidJSONData)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> .success(finalPhotoes)</span><br><span class="line">        &#125;catch let error&#123;</span><br><span class="line">            <span class="keyword">return</span> .failure(error)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-4-本章如何完成下载流程的"><a href="#3-4-本章如何完成下载流程的" class="headerlink" title="3.4 本章如何完成下载流程的"></a>3.4 本章如何完成下载流程的</h2><p>一、从VC的viewDidLoad()中调用下载，并传入完成后的结果打印代码<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoesViewController: <span class="built_in">UIViewController</span> &#123;</span><br><span class="line">    ……</span><br><span class="line">    override func viewDidLoad() &#123;</span><br><span class="line">        <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">        store.fetchInterestingPhotoes&#123;</span><br><span class="line">            (photoesResult) -&gt; Void <span class="keyword">in</span>  <span class="comment">// 下载、解析完成后的打印结果代码</span></span><br><span class="line">            <span class="keyword">switch</span> photoesResult&#123;</span><br><span class="line">            <span class="keyword">case</span> let .success(photoes):</span><br><span class="line">                print(<span class="string">"Successfully found \(photoes.count) photoes"</span>)</span><br><span class="line">            ……</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Do any additional setup after loading the view.</span></span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>二、创建SessionTask启动下载，并传入下载完成后的解析json代码<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoStore &#123;</span><br><span class="line">    ……</span><br><span class="line">    private func processPhotoesRequest(data: Data?, error: Error?) -&gt;PhotoesResult&#123;</span><br><span class="line">        guard let jsonData = data <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> .failure(error!)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> FlickrAPI.photoes(fromJSON: jsonData)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    func fetchInterestingPhotoes(completion: @escaping(PhotoesResult) -&gt; Void)&#123;</span><br><span class="line">        let url = FlickrAPI.interestingPhotoesURL</span><br><span class="line">        let request = URLRequest(url: url)</span><br><span class="line">        <span class="comment">// 下载完成后解析数据代码</span></span><br><span class="line">        let task = session.dataTask(with: request) &#123;    </span><br><span class="line">            (data, response, error) -&gt; Void <span class="keyword">in</span> </span><br><span class="line">            let result = <span class="keyword">self</span>.processPhotosRequest(data: data, error: error) </span><br><span class="line">            completion(result)</span><br><span class="line">        &#125; </span><br><span class="line">        task.resume()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>过程如下图所示：<br><img src="/2017/08/08/2017/0808iOSProgrammingBNRG20/img01.png" alt><br>从web server获取数据是一个异步过程，一旦发起请求，可能需要较长时间才能收到服务器响应。因此<code>fetchInterestingPhotoes(completion:)</code>并不直接返回PhotoesResult，而是由调用者提供完成闭包，当收到应答数据后调用。</p>
+<font color="red">我的问题是：`task.resume()`直接返回了，那控制权交给谁了？当收到应答数据后又是在哪个线程执行的完成代码呢？控制权的获得者和执行这段完成代码的线程是个什么关系？我猜应该是同一个线程，那么控制权又是怎么移交给完成代码的呢？</font>
+
+<h2 id="3-5-escaping关键字的作用"><a href="#3-5-escaping关键字的作用" class="headerlink" title="3.5 @escaping关键字的作用"></a>3.5 @escaping关键字的作用</h2><p>这个关键字用来修饰闭包，它让编译器知道这段闭包可能并不在函数内执行。在本例中<code>fetchInterestingPhotoes(completion:)</code>内部的<code>task.resume()</code>是个异步调用，直到收到服务端应答后才会执行参数闭包代码。</p>
+<font color="red">我的问题：如果不带这个关键字，会有什么后果？这个关键字起到什么作用？
+
+
+本章P592
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">func fetchInterestingPhotos() &#123; </span><br><span class="line">    let url = FlickrAPI.interestingPhotosURL </span><br><span class="line">    let request = URLRequest(url: url)</span><br><span class="line">    let task = session.dataTask(with: request) &#123;</span><br><span class="line">        (data, response, error) -&gt; Void <span class="keyword">in</span> </span><br><span class="line">        <span class="keyword">if</span> let jsonData = data &#123;</span><br><span class="line">            <span class="keyword">if</span> let jsonString = String(data: jsonData, encoding: .utf8) &#123;</span><br><span class="line">                print(jsonString) &#125; </span><br><span class="line">			&#125; <span class="keyword">else</span> <span class="keyword">if</span> let requestError = error &#123;</span><br><span class="line">                print(<span class="string">"Error fetching interesting photos: \(requestError)"</span>) </span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                print(<span class="string">"Unexpected error with the request"</span>) </span><br><span class="line">			&#125; </span><br><span class="line">		&#125; </span><br><span class="line">	task.resume() </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</font>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/07/2017/0807iOSProgrammingBNRG19/" rel="next" title="《iOS Programming BNRG》笔记十九">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记十九
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/09/2017/0809iOSProgrammingBNRG21/" rel="prev" title="《iOS Programming BNRG》笔记二十一">
+                《iOS Programming BNRG》笔记二十一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/08/08/2017/0808iOSProgrammingBNRG20/" data-title="《iOS Programming BNRG》笔记二十" data-url="http://palanceli.github.io/2017/08/08/2017/0808iOSProgrammingBNRG20/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-访问控制"><span class="nav-number">1.</span> <span class="nav-text">1 访问控制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-访问控制的几种类型和含义"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 访问控制的几种类型和含义</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-iOS端的HTTP编程"><span class="nav-number">2.</span> <span class="nav-text">2 iOS端的HTTP编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-如何组装请求和接收应答"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 如何组装请求和接收应答</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-主线程和后台线程"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 主线程和后台线程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-JSON数据"><span class="nav-number">3.</span> <span class="nav-text">3 JSON数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-如何解析JSON数据"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 如何解析JSON数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-打印jsonObject对象长什么样？"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 打印jsonObject对象长什么样？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-如何解析上面的数据结构"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 如何解析上面的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-本章如何完成下载流程的"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 本章如何完成下载流程的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-escaping关键字的作用"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 @escaping关键字的作用</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

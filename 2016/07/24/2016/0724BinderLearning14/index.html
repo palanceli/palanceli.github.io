@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Binder学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在binder请求的发起端，binder_transaction(…)函数的结尾，第#198行，它将struct binder_transaction的work字段插入target_list的尾部，然后完成发起端的工作。">
+<meta name="keywords" content="Binder学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="binder学习笔记（十四）—— binder_thread_read(...)都干了什么？">
+<meta property="og:url" content="http://palanceli.github.io/2016/07/24/2016/0724BinderLearning14/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="在binder请求的发起端，binder_transaction(…)函数的结尾，第#198行，它将struct binder_transaction的work字段插入target_list的尾部，然后完成发起端的工作。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/07/24/2016/0724BinderLearning14/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.645Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="binder学习笔记（十四）—— binder_thread_read(...)都干了什么？">
+<meta name="twitter:description" content="在binder请求的发起端，binder_transaction(…)函数的结尾，第#198行，它将struct binder_transaction的work字段插入target_list的尾部，然后完成发起端的工作。">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/07/24/2016/0724BinderLearning14/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/07/24/2016/0724BinderLearning14/">
+
+
+
+
+
+  <title>binder学习笔记（十四）—— binder_thread_read(...)都干了什么？ | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/07/24/2016/0724BinderLearning14/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">binder学习笔记（十四）—— binder_thread_read(...)都干了什么？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-07-24T18:56:38+08:00">
+                2016-07-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/07/24/2016/0724BinderLearning14/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/24/2016/0724BinderLearning14/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在binder请求的发起端，<a href="https://palanceli.github.io/2016/06/14/2016/0614BinderLearning12/#从服务端addService触发的binder-transaction">binder_transaction(…)</a>函数的结尾，第#198行，它将<code>struct binder_transaction</code>的<code>work</code>字段插入<code>target_list</code>的尾部，然后完成发起端的工作。<br><a id="more"></a><br>在接收端<a href="https://palanceli.github.io/2016/05/09/2016/0514BinderLearning4/#binder-loop-bs-svcmgr-handler">binder_loop(…)</a>函数的第#19行，也在通过调用<code>ioctl(bs-&gt;fd, BINDER_WRITE_READ, &amp;bwr)</code>等待着来自发起端的请求。在驱动层，沿着如下的调用路径<img src="/2016/07/24/2016/0724BinderLearning14/img01.png" alt="binder_ioctl(...)的调用关系">，通过<code>binder_thread_read(...)</code>函数接收到请求。</p>
+<p>需要注意的是，对于checkService请求，在发起端（即Client端）的<code>binder_thread_write(...)</code>函数中，其proc、thread均表示Client端，target_proc、target_thread以及target_xxx均表示目标端（即ServiceManager）；而在接收端的<code>binder_thread_read(...)</code>函数中则刚好相反，proc、thread表示ServiceManager。</p>
+<p>kernel/goldfish/drivers/staging/android/binder.c:2248<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">binder_thread_read</span><span class="params">(struct binder_proc *proc,</span></span></span><br><span class="line"><span class="function"><span class="params">                  struct binder_thread *thread,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">void</span>  __user *buffer, <span class="keyword">int</span> size,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">signed</span> <span class="keyword">long</span> *consumed, <span class="keyword">int</span> non_block)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">void</span> __user *ptr = buffer + *consumed;</span><br><span class="line">    <span class="keyword">void</span> __user *end = buffer + size;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> wait_for_proc_work;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (*consumed == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (put_user(BR_NOOP, (<span class="keyword">uint32_t</span> __user *)ptr))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line">        ptr += <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">retry:</span><br><span class="line">    wait_for_proc_work = thread-&gt;transaction_stack == <span class="literal">NULL</span> &amp;&amp;</span><br><span class="line">                list_empty(&amp;thread-&gt;todo);</span><br><span class="line">    ... ...</span><br><span class="line">    thread-&gt;looper |= BINDER_LOOPER_STATE_WAITING;</span><br><span class="line">    <span class="keyword">if</span> (wait_for_proc_work)</span><br><span class="line">        proc-&gt;ready_threads++;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (wait_for_proc_work) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">            ret = wait_event_freezable_exclusive(proc-&gt;wait, binder_has_proc_work(proc, thread));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        ... ...</span><br><span class="line">            ret = wait_event_freezable(thread-&gt;wait, binder_has_thread_work(thread));</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (wait_for_proc_work)</span><br><span class="line">        proc-&gt;ready_threads--;</span><br><span class="line">    thread-&gt;looper &amp;= ~BINDER_LOOPER_STATE_WAITING;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (ret)</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">uint32_t</span> cmd;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">binder_transaction_data</span> <span class="title">tr</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">binder_work</span> *<span class="title">w</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">binder_transaction</span> *<span class="title">t</span> = <span class="title">NULL</span>;</span></span><br><span class="line">        <span class="comment">// 读取todo列表首节点，这正是在Client端触发的binder_transaction(...)</span></span><br><span class="line">        <span class="comment">// 函数在结尾处插进来的t-&gt;work.entry</span></span><br><span class="line">        <span class="keyword">if</span> (!list_empty(&amp;thread-&gt;todo))</span><br><span class="line">            w = list_first_entry(&amp;thread-&gt;todo, struct binder_work, entry);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (!list_empty(&amp;proc-&gt;todo) &amp;&amp; wait_for_proc_work)</span><br><span class="line">            w = list_first_entry(&amp;proc-&gt;todo, struct binder_work, entry);</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">switch</span> (w-&gt;type) &#123;</span><br><span class="line">        <span class="keyword">case</span> BINDER_WORK_TRANSACTION: &#123;</span><br><span class="line">            <span class="comment">// 根据binder_work找到他所在的binder_transaction</span></span><br><span class="line">            t = container_of(w, struct binder_transaction, work);</span><br><span class="line">        &#125; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> BINDER_WORK_TRANSACTION_COMPLETE: &#123;</span><br><span class="line">            cmd = BR_TRANSACTION_COMPLETE;</span><br><span class="line">            <span class="keyword">if</span> (put_user(cmd, (<span class="keyword">uint32_t</span> __user *)ptr))</span><br><span class="line">                <span class="keyword">return</span> -EFAULT;</span><br><span class="line">            ptr += <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line"></span><br><span class="line">            binder_stat_br(proc, thread, cmd);</span><br><span class="line">            ... ...</span><br><span class="line"></span><br><span class="line">            list_del(&amp;w-&gt;entry);</span><br><span class="line">            kfree(w);</span><br><span class="line">            binder_stats_deleted(BINDER_STAT_TRANSACTION_COMPLETE);</span><br><span class="line">        &#125; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> BINDER_WORK_NODE: &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">binder_node</span> *<span class="title">node</span> = <span class="title">container_of</span>(<span class="title">w</span>, <span class="title">struct</span> <span class="title">binder_node</span>, <span class="title">work</span>);</span></span><br><span class="line">            <span class="keyword">uint32_t</span> cmd = BR_NOOP;</span><br><span class="line">            <span class="keyword">const</span> <span class="keyword">char</span> *cmd_name;</span><br><span class="line">            <span class="keyword">int</span> strong = node-&gt;internal_strong_refs || node-&gt;local_strong_refs;</span><br><span class="line">            <span class="keyword">int</span> weak = !hlist_empty(&amp;node-&gt;refs) || node-&gt;local_weak_refs || strong;</span><br><span class="line">            <span class="keyword">if</span> (weak &amp;&amp; !node-&gt;has_weak_ref) &#123;</span><br><span class="line">                cmd = BR_INCREFS;</span><br><span class="line">                cmd_name = <span class="string">"BR_INCREFS"</span>;</span><br><span class="line">                node-&gt;has_weak_ref = <span class="number">1</span>;</span><br><span class="line">                node-&gt;pending_weak_ref = <span class="number">1</span>;</span><br><span class="line">                node-&gt;local_weak_refs++;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (strong &amp;&amp; !node-&gt;has_strong_ref) &#123;</span><br><span class="line">                cmd = BR_ACQUIRE;</span><br><span class="line">                cmd_name = <span class="string">"BR_ACQUIRE"</span>;</span><br><span class="line">                node-&gt;has_strong_ref = <span class="number">1</span>;</span><br><span class="line">                node-&gt;pending_strong_ref = <span class="number">1</span>;</span><br><span class="line">                node-&gt;local_strong_refs++;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!strong &amp;&amp; node-&gt;has_strong_ref) &#123;</span><br><span class="line">                cmd = BR_RELEASE;</span><br><span class="line">                cmd_name = <span class="string">"BR_RELEASE"</span>;</span><br><span class="line">                node-&gt;has_strong_ref = <span class="number">0</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!weak &amp;&amp; node-&gt;has_weak_ref) &#123;</span><br><span class="line">                cmd = BR_DECREFS;</span><br><span class="line">                cmd_name = <span class="string">"BR_DECREFS"</span>;</span><br><span class="line">                node-&gt;has_weak_ref = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (cmd != BR_NOOP) &#123;</span><br><span class="line">                <span class="keyword">if</span> (put_user(cmd, (<span class="keyword">uint32_t</span> __user *)ptr))</span><br><span class="line">                    <span class="keyword">return</span> -EFAULT;</span><br><span class="line">                ptr += <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">                <span class="keyword">if</span> (put_user(node-&gt;ptr, (<span class="keyword">void</span> * __user *)ptr))</span><br><span class="line">                    <span class="keyword">return</span> -EFAULT;</span><br><span class="line">                ptr += <span class="keyword">sizeof</span>(<span class="keyword">void</span> *);</span><br><span class="line">                <span class="keyword">if</span> (put_user(node-&gt;cookie, (<span class="keyword">void</span> * __user *)ptr))</span><br><span class="line">                    <span class="keyword">return</span> -EFAULT;</span><br><span class="line">                ptr += <span class="keyword">sizeof</span>(<span class="keyword">void</span> *);</span><br><span class="line"></span><br><span class="line">                binder_stat_br(proc, thread, cmd);</span><br><span class="line">                ... ...</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                list_del_init(&amp;w-&gt;entry);</span><br><span class="line">                <span class="keyword">if</span> (!weak &amp;&amp; !strong) &#123;</span><br><span class="line">                    binder_debug(BINDER_DEBUG_INTERNAL_REFS,</span><br><span class="line">                             <span class="string">"binder: %d:%d node %d u%p c%p deleted\n"</span>,</span><br><span class="line">                             proc-&gt;pid, thread-&gt;pid, node-&gt;debug_id,</span><br><span class="line">                             node-&gt;ptr, node-&gt;cookie);</span><br><span class="line">                    rb_erase(&amp;node-&gt;rb_node, &amp;proc-&gt;nodes);</span><br><span class="line">                    kfree(node);</span><br><span class="line">                    binder_stats_deleted(BINDER_STAT_NODE);</span><br><span class="line">                &#125; ... ...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> BINDER_WORK_DEAD_BINDER:</span><br><span class="line">        <span class="keyword">case</span> BINDER_WORK_DEAD_BINDER_AND_CLEAR:</span><br><span class="line">        <span class="keyword">case</span> BINDER_WORK_CLEAR_DEATH_NOTIFICATION: &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">binder_ref_death</span> *<span class="title">death</span>;</span></span><br><span class="line">            <span class="keyword">uint32_t</span> cmd;</span><br><span class="line"></span><br><span class="line">            death = container_of(w, struct binder_ref_death, work);</span><br><span class="line">            <span class="keyword">if</span> (w-&gt;type == BINDER_WORK_CLEAR_DEATH_NOTIFICATION)</span><br><span class="line">                cmd = BR_CLEAR_DEATH_NOTIFICATION_DONE;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                cmd = BR_DEAD_BINDER;</span><br><span class="line">            <span class="keyword">if</span> (put_user(cmd, (<span class="keyword">uint32_t</span> __user *)ptr))</span><br><span class="line">                <span class="keyword">return</span> -EFAULT;</span><br><span class="line">            ptr += <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">            <span class="keyword">if</span> (put_user(death-&gt;cookie, (<span class="keyword">void</span> * __user *)ptr))</span><br><span class="line">                <span class="keyword">return</span> -EFAULT;</span><br><span class="line">            ptr += <span class="keyword">sizeof</span>(<span class="keyword">void</span> *);</span><br><span class="line">            binder_stat_br(proc, thread, cmd);</span><br><span class="line">            ... ...</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (w-&gt;type == BINDER_WORK_CLEAR_DEATH_NOTIFICATION) &#123;</span><br><span class="line">                list_del(&amp;w-&gt;entry);</span><br><span class="line">                kfree(death);</span><br><span class="line">                binder_stats_deleted(BINDER_STAT_DEATH);</span><br><span class="line">            &#125; <span class="keyword">else</span></span><br><span class="line">                list_move(&amp;w-&gt;entry, &amp;proc-&gt;delivered_death);</span><br><span class="line">            <span class="keyword">if</span> (cmd == BR_DEAD_BINDER)</span><br><span class="line">                <span class="keyword">goto</span> done; <span class="comment">/* DEAD_BINDER notifications can cause transactions */</span></span><br><span class="line">        &#125; <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// 重点在这里，它有组织了一个binder_transaction_data结构体，从发起端的binder_transaction以及binder_buffer中提取数据</span></span><br><span class="line">        <span class="keyword">if</span> (t-&gt;buffer-&gt;target_node) &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">binder_node</span> *<span class="title">target_node</span> = <span class="title">t</span>-&gt;<span class="title">buffer</span>-&gt;<span class="title">target_node</span>;</span> <span class="comment">// SM</span></span><br><span class="line">            tr.target.ptr = target_node-&gt;ptr;</span><br><span class="line">            tr.cookie =  target_node-&gt;cookie;</span><br><span class="line">            t-&gt;saved_priority = task_nice(current);</span><br><span class="line">            <span class="keyword">if</span> (t-&gt;priority &lt; target_node-&gt;min_priority &amp;&amp;</span><br><span class="line">                !(t-&gt;flags &amp; TF_ONE_WAY))</span><br><span class="line">                binder_set_nice(t-&gt;priority);</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (!(t-&gt;flags &amp; TF_ONE_WAY) ||</span><br><span class="line">                 t-&gt;saved_priority &gt; target_node-&gt;min_priority)</span><br><span class="line">                binder_set_nice(target_node-&gt;min_priority);</span><br><span class="line">            cmd = BR_TRANSACTION;</span><br><span class="line">        &#125; ... ...</span><br><span class="line">        tr.code = t-&gt;code;</span><br><span class="line">        tr.flags = t-&gt;flags;</span><br><span class="line">        tr.sender_euid = t-&gt;sender_euid;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (t-&gt;from) &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> *<span class="title">sender</span> = <span class="title">t</span>-&gt;<span class="title">from</span>-&gt;<span class="title">proc</span>-&gt;<span class="title">tsk</span>;</span></span><br><span class="line">            tr.sender_pid = task_tgid_nr_ns(sender,</span><br><span class="line">                            current-&gt;nsproxy-&gt;pid_ns);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            tr.sender_pid = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        tr.data_size = t-&gt;buffer-&gt;data_size;</span><br><span class="line">        tr.offsets_size = t-&gt;buffer-&gt;offsets_size;</span><br><span class="line">        tr.data.ptr.buffer = (<span class="keyword">void</span> *)t-&gt;buffer-&gt;data +</span><br><span class="line">                    proc-&gt;user_buffer_offset;</span><br><span class="line">        tr.data.ptr.offsets = tr.data.ptr.buffer +</span><br><span class="line">                    ALIGN(t-&gt;buffer-&gt;data_size,</span><br><span class="line">                        <span class="keyword">sizeof</span>(<span class="keyword">void</span> *));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (put_user(cmd, (<span class="keyword">uint32_t</span> __user *)ptr))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line">        ptr += <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">        <span class="comment">// 将binder_transaction_data结构体拷贝到用户空间，由接收端ServiceManager收到</span></span><br><span class="line">        <span class="keyword">if</span> (copy_to_user(ptr, &amp;tr, <span class="keyword">sizeof</span>(tr))) </span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line">        ptr += <span class="keyword">sizeof</span>(tr);</span><br><span class="line"></span><br><span class="line">        trace_binder_transaction_received(t);</span><br><span class="line">        binder_stat_br(proc, thread, cmd);</span><br><span class="line">        ... ...</span><br><span class="line"></span><br><span class="line">        list_del(&amp;t-&gt;work.entry);</span><br><span class="line">        t-&gt;buffer-&gt;allow_user_free = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (cmd == BR_TRANSACTION &amp;&amp; !(t-&gt;flags &amp; TF_ONE_WAY)) &#123;</span><br><span class="line">            t-&gt;to_parent = thread-&gt;transaction_stack;</span><br><span class="line">            t-&gt;to_thread = thread;</span><br><span class="line">            thread-&gt;transaction_stack = t;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            t-&gt;buffer-&gt;transaction = <span class="literal">NULL</span>;</span><br><span class="line">            kfree(t);</span><br><span class="line">            binder_stats_deleted(BINDER_STAT_TRANSACTION);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">done:</span><br><span class="line"></span><br><span class="line">    *consumed = ptr - buffer;</span><br><span class="line">    <span class="keyword">if</span> (proc-&gt;requested_threads + proc-&gt;ready_threads == <span class="number">0</span> &amp;&amp;</span><br><span class="line">        proc-&gt;requested_threads_started &lt; proc-&gt;max_threads &amp;&amp;</span><br><span class="line">        (thread-&gt;looper &amp; (BINDER_LOOPER_STATE_REGISTERED |</span><br><span class="line">         BINDER_LOOPER_STATE_ENTERED)) <span class="comment">/* the user-space code fails to */</span></span><br><span class="line">         <span class="comment">/*spawn a new thread if we leave this out */</span>) &#123;</span><br><span class="line">        proc-&gt;requested_threads++;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">if</span> (put_user(BR_SPAWN_LOOPER, (<span class="keyword">uint32_t</span> __user *)buffer))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line">        binder_stat_br(proc, thread, BR_SPAWN_LOOPER);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>走到这里，<a href="https://palanceli.github.io/2016/07/09/2016/0709BinderLearning13/#再看ServiceManager是如何响应checkService请求的">上一节</a>末尾处的悬疑似乎可以水落石出了。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>无论addService还是checkService请求，发起端的请求经由驱动层，驱动层的主要工作有两部分：</p>
+<ol>
+<li>修改字段。如果请求中包含binder实体，驱动会修改实体的提领字段，比如addService是Server端向SM注册Service实体，传入的是实体在本地的影子地址以及实体地址，到了驱动层转手给ServiceManager之前会改写成在ServiceManager内唯一的handler；如果请求中不包含binder实体，驱动层不作类似地篡改。</li>
+<li>将请求挂到目标进程或线程的todo链表中。</li>
+</ol>
+<p>在接收端，无论是SM还是一般的Server端，不断地从todo链表检查是否有节点，如果有的话就会摘取下来并解析、执行。驱动层在交给接收端解析、执行之前，会把节点中的数据包装成一个<code>struct binder_transaction_data</code>结构体，数据的内容基本上保持了发起端组织时的样子，只不过在发起端发送到驱动层时，提领信息会被修改，但还是指向同一个实体。</p>
+<p>当SM收到addService请求后会把(name, handle)缓存起来；收到checkService请求后，会找到该缓存并将结果发送给Client，只是此时Client端没有Service任何的提领信息，SM会给它什么呢？肯定是handle，只是这个handle是怎么注册到Client端的？接下来还要再跟。</p>
+<p>Client端再组织Test请求，驱动层再次将handle改成指针，发送到Server端执行，并将执行结果发送给Client。</p>
+<p>这次是真地<code>山高月小，水落石出</code>了！接下来需要把前面的流水账系统地梳理一遍。可以先从原理上宏观地描述三方的职责以及关键操作，然后再从具体需求入手，从addService、checkService、Test三条线梳理清楚控制流、数据流，Binder的主流操作，无非也就这些。当然还有一些扩展话题，比如“死亡通知”可以在主流操作梳理完成后再研究。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Binder学习笔记/" rel="tag"># Binder学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/17/2016/0717抓到一只小乌龟/" rel="next" title="今天抓到一只小乌龟">
+                <i class="fa fa-chevron-left"></i> 今天抓到一只小乌龟
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/28/2016/0728DissectingBinder1/" rel="prev" title="深度探索Binder（一）取款机模型">
+                深度探索Binder（一）取款机模型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/07/24/2016/0724BinderLearning14/" data-title="binder学习笔记（十四）—— binder_thread_read(...)都干了什么？" data-url="http://palanceli.github.io/2016/07/24/2016/0724BinderLearning14/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">1.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

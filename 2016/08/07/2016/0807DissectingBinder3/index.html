@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="深度探索Binder,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="查找服务查找服务的起点在Client端 TestClient.cpp。客户把银行卡插到取款机，取款机负责根据前面的注册找到匹配的服务。">
+<meta name="keywords" content="深度探索Binder">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度探索Binder（三）查找服务">
+<meta property="og:url" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="查找服务查找服务的起点在Client端 TestClient.cpp。客户把银行卡插到取款机，取款机负责根据前面的注册找到匹配的服务。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.678Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深度探索Binder（三）查找服务">
+<meta name="twitter:description" content="查找服务查找服务的起点在Client端 TestClient.cpp。客户把银行卡插到取款机，取款机负责根据前面的注册找到匹配的服务。">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/">
+
+
+
+
+
+  <title>深度探索Binder（三）查找服务 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深度探索Binder（三）查找服务</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-07T16:40:56+08:00">
+                2016-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/07/2016/0807DissectingBinder3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/07/2016/0807DissectingBinder3/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="查找服务"><a href="#查找服务" class="headerlink" title="查找服务"></a>查找服务</h1><p>查找服务的起点在Client端 <a href="https://github.com/palanceli/androidex/blob/master/external-testservice/TestClient.cpp" target="_blank" rel="noopener">TestClient.cpp</a>。客户把银行卡插到取款机，取款机负责根据前面的注册找到匹配的服务。<br><a id="more"></a></p>
+<h2 id="应用层如何组织checkService数据"><a href="#应用层如何组织checkService数据" class="headerlink" title="应用层如何组织checkService数据"></a>应用层如何组织checkService数据</h2><p>客户端的调用很简单：根据服务名称获得服务，接下来就可以调用服务接口执行服务了：<br><code>sp &lt; IBinder &gt; binder = sm-&gt;getService(String16(&quot;service.testservice&quot;));</code><br>上一节已经分析过sm就是给BpBinder(0)加了薄薄一层封装成为BpServiceManager，来看<code>BpServiceManager::getService(...)</code><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/libs/binder/IServiceManager.cpp:134</span></span><br><span class="line"><span class="keyword">virtual</span> sp&lt;IBinder&gt; getService(<span class="keyword">const</span> String16&amp; name) <span class="keyword">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        ... ...</span><br><span class="line">            sp&lt;IBinder&gt; svc = checkService(name);</span><br><span class="line">            <span class="keyword">if</span> (svc != <span class="literal">NULL</span>) <span class="keyword">return</span> svc;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">// frameworks/native/libs/binder/IServiceManager.cpp:146</span></span><br><span class="line">    <span class="keyword">virtual</span> sp&lt;IBinder&gt; checkService( <span class="keyword">const</span> String16&amp; name) <span class="keyword">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        Parcel data, reply;</span><br><span class="line">        data.writeInterfaceToken(IServiceManager::getInterfaceDescriptor());</span><br><span class="line">        data.writeString16(name);</span><br><span class="line">        remote()-&gt;transact(CHECK_SERVICE_TRANSACTION, data, &amp;reply);</span><br><span class="line">        <span class="keyword">return</span> reply.readStrongBinder();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>前文说过remote()就是BpBinder(0)，其<code>transact(...)</code>的调用过程在<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#addService-…-添加服务">addService添加服务</a>中也分析过了，此处只给出调用过程图：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img01.png" alt="checkService的调用过程"><br>其组织的数据为：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img02.png" alt="Client端为checkService组织的数据结构"><br>数据部分只有服务的名字，比addService简单很多。</p>
+<h2 id="驱动层如何发送checkService请求"><a href="#驱动层如何发送checkService请求" class="headerlink" title="驱动层如何发送checkService请求"></a>驱动层如何发送checkService请求</h2><p>数据通过<code>ioctl(...)</code>到达驱动层，来到<code>binder_ioctl(...)</code>。此处代码的调用过程也和<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#驱动层怎么处理Server端的addService数据包">驱动层处理Server端的addService请求</a>是一样的，这里也只给出调用过程图：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img03.png" alt="checkerService请求在驱动层的调用过程"><br>关键的处理在函数<code>binder_transaction(...)</code>中，它生成一个事务结构体<code>binder_transaction</code>，并把该事务插入到目标进程（即ServiceManager）的todo队列中。下图是数据结构：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img04.png" alt="binder_transaction(...)函数产生的数据结构"><br>和addService不同的是：checkService携带的data数据中没有Binder Object类型的数据，因此在<code>binder_transaction(...)</code>函数中不会走到处理<code>Binder Object</code>的for循环内，因此也就不会为源和目标进程创建binder实体和引用。</p>
+<h2 id="ServiceManager如何接收checkService请求"><a href="#ServiceManager如何接收checkService请求" class="headerlink" title="ServiceManager如何接收checkService请求"></a>ServiceManager如何接收checkService请求</h2><p>ServiceManager应用层等待请求的逻辑和<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#ServiceManager应用层如何等待请求">addService在ServiceManager应用层如何等待请求</a>是一模一样，不再赘述。<br>驱动层接收checkService请求的逻辑和<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#驱动层怎么接收请求">驱动层接收addService请求</a>也非常相似，下面是数据结构图：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img05.png" alt="binder_thread_rad(...)收到请求后生成的数据结构"></p>
+<p>然后又到ServiceManager应用层接收和处理checkService请求了，调用过程跟<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#ServiceManager应用层怎么处理请求">接收和处理addService</a>也很相似，调用过程如下：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img06.png" alt="ServiceManager应用层调用关系"><br>来看<code>do_find_service(...)</code>函数，其实不用看上一节都已经猜到了，砍掉细枝末节后逻辑非常简单，就是查表，找到名字匹配的节点后将handle返回：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/cmds/servicemanager/service_manager.c:170</span></span><br><span class="line"><span class="keyword">uint32_t</span> do_find_service(struct binder_state *bs, <span class="keyword">const</span> <span class="keyword">uint16_t</span> *s, <span class="keyword">size_t</span> len, <span class="keyword">uid_t</span> uid, <span class="keyword">pid_t</span> spid)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">svcinfo</span> *<span class="title">si</span> = <span class="title">find_svc</span>(<span class="title">s</span>, <span class="title">len</span>);</span></span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">return</span> si-&gt;handle;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是，这个handle是在ServiceManager空间内的handle，这个数值不能跨进程使用。此处直接返回handle我猜肯定要在驱动层找到对应的binder实体，再找到该实体在Client进程空间内的handle，如果没有，就给它创建一个。</p>
+<h2 id="ServiceManager如何组织checkService的响应数据"><a href="#ServiceManager如何组织checkService的响应数据" class="headerlink" title="ServiceManager如何组织checkService的响应数据"></a>ServiceManager如何组织checkService的响应数据</h2><p>再来看<code>svcmgr_handle(...)</code>函数的<code>case SVC_MGR_CHECK_SERVICE:</code>部分：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/cmds/servicemanager.service_manager.c:291</span></span><br><span class="line">    <span class="keyword">case</span> SVC_MGR_CHECK_SERVICE:</span><br><span class="line">        s = bio_get_string16(msg, &amp;len);</span><br><span class="line">        ... ...</span><br><span class="line">        handle = do_find_service(bs, s, len, txn-&gt;sender_euid, txn-&gt;sender_pid);</span><br><span class="line">        ... ...</span><br><span class="line">        bio_put_ref(reply, handle); <span class="comment">// handle被塞入了reply</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure></p>
+<p>找到handle后会把它塞给reply，其实在处理完SVC_MGR_ADD_SERVICE后，在函数最末，也有这么一行：<br><code>bio_put_uint32(reply, 0);</code>，只是Server不需要处理返回数据，所以前一节中我们没关注。<br>svcmgr_handle(…)完成对SVC_MGR_CHECK_SERVICE的处理，生成的数据结构为：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img07.png" alt="svcmgr_handle(...)完成对SVC_MGR_CHECK_SERVICE的处理，生成的数据结构"></p>
+<p>在<code>binder_parse(...)</code>调用完<code>svcmgr_handler(...)</code>后，再调用<code>binder_send_reply(...)</code>把应答数据发送出去：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/cmds/servicemanger/binder.c:170</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">binder_send_reply</span><span class="params">(struct binder_state *bs,</span></span></span><br><span class="line"><span class="function"><span class="params">                       struct binder_io *reply,</span></span></span><br><span class="line"><span class="function"><span class="params">                       <span class="keyword">binder_uintptr_t</span> buffer_to_free,</span></span></span><br><span class="line"><span class="function"><span class="params">                       <span class="keyword">int</span> status)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="keyword">uint32_t</span> cmd_free;</span><br><span class="line">        <span class="keyword">binder_uintptr_t</span> buffer;</span><br><span class="line">        <span class="keyword">uint32_t</span> cmd_reply;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">binder_transaction_data</span> <span class="title">txn</span>;</span></span><br><span class="line">    &#125; __attribute__((packed)) data;</span><br><span class="line"></span><br><span class="line">    data.cmd_free = BC_FREE_BUFFER;</span><br><span class="line">    data.buffer = buffer_to_free;</span><br><span class="line">    data.cmd_reply = BC_REPLY;</span><br><span class="line">    data.txn.target.ptr = <span class="number">0</span>;</span><br><span class="line">    data.txn.cookie = <span class="number">0</span>;</span><br><span class="line">    data.txn.code = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (status) &#123;                   <span class="comment">// status是svcmgr_handler的返回值，正常应为0</span></span><br><span class="line">        ... ...</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        data.txn.flags = <span class="number">0</span>;</span><br><span class="line">        data.txn.data_size = reply-&gt;data - reply-&gt;data0;</span><br><span class="line">        data.txn.offsets_size = ((<span class="keyword">char</span>*) reply-&gt;offs) - ((<span class="keyword">char</span>*) reply-&gt;offs0);</span><br><span class="line">        data.txn.data.ptr.buffer = (<span class="keyword">uintptr_t</span>)reply-&gt;data0;</span><br><span class="line">        data.txn.data.ptr.offsets = (<span class="keyword">uintptr_t</span>)reply-&gt;offs0;</span><br><span class="line">    &#125;</span><br><span class="line">    binder_write(bs, &amp;data, <span class="keyword">sizeof</span>(data));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>ServiceManager为checkService组织的数据如下，该数据被写入binder作为应答发送给Client端<br><img src="/2016/08/07/2016/0807DissectingBinder3/img08.png" alt="ServiceManager为checkService组织的应答数据"></p>
+<h2 id="驱动层如何处理checkService的响应数据"><a href="#驱动层如何处理checkService的响应数据" class="headerlink" title="驱动层如何处理checkService的响应数据"></a>驱动层如何处理checkService的响应数据</h2><p>接下来的调用过程跟发送请求是一样的，通过<code>ioctl(...)</code>调用到达驱动层，再通过驱动层<code>binder_ioctl(...)</code>调用<code>binder_thread_write(...)</code>再调用<code>binder_transaction(...)</code>。只是此处的数据包含了两段，第一段是BC_FREE_BUFFER，要求释放在驱动层分配的data数据缓存，第二段是BC_REPLY。第一段不再深入探索，来看第二段。<br>BC_REPLY和BC_TRANSACTION走一样的逻辑分支，此处有必要把<code>binder_transaction(...)</code>再展开分析。</p>
+<p>上一节中讲到<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#驱动层怎么接收请求">驱动层接收到<code>addService</code>的请求</a>，在<code>binder_thread_read(...)</code>函数的尾部有一段这样的代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// kernel/godlfish/drivers/staging/android/binder.c:2528</span></span><br><span class="line">        <span class="keyword">if</span> (cmd == BR_TRANSACTION &amp;&amp; !(t-&gt;flags &amp; TF_ONE_WAY)) &#123;</span><br><span class="line">            t-&gt;to_parent = thread-&gt;transaction_stack;</span><br><span class="line">            t-&gt;to_thread = thread;</span><br><span class="line">            thread-&gt;transaction_stack = t;</span><br><span class="line">        &#125; <span class="keyword">else</span> </span><br><span class="line">            ... ...</span><br></pre></td></tr></table></figure></p>
+<p>它把ServiceManager的thread-&gt;transaction_stack指向了收到的事务结构体<code>binder_transaction</code>。驱动层在处理<code>checkService</code>请求时此处的逻辑是一样的。接下来在组织应答数据的时候，需要用到该字段：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// kernel/goldfish/drivers/staging/android/binder.c:1402</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">binder_transaction</span><span class="params">(struct binder_proc *proc,</span></span></span><br><span class="line"><span class="function"><span class="params">                   struct binder_thread *thread,</span></span></span><br><span class="line"><span class="function"><span class="params">                   struct binder_transaction_data *tr, <span class="keyword">int</span> reply)</span></span></span><br><span class="line"><span class="function"></span>&#123;   <span class="comment">// proc     ServiceManager的binder_proc</span></span><br><span class="line">    <span class="comment">// thread   ServiceManager的binder_thread</span></span><br><span class="line">    <span class="comment">// tr       data中的txn</span></span><br><span class="line">    <span class="comment">// reply    cmd==BC_REPLY即true</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_transaction</span> *<span class="title">t</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_work</span> *<span class="title">tcomplete</span>;</span></span><br><span class="line">    <span class="keyword">size_t</span> *offp, *off_end;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_proc</span> *<span class="title">target_proc</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_thread</span> *<span class="title">target_thread</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_node</span> *<span class="title">target_node</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">target_list</span>;</span></span><br><span class="line">    <span class="keyword">wait_queue_head_t</span> *target_wait;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_transaction</span> *<span class="title">in_reply_to</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_transaction_log_entry</span> *<span class="title">e</span>;</span></span><br><span class="line">    <span class="keyword">uint32_t</span> return_error;</span><br><span class="line"></span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (reply) &#123;</span><br><span class="line">        <span class="comment">// 驱动层组织checkService请求时生成的binder_transaction结构体</span></span><br><span class="line">        in_reply_to = thread-&gt;transaction_stack;</span><br><span class="line">        ... ...</span><br><span class="line">        thread-&gt;transaction_stack = in_reply_to-&gt;to_parent;</span><br><span class="line">        target_thread = in_reply_to-&gt;from;  <span class="comment">// Client的binder_thread</span></span><br><span class="line">        ... ...</span><br><span class="line">        target_proc = target_thread-&gt;proc;  <span class="comment">// Client的binder_proc</span></span><br><span class="line">    &#125; <span class="keyword">else</span> </span><br><span class="line">        ... ...</span><br><span class="line">    <span class="keyword">if</span> (target_thread) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">        target_list = &amp;target_thread-&gt;todo; <span class="comment">// Client的todo队列</span></span><br><span class="line">        target_wait = &amp;target_thread-&gt;wait;</span><br><span class="line">    &#125; <span class="keyword">else</span> </span><br><span class="line">    ... ...</span><br><span class="line">    t = kzalloc(<span class="keyword">sizeof</span>(*t), GFP_KERNEL);</span><br><span class="line">    ... ...</span><br><span class="line">    tcomplete = kzalloc(<span class="keyword">sizeof</span>(*tcomplete), GFP_KERNEL);</span><br><span class="line">    ... ...</span><br><span class="line">        t-&gt;from = <span class="literal">NULL</span>;</span><br><span class="line">    t-&gt;sender_euid = proc-&gt;tsk-&gt;cred-&gt;euid;</span><br><span class="line">    t-&gt;to_proc = target_proc;               <span class="comment">// Client的binder_proc</span></span><br><span class="line">    t-&gt;to_thread = target_thread;           <span class="comment">// Client的binder_thread</span></span><br><span class="line">    t-&gt;code = tr-&gt;code;                     <span class="comment">// 0</span></span><br><span class="line">    t-&gt;flags = tr-&gt;flags;                   <span class="comment">// 0</span></span><br><span class="line">    t-&gt;priority = task_nice(current);</span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    t-&gt;buffer = binder_alloc_buf(target_proc, tr-&gt;data_size,</span><br><span class="line">        tr-&gt;offsets_size, !reply &amp;&amp; (t-&gt;flags &amp; TF_ONE_WAY));</span><br><span class="line">    ... ...</span><br><span class="line">    t-&gt;buffer-&gt;allow_user_free = <span class="number">0</span>;</span><br><span class="line">    t-&gt;buffer-&gt;debug_id = t-&gt;debug_id;</span><br><span class="line">    t-&gt;buffer-&gt;transaction = t;</span><br><span class="line">    t-&gt;buffer-&gt;target_node = target_node;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (target_node)</span><br><span class="line">        binder_inc_node(target_node, <span class="number">1</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    offp = (<span class="keyword">size_t</span> *)(t-&gt;buffer-&gt;data + ALIGN(tr-&gt;data_size, <span class="keyword">sizeof</span>(<span class="keyword">void</span> *)));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (copy_from_user(t-&gt;buffer-&gt;data, tr-&gt;data.ptr.buffer, tr-&gt;data_size)) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (copy_from_user(offp, tr-&gt;data.ptr.offsets, tr-&gt;offsets_size)) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">    off_end = (<span class="keyword">void</span> *)offp + tr-&gt;offsets_size;</span><br><span class="line">    <span class="keyword">for</span> (; offp &lt; off_end; offp++) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">flat_binder_object</span> *<span class="title">fp</span>;</span></span><br><span class="line">        ... ...</span><br><span class="line">        fp = (struct flat_binder_object *)(t-&gt;buffer-&gt;data + *offp);</span><br><span class="line">        <span class="keyword">switch</span> (fp-&gt;type) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">case</span> BINDER_TYPE_HANDLE:</span><br><span class="line">        <span class="keyword">case</span> BINDER_TYPE_WEAK_HANDLE: &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">binder_ref</span> *<span class="title">ref</span> = <span class="title">binder_get_ref</span>(<span class="title">proc</span>, <span class="title">fp</span>-&gt;<span class="title">handle</span>);</span></span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 左值是拥有binder实体的proc即Server，右值是Client</span></span><br><span class="line">            <span class="keyword">if</span> (ref-&gt;node-&gt;proc == target_proc) &#123;   <span class="comment">// 为假</span></span><br><span class="line">                ... ...</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;                                <span class="comment">// 为真</span></span><br><span class="line">                struct binder_ref *new_ref;</span><br><span class="line">                <span class="comment">// 在Client中为Server的binder实体创建引用</span></span><br><span class="line">                new_ref = binder_get_ref_for_node(target_proc, ref-&gt;node);</span><br><span class="line">                ... ...</span><br><span class="line">                fp-&gt;handle = new_ref-&gt;desc;</span><br><span class="line">                binder_inc_ref(new_ref, fp-&gt;type == BINDER_TYPE_HANDLE, <span class="literal">NULL</span>);</span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">break</span>;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (reply) &#123;</span><br><span class="line">        BUG_ON(t-&gt;buffer-&gt;async_transaction != <span class="number">0</span>);</span><br><span class="line">        binder_pop_transaction(target_thread, in_reply_to);</span><br><span class="line">    &#125; <span class="keyword">else</span> </span><br><span class="line">        ... ...</span><br><span class="line">    t-&gt;work.type = BINDER_WORK_TRANSACTION;</span><br><span class="line">    list_add_tail(&amp;t-&gt;work.entry, target_list);</span><br><span class="line">    tcomplete-&gt;type = BINDER_WORK_TRANSACTION_COMPLETE;</span><br><span class="line">    list_add_tail(&amp;tcomplete-&gt;entry, &amp;thread-&gt;todo);</span><br><span class="line">    <span class="keyword">if</span> (target_wait)</span><br><span class="line">        wake_up_interruptible(target_wait);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>把驱动层处理checkService的响应数据画出来如下（好大！）：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img09.png" alt="驱动层处理checkService的响应数据"><br>看驱动层的响应数据，驱动层的主要职责是生成<code>binder_transaction</code>结构体，它的buffer所指向的数据则来自ServiceManager的tr-&gt;data.ptr.buffer。尔后遍历fp中的<code>flat_binder_object</code>对象，如果该引用的实体和<code>target_proc（即Client）</code>不在同一个进程，则在<code>target_proc</code>中创建该对象的引用，再把handle改为在<code>target_proc</code>中的引用，因为包含该handle这坨数据是要发送给<code>target_proc</code>的。<br>最后，响应数据中的<code>binder_transaction</code>被插入到<code>target_proc</code>的todo队列中。</p>
+<h2 id="驱动层接收checkService的响应数据"><a href="#驱动层接收checkService的响应数据" class="headerlink" title="驱动层接收checkService的响应数据"></a>驱动层接收checkService的响应数据</h2><p>回顾上文Client端调用<code>ioctl(...)</code>函数把checkService请求发出去：<br><img src="/2016/08/07/2016/0807DissectingBinder3/img03.png" alt="checkService请求在驱动层的调用过程"><br>驱动层发送完数据之后紧接着调用<code>binder_thread_read(...)</code>等待响应数据。接下来的过程和<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#驱动层怎么接收请求">ServiceManager触发的驱动层接收请求</a>过程是一模一样的。<br>驱动在内核层生成一个<code>binger_transaction_data</code>结构体用来记录收到的响应数据。这里不再赘述。</p>
+<h2 id="Client端如何处理响应数据"><a href="#Client端如何处理响应数据" class="headerlink" title="Client端如何处理响应数据"></a>Client端如何处理响应数据</h2><p>Client端收到的数据其实就一个handle是它所请求的”service.testservice”binder在Client空间的引用描述符，通过该描述符，在内核空间可以找到binder实体，于是通过该描述符也就可以调用到binder的服务接口。</p>
+<p>回到本文最头部<code>checkService(...)</code>函数，该函数最后一行<code>return reply.readStrongBinder();</code><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/libs/binder/Parcel.cpp:1334</span></span><br><span class="line">sp&lt;IBinder&gt; Parcel::readStrongBinder() <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    sp&lt;IBinder&gt; val;</span><br><span class="line">    unflatten_binder(ProcessState::self(), *<span class="keyword">this</span>, &amp;val);</span><br><span class="line">    <span class="keyword">return</span> val;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// frameworks/native/libs/binder/Parcel.cpp:293</span></span><br><span class="line"><span class="keyword">status_t</span> unflatten_binder(<span class="keyword">const</span> sp&lt;ProcessState&gt;&amp; proc,</span><br><span class="line">    <span class="keyword">const</span> Parcel&amp; in, sp&lt;IBinder&gt;* out)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> flat_binder_object* flat = in.readObject(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (flat) &#123;</span><br><span class="line">        <span class="keyword">switch</span> (flat-&gt;type) &#123;   <span class="comment">// 这次读到的是个handle</span></span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">case</span> BINDER_TYPE_HANDLE:</span><br><span class="line">                *out = proc-&gt;getStrongProxyForHandle(flat-&gt;handle);</span><br><span class="line">                <span class="keyword">return</span> finish_unflatten_binder(</span><br><span class="line">                    <span class="keyword">static_cast</span>&lt;BpBinder*&gt;(out-&gt;get()), *flat, in);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> BAD_TYPE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>又落到了<br><code>ProcessState::getStrongProxyForHandle(...)</code><br>函数里，在上一篇分析过该函数，它返回的就是<code>new BpBinder(handle)</code>。</p>
+<p>接下来的<br><code>sp&lt;ITestService&gt; cs = interface_cast &lt; ITestService &gt; (binder);</code><br>在上一篇<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#interface-cast-…-把普通火车封装成XX号">把“普通火车”简单包装成“XX号”</a>中也介绍过了。</p>
+<p>以上就是“查找服务”的整个过程。<br>我从早上醒来一直写到晚上快十二点，终于把“注册服务”、“查找服务”写完，希望下周能把“调用服务接口”也整理完，这样深度探索Binder也就告一段落了。其他还有一些相关知识，比如死亡通知、线程池等在这次探索的基础上应该不难攻克。但暂时我不想继续下去了，因为我更迫不及待地是探索Android键盘响应处理机制。研究Android源码就像年轻的时候追剧，水落石出之前，茶饭不思、睡不好觉、魂不守舍的，最近身体耗得比较厉害，现在脖子应有点酸了，希望明天颈椎病不要犯。再往后的几周，我想研究几个轻量级的问题，比如从JAVA层到JNI的调用关系、用AndroidStudio调试framework层代码，以及checkout Android N，休整好了就会尝试向键盘响应处理机制出发了，希望今年内能再拿下三个稍大点的专题。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/深度探索Binder/" rel="tag"># 深度探索Binder</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/06/2016/0806DissectingBinder2/" rel="next" title="深度探索Binder（二）注册服务">
+                <i class="fa fa-chevron-left"></i> 深度探索Binder（二）注册服务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/07/2016/0807DissectingBinder4/" rel="prev" title="深度探索Binder（四）调用服务接口">
+                深度探索Binder（四）调用服务接口 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/08/07/2016/0807DissectingBinder3/" data-title="深度探索Binder（三）查找服务" data-url="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder3/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#查找服务"><span class="nav-number">1.</span> <span class="nav-text">查找服务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#应用层如何组织checkService数据"><span class="nav-number">1.1.</span> <span class="nav-text">应用层如何组织checkService数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#驱动层如何发送checkService请求"><span class="nav-number">1.2.</span> <span class="nav-text">驱动层如何发送checkService请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ServiceManager如何接收checkService请求"><span class="nav-number">1.3.</span> <span class="nav-text">ServiceManager如何接收checkService请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ServiceManager如何组织checkService的响应数据"><span class="nav-number">1.4.</span> <span class="nav-text">ServiceManager如何组织checkService的响应数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#驱动层如何处理checkService的响应数据"><span class="nav-number">1.5.</span> <span class="nav-text">驱动层如何处理checkService的响应数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#驱动层接收checkService的响应数据"><span class="nav-number">1.6.</span> <span class="nav-text">驱动层接收checkService的响应数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Client端如何处理响应数据"><span class="nav-number">1.7.</span> <span class="nav-text">Client端如何处理响应数据</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

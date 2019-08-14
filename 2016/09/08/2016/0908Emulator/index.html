@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android开发环境,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一直没有放弃调研怎么在模拟器上直接运行和调试代码。直接调试一个小程序当然没问题，可是对于一个比较庞大的工程，包含JNI和基于arm编译好的so，之前基础知识匮乏，操作这事总是遇到各种阻碍，又不知道该怎么解决。这两天再次尝试终于有突破了，把过程备忘下来。">
+<meta name="keywords" content="Android开发环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在模拟器上运行app">
+<meta property="og:url" content="http://palanceli.github.io/2016/09/08/2016/0908Emulator/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="一直没有放弃调研怎么在模拟器上直接运行和调试代码。直接调试一个小程序当然没问题，可是对于一个比较庞大的工程，包含JNI和基于arm编译好的so，之前基础知识匮乏，操作这事总是遇到各种阻碍，又不知道该怎么解决。这两天再次尝试终于有突破了，把过程备忘下来。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/09/08/2016/0908Emulator/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/09/08/2016/0908Emulator/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/09/08/2016/0908Emulator/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.741Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在模拟器上运行app">
+<meta name="twitter:description" content="一直没有放弃调研怎么在模拟器上直接运行和调试代码。直接调试一个小程序当然没问题，可是对于一个比较庞大的工程，包含JNI和基于arm编译好的so，之前基础知识匮乏，操作这事总是遇到各种阻碍，又不知道该怎么解决。这两天再次尝试终于有突破了，把过程备忘下来。">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/09/08/2016/0908Emulator/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/09/08/2016/0908Emulator/">
+
+
+
+
+
+  <title>在模拟器上运行app | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/09/08/2016/0908Emulator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在模拟器上运行app</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-08T22:47:24+08:00">
+                2016-09-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/09/08/2016/0908Emulator/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/08/2016/0908Emulator/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一直没有放弃调研怎么在模拟器上直接运行和调试代码。直接调试一个小程序当然没问题，可是对于一个比较庞大的工程，包含JNI和基于arm编译好的so，之前基础知识匮乏，操作这事总是遇到各种阻碍，又不知道该怎么解决。这两天再次尝试终于有突破了，把过程备忘下来。</p>
+<a id="more"></a>
+<p>尽管在模拟器上调试和运行程序比在真机上迟缓，可模拟器有自己独特的优势：</p>
+<ul>
+<li>模拟器天然有root权限，我一直没有搞定root自己的华为手机。模拟器不用再操root的心，随意怎么搞，很爽。</li>
+<li>不用总是带着调试机在身边，也不用叮叮当当的连线。平时自己用的手机有各种网银、电商，还是不太放心直接用来做开发机，再带一台调试机很累赘。</li>
+<li>最近工作的重点都是使用adb，比如调查应用的存储尺寸、内存占用，这些跟模拟器运行的快慢没关系。</li>
+<li>Genymotion、AndroidStudio2.x自带的模拟器运行速度已经很快了，我相信Google还会不断优化模拟器的性能。</li>
+<li>如果要调试的是Android源码，那只有使用Android自带的模拟器最便捷。</li>
+</ul>
+<h1 id="使用Gemymotion运行基于ARM指令的APP"><a href="#使用Gemymotion运行基于ARM指令的APP" class="headerlink" title="使用Gemymotion运行基于ARM指令的APP"></a>使用Gemymotion运行基于ARM指令的APP</h1><p>以前之所以遇到各种问题，主要还是平台指令集不匹配的原因，解决起来其实非常简单。Genymotion和AndroidStudio2.x自带的模拟器都是x86的，而绝大部分app如果有带so的话，都是基于arm指令集编译的，直接跑在x86的模拟器上必然有问题。这两个模拟器现在的运行速度差不多，我选用Genymotion。模拟器启动后，先安装<a href="https://pan.baidu.com/s/1hsQA2LQ" target="_blank" rel="noopener">ARM_Translation_Marshmallow.zip</a>，把该zip文件直接拖到模拟器里，一路安装即可。重启后就可以运行基于arm编译的app了，使用AndroidStudio调试都没有问题。用这种方式调试应用层代码，体验上已经不比在真机上差了。</p>
+<h1 id="使用emulator安装app"><a href="#使用emulator安装app" class="headerlink" title="使用emulator安装app"></a>使用emulator安装app</h1><p>有的时候，必须在基于ARM指令的模拟器上运行、调试代码，那就只有用Android源码自带的emulator。关于emulator的编译，可参见<a href="http://www.cnblogs.com/palance/p/5229500.html" target="_blank" rel="noopener">《Android源码树中C代码的编译》</a>。我尝试使用AndroidStudio直接编译大项目，并安装到模拟器上直接调试，总是在”Installing apk…”的地方模拟器就无响应了，目前还不知道该怎么解决。不过今天我发现直接adb install来安装是没问题的，比如从官网下载搜狗输入法，然后执行：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 设定内存和存储尺寸，设定dns以使网络畅通</span><br><span class="line">$ emulator -memory 512 -partition-size 1024 -dns-server 10.129.181.211 &amp;</span><br><span class="line">// 安装输入法</span><br><span class="line">$ adb install /Users/palance/Downloads/SogouInput_android_v8.4_sweb.apk</span><br></pre></td></tr></table></figure></p>
+<p>就顺利完成安装了。</p>
+<h1 id="使用AndroidStudio在emulator上调试Android源码"><a href="#使用AndroidStudio在emulator上调试Android源码" class="headerlink" title="使用AndroidStudio在emulator上调试Android源码"></a>使用AndroidStudio在emulator上调试Android源码</h1><p>上周只是蜻蜓点水地试了一下，貌似也可以了，详细的步骤我还要再梳理，稍后补上。这一块补足后，开发、调试环境这条道上的障碍就基本扫清了，以后就可以在上面更快地跑马咯~</p>
+<p>记录我在macOS下的操作步骤：</p>
+<h2 id="修改AndroidStudio的内存配置"><a href="#修改AndroidStudio的内存配置" class="headerlink" title="修改AndroidStudio的内存配置"></a>修改AndroidStudio的内存配置</h2><p>应用程序 - Android Studio.app右键 - 显示包内容 - Contents/bin/studio.vmoptions，被修改的两项内容如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms512m</span><br><span class="line">-Xmx2048m</span><br></pre></td></tr></table></figure></p>
+<p>Xms是JVM启动的起始堆内存，Xmx是AndroidStudio能使用的最大heap内存。</p>
+<h2 id="使用源码生成ipr文件"><a href="#使用源码生成ipr文件" class="headerlink" title="使用源码生成ipr文件"></a>使用源码生成ipr文件</h2><p>在源码下执行<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">source</span> build/ensetup.sh</span><br><span class="line">$ make idegen &amp;&amp; development/tools/idegen/idegen.sh</span><br></pre></td></tr></table></figure></p>
+<p>该命令会在源码根目录下生成AndroidStudio所需要的ipr文件，打开AndroidStudio - Open an existing Android Studio project - 选择刚刚生成的android.ipr</p>
+<p>接下来需要一段时间来读取源码，我等了25分钟。为了让以后每次打开项目的时候节省点时间，可以把一些文件夹设置为Excluded，这样以后再打开项目的时候，AndroidStudio就不再读取这些文件夹了。具体操作为：在项目上右键 - Open Module Settings - Project Settings - Modules，点击要排除的文件夹，点击Excluded。我选择排除了docs、out、prebuilts。</p>
+<h2 id="配置JDK、SDK"><a href="#配置JDK、SDK" class="headerlink" title="配置JDK、SDK"></a>配置JDK、SDK</h2><p>回到Module Settings - Platform Settings - SDKs。依照已有的JDK再添加一个，取名为1.8(No Libraries)，删除classpath下所有jar文件，以确保使用Android源码里的库文件。并将1.8(No Libraries)作为Android SDK使用的JDK，如下：<br><img src="/2016/09/08/2016/0908Emulator/img01.png" alt="JDK设置"><br><img src="/2016/09/08/2016/0908Emulator/img02.png" alt="SDK设置"><br>在Project SDK中选择对应的Android API版本：<br><img src="/2016/09/08/2016/0908Emulator/img03.png" alt="Project SDK设置"></p>
+<p>回到Project Settings - Modules - Dependencies，删除除<br><code>&lt;Module source&gt;</code><br><code>Android API 23 Platform(java version &quot;1.8.0_60&quot;</code><br>以外的所有依赖，这样代码跳转时就会优先从这两个文件夹下查找，而不是去Android.jar。</p>
+<h2 id="为Debug配置"><a href="#为Debug配置" class="headerlink" title="为Debug配置"></a>为Debug配置</h2><p>Project Settings - Modules - 选中中间试图中的android - 点击加号 - 选择Framework/Android</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android开发环境/" rel="tag"># Android开发环境</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/28/2016/0828又是一年校招季/" rel="next" title="又是一年校招季">
+                <i class="fa fa-chevron-left"></i> 又是一年校招季
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/19/2016/0919Emacs/" rel="prev" title="使用Emacs">
+                使用Emacs <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/09/08/2016/0908Emulator/" data-title="在模拟器上运行app" data-url="http://palanceli.github.io/2016/09/08/2016/0908Emulator/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用Gemymotion运行基于ARM指令的APP"><span class="nav-number">1.</span> <span class="nav-text">使用Gemymotion运行基于ARM指令的APP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用emulator安装app"><span class="nav-number">2.</span> <span class="nav-text">使用emulator安装app</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用AndroidStudio在emulator上调试Android源码"><span class="nav-number">3.</span> <span class="nav-text">使用AndroidStudio在emulator上调试Android源码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改AndroidStudio的内存配置"><span class="nav-number">3.1.</span> <span class="nav-text">修改AndroidStudio的内存配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用源码生成ipr文件"><span class="nav-number">3.2.</span> <span class="nav-text">使用源码生成ipr文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置JDK、SDK"><span class="nav-number">3.3.</span> <span class="nav-text">配置JDK、SDK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为Debug配置"><span class="nav-number">3.4.</span> <span class="nav-text">为Debug配置</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

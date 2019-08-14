@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章在详情界面中添加了选择照片的功能，引入了UIImageView：本章要点：  UIImageView">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记十五">
+<meta property="og:url" content="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章在详情界面中添加了选择照片的功能，引入了UIImageView：本章要点：  UIImageView">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.005Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记十五">
+<meta name="twitter:description" content="本章在详情界面中添加了选择照片的功能，引入了UIImageView：本章要点：  UIImageView">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记十五 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记十五</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-03T23:00:00+08:00">
+                2017-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/03/2017/0803iOSProgrammingBNRG15/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/03/2017/0803iOSProgrammingBNRG15/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章在详情界面中添加了选择照片的功能，引入了UIImageView：<br><img src="/2017/08/03/2017/0803iOSProgrammingBNRG15/img01.png" alt><br>本章要点：</p>
+<ul>
+<li>UIImageView<a id="more"></a>
+</li>
+</ul>
+<h1 id="1-UIImageView"><a href="#1-UIImageView" class="headerlink" title="1 UIImageView"></a>1 UIImageView</h1><h2 id="1-1-怎么控制UIImageView显示图片的缩放方式"><a href="#1-1-怎么控制UIImageView显示图片的缩放方式" class="headerlink" title="1.1 怎么控制UIImageView显示图片的缩放方式"></a>1.1 怎么控制UIImageView显示图片的缩放方式</h2><p>根据<code>contentMode</code>属性：</p>
+<style>
+table th:nth-of-type(1){
+    width: 80px;
+}
+table th:nth-of-type(2){
+    width: 300px;
+}
+</style>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>contentMode</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>scaleToFill</td>
+<td>缩放图片使之充满容器，可能会导致图片变形</td>
+</tr>
+<tr>
+<td>AspectFill</td>
+<td>保持图片宽高比的前提下缩放图片，使之充满容器</td>
+</tr>
+<tr>
+<td>Aspect Fit</td>
+<td>保持图片宽高比的前提下缩放图片，使图片在容器内完整显示出来</td>
+</tr>
+<tr>
+<td>Aspect</td>
+<td>保持图片的宽高比</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="1-2-UIToolBar的特点"><a href="#1-2-UIToolBar的特点" class="headerlink" title="1.2 UIToolBar的特点"></a>1.2 UIToolBar的特点</h2><p>本章使用UIToolBar来展现左下角的相机图标，UIToolBar和UINavigationBar非常相似，不同之处在于在它上面可以添加多个按钮项，只要屏幕放得下。</p>
+<h2 id="1-3-选取照片都有哪几种形式"><a href="#1-3-选取照片都有哪几种形式" class="headerlink" title="1.3 选取照片都有哪几种形式"></a>1.3 选取照片都有哪几种形式</h2><p>系统的相机和选取照片的界面是同一个控件<code>UIImagePickerController</code>，通过设置该控件的<code>sourceType</code>属性可以控制具体使用哪一个:</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>sourceType</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>camera</td>
+<td>调起拍照界面，拍摄新照片</td>
+</tr>
+<tr>
+<td>photoLibrary</td>
+<td>提示用户从相册里选取照片</td>
+</tr>
+<tr>
+<td>savedPhotosAlbum</td>
+<td>提示用户从最近的拍摄里选取照片</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><img src="/2017/08/03/2017/0803iOSProgrammingBNRG15/img02.png" alt></p>
+<h2 id="1-4-怎样呼出系统相机和照片界面"><a href="#1-4-怎样呼出系统相机和照片界面" class="headerlink" title="1.4 怎样呼出系统相机和照片界面"></a>1.4 怎样呼出系统相机和照片界面</h2><ol>
+<li>判断设备是否有拍照功能，设置选取照片的形式</li>
+<li>为<code>UIImagePickerController</code>变量指定一个委托代理。<br>当用户选择了照片，会向代理发送<code>imagePickerController(_:didFinishPickingMediaWithInfo:)</code>消息。<br>如果用户选择取消，则会向代理发送<code>imagePickerControllerDidCancel(_:)</code>消息。<br>显然这个代理还是应当由UIImagePickerController所在的VC，在本章中即DetailViewController。<br>但是在书中此处让<code>DetailViewController</code>遵守了代理协议：<code>UINavigationControllerDelegate</code> 和<code>UIImagePickerControllerDelegate</code>。<font color="red">书中的解释是：<code>UIImagePickerController</code>的代理属性实际上是从它的基类<code>UINavigationController</code>继承的，<code>UIImagePickerController</code>有它自己的代理协议，它继承来的代理属性指向一个遵守<code>UINavigationControllerDelegate</code>的对象。这句话没看懂（P441）</font></li>
+<li>调用<code>present</code>函数，显示选取图片的界面。</li>
+<li>在项目属性中声明Custom iOS Target Properties。如果没有这一步，运行程序会崩溃，因为访问相机或者相册时，iOS会弹出提示问用户是否同意应用程序获取访问权限。需要在项目配置中填写申请访问相机/相册的提示语。</li>
+</ol>
+<p>代码如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ② 让VC遵循委托代理协议</span></span><br><span class="line"><span class="keyword">class</span> DetailViewController: <span class="built_in">UIViewController</span>, <span class="built_in">UITextFieldDelegate</span>, <span class="built_in">UIImagePickerControllerDelegate</span>, <span class="built_in">UINavigationControllerDelegate</span> &#123;</span><br><span class="line">    ……</span><br><span class="line">    @IBAction func takePicture(_ sender: <span class="built_in">UIBarButtonItem</span>) &#123;</span><br><span class="line">        let imagePicker = <span class="built_in">UIImagePickerController</span>()</span><br><span class="line">        <span class="comment">// ① 判断设备是否有拍摄功能，并设置选取照片的形式</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">UIImagePickerController</span>.isSourceTypeAvailable(.camera)&#123;	</span><br><span class="line">            imagePicker.sourceType = .camera</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            imagePicker.sourceType = .photoLibrary</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        imagePicker.delegate = <span class="keyword">self</span> <span class="comment">// ②设置委托代理</span></span><br><span class="line">        <span class="comment">// ③ 显示选取照片界面</span></span><br><span class="line">        present(imagePicker, animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)   </span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>④ 设置项目的权限申请提示语<br><img src="/2017/08/03/2017/0803iOSProgrammingBNRG15/img03.png" alt></p>
+<font color="red">问题：当调用了present之后，控制权在哪里？根据如何获得照片的方法，我判断present立即返回了，返回给谁了呢？</font>
+
+<h2 id="1-5-如何获得-保存照片"><a href="#1-5-如何获得-保存照片" class="headerlink" title="1.5 如何获得/保存照片"></a>1.5 如何获得/保存照片</h2><p>常规的想法是在present调用之后获取imagePicker的图片属性，得到照片。实际不是这么完成的，而是在代理协议<code>UIImagePickerControllerDelegate</code>的<code>imagePickerController(_:didFinishPickingMediaWithInfo:)</code>函数中获取照片：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">func imagePickerController(_ picker: <span class="built_in">UIImagePickerController</span>, didFinishPickingMediaWithInfo info: [String : Any]) &#123;</span><br><span class="line">    <span class="comment">// 获取被选中的照片</span></span><br><span class="line">    let image = info[<span class="built_in">UIImagePickerControllerOriginalImage</span>] as! <span class="built_in">UIImage</span>	</span><br><span class="line">    imageView.image = image</span><br><span class="line">    </span><br><span class="line">    dismiss(animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>书中P448<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">func setImage(_ image: <span class="built_in">UIImage</span>, forKey key: String) &#123; </span><br><span class="line">    cache.setObject(image, forKey: key as <span class="built_in">NSString</span>)	<span class="comment">// 为什么转换呢？</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>key在setImage函数传入的时候是String，再传入caceh.setObjet的时候，它接受的是NSString参数，因此需要做个转换。NSString是class，String是Struct。</p>
+</blockquote>
+<h1 id="2-引入imageStore"><a href="#2-引入imageStore" class="headerlink" title="2 引入imageStore"></a>2 引入imageStore</h1><h2 id="2-1-为什么要引入imageStore"><a href="#2-1-为什么要引入imageStore" class="headerlink" title="2.1 为什么要引入imageStore"></a>2.1 为什么要引入imageStore</h2><p>用户选择的照片通常是较大的文件，如果都存入item结构体内会消耗巨大的内存。比较好的做法是把数据保存到文件，在内存中只缓存一小部分，需要的时候加载到缓存，不需要或者收到低内存警告的时候释放内存。这就是imageStore做的事情，它给每一个图片生成一个UUID，在item的数据结构中仅保存此UUID，它对应的图片将被永久保存到文件。</p>
+<h2 id="2-2-引入imageStore的步骤"><a href="#2-2-引入imageStore的步骤" class="headerlink" title="2.2 引入imageStore的步骤"></a>2.2 引入imageStore的步骤</h2><p>一、创建ImageStore，用于根据key到图片的增、删、改、查，代码如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import <span class="built_in">UIKit</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> ImageStore &#123;</span><br><span class="line">    let cache = <span class="built_in">NSCache</span>&lt;<span class="built_in">NSString</span>, <span class="built_in">UIImage</span>&gt;()</span><br><span class="line">    </span><br><span class="line">    func setImage(_ image: <span class="built_in">UIImage</span>, forKey key: String)&#123;</span><br><span class="line">        cache.setObject(image, forKey: key as <span class="built_in">NSString</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    func image(forKey key: String) -&gt; <span class="built_in">UIImage</span>?&#123;</span><br><span class="line">        <span class="keyword">return</span> cache.object(forKey: key as <span class="built_in">NSString</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    func deleteImage(forKey key: String)&#123;</span><br><span class="line">        cache.removeObject(forKey: key as <span class="built_in">NSString</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>二、在AppDelegate中创建ImageStore实例，并将该实例传入ItemViewController和DetailViewController<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> AppDelegate: <span class="built_in">UIResponder</span>, <span class="built_in">UIApplicationDelegate</span> &#123;</span><br><span class="line">   ……</span><br><span class="line">    func application(_ application: <span class="built_in">UIApplication</span>, didFinishLaunchingWithOptions launchOptions: [<span class="built_in">UIApplicationLaunchOptionsKey</span>: Any]?) -&gt; Bool &#123;</span><br><span class="line">        let itemStore = ItemStore()</span><br><span class="line">        let imageStore = ImageStore()	<span class="comment">// 创建ImageStore实例</span></span><br><span class="line">        </span><br><span class="line">        let navigationController = window!.rootViewController as! <span class="built_in">UINavigationController</span></span><br><span class="line">        let itemsController = navigationController.topViewController as! ItemsViewController</span><br><span class="line">        itemsController.itemStore = itemStore</span><br><span class="line">        itemsController.imageStore = imageStore <span class="comment">// 传入ItemViewController</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> ItemsViewController: <span class="built_in">UITableViewController</span> &#123;</span><br><span class="line">    var itemStore: ItemStore!</span><br><span class="line">    var imageStore: ImageStore!	<span class="comment">// 用来接收传入的ImageStore</span></span><br><span class="line">    ……</span><br><span class="line">    <span class="comment">// 点击某个Item引发转场</span></span><br><span class="line">    override func prepare(<span class="keyword">for</span> segue: <span class="built_in">UIStoryboardSegue</span>, sender: Any?) &#123;</span><br><span class="line">       </span><br><span class="line">        <span class="keyword">switch</span> segue.identifier &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">"showItem"</span>?:</span><br><span class="line">            <span class="keyword">if</span> let row = tableView.indexPathForSelectedRow?.row&#123;</span><br><span class="line">                let item = itemStore.allItems[row]</span><br><span class="line">                let detailViewController = segue.destination as! DetailViewController</span><br><span class="line">                detailViewController.item = item</span><br><span class="line">                <span class="comment">// 当点击数据项时，传入imageStore</span></span><br><span class="line">                detailViewController.imageStore = imageStore	 </span><br><span class="line">            &#125;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            preconditionFailure(<span class="string">"Unexpected segue identifier."</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>三、在创建一个新Item时，生成UUID：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Item: <span class="built_in">NSObject</span> &#123;</span><br><span class="line">    ……</span><br><span class="line">    let itemKey: String	<span class="comment">// 保存UUID</span></span><br><span class="line">    </span><br><span class="line">    init(name: String, serialNumber: String?, valueInDollars: Int)&#123;</span><br><span class="line">        ……</span><br><span class="line">        <span class="keyword">self</span>.itemKey = UUID().uuidString</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">super</span>.init()</span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>四、在DetailViewController中，加载时根据key显示照片，选择了一张照片后更新key对应的数据<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> DetailViewController: <span class="built_in">UIViewController</span>, <span class="built_in">UITextFieldDelegate</span>, <span class="built_in">UIImagePickerControllerDelegate</span>, <span class="built_in">UINavigationControllerDelegate</span> &#123;</span><br><span class="line">……</span><br><span class="line">    </span><br><span class="line">    override func viewDidLoad() &#123;</span><br><span class="line">        <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line"></span><br><span class="line">        ……</span><br><span class="line">        <span class="comment">// 加载时显示key对应的图片</span></span><br><span class="line">        let key = item.itemKey</span><br><span class="line">        let imageToDisplay = imageStore.image(forKey: key)</span><br><span class="line">        imageView.image = imageToDisplay</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ……</span><br><span class="line">    func imagePickerController(_ picker: <span class="built_in">UIImagePickerController</span>, didFinishPickingMediaWithInfo info: [String : Any]) &#123;</span><br><span class="line">        let image = info[<span class="built_in">UIImagePickerControllerOriginalImage</span>] as! <span class="built_in">UIImage</span></span><br><span class="line">        <span class="comment">// 修改了图片，更新imageStore</span></span><br><span class="line">        imageStore.setImage(image, forKey: item.itemKey)    </span><br><span class="line">        imageView.image = image</span><br><span class="line">        </span><br><span class="line">        dismiss(animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line">    &#125;</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>五、删除一条记录时，记得删除它对应的数据<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> ItemsViewController: <span class="built_in">UITableViewController</span> &#123;</span><br><span class="line">……</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Override to support editing the table view.</span></span><br><span class="line">    override func tableView(_ tableView: <span class="built_in">UITableView</span>, commit editingStyle: <span class="built_in">UITableViewCellEditingStyle</span>, forRowAt indexPath: IndexPath) &#123;</span><br><span class="line">        <span class="keyword">if</span> editingStyle == .delete &#123;</span><br><span class="line">            <span class="comment">// Delete the row from the data source</span></span><br><span class="line">            let item = itemStore.allItems[indexPath.row]</span><br><span class="line">            </span><br><span class="line">            let title = <span class="string">"Delete \(item.name)?"</span></span><br><span class="line">            let message = <span class="string">"Are you sure you want to delete this item?"</span></span><br><span class="line">            let ac = <span class="built_in">UIAlertController</span>(title: title, message:message, preferredStyle:.actionSheet)</span><br><span class="line">            </span><br><span class="line">            let cancelAction = <span class="built_in">UIAlertAction</span>(title: <span class="string">"Cancel"</span>, style: .cancel, handler: <span class="literal">nil</span>)</span><br><span class="line">            ac.addAction(cancelAction)</span><br><span class="line">            </span><br><span class="line">            let deleteAction = <span class="built_in">UIAlertAction</span>(title: <span class="string">"Delete"</span>, style: .destructive, handler: &#123;(action) -&gt; Void <span class="keyword">in</span></span><br><span class="line">                <span class="keyword">self</span>.itemStore.removeItem(item)</span><br><span class="line">                <span class="keyword">self</span>.imageStore.deleteImage(forKey: item.itemKey)		<span class="comment">// 删除图片数据</span></span><br><span class="line">                <span class="keyword">self</span>.tableView.deleteRows(at: [indexPath], with: .automatic)</span><br><span class="line">            &#125;)</span><br><span class="line">            ac.addAction(deleteAction)</span><br><span class="line">            </span><br><span class="line">            present(ac, animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> editingStyle == .insert &#123;</span><br><span class="line">            <span class="comment">// Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view</span></span><br><span class="line">        &#125;    </span><br><span class="line">    &#125;</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/02/2017/0802iOSProgrammingBNRG14/" rel="next" title="《iOS Programming BNRG》笔记十四">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记十四
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/04/2017/0804iOSProgrammingBNRG16/" rel="prev" title="《iOS Programming BNRG》笔记十六">
+                《iOS Programming BNRG》笔记十六 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/08/03/2017/0803iOSProgrammingBNRG15/" data-title="《iOS Programming BNRG》笔记十五" data-url="http://palanceli.github.io/2017/08/03/2017/0803iOSProgrammingBNRG15/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-UIImageView"><span class="nav-number">1.</span> <span class="nav-text">1 UIImageView</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-怎么控制UIImageView显示图片的缩放方式"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 怎么控制UIImageView显示图片的缩放方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-UIToolBar的特点"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 UIToolBar的特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-选取照片都有哪几种形式"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 选取照片都有哪几种形式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-怎样呼出系统相机和照片界面"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 怎样呼出系统相机和照片界面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-如何获得-保存照片"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 如何获得/保存照片</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-引入imageStore"><span class="nav-number">2.</span> <span class="nav-text">2 引入imageStore</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-为什么要引入imageStore"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 为什么要引入imageStore</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-引入imageStore的步骤"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 引入imageStore的步骤</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

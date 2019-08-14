@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="键盘消息处理学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文的起点是ViewRootImpl的setView(…)函数，先不管Android系统中它和Activity之间的关系，只需要知道它是Activity创建的必经之路。本文的目标是探索InputChannel的创建过程，等这个过程捋顺了，以后再探索窗体的创建过程。">
+<meta name="keywords" content="键盘消息处理学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="键盘消息处理学习笔记（五）——InputChannel的创建">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning5/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本文的起点是ViewRootImpl的setView(…)函数，先不管Android系统中它和Activity之间的关系，只需要知道它是Activity创建的必经之路。本文的目标是探索InputChannel的创建过程，等这个过程捋顺了，以后再探索窗体的创建过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.749Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="键盘消息处理学习笔记（五）——InputChannel的创建">
+<meta name="twitter:description" content="本文的起点是ViewRootImpl的setView(…)函数，先不管Android系统中它和Activity之间的关系，只需要知道它是Activity创建的必经之路。本文的目标是探索InputChannel的创建过程，等这个过程捋顺了，以后再探索窗体的创建过程。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning5/">
+
+
+
+
+
+  <title>键盘消息处理学习笔记（五）——InputChannel的创建 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">键盘消息处理学习笔记（五）——InputChannel的创建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-02T21:17:38+08:00">
+                2016-10-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/02/2016/1002KeyboardLearning5/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/02/2016/1002KeyboardLearning5/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文的起点是ViewRootImpl的setView(…)函数，先不管Android系统中它和Activity之间的关系，只需要知道它是Activity创建的必经之路。本文的目标是探索InputChannel的创建过程，等这个过程捋顺了，以后再探索窗体的创建过程。<br><a id="more"></a></p>
+<h1 id="Step1-ViewRootImpl-setView-…"><a href="#Step1-ViewRootImpl-setView-…" class="headerlink" title="Step1: ViewRootImpl::setView(…)"></a>Step1: ViewRootImpl::setView(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:447</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setView</span><span class="params">(View view, WindowManager.LayoutParams attrs, View panelParentView)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">                mView = view;</span><br><span class="line">                ... ...</span><br><span class="line">                mAdded = <span class="keyword">true</span>;</span><br><span class="line">                ... ...</span><br><span class="line">                    mInputChannel = <span class="keyword">new</span> InputChannel();</span><br><span class="line">                ... ...</span><br><span class="line">                    <span class="comment">// 🏁将正在启动的应用程序窗口添加到WindowManagerService中</span></span><br><span class="line">                    res = mWindowSession.addToDisplay(mWindow, mSeq, mWindowAttributes,</span><br><span class="line">                            getHostVisibility(), mDisplay.getDisplayId(),</span><br><span class="line">                            mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,</span><br><span class="line">                            mAttachInfo.mOutsets, mInputChannel);</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="keyword">if</span> (view <span class="keyword">instanceof</span> RootViewSurfaceTaker) &#123;</span><br><span class="line">                    mInputQueueCallback =</span><br><span class="line">                        ((RootViewSurfaceTaker)view).willYouTakeTheInputQueue();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (mInputChannel != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (mInputQueueCallback != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        mInputQueue = <span class="keyword">new</span> InputQueue();</span><br><span class="line">                        mInputQueueCallback.onInputQueueCreated(mInputQueue);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 🏁将mInputChannel注册到正在启动的Activity所在进程的主线程中</span></span><br><span class="line">                    <span class="comment">// 在《键盘消息处理学习笔记（八）》中深入讨论</span></span><br><span class="line">                    mInputEventReceiver = <span class="keyword">new</span> WindowInputEventReceiver(mInputChannel,</span><br><span class="line">                            Looper.myLooper());</span><br><span class="line">                &#125;</span><br><span class="line">                ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>mWindowSession是在ViewRootImpl的构造函数中创建的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:358</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ViewRootImpl</span><span class="params">(Context context, Display display)</span> </span>&#123;</span><br><span class="line">        mContext = context;</span><br><span class="line">        mWindowSession = WindowManagerGlobal.getWindowSession();</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>WindowManagerGlobal.getWindowSession()是一个单例工厂方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/WindowManagerGlobal.java:148</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IWindowSession <span class="title">getWindowSession</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (WindowManagerGlobal.class) &#123;</span><br><span class="line">            <span class="keyword">if</span> (sWindowSession == <span class="keyword">null</span>) &#123;</span><br><span class="line">                ... ...</span><br><span class="line">                    InputMethodManager imm = InputMethodManager.getInstance();</span><br><span class="line">                    <span class="comment">// 获得WindowManagerService的代理对象</span></span><br><span class="line">                    IWindowManager windowManager = getWindowManagerService();</span><br><span class="line">                    <span class="comment">// 获得session的代理对象，并保存到静态变量sWindowsSession</span></span><br><span class="line">                    sWindowSession = windowManager.openSession(</span><br><span class="line">                            <span class="keyword">new</span> IWindowSessionCallback.Stub() &#123;</span><br><span class="line">                                <span class="meta">@Override</span></span><br><span class="line">                                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onAnimatorScaleChanged</span><span class="params">(<span class="keyword">float</span> scale)</span> </span>&#123;</span><br><span class="line">                                    ValueAnimator.setDurationScale(scale);</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;,</span><br><span class="line">                            imm.getClient(), imm.getInputContext());</span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> sWindowSession;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>sWindowSession是一个静态变量，getWindowManagerService()返回的是WindowManagerService的代理对象，通过它的openSession(…)得到的当然也是WindowSession的代理对象。</p>
+<blockquote>
+<p>注意，由于它们都是Binder代理对象，以后对他们的调用都是跨进程的请求，实际执行是在WindowManagerService所在的进程中完成。<br>Binder是Android下一个神奇的机制，它弱化了进程之间的边界。在我的《Binder学习笔记》和《深度探索Binder》系列中有深入的讨论。</p>
+</blockquote>
+<p>回到ViewRootImpl::setView(…)中，它调用mWindowSession.addToDisplay(…)向运行在WindowManagerService中的一个Session发送进程间通信请求，将正在启动的应用程序窗口添加到WindowManagerService中。</p>
+<h1 id="Step2-Session-addToDisplay-…"><a href="#Step2-Session-addToDisplay-…" class="headerlink" title="Step2: Session::addToDisplay(…)"></a>Step2: Session::addToDisplay(…)</h1><p>接下来的代码就是在WindowManagerService进程内完成的了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/wm/Session.java:69</span></span><br><span class="line">    <span class="comment">// outInputChannel  ViewRootImpl::mInputChannel</span></span><br><span class="line">    <span class="comment">// window           ViewRootImpl::mWindow</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">addToDisplay</span><span class="params">(IWindow window, <span class="keyword">int</span> seq, WindowManager.LayoutParams attrs,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> viewVisibility, <span class="keyword">int</span> displayId, Rect outContentInsets, Rect outStableInsets,</span></span></span><br><span class="line"><span class="function"><span class="params">            Rect outOutsets, InputChannel outInputChannel)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mService.addWindow(<span class="keyword">this</span>, window, seq, attrs, viewVisibility, displayId,</span><br><span class="line">                outContentInsets, outStableInsets, outOutsets, outInputChannel);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中mService类型为WindowManagerService。</p>
+<h1 id="Step3-WindowManagerService-addWindow-…"><a href="#Step3-WindowManagerService-addWindow-…" class="headerlink" title="Step3: WindowManagerService::addWindow(…)"></a>Step3: WindowManagerService::addWindow(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java:2353</span></span><br><span class="line">    <span class="comment">// outInputChannel  ViewRootImpl::mInputChannel</span></span><br><span class="line">    <span class="comment">// client           ViewRootImpl::mWindow</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">addWindow</span><span class="params">(Session session, IWindow client, <span class="keyword">int</span> seq,</span></span></span><br><span class="line"><span class="function"><span class="params">            WindowManager.LayoutParams attrs, <span class="keyword">int</span> viewVisibility, <span class="keyword">int</span> displayId,</span></span></span><br><span class="line"><span class="function"><span class="params">            Rect outContentInsets, Rect outStableInsets, Rect outOutsets,</span></span></span><br><span class="line"><span class="function"><span class="params">            InputChannel outInputChannel)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        WindowState attachedWindow = <span class="keyword">null</span>;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">synchronized</span>(mWindowMap) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 描述正在启动的应用程序窗口</span></span><br><span class="line">            WindowState win = <span class="keyword">new</span> WindowState(<span class="keyword">this</span>, session, client, token,</span><br><span class="line">                    attachedWindow, appOp[<span class="number">0</span>], seq, attrs, viewVisibility, displayContent);</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 此句为真</span></span><br><span class="line">            <span class="keyword">if</span> (outInputChannel != <span class="keyword">null</span> &amp;&amp; (attrs.inputFeatures</span><br><span class="line">                    &amp; WindowManager.LayoutParams.INPUT_FEATURE_NO_INPUT_CHANNEL) == <span class="number">0</span>) &#123;    </span><br><span class="line">                String name = win.makeInputChannelName();</span><br><span class="line">                <span class="comment">// 🏁创建一对InputChannel</span></span><br><span class="line">                InputChannel[] inputChannels = InputChannel.openInputChannelPair(name);</span><br><span class="line">                <span class="comment">// server端InputChannel     </span></span><br><span class="line">                win.setInputChannel(inputChannels[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// client端InputChannel，用inputChannels[1]初始化outInputChannel</span></span><br><span class="line">                <span class="comment">// 即：将outInputChannel的C++层指针指向inputChannels[1]</span></span><br><span class="line">                inputChannels[<span class="number">1</span>].transferTo(outInputChannel);</span><br><span class="line">                <span class="comment">// 🏁把server端InputChannel注册到InputManager</span></span><br><span class="line">                <span class="comment">// 详见《键盘消息处理学习笔记（六）》</span></span><br><span class="line">                mInputManager.registerInputChannel(win.mInputChannel, win.mInputWindowHandle);</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// client即ViewRootImpl::mWindow，是正在创建的窗口的代理对象</span></span><br><span class="line">            <span class="comment">// 以该代理的IBinder接口为key，保存WindowState对象</span></span><br><span class="line">            mWindowMap.put(client.asBinder(), win);</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">if</span> (type == TYPE_INPUT_METHOD) &#123;</span><br><span class="line">                ... ...</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type == TYPE_INPUT_METHOD_DIALOG) &#123;</span><br><span class="line">                ... ...</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; <span class="comment">// 如果正在创建的窗口不是与输入法相关的窗口</span></span><br><span class="line">                <span class="comment">// 将正在创建的WindowState保存在mWindows所描述的窗口列表中</span></span><br><span class="line">                addWindowToListInOrderLocked(win, <span class="keyword">true</span>);</span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line"></span><br><span class="line">            <span class="keyword">boolean</span> focusChanged = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">if</span> (win.canReceiveKeys()) &#123; <span class="comment">// 可以接收键盘事件</span></span><br><span class="line">                <span class="comment">// 将正在创建的窗口作为当前活动窗口，即把win保存在mCurrentFocus中</span></span><br><span class="line">                focusChanged = updateFocusedWindowLocked(UPDATE_FOCUS_WILL_ASSIGN_LAYERS,</span><br><span class="line">                        <span class="keyword">false</span> <span class="comment">/*updateInputWindows*/</span>);</span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 如果当前活动窗口和正在启动的窗口不是同一个窗口，则当前焦点会发生改变</span></span><br><span class="line">            <span class="keyword">if</span> (focusChanged) &#123;</span><br><span class="line">                <span class="comment">// 🏁把正在启动的窗口注册到InputDispatcher中，以便它可以将键盘</span></span><br><span class="line">                <span class="comment">// 事件分发给窗口，在《键盘消息处理学习笔记（七）》中详细讨论</span></span><br><span class="line">                mInputMonitor.setInputFocusLw(mCurrentFocus, <span class="keyword">false</span> <span class="comment">/*updateInputWindows*/</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>关于<code>inputChannels[1].transferTo(outInputChannel);</code>这句，后面还会关注，我们先把它背后做了什么得出个结论放在这：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/InputChannel.java:121</span></span><br><span class="line"><span class="comment">// 让outParameter的mPtr指向this，让this的mPtr废掉</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transferTo</span><span class="params">(InputChannel outParameter)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        nativeTransferTo(outParameter);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputChannel.cpp:178</span></span><br><span class="line"><span class="comment">// 让otherObj的mPtr指向obj，让obj的mPtr指向空</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">android_view_InputChannel_nativeTransferTo</span><span class="params">(JNIEnv* env, </span></span></span><br><span class="line"><span class="function"><span class="params">        jobject obj, jobject otherObj)</span> </span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    NativeInputChannel* nativeInputChannel =</span><br><span class="line">            android_view_InputChannel_getNativeInputChannel(env, obj);</span><br><span class="line">    android_view_InputChannel_setNativeInputChannel(env, otherObj, nativeInputChannel);</span><br><span class="line">    android_view_InputChannel_setNativeInputChannel(env, obj, <span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputChannel.cpp:90</span></span><br><span class="line"><span class="comment">// 让inputChannelObj.mPtr指向nativeInputChannel.mPtr</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">android_view_InputChannel_setNativeInputChannel</span><span class="params">(JNIEnv* env, </span></span></span><br><span class="line"><span class="function"><span class="params">        jobject inputChannelObj, NativeInputChannel* nativeInputChannel)</span> </span>&#123;</span><br><span class="line">    env-&gt;SetLongField(inputChannelObj, gInputChannelClassInfo.mPtr,</span><br><span class="line">             <span class="keyword">reinterpret_cast</span>&lt;jlong&gt;(nativeInputChannel));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>综上所述，<br><code>inputChannels[1].transferTo(outInputChannel)</code><br>的含义就是让outInputChannel“变成”inputChannels[1]，所谓“变成”是指令其C++层实体对象指向后者。跟C++的引用很像：<br><code>InputChannel&amp; outInputChannel = inputChannels[1];</code></p>
+<h1 id="Step4-InputChannel-openInputChannelPair-…"><a href="#Step4-InputChannel-openInputChannelPair-…" class="headerlink" title="Step4: InputChannel::openInputChannelPair(…)"></a>Step4: InputChannel::openInputChannelPair(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/InputChannel.java:86</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> InputChannel[] openInputChannelPair(String name) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">return</span> nativeOpenInputChannelPair(name);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step5-nativeOpenInputChannelPair-…"><a href="#Step5-nativeOpenInputChannelPair-…" class="headerlink" title="Step5: nativeOpenInputChannelPair(…)"></a>Step5: nativeOpenInputChannelPair(…)</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputChannel.cpp:123</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> jobjectArray <span class="title">android_view_InputChannel_nativeOpenInputChannelPair</span><span class="params">(JNIEnv* env,</span></span></span><br><span class="line"><span class="function"><span class="params">        jclass clazz, jstring nameObj)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* nameChars = env-&gt;GetStringUTFChars(nameObj, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="function">String8 <span class="title">name</span><span class="params">(nameChars)</span></span>;</span><br><span class="line">    env-&gt;ReleaseStringUTFChars(nameObj, nameChars);</span><br><span class="line"></span><br><span class="line">    sp&lt;InputChannel&gt; serverChannel;</span><br><span class="line">    sp&lt;InputChannel&gt; clientChannel;</span><br><span class="line">    <span class="comment">// 🏁创建一个server端InputChannel和一个client端InputChannel</span></span><br><span class="line">    <span class="keyword">status_t</span> result = InputChannel::openInputChannelPair(name, serverChannel, clientChannel);</span><br><span class="line">    ... ...</span><br><span class="line">    jobjectArray channelPair = env-&gt;NewObjectArray(<span class="number">2</span>, gInputChannelClassInfo.clazz, <span class="literal">NULL</span>);</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="comment">// 把C++层的InputChannel对象封装成java层InputChannel对象</span></span><br><span class="line">    jobject serverChannelObj = android_view_InputChannel_createInputChannel(env,</span><br><span class="line">            <span class="keyword">new</span> NativeInputChannel(serverChannel));</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="comment">// 把C++层的InputChannel对象封装成java层InputChannel对象</span></span><br><span class="line">    jobject clientChannelObj = android_view_InputChannel_createInputChannel(env,</span><br><span class="line">            <span class="keyword">new</span> NativeInputChannel(clientChannel));</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="comment">// 将两个对象保存到数组channelPair，返回给调用者</span></span><br><span class="line">    env-&gt;SetObjectArrayElement(channelPair, <span class="number">0</span>, serverChannelObj);</span><br><span class="line">    env-&gt;SetObjectArrayElement(channelPair, <span class="number">1</span>, clientChannelObj);</span><br><span class="line">    <span class="keyword">return</span> channelPair;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step6-InputChannel-openInputChannelPair-…"><a href="#Step6-InputChannel-openInputChannelPair-…" class="headerlink" title="Step6: InputChannel::openInputChannelPair(…)"></a>Step6: InputChannel::openInputChannelPair(…)</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/libs/input/InputTransport.cpp: 124</span></span><br><span class="line"><span class="keyword">status_t</span> InputChannel::openInputChannelPair(<span class="keyword">const</span> String8&amp; name,</span><br><span class="line">        sp&lt;InputChannel&gt;&amp; outServerChannel, sp&lt;InputChannel&gt;&amp; outClientChannel) &#123;</span><br><span class="line">    <span class="keyword">int</span> sockets[<span class="number">2</span>];</span><br><span class="line">    <span class="comment">// 创建一对匿名的相互连接的socket，成功返回0</span></span><br><span class="line">    <span class="keyword">if</span> (socketpair(AF_UNIX, SOCK_SEQPACKET, <span class="number">0</span>, sockets)) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> bufferSize = SOCKET_BUFFER_SIZE;</span><br><span class="line">    setsockopt(sockets[<span class="number">0</span>], SOL_SOCKET, SO_SNDBUF, &amp;bufferSize, <span class="keyword">sizeof</span>(bufferSize));</span><br><span class="line">    setsockopt(sockets[<span class="number">0</span>], SOL_SOCKET, SO_RCVBUF, &amp;bufferSize, <span class="keyword">sizeof</span>(bufferSize));</span><br><span class="line">    setsockopt(sockets[<span class="number">1</span>], SOL_SOCKET, SO_SNDBUF, &amp;bufferSize, <span class="keyword">sizeof</span>(bufferSize));</span><br><span class="line">    setsockopt(sockets[<span class="number">1</span>], SOL_SOCKET, SO_RCVBUF, &amp;bufferSize, <span class="keyword">sizeof</span>(bufferSize));</span><br><span class="line"></span><br><span class="line">    String8 serverChannelName = name;</span><br><span class="line">    serverChannelName.append(<span class="string">" (server)"</span>);</span><br><span class="line">    outServerChannel = <span class="keyword">new</span> InputChannel(serverChannelName, sockets[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    String8 clientChannelName = name;</span><br><span class="line">    clientChannelName.append(<span class="string">" (client)"</span>);</span><br><span class="line">    outClientChannel = <span class="keyword">new</span> InputChannel(clientChannelName, sockets[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Server端的InputChannel和Client端的InputChannel实际上是两个相互连接的socket。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>窗体在创建的时候会向WindowManagerService发送跨进程请求，将自己添加到WindowManagerService中。WindowManagerService收到请求后会创建一对相互连接的InputChannel，一个用于Server端，一个用于Client端，这一对互联的InputChannel是通过socket来实现的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/键盘消息处理学习笔记/" rel="tag"># 键盘消息处理学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/02/2016/1002KeyboardLearning4/" rel="next" title="键盘消息处理学习笔记（四）——Looper机制">
+                <i class="fa fa-chevron-left"></i> 键盘消息处理学习笔记（四）——Looper机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/02/2016/1002KeyboardLearning6/" rel="prev" title="键盘消息处理学习笔记（六）——注册Server端InputChannel">
+                键盘消息处理学习笔记（六）——注册Server端InputChannel <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/02/2016/1002KeyboardLearning5/" data-title="键盘消息处理学习笔记（五）——InputChannel的创建" data-url="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning5/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-ViewRootImpl-setView-…"><span class="nav-number">1.</span> <span class="nav-text">Step1: ViewRootImpl::setView(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-Session-addToDisplay-…"><span class="nav-number">2.</span> <span class="nav-text">Step2: Session::addToDisplay(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-WindowManagerService-addWindow-…"><span class="nav-number">3.</span> <span class="nav-text">Step3: WindowManagerService::addWindow(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-InputChannel-openInputChannelPair-…"><span class="nav-number">4.</span> <span class="nav-text">Step4: InputChannel::openInputChannelPair(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step5-nativeOpenInputChannelPair-…"><span class="nav-number">5.</span> <span class="nav-text">Step5: nativeOpenInputChannelPair(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step6-InputChannel-openInputChannelPair-…"><span class="nav-number">6.</span> <span class="nav-text">Step6: InputChannel::openInputChannelPair(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="消息循环,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="带有消息循环的子线程 HandlerThread一个典型的工作线程是这样的：1234567891011121314// 定义工作线程public class WorkThread extends Thread&amp;#123;    public WorkThread(String name)&amp;#123;        super(name);    &amp;#125;    public void run(">
+<meta name="keywords" content="消息循环">
+<meta property="og:type" content="article">
+<meta property="og:title" content="消息循环几个常用类">
+<meta property="og:url" content="http://palanceli.github.io/2017/01/31/2017/0131MessageQueue5/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="带有消息循环的子线程 HandlerThread一个典型的工作线程是这样的：1234567891011121314// 定义工作线程public class WorkThread extends Thread&amp;#123;    public WorkThread(String name)&amp;#123;        super(name);    &amp;#125;    public void run(">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/01/31/2017/0131MessageQueue5/img1.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/01/31/2017/0131MessageQueue5/img2.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.799Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="消息循环几个常用类">
+<meta name="twitter:description" content="带有消息循环的子线程 HandlerThread一个典型的工作线程是这样的：1234567891011121314// 定义工作线程public class WorkThread extends Thread&amp;#123;    public WorkThread(String name)&amp;#123;        super(name);    &amp;#125;    public void run(">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/01/31/2017/0131MessageQueue5/img1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/01/31/2017/0131MessageQueue5/">
+
+
+
+
+
+  <title>消息循环几个常用类 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/01/31/2017/0131MessageQueue5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">消息循环几个常用类</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-31T09:24:00+08:00">
+                2017-01-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/31/2017/0131MessageQueue5/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/31/2017/0131MessageQueue5/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="带有消息循环的子线程-HandlerThread"><a href="#带有消息循环的子线程-HandlerThread" class="headerlink" title="带有消息循环的子线程 HandlerThread"></a>带有消息循环的子线程 HandlerThread</h1><p>一个典型的工作线程是这样的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义工作线程</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WorkThread</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WorkThread</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">// work...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用工作线程</span></span><br><span class="line">WorkThread workThread = <span class="keyword">new</span> WorkThread(<span class="string">"Work Thread"</span>);</span><br><span class="line">workThread.start();</span><br></pre></td></tr></table></figure></p>
+<p>这种工作线程适合默默无闻在后台干活，当需要和其他线程有关联或交互的时候，就适合用一个配备了消息循环的子线程来处理了，这就是HandlerThread的用武之地。<br><a id="more"></a><br>假设有一个后台工作线程不断产生数据；前台UI也可以产生数据；这些数据都需要保存起来，我们使用HandlerThread来完成数据保存的工作。过程如下：<br><img src="/2017/01/31/2017/0131MessageQueue5/img1.png" alt="场景1"></p>
+<ul>
+<li>WorkThread中每隔一段时间产生一条数据，之后打印数据信息，并通知DataThread保存。</li>
+<li>MainThread中每次点击按钮就会产生一条数据，并通知DataThread保存。</li>
+<li>DataThread中收到保存请求时，先Sleep片刻表示正在保存，之后打印保存信息。</li>
+</ul>
+<h2 id="创建DataThread"><a href="#创建DataThread" class="headerlink" title="创建DataThread"></a>创建DataThread</h2><p>创建数据线程与创建工作线程没有差别，只是需要拿到其Handler以备后面向线程发送消息：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建数据线程</span></span><br><span class="line">mDataThread = <span class="keyword">new</span> HandlerThread(<span class="string">"Data Thread"</span>);</span><br><span class="line">mDataThread.start();</span><br><span class="line"><span class="comment">// 保存数据线程的Handler</span></span><br><span class="line">mDataThreadHandler = <span class="keyword">new</span> Handler(mDataThread.getLooper());</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="向DataThread发送消息"><a href="#向DataThread发送消息" class="headerlink" title="向DataThread发送消息"></a>向DataThread发送消息</h2><p>在工作线程中，每完成一项工作后向数据线程发送消息：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WorkThread</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mWorkNum;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WorkThread</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> tid = android.os.Process.myTid();</span><br><span class="line">        <span class="keyword">for</span> (; mWorkNum&lt;<span class="number">10</span>; mWorkNum++)&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">1000</span>);  <span class="comment">// 工作线程完成每次工作</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.printf(<span class="string">"[Work Thread %d] Complete Work %d.\n"</span>, tid, mWorkNum);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 向数据线程发送消息</span></span><br><span class="line">            mDataThreadHandler.post(<span class="keyword">new</span> DataTask(mWorkNum, <span class="keyword">true</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在主线程中，每按一次按钮也产生一次数据请求，发送给数据线程：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mManualWorkNum = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">final</span> Button clickMeButton = (Button)findViewById(R.id.ManualWorkButton);</span><br><span class="line">clickMeButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">                                     <span class="meta">@Override</span></span><br><span class="line">                                     <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View view)</span> </span>&#123;</span><br><span class="line">                                         mManualWorkNum++;</span><br><span class="line">                                         mDataThreadHandler.post(<span class="keyword">new</span> DataTask(mManualWorkNum, <span class="keyword">false</span>));</span><br><span class="line">                                     &#125;</span><br><span class="line">                                 &#125;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="封装成消息的数据请求"><a href="#封装成消息的数据请求" class="headerlink" title="封装成消息的数据请求"></a>封装成消息的数据请求</h2><p>无论是手动还是自动数据请求，都是把DataTask对象封装成一条消息，post给DataThread。<br>DataTask实现了Runnable接口，并在其中完成数据线程的业务逻辑：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义在数据线程中的工作任务</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mWorkNum;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mAutoWork = <span class="keyword">true</span>; <span class="comment">// 手动还是自动</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DataTask</span><span class="params">(<span class="keyword">int</span> workNum, <span class="keyword">boolean</span> autoWork)</span></span>&#123;</span><br><span class="line">        mWorkNum = workNum;</span><br><span class="line">        mAutoWork = autoWork;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> tid = android.os.Process.myTid();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">2000</span>);       <span class="comment">// 假设需要一段时间保存数据</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(mAutoWork)</span><br><span class="line">            System.out.printf(<span class="string">"[Data Thread %d] Save auto work %d\n"</span>, tid, mWorkNum);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            System.out.printf(<span class="string">"[Data Thread %d] Save manual work %d\n"</span>, tid, mWorkNum);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在它的run()函数里，每次完成数据保存，都把当前的线程id打印出来。从log中可以发现：不管是从工作线程还是从主线程发起的post，在保存完成后打印的线程id都是DataThread的tid。</p>
+<h1 id="可更新主线程UI的子线程-AsyncTask"><a href="#可更新主线程UI的子线程-AsyncTask" class="headerlink" title="可更新主线程UI的子线程 AsyncTask"></a>可更新主线程UI的子线程 AsyncTask</h1><h2 id="Step0-定义和启动AsyncTask"><a href="#Step0-定义和启动AsyncTask" class="headerlink" title="Step0 定义和启动AsyncTask"></a>Step0 定义和启动AsyncTask</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义AsyncTask，</span></span><br><span class="line"><span class="comment">// public abstract class AsyncTask&lt;Params, Progress, Result&gt; 三个模板参数分别为：</span></span><br><span class="line"><span class="comment">//   Params：  doInBackground方法的参数类型</span></span><br><span class="line"><span class="comment">//   Progress：AsyncTask所执行的后台任务的进度类型</span></span><br><span class="line"><span class="comment">//   Result：  后台任务的返回结果类型</span></span><br><span class="line">AsyncTask&lt;Integer, Integer, Integer&gt; task =</span><br><span class="line">        <span class="keyword">new</span> AsyncTask&lt;Integer, Integer, Integer&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Integer <span class="title">doInBackground</span><span class="params">(Integer... integers)</span> </span>&#123;</span><br><span class="line">        Integer asyncTaskNum = integers[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span> tid = android.os.Process.myTid();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(; asyncTaskNum&lt;<span class="number">10</span>; asyncTaskNum++)&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                System.out.printf(<span class="string">"[Async Task Thread %d] Complete async task%d.\n"</span>, tid, asyncTaskNum);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            publishProgress(asyncTaskNum);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> asyncTaskNum;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">updateAsyncTextInfo</span><span class="params">(Integer val)</span></span>&#123;</span><br><span class="line">        TextView tv = (TextView)findViewById(R.id.aysncTextInfo);</span><br><span class="line">        <span class="keyword">int</span> tid = android.os.Process.myTid();</span><br><span class="line">        tv.setText(<span class="string">"Completed "</span> + val + <span class="string">" async tasks.(tid="</span> + tid + <span class="string">")"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onProgressUpdate</span><span class="params">(Integer... integers)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onProgressUpdate(integers);</span><br><span class="line">        updateAsyncTextInfo(integers[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostExecute</span><span class="params">(Integer integer)</span></span>&#123;</span><br><span class="line">        updateAsyncTextInfo(integer);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 启动</span></span><br><span class="line">task.execute(<span class="number">0</span>);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>从demo中的log可以看出，函数<code>doInBackground(...)</code>是由AsyncTask在内部线程池执行，其余方法均在主线程中执行。</p>
+<p>AsyncTask主要提供了如下方法：</p>
+<ul>
+<li><code>onPreExecute()</code><br>后台任务执行前被调用，用于进行一些准备工作</li>
+<li><code>doInBackground(Params... params)</code><br>定义要执行的后台任务，在这个方法中可以调用publishProgress来更新任务进度（publishProgress内部会调用onProgressUpdate方法）</li>
+<li><code>onProgressUpdate(Progress... values)</code><br>由publishProgress内部调用，表示任务进度更新</li>
+<li><code>onPostExecute(Result result)</code><br>后台任务执行完毕后被调用，参数即为后台任务的返回结果</li>
+<li><code>onCancelled()</code><br>后台任务被取消时被调用</li>
+</ul>
+<p>异步任务执行完成后，就会从函数doInBackground(…)中返回，并将它的返回值分发给函数onPostExecute(…)处理。接下来深入到AsyncTask内部来看它的实现。</p>
+<h2 id="Step1-AsyncTask的创建AsyncTask"><a href="#Step1-AsyncTask的创建AsyncTask" class="headerlink" title="Step1 AsyncTask的创建AsyncTask()"></a>Step1 AsyncTask的创建AsyncTask()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:180</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTask</span>&lt;<span class="title">Params</span>, <span class="title">Progress</span>, <span class="title">Result</span>&gt; </span>&#123;</span><br><span class="line">...</span><br><span class="line"><span class="comment">//:288</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AsyncTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// mWorker和mFuture共同描述一个即将要执行的工作任务</span></span><br><span class="line">        mWorker = <span class="keyword">new</span> WorkerRunnable&lt;Params, Result&gt;() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> Result <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                mTaskInvoked.set(<span class="keyword">true</span>); <span class="comment">// 表示任务已经被调用过</span></span><br><span class="line"></span><br><span class="line">                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);</span><br><span class="line">                <span class="comment">//noinspection unchecked</span></span><br><span class="line">                Result result = doInBackground(mParams); <span class="comment">// 执行后台任务</span></span><br><span class="line">                Binder.flushPendingCommands();</span><br><span class="line">                <span class="comment">// 从函数名上可以判断postResult(...)的执行并不在后台线程，</span></span><br><span class="line">                <span class="comment">// 而应该是封装成消息扔给了主线程，因为要刷新UI</span></span><br><span class="line">                <span class="keyword">return</span> postResult(result);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        mFuture = <span class="keyword">new</span> FutureTask&lt;Result&gt;(mWorker) &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">done</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    postResultIfNotInvoked(get());</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) </span><br><span class="line">                    ...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//:677</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">WorkerRunnable</span>&lt;<span class="title">Params</span>, <span class="title">Result</span>&gt; <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Result</span>&gt; </span>&#123;</span><br><span class="line">        Params[] mParams;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>构造函数初始化了两个成员变量。mWorker派生自WorkerRunnable，后者实现了接口Callable，该接口定义如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// libcore/luni/src/main/java/java/util/concurrent/Callable.java:28</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>因此mWorker就是一个指定了参数、返回值，并实现了call接口的Callable对象，在mWorker.call()中执行了后台任务的核心处理逻辑。</p>
+<p>mFuture派生自FutureTask，<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// libcore/luni/src/main/java/java/util/concurrent/FutureTask.java:35</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FutureTask</span>&lt;<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">RunnableFuture</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">...</span><br><span class="line"><span class="comment">//:123</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FutureTask</span><span class="params">(Callable&lt;V&gt; callable)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (callable == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">        <span class="keyword">this</span>.callable = callable;</span><br><span class="line">        <span class="keyword">this</span>.state = NEW;       <span class="comment">// ensure visibility of callable</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>是对mWorker的进一步封装，通过它可以方便地取消任务以及获取任务的执行结果，主干逻辑是通过调用mFuture.call()到达mWorker.call()。那么mFuture.call()是什么时候被调用的呢？接下来看执行的导火索<code>AsyncTask::execute(...)</code>。</p>
+<h2 id="Step2-AsyncTask的执行execute-…"><a href="#Step2-AsyncTask的执行execute-…" class="headerlink" title="Step2 AsyncTask的执行execute(…)"></a>Step2 AsyncTask的执行execute(…)</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:550</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> AsyncTask&lt;Params, Progress, Result&gt; <span class="title">execute</span><span class="params">(Params... params)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> executeOnExecutor(sDefaultExecutor, params); <span class="comment">// 🏁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参数params正是在Step0中AsyncTask的第一个模板参数，用来描述初始数据。</p>
+<h2 id="Step3-AsyncTask-executeOnExecutor-…"><a href="#Step3-AsyncTask-executeOnExecutor-…" class="headerlink" title="Step3 AsyncTask::executeOnExecutor(…)"></a>Step3 AsyncTask::executeOnExecutor(…)</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:588</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> AsyncTask&lt;Params, Progress, Result&gt; <span class="title">executeOnExecutor</span><span class="params">(Executor exec,</span></span></span><br><span class="line"><span class="function"><span class="params">        Params... params)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// exec = sDefaultExecutor</span></span><br><span class="line">    <span class="comment">// 可见，不能重复执行“正在运行”和“已经完成”的AsyncTask任务，即只能被执行一次</span></span><br><span class="line">    <span class="keyword">if</span> (mStatus != Status.PENDING) &#123; </span><br><span class="line">        <span class="keyword">switch</span> (mStatus) &#123;</span><br><span class="line">            <span class="keyword">case</span> RUNNING:</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Cannot execute task:"</span></span><br><span class="line">                        + <span class="string">" the task is already running."</span>);</span><br><span class="line">            <span class="keyword">case</span> FINISHED:</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Cannot execute task:"</span></span><br><span class="line">                        + <span class="string">" the task has already been executed "</span></span><br><span class="line">                        + <span class="string">"(a task can be executed only once)"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mStatus = Status.RUNNING;</span><br><span class="line"></span><br><span class="line">    onPreExecute(); <span class="comment">// 由此可见onPreExecute()是在主线程中执行</span></span><br><span class="line"></span><br><span class="line">    mWorker.mParams = params;</span><br><span class="line">    exec.execute(mFuture); <span class="comment">// 🏁</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>exec是sDefaultExecutor，追溯其来源：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:180</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTask</span>&lt;<span class="title">Params</span>, <span class="title">Progress</span>, <span class="title">Result</span>&gt; </span>&#123;</span><br><span class="line">...</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Executor SERIAL_EXECUTOR = <span class="keyword">new</span> SerialExecutor();</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Executor sDefaultExecutor = SERIAL_EXECUTOR;</span><br></pre></td></tr></table></figure></p>
+<p>类型为SerialExecutor，来看它的定义：</p>
+<h2 id="Step4-SerialExecutor"><a href="#Step4-SerialExecutor" class="headerlink" title="Step4 SerialExecutor"></a>Step4 SerialExecutor</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:226</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SerialExecutor</span> <span class="keyword">implements</span> <span class="title">Executor</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 线程池的任务缓存队列</span></span><br><span class="line">        <span class="keyword">final</span> ArrayDeque&lt;Runnable&gt; mTasks = <span class="keyword">new</span> ArrayDeque&lt;Runnable&gt;();</span><br><span class="line">        Runnable mActive;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(<span class="keyword">final</span> Runnable r)</span> </span>&#123;</span><br><span class="line">            mTasks.offer(<span class="keyword">new</span> Runnable() &#123; <span class="comment">// 向mTasks中添加一个任务</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        r.run();</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        scheduleNext();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="keyword">if</span> (mActive == <span class="keyword">null</span>) &#123; <span class="comment">// 首次执行为真</span></span><br><span class="line">                scheduleNext();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">scheduleNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> ((mActive = mTasks.poll()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                THREAD_POOL_EXECUTOR.execute(mActive);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在Step3中通过调用它的execute(…)函数，把后台任务mFuture添加到线程池任务缓存队列SerialExecutor::mTasks中，并设置好了“启动按钮”<code>run()</code>，该函数会调用mFuture.run()，后者再调用mWorker.call()。那么谁来负责按下这个“启动按钮”呢？继续往下看。</p>
+<p>SerialExecutor有一个成员变量mActive表示当前正在执行的后台任务，初始值为空，于是执行<code>scheduleNext()</code>，其内部取出mTasks中的元素即mFuture，尔后继续执行execute(…)函数。THREAD_POOL_EXECUTOR是什么？</p>
+<h2 id="Step5-THREAD-POOL-EXECUTOR"><a href="#Step5-THREAD-POOL-EXECUTOR" class="headerlink" title="Step5 THREAD_POOL_EXECUTOR"></a>Step5 THREAD_POOL_EXECUTOR</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:180</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTask</span>&lt;<span class="title">Params</span>, <span class="title">Progress</span>, <span class="title">Result</span>&gt; </span>&#123;</span><br><span class="line">...</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> CPU_COUNT = Runtime.getRuntime().availableProcessors();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> CORE_POOL_SIZE = CPU_COUNT + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAXIMUM_POOL_SIZE = CPU_COUNT * <span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> KEEP_ALIVE = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这是一个工厂类，它创建出来的线程用于执行sPoolWorkQueue中的任务</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadFactory sThreadFactory = <span class="keyword">new</span> ThreadFactory() &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> AtomicInteger mCount = <span class="keyword">new</span> AtomicInteger(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, <span class="string">"AsyncTask #"</span> + mCount.getAndIncrement());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 维护一个工作任务队列，每个元素均为实现了Runnable接口的任务</span></span><br><span class="line">    <span class="comment">// 该队列有两个性质：1、从空队列中取出一个元素，将导致阻塞知道有新任务添加进来；</span></span><br><span class="line">    <span class="comment">// 2、向满的队列中添加新任务同样导致阻塞，直到队列腾出新的空闲位置为止。</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> BlockingQueue&lt;Runnable&gt; sPoolWorkQueue =</span><br><span class="line">            <span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;(<span class="number">128</span>);</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// :202</span></span><br><span class="line">    <span class="comment">// 这是一个线程池对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Executor THREAD_POOL_EXECUTOR</span><br><span class="line">            = <span class="keyword">new</span> ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,</span><br><span class="line">                    TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory);</span><br></pre></td></tr></table></figure>
+<p>THREAD_POOL_EXECUTOR是根据CPU个数创建的线程池对象，作为AsyncTask的底层执行引擎。乍一看AsyncTask只有一个后台任务mFuture，而且每个AsyncTask仅能调用一次execute(…)函数，为什么需要一个线程池来为之服务呢？原因很简单，AsyncTask的底层执行引擎sDefaultExecutor是静态成员，上层有可能创建多个AsyncTask对象，不管创建了多少个，到了底层执行的时候都是同一个引擎，具体执行策略跟多少个任务无关，而是根据CPU个数而定，这个设计很棒！</p>
+<h2 id="Step6-AsyncTask-postResult-…"><a href="#Step6-AsyncTask-postResult-…" class="headerlink" title="Step6 AsyncTask::postResult(…)"></a>Step6 AsyncTask::postResult(…)</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:325</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Handler <span class="title">getHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (AsyncTask.class) &#123;</span><br><span class="line">            <span class="keyword">if</span> (sHandler == <span class="keyword">null</span>) &#123;</span><br><span class="line">                sHandler = <span class="keyword">new</span> InternalHandler();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> sHandler;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// :325</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Result <span class="title">postResult</span><span class="params">(Result result)</span> </span>&#123;</span><br><span class="line">        <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">        Message message = getHandler().obtainMessage(MESSAGE_POST_RESULT,</span><br><span class="line">                <span class="keyword">new</span> AsyncTaskResult&lt;Result&gt;(<span class="keyword">this</span>, result));</span><br><span class="line">        message.sendToTarget();</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>getHandler()</code>返回sHandler，并通过它发送一个MESSAGE_POST_RESULT消息，sHandler又是什么？</p>
+<h2 id="Step-7-AsyncTask-sHandler"><a href="#Step-7-AsyncTask-sHandler" class="headerlink" title="Step 7 AsyncTask::sHandler"></a>Step 7 AsyncTask::sHandler</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/os/AsyncTask.java:216</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> InternalHandler sHandler;</span><br><span class="line"><span class="comment">// :656</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">InternalHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">InternalHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>(Looper.getMainLooper()); <span class="comment">// 注意这里传入的是主线程的Looper</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@SuppressWarnings</span>(&#123;<span class="string">"unchecked"</span>, <span class="string">"RawUseOfParameterizedType"</span>&#125;)</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">            AsyncTaskResult&lt;?&gt; result = (AsyncTaskResult&lt;?&gt;) msg.obj;</span><br><span class="line">            <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">                <span class="keyword">case</span> MESSAGE_POST_RESULT:</span><br><span class="line">                    <span class="comment">// There is only one result</span></span><br><span class="line">                    result.mTask.finish(result.mData[<span class="number">0</span>]);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> MESSAGE_POST_PROGRESS:</span><br><span class="line">                    result.mTask.onProgressUpdate(result.mData);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>InternalHandler在构造函数中传入的是主线程的Looper，由此确保了其消息处理函数<code>handleMessage(...)</code>也是在主线程中执行的。这样就印证了在Step1中的猜测：的确是把执行结果封装成了消息发送给主线程执行。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>当回过头来再看AsyncTask的设计的时候，不由得感叹：这玩意儿设计得够精妙！它有三层结构：一、最上层是给客户端调用，用于定义业务层逻辑；二、中间层将上层定义的后台任务排队进入任务缓存队列；三、根据CPU个数创建一个线程池，完成执行引擎的职责。</p>
+<p><img src="/2017/01/31/2017/0131MessageQueue5/img2.png" alt="AsyncTask原理"></p>
+<p><a href="https://github.com/palanceli/blog/tree/master/source/_attachment/20170131MessageQueue5/MsgLoopDemo" target="_blank" rel="noopener">本文的Demo源码</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/消息循环/" rel="tag"># 消息循环</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/30/2017/0130MessageQueue3/" rel="next" title="Android应用消息队列（三）——发送消息">
+                <i class="fa fa-chevron-left"></i> Android应用消息队列（三）——发送消息
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/01/2017/0201HomoDeus1/" rel="prev" title="《未来简史》读书笔记">
+                《未来简史》读书笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/01/31/2017/0131MessageQueue5/" data-title="消息循环几个常用类" data-url="http://palanceli.github.io/2017/01/31/2017/0131MessageQueue5/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#带有消息循环的子线程-HandlerThread"><span class="nav-number">1.</span> <span class="nav-text">带有消息循环的子线程 HandlerThread</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建DataThread"><span class="nav-number">1.1.</span> <span class="nav-text">创建DataThread</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#向DataThread发送消息"><span class="nav-number">1.2.</span> <span class="nav-text">向DataThread发送消息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#封装成消息的数据请求"><span class="nav-number">1.3.</span> <span class="nav-text">封装成消息的数据请求</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可更新主线程UI的子线程-AsyncTask"><span class="nav-number">2.</span> <span class="nav-text">可更新主线程UI的子线程 AsyncTask</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Step0-定义和启动AsyncTask"><span class="nav-number">2.1.</span> <span class="nav-text">Step0 定义和启动AsyncTask</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step1-AsyncTask的创建AsyncTask"><span class="nav-number">2.2.</span> <span class="nav-text">Step1 AsyncTask的创建AsyncTask()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step2-AsyncTask的执行execute-…"><span class="nav-number">2.3.</span> <span class="nav-text">Step2 AsyncTask的执行execute(…)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step3-AsyncTask-executeOnExecutor-…"><span class="nav-number">2.4.</span> <span class="nav-text">Step3 AsyncTask::executeOnExecutor(…)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step4-SerialExecutor"><span class="nav-number">2.5.</span> <span class="nav-text">Step4 SerialExecutor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step5-THREAD-POOL-EXECUTOR"><span class="nav-number">2.6.</span> <span class="nav-text">Step5 THREAD_POOL_EXECUTOR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step6-AsyncTask-postResult-…"><span class="nav-number">2.7.</span> <span class="nav-text">Step6 AsyncTask::postResult(…)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Step-7-AsyncTask-sHandler"><span class="nav-number">2.8.</span> <span class="nav-text">Step 7 AsyncTask::sHandler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.9.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

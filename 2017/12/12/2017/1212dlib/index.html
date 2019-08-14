@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="dlib,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章要点：  dlib提取人脸关键点的时间性能和尺寸">
+<meta name="keywords" content="dlib">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dlib提取人脸关键点的性能">
+<meta property="og:url" content="http://palanceli.github.io/2017/12/12/2017/1212dlib/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章要点：  dlib提取人脸关键点的时间性能和尺寸">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/12/12/2017/1212dlib/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.191Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dlib提取人脸关键点的性能">
+<meta name="twitter:description" content="本章要点：  dlib提取人脸关键点的时间性能和尺寸">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/12/12/2017/1212dlib/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/12/12/2017/1212dlib/">
+
+
+
+
+
+  <title>dlib提取人脸关键点的性能 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/12/12/2017/1212dlib/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">dlib提取人脸关键点的性能</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-12T20:00:00+08:00">
+                2017-12-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/人脸识别/" itemprop="url" rel="index">
+                    <span itemprop="name">人脸识别</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/12/2017/1212dlib/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/12/12/2017/1212dlib/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章要点：</p>
+<ul>
+<li>dlib提取人脸关键点的时间性能和尺寸</li>
+</ul>
+<a id="more"></a>
+<p>来单独聊聊dlib提取人脸关键点的时间、空间性能。作者训练的<a href="http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2" target="_blank" rel="noopener">http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2</a>模型压缩后有61M，解压后99M，跑在服务端这不算什么，但是如果放在一个客户端产品里这么大的尺寸是不能接受的。</p>
+<h1 id="时间性能优化"><a href="#时间性能优化" class="headerlink" title="时间性能优化"></a>时间性能优化</h1><p>时间性能开销更是慢得像屎一样，我在mac book pro 2013下，用python在每个视频帧上标出landmarks，我发现每次提取关键点需要700ms左右。代码如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DLibHelper</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.mParams = &#123;<span class="string">'predictorPath'</span>:<span class="string">'extdata/shape_predictor_68_face_landmarks.dat'</span>, </span><br><span class="line">        <span class="string">'faceRecModelPath'</span>:<span class="string">'extdata/dlib_face_recognition_resnet_model_v1.dat'</span>&#125;</span><br><span class="line">        self.ReloadFunctions()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ReloadFunctions</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.funcShapePredictor = dlib.shape_predictor(self.mParams[<span class="string">'predictorPath'</span>])</span><br><span class="line">        self.funcFaceRecognize = dlib.face_recognition_model_v1(self.mParams[<span class="string">'faceRecModelPath'</span>])</span><br><span class="line">        self.funcDetector = dlib.get_frontal_face_detector()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">GetFaces</span><span class="params">(self, img)</span>:</span>    <span class="comment"># 返回所有脸盘</span></span><br><span class="line">        <span class="keyword">return</span> self.funcDetector(img, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">GetFaceLandmarks</span><span class="params">(self, img, faceRect)</span>:</span>  <span class="comment"># 返回指定脸盘的landmarks</span></span><br><span class="line">        keyPts = self.funcShapePredictor(img, faceRect).parts()</span><br><span class="line">        landmarks = numpy.matrix([[p.x, p.y] <span class="keyword">for</span> p <span class="keyword">in</span> keyPts])</span><br><span class="line">        <span class="keyword">return</span> landmarks</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DLibPerfUT</span><span class="params">(unittest.TestCase)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setUp</span><span class="params">(self)</span>:</span></span><br><span class="line">        logFmt = <span class="string">'%(asctime)s %(lineno)04d %(levelname)-8s %(message)s'</span></span><br><span class="line">        logging.basicConfig(level=logging.DEBUG, format=logFmt, datefmt=<span class="string">'%H:%M'</span>,)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test02</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">''' 从摄像头读取图像并显示 '''</span></span><br><span class="line">        dlibHelper = DLibHelper()</span><br><span class="line">        cap = cv2.VideoCapture(<span class="number">0</span>)</span><br><span class="line">        img = cap.read()[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            img = cap.read()[<span class="number">1</span>]</span><br><span class="line">            t0= timeit.default_timer()</span><br><span class="line"></span><br><span class="line">            faceRects = dlibHelper.GetFaces(img)  <span class="comment"># 检测人脸rect</span></span><br><span class="line">            <span class="keyword">if</span> len(faceRects) == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">            t1= timeit.default_timer()</span><br><span class="line">            faceRect = faceRects[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">            landmarks = dlibHelper.GetFaceLandmarks(img, faceRect)  <span class="comment"># 提取landmarks</span></span><br><span class="line">            t2 = timeit.default_timer()</span><br><span class="line">            logging.debug(<span class="string">'GetFaces:%5.3f, GetFaceLandmarks:%5.3f'</span> % (t1-t0, t2-t1))</span><br><span class="line"></span><br><span class="line">            pts = numpy.array(landmarks, numpy.int32)</span><br><span class="line">            cv2.polylines(img, pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>), <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">            cv2.imshow(<span class="string">'image'</span>, img)</span><br><span class="line">            key = cv2.waitKey(<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">if</span> key == <span class="number">27</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br></pre></td></tr></table></figure></p>
+<p>这段代码的输出结果如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ python -m unittest sample.DLibPerfUT.test02</span><br><span class="line">23:36 0096 DEBUG    GetFaces:0.719, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.730, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.703, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.699, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.724, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.733, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.691, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.695, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.684, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.684, GetFaceLandmarks:0.004</span><br><span class="line">23:37 0096 DEBUG    GetFaces:0.685, GetFaceLandmarks:0.004</span><br></pre></td></tr></table></figure></p>
+<p>这么慢的速度根本没法应用到实时视频上，不过很容易关注到瓶颈点是在人脸识别上，即脸部矩形的检测上，关键点检测倒是挺快的。</p>
+<h2 id="修改人脸检测器的参数"><a href="#修改人脸检测器的参数" class="headerlink" title="修改人脸检测器的参数"></a>修改人脸检测器的参数</h2><p>我在<a href="https://github.com/davisking/dlib/blob/master/python_examples/face_detector.py" target="_blank" rel="noopener">face_detector.py</a>中找到如下一段代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">    img = io.imread(f)</span><br><span class="line">    <span class="comment"># The 1 in the second argument indicates that we should upsample the image</span></span><br><span class="line">    <span class="comment"># 1 time.  This will make everything bigger and allow us to detect more</span></span><br><span class="line">    <span class="comment"># faces.</span></span><br><span class="line">    dets = detector(img, <span class="number">1</span>)</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure></p>
+<p>这段注释是说：<code>detector的第二个参数1表示会把图片扩大1倍，以便发现更多的面孔</code>，这也意味着要付出更大的性能代价。如果应用场景确定是单面孔，其实没必要扩大，因此我把这个数值改为0，发现时间消耗只剩原来的1/4！<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">palancedeMacBook-Pro:faceRek palance$ python -m unittest sample.DLibPerfUT.test02</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.171, GetFaceLandmarks:0.007</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.165, GetFaceLandmarks:0.004</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.164, GetFaceLandmarks:0.004</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.162, GetFaceLandmarks:0.004</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.163, GetFaceLandmarks:0.004</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.160, GetFaceLandmarks:0.004</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.159, GetFaceLandmarks:0.004</span><br><span class="line">23:47 0096 DEBUG    GetFaces:0.164, GetFaceLandmarks:0.004</span><br></pre></td></tr></table></figure></p>
+<h2 id="在小图上做人脸检测"><a href="#在小图上做人脸检测" class="headerlink" title="在小图上做人脸检测"></a>在小图上做人脸检测</h2><p>已经很棒了，但是还不够。一般视频每秒钟在20~30帧，因此每帧的处理时间必须控制在30ms才能保证视频流畅。既然缩小图片尺寸可以有效减少时间开销，可以进一步沿着这个思路做优化。如果应用的场景中面孔不是很多，可以进一步缩小图片尺寸，使用缩小的图片做人脸检测，然后再等比扩大到初始尺寸，做landmark提取。由于人脸在图片中的面积通常比较大，所以缩放几乎不会影响人脸识别的精度，landmarks提取还是在原始图片上做的，精度也不受影响。我把代码改成这样：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test02</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">''' 从摄像头读取图像并显示 '''</span></span><br><span class="line">        dlibHelper = DLibHelper()</span><br><span class="line">        cap = cv2.VideoCapture(<span class="number">0</span>)</span><br><span class="line">        img = cap.read()[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            img = cap.read()[<span class="number">1</span>]</span><br><span class="line">            </span><br><span class="line">            t0= timeit.default_timer()</span><br><span class="line">            imgZoomed = cv2.resize(img, <span class="literal">None</span>, fx=<span class="number">0.25</span>, fy=<span class="number">0.25</span>, interpolation=cv2.INTER_CUBIC) <span class="comment"># 缩小四分之一</span></span><br><span class="line">            t1= timeit.default_timer()</span><br><span class="line"></span><br><span class="line">            faceRects = dlibHelper.GetFaces(imgZoomed)  <span class="comment"># 检测人脸rect</span></span><br><span class="line">            <span class="keyword">if</span> len(faceRects) == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">            t2= timeit.default_timer()</span><br><span class="line">            faceRect = faceRects[<span class="number">0</span>]</span><br><span class="line">            faceRect = dlib.rectangle(faceRects[<span class="number">0</span>].left()*<span class="number">4</span>, faceRects[<span class="number">0</span>].top()*<span class="number">4</span>, </span><br><span class="line">                faceRects[<span class="number">0</span>].right()*<span class="number">4</span>, faceRects[<span class="number">0</span>].bottom()*<span class="number">4</span>)</span><br><span class="line">            cv2.rectangle(img, (faceRect.left(), faceRect.top()), (faceRect.right(), faceRect.bottom()), (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">            landmarks = dlibHelper.GetFaceLandmarks(img, faceRect)  <span class="comment"># 提取landmarks</span></span><br><span class="line">            t3 = timeit.default_timer()</span><br><span class="line">            logging.debug(<span class="string">'GetFaces:%5.3f, GetFaceLandmarks:%5.3f'</span> % (t2-t1, t3-t2))</span><br><span class="line"></span><br><span class="line">            pts = numpy.array(landmarks, numpy.int32)</span><br><span class="line">            cv2.polylines(img, pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>), <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">            cv2.imshow(<span class="string">'image'</span>, img)</span><br><span class="line">            key = cv2.waitKey(<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">if</span> key == <span class="number">27</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br></pre></td></tr></table></figure></p>
+<p>输出结果如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ python -m unittest sample.DLibPerfUT.test02</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.013, GetFaceLandmarks:0.009</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.012, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.011, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.012, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.012, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.012, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.012, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.011, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.012, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.017, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.011, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.012, GetFaceLandmarks:0.004</span><br><span class="line">23:58 0095 DEBUG    GetFaces:0.011, GetFaceLandmarks:0.004</span><br></pre></td></tr></table></figure></p>
+<p>哈哈简直健步如飞！播放视频已经没问题了。</p>
+<h2 id="使用correlation-tracker跟踪脸部区域"><a href="#使用correlation-tracker跟踪脸部区域" class="headerlink" title="使用correlation_tracker跟踪脸部区域"></a>使用correlation_tracker跟踪脸部区域</h2><p>还发现另一种更快的方式：使用dlib.correlation_tracker()跟踪，它的使用方式大致是：在第一帧采用常规方式抓取脸部区域，之后使用tracker基于前一帧判断当前帧的脸部区域。代码如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test03</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">''' 从摄像头读取图像并显示 '''</span></span><br><span class="line">    dlibHelper = DLibHelper()</span><br><span class="line">    cap = cv2.VideoCapture(<span class="number">0</span>)</span><br><span class="line">    img = cap.read()[<span class="number">1</span>]</span><br><span class="line">    tracker = dlib.correlation_tracker()    <span class="comment"># 初始化tracker</span></span><br><span class="line">    faceRect = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        img = cap.read()[<span class="number">1</span>]</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># logging.debug(tracker.get_position())</span></span><br><span class="line">        t0 = timeit.default_timer()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> faceRect <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            faceRects = dlibHelper.GetFaces(img)    <span class="comment"># 首帧采用常规方法抓取脸部区域</span></span><br><span class="line">            <span class="keyword">if</span> len(faceRects) == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            faceRect = dlib.rectangle(faceRects[<span class="number">0</span>].left(), faceRects[<span class="number">0</span>].top(), faceRects[<span class="number">0</span>].right(), faceRects[<span class="number">0</span>].bottom())</span><br><span class="line">            tracker.start_track(img, faceRect)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            tracker.update(img)     <span class="comment"># 非首帧采用跟踪器</span></span><br><span class="line">            rect = tracker.get_position()</span><br><span class="line">            faceRect = dlib.rectangle(int(rect.left()), int(rect.top()), int(rect.right()), int(rect.bottom()))</span><br><span class="line">        t1 = timeit.default_timer()</span><br><span class="line">        cv2.rectangle(img, (faceRect.left(), faceRect.top()), (faceRect.right(), faceRect.bottom()), (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        landmarks = dlibHelper.GetFaceLandmarks(img, faceRect)</span><br><span class="line">        t2 = timeit.default_timer()</span><br><span class="line">        logging.debug(<span class="string">'GetFaceRect:%5.3f, GetFaceLandmarks:%5.3f'</span> % (t1-t0, t2-t1))</span><br><span class="line"></span><br><span class="line">        pts = numpy.array(landmarks, numpy.int32)</span><br><span class="line">        cv2.polylines(img, pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>), <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        cv2.imshow(<span class="string">'image'</span>, img)</span><br><span class="line">        key = cv2.waitKey(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> key == <span class="number">27</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br></pre></td></tr></table></figure></p>
+<p>我把图片缩放的代码去掉，执行结果如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ python -m unittest sample.DLibPerfUT.test03</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.123, GetFaceLandmarks:0.004</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.009, GetFaceLandmarks:0.001</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.009, GetFaceLandmarks:0.001</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.010, GetFaceLandmarks:0.001</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.009, GetFaceLandmarks:0.001</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.009, GetFaceLandmarks:0.001</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.009, GetFaceLandmarks:0.002</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.009, GetFaceLandmarks:0.001</span><br><span class="line">19:48 0131 DEBUG    GetFaceRect:0.009, GetFaceLandmarks:0.001</span><br></pre></td></tr></table></figure></p>
+<h2 id="移植到Android"><a href="#移植到Android" class="headerlink" title="移植到Android"></a>移植到Android</h2><p>这个优化方法移植到Android需要修改dlib-android的代码并重新编译so，所以这里把移植方法也做一遍。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> --recursive https://github.com/tzutalin/dlib-android.git</span><br><span class="line">$ <span class="built_in">cd</span> dlib-android</span><br><span class="line">$ ./envsetup</span><br></pre></td></tr></table></figure></p>
+<p><code>./envsetup</code>会下载<a href="https://sourceforge.net/projects/opencvlibrary/files/opencv-android/" target="_blank" rel="noopener">opencv-android</a>，这个过程特别慢，建议自己下载最新版本，将opencv-<version>-android-sdk.zip文件放到<code>dlib-android/thrid_party/</code>，并修改envsetup，将函数<code>def downloadPrebuiltOpencv(prefix=&#39;.&#39;, out_prefix=&#39;.&#39;, version=&#39;3.3.1&#39;)</code>参数version的默认值改为对应的版本号。<br><code>envsetup</code>还会clone<code>dlib-android-app</code>，也可以自己通过下载工具把它下到本地，在解压到<code>dlib-android/androidstudio-examples/dlib-android-app</code>。<br>然后再执行<code>./envsetup</code>。</version></p>
+<p>去<a href="https://developer.android.com/ndk/downloads/index.html" target="_blank" rel="noopener">Android website</a>下载Android-NDK，在~/.bashrc中添加：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> ANDROID_NDK_HOME=[NDK_PATH]/android-ndk-[version]</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$ANDROID_NDK_HOME</span></span><br></pre></td></tr></table></figure></p>
+<p>保存退出并执行：<code>source ~/.bashrc</code></p>
+<p>执行<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> dlib-android</span><br><span class="line">$ python build.py</span><br></pre></td></tr></table></figure></p>
+<p>搞定！</p>
+<h3 id="编译dlib-android-app"><a href="#编译dlib-android-app" class="headerlink" title="编译dlib-android-app"></a>编译dlib-android-app</h3><p>打开<code>dlib-android/androidstudio-examples/dlib-android-app</code>，编译遇到如下问题：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Error:A problem occurred configuring project <span class="string">':app'</span>.  </span><br><span class="line">&gt; android-apt plugin is incompatible with the Android Gradle plugin.  Please use <span class="string">'annotationProcessor'</span> configuration instead.</span><br></pre></td></tr></table></figure></p>
+<p>解决办法：<br>1、在app/build.gradle中删除<code>classpath &#39;com.neenbedankt.gradle.plugins:android-apt:1.4&#39;</code>和<code>apply plugin: &#39;com.neenbedankt.android-apt&#39;</code><br>2、将<code>apt &quot;org.androidannotations:androidannotations:$AAVersion&quot;</code>替换为<code>annotationProcessor &quot;org.androidannotations:androidannotations:$AAVersion&quot;</code></p>
+<p>再编译遇到如下问题：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.../dlib-android/androidstudio-examples/dlib-android-app/app/build/intermediates/res/merged/debug/raw_shape_predictor_68_face_landmarks.dat.flat</span><br><span class="line">Error:error: failed to <span class="built_in">read</span> data meta data.</span><br><span class="line">Error:failed parsing overlays.</span><br><span class="line">Error:java.util.concurrent.ExecutionException: java.util.concurrent.ExecutionException: com.android.tools.aapt2.Aapt2Exception: AAPT2 error: check logs <span class="keyword">for</span> details</span><br><span class="line">Error:java.util.concurrent.ExecutionException: com.android.tools.aapt2.Aapt2Exception: AAPT2 error: check logs <span class="keyword">for</span> details</span><br><span class="line">Error:com.android.tools.aapt2.Aapt2Exception: AAPT2 error: check logs <span class="keyword">for</span> details</span><br><span class="line">Error:Execution failed <span class="keyword">for</span> task <span class="string">':app:processDebugResources'</span>.</span><br><span class="line">&gt; Failed to execute aapt</span><br></pre></td></tr></table></figure></p>
+<p>这是AAPT的bug，当raw文件超过68M就会出这个问题，关于bug的讨论详见<a href="https://issuetracker.google.com/issues/68425589" target="_blank" rel="noopener">这里</a>，解决方案有两个：<br>1、修改<code>gradle.properties</code>文件，添加<code>android.enableAapt2=false</code>，这个方案在<a href="https://stackoverflow.com/questions/46961577/android-studio-error-failed-to-read-metadata-after-update-to-3-0-0" target="_blank" rel="noopener">这里</a>有讨论。<br>2、把<code>dlib-android/androidstudio-examples/dlib-android-app/app/src/main/res/raw/shape_predictor_68_face_landmarks.dat</code>替换为一个更小的模型</p>
+<p>继续编译终于搞定了。</p>
+<h1 id="尺寸性能优化"><a href="#尺寸性能优化" class="headerlink" title="尺寸性能优化"></a>尺寸性能优化</h1><p>最大的瓶颈在模型数据上，所以只能先从模型入手训练不同数据集的模型，看看<code>数据</code>、<code>特征点</code>、<code>尺寸</code>之间是个什么关系。训练模型的方法在<a href="http://localhost:4000/2017/11/26/2017/1126dlib/#训练自己的人脸关键点模型" target="_blank" rel="noopener">《训练自己的人脸关键点模型》</a>已经说过了。这里使用的训练数据是<a href="http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz" target="_blank" rel="noopener">http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz</a>，结果如下：<br><img src="/2017/12/12/2017/1212dlib/img01.png" alt><br>结论：landmarks对于模型的大小有着决定性作用，而且成正比，增加图片数量对于模型几乎没有影响，对于准确率有提升。<br>但是作者号称ibug有300万的数据，应该指的是landmarks点，我把图片全部下载也就6000多张。<br>为什么我跑完了所有数据也只有16.6M呢？<a href="http://blog.dlib.net/2014/08/real-time-face-pose-estimation.html?showComment=1416144989345#c5823830982307347300" target="_blank" rel="noopener">这里</a>作者提到他修改了学习深度从10改到15，我猜测跟这个有关，没验证过。<br>对于一般的娱乐应用，能达到90%的准确率，在直观体验上已经没问题了，这是我在实时视频下圈出landmarks的感受。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.learnopencv.com/speeding-up-dlib-facial-landmark-detector/" target="_blank" rel="noopener">Speeding up Dlib’s Facial Landmark Detector</a><br><a href="https://github.com/tzutalin/dlib-android" target="_blank" rel="noopener">dlib-android</a><br><a href="http://blog.dlib.net/2014/08/real-time-face-pose-estimation.html?showComment=1445290037220#c6512573392805280310" target="_blank" rel="noopener">Real-Time Face Pose Estimation</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/dlib/" rel="tag"># dlib</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/26/2017/1126dlib/" rel="next" title="dlib的使用">
+                <i class="fa fa-chevron-left"></i> dlib的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/18/2017/1218GitReduceSize/" rel="prev" title="git瘦身">
+                git瘦身 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/12/12/2017/1212dlib/" data-title="dlib提取人脸关键点的性能" data-url="http://palanceli.github.io/2017/12/12/2017/1212dlib/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#时间性能优化"><span class="nav-number">1.</span> <span class="nav-text">时间性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改人脸检测器的参数"><span class="nav-number">1.1.</span> <span class="nav-text">修改人脸检测器的参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在小图上做人脸检测"><span class="nav-number">1.2.</span> <span class="nav-text">在小图上做人脸检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用correlation-tracker跟踪脸部区域"><span class="nav-number">1.3.</span> <span class="nav-text">使用correlation_tracker跟踪脸部区域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#移植到Android"><span class="nav-number">1.4.</span> <span class="nav-text">移植到Android</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编译dlib-android-app"><span class="nav-number">1.4.1.</span> <span class="nav-text">编译dlib-android-app</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#尺寸性能优化"><span class="nav-number">2.</span> <span class="nav-text">尺寸性能优化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

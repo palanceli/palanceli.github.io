@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="技术随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="图形图像处理好帮手——opencv，python便于上手，所以这里简要归纳opencv-python的一些使用，便于自己查阅。">
+<meta name="keywords" content="技术随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="opencv python的使用">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="图形图像处理好帮手——opencv，python便于上手，所以这里简要归纳opencv-python的一些使用，便于自己查阅。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img11.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img12.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img13.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img14.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img15.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img16.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.054Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="opencv python的使用">
+<meta name="twitter:description" content="图形图像处理好帮手——opencv，python便于上手，所以这里简要归纳opencv-python的一些使用，便于自己查阅。">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/">
+
+
+
+
+
+  <title>opencv python的使用 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">opencv python的使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-01T23:00:00+08:00">
+                2017-10-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/opencv/" itemprop="url" rel="index">
+                    <span itemprop="name">opencv</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/01/2017/1001opencvpy/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/01/2017/1001opencvpy/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>图形图像处理好帮手——opencv，python便于上手，所以这里简要归纳opencv-python的一些使用，便于自己查阅。<br><a id="more"></a></p>
+<h1 id="简单几何图形的绘制"><a href="#简单几何图形的绘制" class="headerlink" title="简单几何图形的绘制"></a>简单几何图形的绘制</h1><h2 id="绘图板"><a href="#绘图板" class="headerlink" title="绘图板"></a>绘图板</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">400</span>, <span class="number">3</span>), numpy.uint8) <span class="comment"># 创建高300，宽400的绘图板</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">  cv2.imshow(<span class="string">'image'</span>, img)</span><br><span class="line">  <span class="keyword">if</span> cv2.waitKey(<span class="number">20</span>) &amp; <span class="number">0xFF</span> == <span class="number">27</span>: <span class="comment"># 等待按键，如果为ESC则跳出循环</span></span><br><span class="line">    <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">cv2.destroyAllWindows() <span class="comment"># 销毁窗体</span></span><br></pre></td></tr></table></figure>
+<p>所谓绘图板就是一个三维数组，第一维有300个元素，进入第二维每个元素又有400个元素，进入第三维每个元素有3个uint8的值。300是数组的行数，表示位图的高；400是数组的列数，表示位图的宽；每个宽、高确定一个像素点，这是一个(uint8, uint8, uint8)的值，表示颜色。此处为全0，即黑色。</p>
+<p>接下来的while循环里，每隔20ms读一次键盘，如果有按键并且为ESC，则跳出循环，否则继续循环。跳出循环后销毁窗体。</p>
+<p>下文中我把循环封装成函数<code>self.waitToClose(img)</code>。</p>
+<h2 id="直线"><a href="#直线" class="headerlink" title="直线"></a>直线</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">400</span>, <span class="number">300</span>, <span class="number">3</span>), numpy.uint8) </span><br><span class="line">cv2.line(img, (<span class="number">0</span>, <span class="number">0</span>), (<span class="number">511</span>, <span class="number">511</span>), (<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">2</span>) <span class="comment"># 绘制直线</span></span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure>
+<p>参数分别为：<code>背景位图</code>，<code>起始坐标</code>，<code>终止坐标</code>，<code>线条颜色</code>，<code>线宽</code>。<br>结果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img01.png" alt></p>
+<h2 id="矩形"><a href="#矩形" class="headerlink" title="矩形"></a>矩形</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">400</span>, <span class="number">3</span>), numpy.uint8)</span><br><span class="line">img[:, :] = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br><span class="line">cv2.rectangle(img, (<span class="number">10</span>, <span class="number">10</span>), (<span class="number">100</span>, <span class="number">100</span>), (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>)<span class="comment"># 绘制矩形</span></span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure>
+<p>参数分别为：<code>背景位图</code>，<code>左上坐标</code>，<code>右下坐标</code>，<code>线条颜色</code>，<code>线宽</code>。<br>结果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img02.png" alt></p>
+<h2 id="多边形"><a href="#多边形" class="headerlink" title="多边形"></a>多边形</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">400</span>, <span class="number">3</span>), numpy.uint8)</span><br><span class="line">img[:, :] = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br><span class="line"></span><br><span class="line">pts = numpy.array([[<span class="number">10</span>, <span class="number">10</span>], [<span class="number">100</span>, <span class="number">10</span>], [<span class="number">100</span>, <span class="number">100</span>], [<span class="number">10</span>, <span class="number">100</span>]], numpy.int32)</span><br><span class="line">cv2.polylines(img, [pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>)], <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">pts[:, <span class="number">0</span>] = pts[:, <span class="number">0</span>] + <span class="number">100</span></span><br><span class="line">cv2.polylines(img, [pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>)], <span class="literal">False</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">pts[:, <span class="number">1</span>] = pts[:, <span class="number">1</span>] + <span class="number">100</span></span><br><span class="line">cv2.polylines(img, pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>), <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure>
+<p>参数分别为：<code>背景位图</code>，<code>多边形顶点坐标</code>，<code>是否封闭</code>，<code>右下坐标</code>，<code>线条颜色</code>，<code>线宽</code>。结果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img03.png" alt><br>其中<code>多边形顶点坐标</code>如果括到[]里，将绘制多边形，如果没有[]，则只绘制顶点。</p>
+<h2 id="圆"><a href="#圆" class="headerlink" title="圆"></a>圆</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">400</span>, <span class="number">3</span>), numpy.uint8)</span><br><span class="line">img[:, :] = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br><span class="line">cv2.circle(img, (<span class="number">50</span>, <span class="number">50</span>), <span class="number">20</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">-1</span>)</span><br><span class="line">cv2.circle(img, (<span class="number">100</span>, <span class="number">100</span>), <span class="number">20</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure>
+<p>参数分别为：<code>背景位图</code>，<code>圆心坐标</code>，<code>半径</code>，<code>线条颜色</code>，<code>线宽</code>。其中线宽如果是-1，则为实心。结果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img04.png" alt></p>
+<h2 id="椭圆"><a href="#椭圆" class="headerlink" title="椭圆"></a>椭圆</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">400</span>, <span class="number">3</span>), numpy.uint8)</span><br><span class="line">img[:, :] = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br><span class="line">cv2.ellipse(img, (<span class="number">200</span>, <span class="number">50</span>), (<span class="number">100</span>, <span class="number">50</span>), <span class="number">0</span>, <span class="number">0</span>, <span class="number">180</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>)</span><br><span class="line">cv2.ellipse(img, (<span class="number">200</span>, <span class="number">250</span>), (<span class="number">100</span>, <span class="number">50</span>), <span class="number">0</span>, <span class="number">120</span>, <span class="number">180</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">-1</span>)</span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure>
+<p>参数分别为：<code>背景位图</code>，<code>中心坐标</code>，<code>长短轴长度</code>，<code>起始旋转角度</code>，<code>起始绘制角度</code>，<code>终止绘制角度</code>，<code>颜色</code>，<code>线宽</code>。其中线宽如果是-1，则为实心。结果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img05.png" alt><br>不知道为什么要引入起始旋转角度，大致意思是说从起始旋转角度，旋转<code>起始绘制角度</code>后开始绘制，直到旋转到<code>终止绘制角度</code>。<br>把第二个实心椭圆改成下面这样：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv2.ellipse(img, (<span class="number">200</span>, <span class="number">250</span>), (<span class="number">100</span>, <span class="number">50</span>), <span class="number">90</span>, <span class="number">120</span>, <span class="number">180</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">-1</span>)</span><br></pre></td></tr></table></figure></p>
+<p>图形为：<br><img src="/2017/10/01/2017/1001opencvpy/img06.png" alt></p>
+<h2 id="文字"><a href="#文字" class="headerlink" title="文字"></a>文字</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">400</span>, <span class="number">3</span>), numpy.uint8)</span><br><span class="line">img[:, :] = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br><span class="line">font = cv2.FONT_HERSHEY_SIMPLEX								<span class="comment"># 文字</span></span><br><span class="line">cv2.putText(img, <span class="string">'OpenCV'</span>, (<span class="number">10</span>, <span class="number">100</span>), font, <span class="number">2</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">2</span>, cv2.LINE_AA)</span><br><span class="line">cv2.putText(img, <span class="string">'OpenCV'</span>, (<span class="number">10</span>, <span class="number">200</span>), font, <span class="number">1</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>, cv2.LINE_AA)</span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure>
+<p>参数分别为：<code>背景位图</code>，<code>字串</code>，<code>位置</code>，<code>字体</code>，<code>字号</code>，<code>字色</code>，<code>线宽</code>，<code>线条类型</code>。结果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img07.png" alt></p>
+<h2 id="填充"><a href="#填充" class="headerlink" title="填充"></a>填充</h2><h3 id="cv2-floodFill-…"><a href="#cv2-floodFill-…" class="headerlink" title="cv2.floodFill(…)"></a>cv2.floodFill(…)</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">300</span>, <span class="number">3</span>), numpy.uint8)</span><br><span class="line">img[:, :] = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br><span class="line">pts = numpy.array([[<span class="number">10</span>, <span class="number">10</span>], [<span class="number">100</span>, <span class="number">10</span>], [<span class="number">100</span>, <span class="number">100</span>], [<span class="number">10</span>, <span class="number">100</span>]], numpy.int32)</span><br><span class="line">pts = pts.reshape((<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>))</span><br><span class="line">cv2.polylines(img, [pts], <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">mask = numpy.zeros((<span class="number">302</span>, <span class="number">302</span>), numpy.uint8)</span><br><span class="line">cv2.floodFill(img, mask, (<span class="number">50</span>, <span class="number">50</span>), (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>,), (<span class="number">0</span>,), <span class="number">8</span>)  <span class="comment"># 填充封闭区域</span></span><br><span class="line"></span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure>
+<p><code>cv2.floodFill</code>参数分别为：<code>源图</code>，<code>掩码</code>，<code>起始填充标记点</code>，<code>填充色</code>，<code>最大低亮度之间的差异</code>，<code>最大高亮度之间的差异</code>，<code>联通方式</code>。</p>
+<ul>
+<li><code>掩码图像</code>，大小比原图多两个像素点。设输入图像大小为w <em> h ,则掩码的大小必须为 (w + 2) </em> (h + 2) , mask可为输出，也可作为输入 ，由flags决定。</li>
+<li><code>起始填充标记点</code>，从这个点开始往外扩散执行填充。</li>
+<li><code>连通方式</code>：0~7位为0x04或者0x08 即 4连通 或者 8连通，<br>8~15位为填充mask的值大小 , 若为0 ， 则默认用1填充<br>16~23位为 <code>CV_FLOODFILL_FIXED_RANGE =(1 &lt;&lt; 16)</code>, <code>CV_FLOODFILL_MASK_ONLY =(1 &lt;&lt; 17)</code> </li>
+</ul>
+<p>flags参数通过位与运算处理：</p>
+<ul>
+<li>当为CV_FLOODFILL_FIXED_RANGE 待处理的像素点与种子点作比较，如果∈(s – lodiff , s + updiff)，s为种子点像素值，则填充此像素。若无此位设置，则将待处理点与已填充的相邻点作此比较。</li>
+<li>当为CV_FLOODFILL_MASK_ONLY 此位设置填充的对像， 若设置此位，则mask不能为空，此时，函数不填充原始图像img，而是填充掩码图像. 若无此位设置，则在填充原始图像的时候，也用flags的8~15位标记对应位置的mask.</li>
+</ul>
+<p>在本例中，先沿(10, 10), (100, 10), (100, 100), (10, 100)四个顶点画矩形，在图中用红色标出这四个顶点；再将(50, 50)作为起始填充标记点，开始执行填充，该点用蓝色标记，结果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img08.png" alt></p>
+<h3 id="cv2-fillPoly-…"><a href="#cv2-fillPoly-…" class="headerlink" title="cv2.fillPoly(…)"></a>cv2.fillPoly(…)</h3><p>当被填充的多边形的边界不是横平竖直，而是斜的，这个时候使用<code>cv2.floodFill(...)</code>会产生诸多问题。如果边界线宽度为1，会导致洪水泛滥到边界以外，因为边界线上不是所有的像素都是边界色。如果边界线的绘制采用了平滑曲线<code>cv2.LINE_AA</code>的方式，使用<code>cv2.floodFill(...)</code>会导致界内有一个白边：<br><img src="/2017/10/01/2017/1001opencvpy/img09.png" alt><br>使用<code>cv2.floodFill(...)</code>解决这个问题只能把边界线画为2个像素，并且不使用平滑。更好的方式是使用<code>cv2.fillPoly(...)</code>来完成填充。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">img = numpy.zeros((<span class="number">300</span>, <span class="number">300</span>, <span class="number">3</span>), numpy.uint8)</span><br><span class="line">img[:, :] = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br><span class="line">pts = numpy.array([[<span class="number">454</span>, <span class="number">283</span>], [<span class="number">471</span>, <span class="number">288</span>], [<span class="number">486</span>, <span class="number">294</span>], [<span class="number">553</span>, <span class="number">320</span>], </span><br><span class="line">  [<span class="number">548</span>, <span class="number">339</span>], [<span class="number">479</span>, <span class="number">313</span>], [<span class="number">464</span>, <span class="number">307</span>], [<span class="number">449</span>, <span class="number">302</span>]], numpy.int32)</span><br><span class="line">cv2.polylines(img, [pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>)], <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="number">1</span>, cv2.LINE_AA)</span><br><span class="line">cv2.fillPoly(img, [pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>)], (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure></p>
+<p>效果如下：<br><img src="/2017/10/01/2017/1001opencvpy/img10.png" alt></p>
+<h1 id="读取图片"><a href="#读取图片" class="headerlink" title="读取图片"></a>读取图片</h1><h2 id="读取图片时的标记参数"><a href="#读取图片时的标记参数" class="headerlink" title="读取图片时的标记参数"></a>读取图片时的标记参数</h2><p>函数原型为：<code>cv2.imread(filename[, flags]) → retval</code><br>在官方文档中说flag取值为<code>CV_LOAD_IMAGE_ANYDEPTH</code>、<code>CV_LOAD_IMAGE_COLOR</code>或<code>CV_LOAD_IMAGE_GRAYSCALE</code>。<br>但是我并没有从cv2中找到这些常量：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IMAGE = [i <span class="keyword">for</span> i <span class="keyword">in</span> dir(cv2) <span class="keyword">if</span> <span class="string">'IMAGE'</span> <span class="keyword">in</span> i]</span><br><span class="line">logging.debug(IMAGE)</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">'CALIB_CB_NORMALIZE_IMAGE'</span>, <span class="string">'CAP_IMAGES'</span>, <span class="string">'CAP_INTELPERC_IMAGE'</span>, <span class="string">'CAP_INTELPERC_IMAGE_GENERATOR'</span>, <span class="string">'CAP_OPENNI_BGR_IMAGE'</span>, <span class="string">'CAP_OPENNI_GRAY_IMAGE'</span>, <span class="string">'CAP_OPENNI_IMAGE_GENERATOR'</span>, <span class="string">'CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE'</span>, <span class="string">'CAP_OPENNI_IMAGE_GENERATOR_PRESENT'</span>, <span class="string">'CAP_OPENNI_IR_IMAGE'</span>, <span class="string">'CAP_PROP_IMAGES_BASE'</span>, <span class="string">'CAP_PROP_IMAGES_LAST'</span>, <span class="string">'CAP_PROP_XI_IMAGE_BLACK_LEVEL'</span>, <span class="string">'CAP_PROP_XI_IMAGE_DATA_BIT_DEPTH'</span>, <span class="string">'CAP_PROP_XI_IMAGE_DATA_FORMAT'</span>, <span class="string">'CAP_PROP_XI_IMAGE_DATA_FORMAT_RGB32_ALPHA'</span>, <span class="string">'CAP_PROP_XI_IMAGE_IS_COLOR'</span>, <span class="string">'CAP_PROP_XI_IMAGE_PAYLOAD_SIZE'</span>, <span class="string">'CASCADE_SCALE_IMAGE'</span>]</span><br></pre></td></tr></table></figure>
+<p>文档还提到，如果flag大于0，则为3通道图片；flag等于0为灰度图；flag小于0为带alpha通道的图片。这是靠谱的：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">img = cv2.imread(<span class="string">'dot.png'</span>)</span><br><span class="line">logging.debug(img.shape)  <span class="comment"># 打印行像素数、列像素数、颜色</span></span><br><span class="line">img = cv2.imread(<span class="string">'dot.png'</span>, <span class="number">-1</span>)</span><br><span class="line">logging.debug(img.shape)</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">23:47 0120 DEBUG    (41, 36, 3)   <span class="comment"># 表示3通道RGB</span></span><br><span class="line">23:47 0122 DEBUG    (41, 36, 4)   <span class="comment"># 表示4通道ARGB</span></span><br></pre></td></tr></table></figure>
+<p>当然，如果图片本身是3通道的，即使传入flag=1，得到的通道数还是3。</p>
+<p>遗憾的是，虽然能读出ARGB的图片数据，但是opencv-python只能以灰度图的形式显示它：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">img = cv2.imread(<span class="string">'dot.png'</span>, <span class="number">-1</span>)</span><br><span class="line">logging.debug(img.shape)</span><br><span class="line">self.waitToClose(img)</span><br></pre></td></tr></table></figure></p>
+<p>如下左半部分是在photo中看到的样子，右半部分则是用这段代码显示出来的样子：<br><img src="/2017/10/01/2017/1001opencvpy/img11.png" alt></p>
+<h2 id="图像混合"><a href="#图像混合" class="headerlink" title="图像混合"></a>图像混合</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">background = cv2.imread(<span class="string">'messi.jpg'</span>)</span><br><span class="line">logo = cv2.imread(<span class="string">'opencv_logo.png'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在background上截取与logo相同大小的图片</span></span><br><span class="line">rows, cols, channels = logo.shape</span><br><span class="line">roi = background[<span class="number">0</span>:rows, <span class="number">0</span>:cols]</span><br><span class="line"></span><br><span class="line">logogray = cv2.cvtColor(logo, cv2.COLOR_BGR2GRAY)	<span class="comment"># logo转成灰度图</span></span><br><span class="line">ret, mask = cv2.threshold(logogray, <span class="number">20</span>, <span class="number">255</span>, cv2.THRESH_BINARY)	<span class="comment"># 前景纯白，背景纯黑</span></span><br><span class="line">mask_inv = cv2.bitwise_not(mask)					<span class="comment"># 翻转：前景纯黑，背景纯白</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># img1_bg = if(mask≠0)&#123;roi ^ roi&#125;else&#123;mask&#125;</span></span><br><span class="line">img1_bg = cv2.bitwise_and(roi, roi, mask = mask_inv) <span class="comment"># 在messi中把logo部分变黑</span></span><br><span class="line"></span><br><span class="line">img2_fg = cv2.bitwise_and(logo, logo, mask = mask)</span><br><span class="line"></span><br><span class="line">dst = cv2.add(img1_bg, img2_fg)</span><br><span class="line">background[<span class="number">0</span>:rows, <span class="number">0</span>:cols] = dst</span><br><span class="line"><span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">dst = cv2.add(img1_bg, img2_fg)</span><br><span class="line">background[<span class="number">0</span>:rows, <span class="number">0</span>:cols] = dst</span><br></pre></td></tr></table></figure>
+<p><code>background</code>：<br><img src="/2017/10/01/2017/1001opencvpy/img12.png" alt><br><code>logo</code>：<br><img src="/2017/10/01/2017/1001opencvpy/img13.png" alt><br><code>roi</code>是在<code>background</code>上截取了与<code>logo</code>相同大小的区域；<code>logogray</code>是将<code>logo</code>转成灰度图；<code>mask</code>是将<code>logogray</code>转成前景纯白，背景纯黑；<code>mask_inv</code>是将<code>logogray</code>转成前景纯黑，背景纯白。<br>这四张图如下：<br><img src="/2017/10/01/2017/1001opencvpy/img14.png" alt><br><code>img1_bg</code>是将<code>roi</code>中<code>logo</code>的部分转成黑色；<code>img2_fg</code>是将<code>logo</code>中背景转成黑色；<code>dst</code>是将<code>img1_bg</code>和<code>img2_fg</code>取逻辑与，也即混合两张图中非黑色的部分。<br>这三张图如下：<br><img src="/2017/10/01/2017/1001opencvpy/img15.png" alt><br>最后，将混合后的<code>dst</code>贴到背景图上：<br><img src="/2017/10/01/2017/1001opencvpy/img16.png" alt></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>把要混合的两张图对方的部分转成黑色，然后把这两张图做个逻辑相加。<br>怎么做到“把对方的部分转成黑色”呢？在本例中，把logo的前景转成黑色，背景转成白色，即<code>mask_inv</code>，再与另一张图<code>roi</code>做逻辑与，这就得到<code>img1_bg</code>。而<code>logo</code>的背景本来就是纯色的，转成黑色很容易。</p>
+<h2 id="缩放"><a href="#缩放" class="headerlink" title="缩放"></a>缩放</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">logo = cv2.imread(<span class="string">'opencv_logo.png'</span>)</span><br><span class="line"><span class="comment"># 设置x/y轴的缩放因子均为0.8</span></span><br><span class="line">res1 = cv2.resize(logo, <span class="literal">None</span>, fx=<span class="number">0.8</span>, fy=<span class="number">0.8</span>, interpolation=cv2.INTER_CUBIC)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置宽高的实际值为原来的1.5倍</span></span><br><span class="line">height, width = logo.shape[:<span class="number">2</span>]</span><br><span class="line">res2 = cv2.resize(logo, (int(width*<span class="number">1.5</span>), int(height*<span class="number">1.5</span>)), interpolation=cv2.INTER_CUBIC)</span><br><span class="line"></span><br><span class="line">self.waitToClose(res1)</span><br><span class="line">self.waitToClose(res2)</span><br></pre></td></tr></table></figure>
+<p>缩放的代码非常简单，有两种方式完成缩放：1、设置x/y轴的缩放因子；2、设置缩放后的尺寸。</p>
+<h1 id="读取摄像头并实时显示"><a href="#读取摄像头并实时显示" class="headerlink" title="读取摄像头并实时显示"></a>读取摄像头并实时显示</h1><p>方法很简单，在做人脸识别的时候直接在PC上调试很方便：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cap = cv2.VideoCapture(<span class="number">0</span>) <span class="comment"># 获取摄像头</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    cameraImg = cap.read()[<span class="number">1</span>] <span class="comment"># 读取图像</span></span><br><span class="line"></span><br><span class="line">    cv2.imshow(<span class="string">'image'</span>, cameraImg)</span><br><span class="line">    key = cv2.waitKey(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> cv2.waitKey(<span class="number">20</span>) &amp; <span class="number">0xFF</span> == <span class="number">27</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>本文例程放在了<a href="https://github.com/palanceli/HandWriting/blob/master/opencvSample.py" target="_blank" rel="noopener">opencvSample.py</a></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>$ pip install opencv-python<br>使用brew install opencv是不行滴<br>如果是python3，可以执行：<br>$ python3 -m pip install opencv-python</p>
+<h2 id="入门文档"><a href="#入门文档" class="headerlink" title="入门文档"></a>入门文档</h2><p><a href="https://github.com/makelove/OpenCV-Python-Tutorial" target="_blank" rel="noopener">OpenCV Python Tutorial中文版</a><br>或者到官网下载<br><a href="http://readthedocs.org/projects/opencv-python-tutroals/downloads/" target="_blank" rel="noopener">OpenCV Python Tutorials英文版</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/技术随笔/" rel="tag"># 技术随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/29/2017/0929CubicSplineInterpolation/" rel="next" title="三次样条插值（Cubic Spline Interpolation）">
+                <i class="fa fa-chevron-left"></i> 三次样条插值（Cubic Spline Interpolation）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG02/" rel="prev" title="《Android Programming BNRG》笔记二">
+                《Android Programming BNRG》笔记二 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/01/2017/1001opencvpy/" data-title="opencv python的使用" data-url="http://palanceli.github.io/2017/10/01/2017/1001opencvpy/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简单几何图形的绘制"><span class="nav-number">1.</span> <span class="nav-text">简单几何图形的绘制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#绘图板"><span class="nav-number">1.1.</span> <span class="nav-text">绘图板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#直线"><span class="nav-number">1.2.</span> <span class="nav-text">直线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#矩形"><span class="nav-number">1.3.</span> <span class="nav-text">矩形</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多边形"><span class="nav-number">1.4.</span> <span class="nav-text">多边形</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#圆"><span class="nav-number">1.5.</span> <span class="nav-text">圆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#椭圆"><span class="nav-number">1.6.</span> <span class="nav-text">椭圆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文字"><span class="nav-number">1.7.</span> <span class="nav-text">文字</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#填充"><span class="nav-number">1.8.</span> <span class="nav-text">填充</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cv2-floodFill-…"><span class="nav-number">1.8.1.</span> <span class="nav-text">cv2.floodFill(…)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cv2-fillPoly-…"><span class="nav-number">1.8.2.</span> <span class="nav-text">cv2.fillPoly(…)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#读取图片"><span class="nav-number">2.</span> <span class="nav-text">读取图片</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#读取图片时的标记参数"><span class="nav-number">2.1.</span> <span class="nav-text">读取图片时的标记参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图像混合"><span class="nav-number">2.2.</span> <span class="nav-text">图像混合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.2.1.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缩放"><span class="nav-number">2.3.</span> <span class="nav-text">缩放</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#读取摄像头并实时显示"><span class="nav-number">3.</span> <span class="nav-text">读取摄像头并实时显示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">4.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#入门文档"><span class="nav-number">4.2.</span> <span class="nav-text">入门文档</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

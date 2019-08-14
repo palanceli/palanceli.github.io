@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前文分析了基于IMK输入法的创建步骤，本文将分析对按键的处理流程和规范。《Input Method Kit（译）》中提到IMKServerInput对按键的处理模式有三种：键盘绑定，仅处理文本数据，处理所有事件。这三种模式，输入法的处理空间越来越大，灵活性越来越强，可实现的功能也越来越强大，当然要承担的职责也就越来越多。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="macOS下基于IMK的输入法（二）——处理流程">
+<meta property="og:url" content="http://palanceli.github.io/2017/03/23/2017/0323macOSIMKSample2/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="前文分析了基于IMK输入法的创建步骤，本文将分析对按键的处理流程和规范。《Input Method Kit（译）》中提到IMKServerInput对按键的处理模式有三种：键盘绑定，仅处理文本数据，处理所有事件。这三种模式，输入法的处理空间越来越大，灵活性越来越强，可实现的功能也越来越强大，当然要承担的职责也就越来越多。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.814Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="macOS下基于IMK的输入法（二）——处理流程">
+<meta name="twitter:description" content="前文分析了基于IMK输入法的创建步骤，本文将分析对按键的处理流程和规范。《Input Method Kit（译）》中提到IMKServerInput对按键的处理模式有三种：键盘绑定，仅处理文本数据，处理所有事件。这三种模式，输入法的处理空间越来越大，灵活性越来越强，可实现的功能也越来越强大，当然要承担的职责也就越来越多。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/03/23/2017/0323macOSIMKSample2/">
+
+
+
+
+
+  <title>macOS下基于IMK的输入法（二）——处理流程 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/03/23/2017/0323macOSIMKSample2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">macOS下基于IMK的输入法（二）——处理流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-23T23:33:00+08:00">
+                2017-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/23/2017/0323macOSIMKSample2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/23/2017/0323macOSIMKSample2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="http://palanceli.com/2017/03/05/2017/0305macOSIMKSample1/" target="_blank" rel="noopener">前文</a>分析了基于IMK输入法的创建步骤，本文将分析对按键的处理流程和规范。<a href="http://palanceli.com/2017/03/06/2017/0306InputMethodKit/#IMKServerInput" target="_blank" rel="noopener">《Input Method Kit（译）》</a>中提到IMKServerInput对按键的处理模式有三种：键盘绑定，仅处理文本数据，处理所有事件。这三种模式，输入法的处理空间越来越大，灵活性越来越强，可实现的功能也越来越强大，当然要承担的职责也就越来越多。<a id="more"></a></p>
+<h1 id="键盘绑定"><a href="#键盘绑定" class="headerlink" title="键盘绑定"></a>键盘绑定</h1><blockquote>
+<p>系统把每一个键盘按下事件映射到到输入法的一个方法。如果成功（找到此映射方法），系统调用didCommandBySelector:client:，否则（没有找到该方法）调用inputText:client:。针对此方式，你应当实现inputText(_:client:) 和didCommand(by:client:)两个方法。</p>
+</blockquote>
+<p>以上是苹果官方文档的描述，可以做个实验来观察这两个方法的调用流程：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"IMKSampleController.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">IMKSampleController</span></span></span><br><span class="line"><span class="comment">// 该方法接收来自客户程序的按键输入，InputMethodKit会把按键事件转换成NSString发送给本方法。</span></span><br><span class="line"><span class="comment">//返回YES表明输入法要处理，系统将不再把按键继续发送给应用程序；否则返回NO</span></span><br><span class="line">-(<span class="built_in">BOOL</span>)inputText:(<span class="built_in">NSString</span>*)string client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, string);</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="built_in">BOOL</span>)didCommandBySelector:(SEL)aSelector client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// 如果输入法要处理该事件，则返回YES，否则返回NO</span></span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"didCommandBySelector:%@"</span>, <span class="built_in">NSStringFromSelector</span>(aSelector));</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>切出输入法，按下<code>a</code>、<code>b</code>、<code>c</code>，可以在控制台看到如下输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">默认  12:33:25.769423 +0800 IMKSample a</span><br><span class="line">默认  12:33:33.385260 +0800 IMKSample b</span><br><span class="line">默认  12:33:33.385260 +0800 IMKSample c</span><br></pre></td></tr></table></figure></p>
+<p>按下<code>Backspace</code>、<code>回车</code>、<code>Tab</code>以及上下左右键，看到如下输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">默认  12:33:36.319315 +0800 IMKSample didCommandBySelector:deleteBackward:</span><br><span class="line">默认  12:33:27.258984 +0800 IMKSample didCommandBySelector:insertNewline:</span><br><span class="line">默认  12:33:45.027618 +0800 IMKSample didCommandBySelector:insertTab:</span><br><span class="line">默认  12:36:20.385862 +0800 IMKSample didCommandBySelector:moveUp:</span><br><span class="line">默认  12:36:21.633254 +0800 IMKSample didCommandBySelector:moveDown:</span><br><span class="line">默认  12:36:21.063002 +0800 IMKSample didCommandBySelector:moveLeft:</span><br><span class="line">默认  12:36:22.083668 +0800 IMKSample didCommandBySelector:moveRight:</span><br></pre></td></tr></table></figure></p>
+<p>我找不到系统在哪里做的按键与方法的映射，但可以用这种方法遍历出所有的方法选择器，可以得出<strong>结论：</strong></p>
+<ol>
+<li>当按下字符键，将调用<code>input​Text:​client:​</code>并传入按下的字符</li>
+<li>当按下控制键，将调用<code>did​Command​By​Selector:​client:​</code>并传入该控制键对应的方法选择器</li>
+</ol>
+<p>在两个函数中，如果输入法要处理该字符/控制键，则返回YES，该按键就不在传递给应用程序；否则返回NO，同时按键被发送到应用程序。</p>
+<p>两个函数本质上是一样的，都是当用户有按键时被调用，只不过一个是按字符键，一个是按控制键，输入法要做的就是根据按键内容决定是否更新写作串、候选串以及是否上屏。</p>
+<h2 id="实现方法"><a href="#实现方法" class="headerlink" title="实现方法"></a>实现方法</h2><p>假设要实现的输入法逻辑是：对于字符按键暂时缓存起来，通过回车或空格完成上屏。实现方法：在<code>input​Text:​client:​</code>中缓存空格以外的字符，如果是空格则上屏；在<code>did​Command​By​Selector:​client:​</code>中处理回车完成上屏。以下是这两个函数的实现：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="built_in">BOOL</span>)inputText:(<span class="built_in">NSString</span>*)string client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"inputText:%@"</span>, string);</span><br><span class="line">  <span class="keyword">if</span>([string isEqualToString:<span class="string">@" "</span>])&#123;  <span class="comment">// 如果是空格则上屏</span></span><br><span class="line">    [<span class="keyword">self</span> commitComposedString:sender];</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123;                              <span class="comment">// 否则追加到写作串</span></span><br><span class="line">    [<span class="keyword">self</span> appendComposedString:string client:sender];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"composed String:%@"</span>, [<span class="keyword">self</span> composedString]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="built_in">BOOL</span>)didCommandBySelector:(SEL)aSelector client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// 如果输入法要处理该事件，则返回YES，否则返回NO</span></span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"didCommandBySelector:%@"</span>, <span class="built_in">NSStringFromSelector</span>(aSelector));</span><br><span class="line">  <span class="keyword">if</span>(aSelector == <span class="keyword">@selector</span>(insertNewline:))&#123; <span class="comment">// 如果是回车则上屏</span></span><br><span class="line">    [<span class="keyword">self</span> commitComposedString:sender];</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>本节的实现代码参见<a href="https://github.com/palanceli/macIMKSample/tree/v1.1" target="_blank" rel="noopener">macIMKSample v1.1</a>。</p>
+<h1 id="仅处理文本数据"><a href="#仅处理文本数据" class="headerlink" title="仅处理文本数据"></a>仅处理文本数据</h1><blockquote>
+<p>这种方式下你无需键盘绑定就能接收到所有键盘事件，然后解析相关的文本数据。键盘事件会包含Unicodes，产生它们的键盘码，修饰标记。该数据被发送给方法- (BOOL)inputText:key:modifiers:client:，你应当实现该方法。</p>
+</blockquote>
+<p>按照与键盘绑定同样的方法实现<code>- (BOOL)inputText:key:modifiers:client:</code>并观察系统传入的参数：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)inputText:(<span class="built_in">NSString</span>*)string</span><br><span class="line">              key:(<span class="built_in">NSInteger</span>)keyCode</span><br><span class="line">        modifiers:(<span class="built_in">NSUInteger</span>)flags</span><br><span class="line">           client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"inputText:%@ key:0x%2lX modifiers:0x%4lX"</span>,</span><br><span class="line">        string, (<span class="keyword">long</span>)keyCode, (<span class="keyword">unsigned</span> <span class="keyword">long</span>)flags);</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果既实现了<code>input​Text:​client:​</code>又实现了<code>input​Text:​key:​modifiers:​client:​</code>，系统会调用后者。切出输入法，按下<code>a</code>、<code>shift-a</code>、<code>Ctrl-a</code>、<code>Backspace</code>、<code>回车</code>、<code>Tab</code>以及<code>→</code>键，看到如下输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">17/3/24 上午1:17:03.266 IMKSample[7202]: inputText:a key:0x 0 modifiers:0x   0</span><br><span class="line">17/3/24 上午1:17:06.854 IMKSample[7202]: inputText:A key:0x 0 modifiers:0x20000</span><br><span class="line">17/3/24 上午1:17:08.136 IMKSample[7202]: inputText: key:0x 0 modifiers:0x40000</span><br><span class="line">17/3/24 上午1:17:10.206 IMKSample[7202]: inputText: key:0x33 modifiers:0x   0</span><br><span class="line">17/3/24 上午1:17:10.972 IMKSample[7202]: inputText:</span><br><span class="line"> key:0x24 modifiers:0x   0</span><br><span class="line">17/3/24 上午1:17:13.244 IMKSample[7202]: inputText:    key:0x30 modifiers:0x   0</span><br><span class="line">17/3/24 上午1:17:16.203 IMKSample[7202]: inputText: key:0x7C modifiers:0xA00000</span><br></pre></td></tr></table></figure></p>
+<h2 id="实现方法-1"><a href="#实现方法-1" class="headerlink" title="实现方法"></a>实现方法</h2><p>在这种方式下实现输入法的方法和键盘绑定很像，只不过把在两个函数里做的事情放在<code>input​Text:​key:​modifiers:​client:​</code>这一个函数里干了。mac为keyCode定义了一套常量，位于<code>Events.h</code>中的<code>kVK_ANSI_xxx</code>。根据传入的按键，如果是字符则追加入写作串，如果是空格或回车，且写作串非空，则上屏。代码如下：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)inputText:(<span class="built_in">NSString</span>*)string</span><br><span class="line">              key:(<span class="built_in">NSInteger</span>)keyCode</span><br><span class="line">        modifiers:(<span class="built_in">NSUInteger</span>)flags</span><br><span class="line">           client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"inputText:%@ key:0x%02lX modifiers:0x%04lX"</span>,</span><br><span class="line">        string, (<span class="keyword">long</span>)keyCode, (<span class="keyword">unsigned</span> <span class="keyword">long</span>)flags);</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">unichar</span> key = [string characterAtIndex:<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">if</span>((key &gt;= <span class="string">'a'</span> &amp;&amp; key &lt;= <span class="string">'z'</span>) || (key &gt;= <span class="string">'0'</span> &amp;&amp; key &lt;= <span class="string">'9'</span>))</span><br><span class="line">  &#123; <span class="comment">// 如果是字符则追加到写作串</span></span><br><span class="line">    [<span class="keyword">self</span> appendComposedString:string client:sender];</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    </span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span>((keyCode == kVK_Space || keyCode == kVK_Return)</span><br><span class="line">     &amp;&amp; [[<span class="keyword">self</span> composedString] length]&gt;<span class="number">0</span>)</span><br><span class="line">  &#123; <span class="comment">// 如果是空格或回车且有写作串则上屏</span></span><br><span class="line">    [<span class="keyword">self</span> commitComposedString:sender];</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>本节的实现代码参见<a href="https://github.com/palanceli/macIMKSample/releases/tag/v1.2" target="_blank" rel="noopener">macIMKSample v1.2</a>。</p>
+<h1 id="处理所有事件"><a href="#处理所有事件" class="headerlink" title="处理所有事件"></a>处理所有事件</h1><blockquote>
+<p>这种方式下输入法会接收到来自文本服务管理器的所有方法，这些方法被封装为NSEvent对象。你必须实现方法handle​Event:​client:​。</p>
+</blockquote>
+<p>同理，可以打印<code>handle​Event:​client:​</code>的参数，看系统都传入了什么。需要注意：如果输入法同时实现了三种实现方式，系统使用它们的优先级是：处理文本数据&gt;处理所有事件&gt;键盘绑定。所以在实现<code>handle​Event:​client:​</code>之前必须把<code>input​Text:​key:​modifiers:​client:​注掉。此外还要实现方法</code>recognizedEvents:`并返回输入法要处理的事件：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSUInteger</span>)recognizedEvents:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">NSEventMaskFlagsChanged</span> | <span class="built_in">NSEventMaskKeyDown</span> | <span class="built_in">NSEventMaskKeyUp</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">BOOL</span>)handleEvent:(<span class="built_in">NSEvent</span> *)event client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, event);</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>切出输入法按下：<code>a</code>、<code>shift</code>、<code>control</code>、<code>option</code>、<code>command</code>看到如下输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">... NSEvent: type=KeyDown      ... flags=0 win=0x0 winNum=0 ctxt=0x0 chars=&quot;a&quot; unmodchars=&quot;a&quot; repeat=0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0x20000 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0x40000 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0x80000 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0x100000 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br><span class="line">... NSEvent: type=FlagsChanged ... flags=0x100000 win=0x0 winNum=0 ctxt=0x0 keyCode=0</span><br></pre></td></tr></table></figure></p>
+<p>可见，接管所有事件的方式可以收到<code>shift</code>、<code>control</code>、<code>option</code>、<code>command</code>等按键，这在键盘绑定或处理文本数据的方式下是收不到的。从<code>recognizedEvents:</code>的返回来看，输入法应该能响应每个按键的按下抬起，但实际上却只能收到控制键的抬起，收不到字符的按键抬起事件。</p>
+<h2 id="实现方法-2"><a href="#实现方法-2" class="headerlink" title="实现方法"></a>实现方法</h2><p>要实现与前面同等功能的输入法，需要在<code>handle​Event:​client:​</code>函数中判断如果是字符按键则缓存，如果是回车或空格则上屏。代码如下：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)handleEvent:(<span class="built_in">NSEvent</span> *)event client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, event);</span><br><span class="line">  <span class="keyword">if</span>([event type] == <span class="built_in">NSKeyDown</span>)&#123;</span><br><span class="line">    <span class="keyword">unichar</span> key = [[event characters] characterAtIndex:<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">if</span>((key &gt;= <span class="string">'a'</span> &amp;&amp; key &lt;= <span class="string">'z'</span>) ||(key &gt;= <span class="string">'0'</span> &amp;&amp; key &lt;= <span class="string">'9'</span>))&#123;</span><br><span class="line">      [<span class="keyword">self</span> appendComposedString:[event characters] client:sender];</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(([event keyCode] == kVK_Space || [event keyCode] == kVK_Return)&amp;&amp;</span><br><span class="line">      [[<span class="keyword">self</span> composedString] length] &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      [<span class="keyword">self</span> commitComposedString:sender];</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>本节的实现代码参见<a href="https://github.com/palanceli/macIMKSample/releases/tag/v1.3" target="_blank" rel="noopener">macIMKSample v1.3</a>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/11/2017/0311iOSCKImeSample/" rel="next" title="iOS下开发Custom Keyboard">
+                <i class="fa fa-chevron-left"></i> iOS下开发Custom Keyboard
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/27/2017/0327AndroidIMESample1/" rel="prev" title="创建Android下的输入法(一)——创建步骤">
+                创建Android下的输入法(一)——创建步骤 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/03/23/2017/0323macOSIMKSample2/" data-title="macOS下基于IMK的输入法（二）——处理流程" data-url="http://palanceli.github.io/2017/03/23/2017/0323macOSIMKSample2/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#键盘绑定"><span class="nav-number">1.</span> <span class="nav-text">键盘绑定</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方法"><span class="nav-number">1.1.</span> <span class="nav-text">实现方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#仅处理文本数据"><span class="nav-number">2.</span> <span class="nav-text">仅处理文本数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方法-1"><span class="nav-number">2.1.</span> <span class="nav-text">实现方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#处理所有事件"><span class="nav-number">3.</span> <span class="nav-text">处理所有事件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方法-2"><span class="nav-number">3.1.</span> <span class="nav-text">实现方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在苹果给的例子NumberInput_IMKit_Sample中，NumberInput2指示了如何显示候选窗口，但这个候选窗口的绘制是由系统完成的，输入法只是给它提供候选数据，并指定横/竖排等属性，并不能参与到候选窗口的绘制，无法支持皮肤等特性，因此对于第三方输入法的开发意义不大。通常都是关闭该属性，而由输入法自行创建和绘制候选窗口。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="macOS下基于IMK的输入法（三）——绘制候选窗口">
+<meta property="og:url" content="http://palanceli.github.io/2017/03/27/2017/0327macOSIMKSample3/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="在苹果给的例子NumberInput_IMKit_Sample中，NumberInput2指示了如何显示候选窗口，但这个候选窗口的绘制是由系统完成的，输入法只是给它提供候选数据，并指定横/竖排等属性，并不能参与到候选窗口的绘制，无法支持皮肤等特性，因此对于第三方输入法的开发意义不大。通常都是关闭该属性，而由输入法自行创建和绘制候选窗口。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.814Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="macOS下基于IMK的输入法（三）——绘制候选窗口">
+<meta name="twitter:description" content="在苹果给的例子NumberInput_IMKit_Sample中，NumberInput2指示了如何显示候选窗口，但这个候选窗口的绘制是由系统完成的，输入法只是给它提供候选数据，并指定横/竖排等属性，并不能参与到候选窗口的绘制，无法支持皮肤等特性，因此对于第三方输入法的开发意义不大。通常都是关闭该属性，而由输入法自行创建和绘制候选窗口。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/03/27/2017/0327macOSIMKSample3/">
+
+
+
+
+
+  <title>macOS下基于IMK的输入法（三）——绘制候选窗口 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/03/27/2017/0327macOSIMKSample3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">macOS下基于IMK的输入法（三）——绘制候选窗口</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-27T23:00:00+08:00">
+                2017-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/27/2017/0327macOSIMKSample3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/27/2017/0327macOSIMKSample3/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在苹果给的例子<a href="https://developer.apple.com/library/content/samplecode/NumberInput_IMKit_Sample/Introduction/Intro.html#" target="_blank" rel="noopener">NumberInput_IMKit_Sample</a>中，<code>NumberInput2</code>指示了如何显示候选窗口，但这个候选窗口的绘制是由系统完成的，输入法只是给它提供候选数据，并指定横/竖排等属性，并不能参与到候选窗口的绘制，无法支持皮肤等特性，因此对于第三方输入法的开发意义不大。通常都是关闭该属性，而由输入法自行创建和绘制候选窗口。<a id="more"></a></p>
+<p>本文就介绍如何完成候选窗口的创建和绘制。本例的功能非常简单，还是缓存写作串，按空格或回车上屏。只是缓存的写作串将同时绘制到候选窗口上，上屏后候选窗口消失。</p>
+<h1 id="独立的输入法引擎"><a href="#独立的输入法引擎" class="headerlink" title="独立的输入法引擎"></a>独立的输入法引擎</h1><p>在前文中，输入法相关的数据直接放在<code>IMKSampleController</code>中维护，其实也只有写作串。如果要支持自绘候选窗，就需要在多个类中访问写作串，就需要将该数据独立出来，放到输入法引擎中了：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SGDXIMEngine.h</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">SGDXIMEngine</span> : <span class="title">NSObject</span></span></span><br><span class="line">+(SGDXIMEngine*) sharedObject;</span><br><span class="line"></span><br><span class="line">-(<span class="built_in">NSMutableString</span>*) appendComposeString:(<span class="built_in">NSString</span>*)string;  <span class="comment">// 向写作串追加字符</span></span><br><span class="line">-(<span class="keyword">void</span>) cleanComposeString;         <span class="comment">// 清除写作串</span></span><br><span class="line">-(<span class="built_in">NSMutableString</span>*) composeString;  <span class="comment">// 获得写作串</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SGDXIMEngine.m</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">SGDXIMEngine</span></span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSMutableString</span>* _composeString;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+(SGDXIMEngine*)sharedObject</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">static</span> SGDXIMEngine* sObject = <span class="literal">nil</span>;</span><br><span class="line">  <span class="keyword">@synchronized</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span>(sObject == <span class="literal">nil</span>)&#123;</span><br><span class="line">      sObject = [[<span class="keyword">self</span> alloc]init];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> sObject;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="built_in">NSMutableString</span>*) composeString</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span>(_composeString == <span class="literal">nil</span>)&#123;</span><br><span class="line">    _composeString = [[<span class="built_in">NSMutableString</span> alloc]init];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> _composeString;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>) setComposeString:(<span class="built_in">NSString</span>*) value</span><br><span class="line">&#123;</span><br><span class="line">  [[<span class="keyword">self</span> composeString] setString:value];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="built_in">NSString</span>*)appendComposeString:(<span class="built_in">NSString</span> *)string</span><br><span class="line">&#123;</span><br><span class="line">  [[<span class="keyword">self</span> composeString] appendString:string];</span><br><span class="line">  <span class="keyword">return</span> [<span class="keyword">self</span> composeString];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)cleanComposeString</span><br><span class="line">&#123;</span><br><span class="line">  [[<span class="keyword">self</span> composeString] setString:<span class="string">@""</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<h1 id="添加显示写作串的候选视图"><a href="#添加显示写作串的候选视图" class="headerlink" title="添加显示写作串的候选视图"></a>添加显示写作串的候选视图</h1><p>在这个视图中一般要显示候选串，此处并没有给输入法配备转换引擎，因此让它显示写作串即可。只需要实现函数-(void)drawRect:(NSRect)dirtyRect完成绘制：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IMKSCandidatesView.h</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;Cocoa/Cocoa.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">IMKSCandidatesView</span> : <span class="title">NSView</span></span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IMKSCandidatesView.m</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"IMKSCandidatesView.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"SGDXIMEngine.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">IMKSCandidatesView</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)drawRect:(<span class="built_in">NSRect</span>)dirtyRect </span><br><span class="line">&#123;</span><br><span class="line">  [<span class="keyword">super</span> drawRect:dirtyRect];</span><br><span class="line">    </span><br><span class="line">  <span class="comment">// Drawing code here.</span></span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"IMKSCandidatesView::drawRect"</span>);</span><br><span class="line">  <span class="comment">// 绘制灰色背景</span></span><br><span class="line">  <span class="built_in">NSRect</span> bounds = [<span class="keyword">self</span> bounds];</span><br><span class="line">  [[<span class="built_in">NSColor</span> lightGrayColor]set];</span><br><span class="line">  [<span class="built_in">NSBezierPath</span> fillRect:bounds];</span><br><span class="line"></span><br><span class="line">  SGDXIMEngine *imEngine = [SGDXIMEngine sharedObject];</span><br><span class="line">  <span class="comment">// 绘制写作串</span></span><br><span class="line">  <span class="built_in">NSMutableAttributedString</span>* compString =</span><br><span class="line">  [[<span class="built_in">NSMutableAttributedString</span> alloc]initWithString:[imEngine composeString]];</span><br><span class="line">  [compString addAttribute:<span class="built_in">NSFontAttributeName</span></span><br><span class="line">                     value:[<span class="built_in">NSFont</span> userFontOfSize:<span class="number">16</span>]</span><br><span class="line">                     range:<span class="built_in">NSMakeRange</span>(<span class="number">0</span>, [[imEngine composeString]length])];</span><br><span class="line">  </span><br><span class="line">  [compString drawInRect:[<span class="keyword">self</span> bounds]];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<h1 id="添加候选窗口"><a href="#添加候选窗口" class="headerlink" title="添加候选窗口"></a>添加候选窗口</h1><p>这个候选窗口包含前面创建的视图，负责在compString非空的时候显示，为空的时候隐藏。显示的位置位于光标的下方。<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IMKSCandidatesWindow.h</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;Cocoa/Cocoa.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;InputMethodKit/InputMethodKit.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">IMKSCandidatesWindow</span> : <span class="title">NSWindow</span></span></span><br><span class="line">-(<span class="keyword">void</span>)update:(<span class="keyword">id</span>&lt;IMKTextInput, <span class="built_in">NSObject</span>&gt;)sender;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IMKSCandidatesWindow.m</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"IMKSCandidatesWindow.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"SGDXIMEngine.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"IMKSCandidatesView.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">IMKSCandidatesWindow</span></span></span><br><span class="line">&#123;</span><br><span class="line">  IMKSCandidatesView* _view;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">id</span>)initWithContentRect:(<span class="built_in">NSRect</span>)contentRect styleMask:(<span class="built_in">NSWindowStyleMask</span>)style</span><br><span class="line">                 backing:(<span class="built_in">NSBackingStoreType</span>)bufferingType defer:(<span class="built_in">BOOL</span>)flag</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">self</span> = [<span class="keyword">super</span> initWithContentRect:contentRect</span><br><span class="line">                          styleMask:<span class="built_in">NSBorderlessWindowMask</span></span><br><span class="line">                            backing:bufferingType defer:flag];</span><br><span class="line">  <span class="keyword">if</span>(<span class="keyword">self</span>)&#123;</span><br><span class="line">    [<span class="keyword">self</span> setOpaque:<span class="literal">NO</span>];</span><br><span class="line">    [<span class="keyword">self</span> setLevel:<span class="built_in">NSFloatingWindowLevel</span>];</span><br><span class="line">    [<span class="keyword">self</span> setBackgroundColor:[<span class="built_in">NSColor</span> clearColor]];</span><br><span class="line">    _view = [[IMKSCandidatesView alloc]initWithFrame:<span class="keyword">self</span>.frame];</span><br><span class="line">    [<span class="keyword">self</span> setContentView:_view];</span><br><span class="line">    [<span class="keyword">self</span> orderFront:<span class="literal">nil</span>];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算光标位置</span></span><br><span class="line">-(<span class="built_in">NSPoint</span>) getCaretPosition:(<span class="keyword">id</span>&lt;IMKTextInput, <span class="built_in">NSObject</span>&gt;)sender</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSPoint</span> ps;</span><br><span class="line">  <span class="built_in">NSRect</span> lineHeightRect;</span><br><span class="line">  [sender attributesForCharacterIndex:<span class="number">0</span> lineHeightRectangle:&amp;lineHeightRect];</span><br><span class="line">  ps = <span class="built_in">NSMakePoint</span>(lineHeightRect.origin.x, lineHeightRect.origin.y);</span><br><span class="line">  <span class="keyword">return</span> ps;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)update:(<span class="keyword">id</span>&lt;IMKTextInput, <span class="built_in">NSObject</span>&gt;)sender</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">NSPoint</span> caretPosition = [<span class="keyword">self</span> getCaretPosition:sender];</span><br><span class="line">  SGDXIMEngine *imEngine = [SGDXIMEngine sharedObject];</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">NSMutableAttributedString</span>* compString =</span><br><span class="line">  [[<span class="built_in">NSMutableAttributedString</span> alloc]initWithString:[imEngine composeString]];</span><br><span class="line">  [compString addAttribute:<span class="built_in">NSFontAttributeName</span></span><br><span class="line">                     value:[<span class="built_in">NSFont</span> userFontOfSize:<span class="number">16</span>]</span><br><span class="line">                     range:<span class="built_in">NSMakeRange</span>(<span class="number">0</span>, [[imEngine composeString]length])];</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">NSRect</span> rect = <span class="built_in">NSZeroRect</span>;   <span class="comment">// 写作串为空则不显示</span></span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 计算窗口区域</span></span><br><span class="line">  <span class="keyword">if</span>([[[SGDXIMEngine sharedObject]composeString] length] &gt; <span class="number">0</span>)&#123;</span><br><span class="line">    rect = <span class="built_in">NSMakeRect</span>(caretPosition.x,</span><br><span class="line">                      caretPosition.y - [compString size].height,</span><br><span class="line">                      [compString size].width ,</span><br><span class="line">                      [compString size].height);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">NSLog</span>(<span class="string">@"IMKSCandidatesWindow::update rect:(%.0f, %.0f, %.0f, %.0f)"</span>,</span><br><span class="line">        rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);</span><br><span class="line">  [<span class="keyword">self</span> setFrame:rect display:<span class="literal">YES</span>];</span><br><span class="line">  <span class="comment">// 计算视图区域</span></span><br><span class="line">  [_view setFrame:<span class="built_in">NSMakeRect</span>(<span class="number">0</span>, <span class="number">0</span>, rect.size.width, rect.size.height)];</span><br><span class="line">  [_view setNeedsDisplay:<span class="literal">YES</span>];</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<h1 id="InputInputController子类"><a href="#InputInputController子类" class="headerlink" title="InputInputController子类"></a>InputInputController子类</h1><p>该子类的实现在之前的基础上需要：1、创建候选窗口；2、每次追加写作串或上屏后需要更新候选窗口：<br><figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IMKSampleController.h</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;Cocoa/Cocoa.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;InputMethodKit/InputMethodKit.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">IMKSampleController</span> : <span class="title">IMKInputController</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#import <span class="meta-string">"IMKSampleController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"SGDXIMEngine.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"IMKSCandidatesWindow.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">IMKSampleController</span></span></span><br><span class="line">&#123;</span><br><span class="line">  IMKSCandidatesWindow* _candidatesWindow;</span><br><span class="line">&#125;</span><br><span class="line">-(IMKSCandidatesWindow*) candidatesWindow</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span>(_candidatesWindow == <span class="literal">nil</span>)&#123;</span><br><span class="line">    _candidatesWindow = [[IMKSCandidatesWindow alloc]</span><br><span class="line">               initWithContentRect:<span class="built_in">NSZeroRect</span></span><br><span class="line">               styleMask:<span class="built_in">NSBorderlessWindowMask</span></span><br><span class="line">               backing:<span class="built_in">NSBackingStoreBuffered</span></span><br><span class="line">               defer:<span class="literal">YES</span>];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> _candidatesWindow;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>) appendComposedString:(<span class="built_in">NSString</span>*) string client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  SGDXIMEngine* imEngine = [SGDXIMEngine sharedObject];</span><br><span class="line">  <span class="built_in">NSString</span> *compString = [imEngine appendComposeString:string];</span><br><span class="line">  <span class="comment">// 向光标处插入内嵌文字</span></span><br><span class="line">  [sender setMarkedText:compString</span><br><span class="line">         selectionRange:<span class="built_in">NSMakeRange</span>(<span class="number">0</span>, [compString length])</span><br><span class="line">       replacementRange:<span class="built_in">NSMakeRange</span>(<span class="built_in">NSNotFound</span>, <span class="built_in">NSNotFound</span>)];</span><br><span class="line">  [[<span class="keyword">self</span> candidatesWindow]update:[<span class="keyword">self</span> client]]; <span class="comment">// 更新候选窗</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>) commitComposedString:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line">  SGDXIMEngine* imEngine = [SGDXIMEngine sharedObject];</span><br><span class="line">  <span class="comment">// 向光标处插入上屏文字</span></span><br><span class="line">  [sender insertText:[[SGDXIMEngine sharedObject] composeString] </span><br><span class="line">    replacementRange:<span class="built_in">NSMakeRange</span>(<span class="built_in">NSNotFound</span>, <span class="built_in">NSNotFound</span>)];</span><br><span class="line">  [imEngine cleanComposeString];</span><br><span class="line">  [[<span class="keyword">self</span> candidatesWindow]update:[<span class="keyword">self</span> client]];  <span class="comment">// 更新候选窗</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">BOOL</span>)handleEvent:(<span class="built_in">NSEvent</span> *)event client:(<span class="keyword">id</span>)sender</span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">//  NSLog(@"%@", event);</span></span><br><span class="line">  <span class="keyword">if</span>([event type] == <span class="built_in">NSKeyDown</span>)&#123;</span><br><span class="line">    <span class="keyword">unichar</span> key = [[event characters] characterAtIndex:<span class="number">0</span>];</span><br><span class="line">    <span class="comment">// 如果是字符则追加到写作串，并更新候选窗</span></span><br><span class="line">    <span class="keyword">if</span>((key &gt;= <span class="string">'a'</span> &amp;&amp; key &lt;= <span class="string">'z'</span>) ||(key &gt;= <span class="string">'0'</span> &amp;&amp; key &lt;= <span class="string">'9'</span>))&#123;</span><br><span class="line">      [<span class="keyword">self</span> appendComposedString:[event characters] client:sender];</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果是空格或回车且有写作串则上屏，并更新候选窗</span></span><br><span class="line">    <span class="keyword">if</span>(([event keyCode] == kVK_Space || [event keyCode] == kVK_Return)&amp;&amp;</span><br><span class="line">      [[[SGDXIMEngine sharedObject] composeString] length] &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      [<span class="keyword">self</span> commitComposedString:sender];</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSUInteger</span>)recognizedEvents:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">NSEventMaskFlagsChanged</span> | <span class="built_in">NSEventMaskKeyDown</span> | <span class="built_in">NSEventMaskKeyUp</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/27/2017/0327AndroidIMESample1/" rel="next" title="创建Android下的输入法(一)——创建步骤">
+                <i class="fa fa-chevron-left"></i> 创建Android下的输入法(一)——创建步骤
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/03/2017/0403AndroidIMESample2/" rel="prev" title="创建Android下的输入法(二)——绘制候选窗口">
+                创建Android下的输入法(二)——绘制候选窗口 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/03/27/2017/0327macOSIMKSample3/" data-title="macOS下基于IMK的输入法（三）——绘制候选窗口" data-url="http://palanceli.github.io/2017/03/27/2017/0327macOSIMKSample3/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#独立的输入法引擎"><span class="nav-number">1.</span> <span class="nav-text">独立的输入法引擎</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加显示写作串的候选视图"><span class="nav-number">2.</span> <span class="nav-text">添加显示写作串的候选视图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加候选窗口"><span class="nav-number">3.</span> <span class="nav-text">添加候选窗口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InputInputController子类"><span class="nav-number">4.</span> <span class="nav-text">InputInputController子类</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

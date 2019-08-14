@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《卷积神经网络》第三周《目标检测》。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（十一）">
+<meta property="og:url" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《卷积神经网络》第三周《目标检测》。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img11.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img12.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img13.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.274Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（十一）">
+<meta name="twitter:description" content="《卷积神经网络》第三周《目标检测》。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（十一） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（十一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T11:00:00+08:00">
+                2018-04-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/18/2018/0418DeepLearningAI13/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/18/2018/0418DeepLearningAI13/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《卷积神经网络》第三周《目标检测》。  </p>
+<a id="more"></a>
+<h1 id="3-1-目标定位"><a href="#3-1-目标定位" class="headerlink" title="3.1 目标定位"></a>3.1 目标定位</h1><p>图片分类是判断图片中是否包含要寻找的目标。<br>定位分类不仅要判断是否包含目标，还要在图片中标记出它的位置。<br>对象检测则是在单张图片中定位分类多个对象。</p>
+<p>和常规的卷积神经网络相比，定位分类在输出层除了输出softmax结果外，还应增加4个字段，分别表示定位到的中心坐标和宽、高。下面在左边的原图中标出了坐标系及bx、by、bh、bw的含义：<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img01.png" alt><br>在标注时，向量y包含8个维度：如果包含目标，则Pc=1，bx by bh bw是目标位置，c1 c2 c3是目标类型<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img02.png" alt><br>定位分类问题仅讨论图片中只有一个目标的情况，如果有多个目标，则是对象检测的范畴，在后面会讨论。</p>
+<h1 id="3-2-特征点检测"><a href="#3-2-特征点检测" class="headerlink" title="3.2 特征点检测"></a>3.2 特征点检测</h1><p>特征点检测和定位分类问题的原理完全一样，以人脸特征点检测为例，需要针对人脸定义出若干个关键点，如左右外眼角、左右内眼角，并在标注中依次标出，如下面中间图所示。然后在卷积网络的输出层输出相应的：是否有人脸，以及各特征点的位置，这在人脸识别中成为landmarks，在前面研究DLib时有所涉及。<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img03.png" alt></p>
+<p>人体特征点也是类似的，定义出肢体中的关键节点，并在标注、以及CNN中输出对应的结果。</p>
+<h1 id="3-3-目标检测"><a href="#3-3-目标检测" class="headerlink" title="3.3 目标检测"></a>3.3 目标检测</h1><p>本节介绍滑动窗口目标检测的基本思路：<br>1、针对要检测的目标手机样本并训练CNN。如下图所示，假设要检测的是道路中的汽车，首先应采集只有汽车的图片，而且尽量令汽车占满整个图片。完成标注，并针对这些样本做训练。<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img04.png" alt><br>2、对于给定的被检测图片，定义一个窗口，如下面左图，将窗口在被检测图片中按照固定的步长从左上角依次移动到右下角，每移动一步都应用前面训练的CNN做一次目标检测，如果检测到结果则结束；如果整张图都检测不到结果，则增大窗口尺寸，再做一轮，如中间和右侧图片。<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img05.png" alt><br>窗口尺寸越小，计算成本越大，而且如果被检测目标比窗体大时可能检测不到目标。<br>窗口尺寸越大，计算成本越小，但是检测的性能也会下降。<br>所以理想情况是当窗体与目标大小一致时，并且滑动到目标中心，则可以检测出目标。</p>
+<p>这只是滑动窗口的大致思想，具体操作时常常要应用到实时视频检测中，显然不能在每张图上执行这么多次运算，还需要做更多的优化。</p>
+<h1 id="3-4-卷积的滑动窗口实现"><a href="#3-4-卷积的滑动窗口实现" class="headerlink" title="3.4 卷积的滑动窗口实现"></a>3.4 卷积的滑动窗口实现</h1><p>上一节滑动窗口目标检测只是引入个概念，本节继续在性能上改善和提升，使它成为工程上可用的方法。<br>第一步先将原先卷积神经网络的全连接部分也用卷积的方式来运算，把全连接层输出的向量以1×1矩阵的形式输出，二者其实是完全等价的，只是表示方式有所不同：<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img06.png" alt><br>接下来一步是实质性的优化，在16×16×3的图片上做步长为2的窗口滑动运算，相当于对4个图片做了CNN，最后生成4×4×softmax类别的矩阵，这4个CNN的乘数是完全一样的，被乘数又有大量的重合，因此可以等效于用1个CNN输出4×4×softmax类别的矩阵：<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img07.png" alt><br>不论窗口滑动多少次，只要一个CNN就全都搞定了。</p>
+<h1 id="3-5-Bounding-Box预测"><a href="#3-5-Bounding-Box预测" class="headerlink" title="3.5 Bounding Box预测"></a>3.5 Bounding Box预测</h1><p>上一节卷积滑动窗口可以在窗口尺寸固定时，只做一次CNN，但是它解决不了一个问题是：当窗口和目标框不重合的时候，还是需要通过缩放窗口进行多轮的循环运算。例如下图的情况，目标窗是红框，滑动窗口是紫框，按照这个尺寸滑动下去，二者是无法重合的：<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img08.png" alt><br>本节引入YOLO方法，论文在<a href="https://arxiv.org/abs/1506.02640" target="_blank" rel="noopener">《You Only Look Once: Unified, Real-Time Object Detection》</a>，也可在<a href="https://github.com/SnailTyan/deep-learning-papers-translation" target="_blank" rel="noopener">Deep Learning Papers Translation</a>找到中英翻译。</p>
+<p>算法的思想是从标注开始的：将训练样本分割成3×3的格子，在每个格子内分别标注，如下图中紫、绿、黄色向量所示，因此标签数据就是3×3×8的矩阵。在建立CNN时，以该3×3×8 的矩阵作为结果y。如果目标超出格子，bx、by以它的重心所在格子为准，bh、hw则可以大于格子。<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img09.png" alt><br>下图更详细地描述了标注的原则：<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img10.png" alt><br>我的理解：YOLO是和卷积滑动窗口完全不同的解决办法，它不仅实现了CNN的一次运算，也解决了目标超出窗体的问题。让机器学习去解决“半个车该属于哪个窗口”的问题。</p>
+<h1 id="3-6-交并比"><a href="#3-6-交并比" class="headerlink" title="3.6 交并比"></a>3.6 交并比</h1><p>将训练完成的模型应用在训练集、开发集或测试集的时候，结果不像二分那样直观。有可能会出现下图的情况，紫框是预测结果，红框是标注结果，他们有一部分重合了，怎么评价这个预测正确与否呢？<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img11.png" alt><br>本节引入交并比（Intersection Over Union IoU）的概念，即：<code>两个框的交集÷两个框的并集</code>，可以人为给结果设定一个合理的阈值，比如大于0.5表示预测正确，小于0.5表示预测错误。也可以设定更严格的阈值，比如0.6。</p>
+<h1 id="3-7-非极大值抑制"><a href="#3-7-非极大值抑制" class="headerlink" title="3.7 非极大值抑制"></a>3.7 非极大值抑制</h1><p>按照YOLO算法，结果可能有多个格子声称自己检测到了目标，需要一种方法来筛选出最可能包含目标中心的格子。这就是非极大值抑制算法。<br>它的核心思想可以用如下伪码表示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">while 图片中还有目标框:</span><br><span class="line">  挑选pc最大的作为预测命中框A</span><br><span class="line">  删除与框A的IoU≥0.5的所有框</span><br><span class="line">  记录框A并从图片中删除</span><br></pre></td></tr></table></figure></p>
+<p><img src="/2018/04/18/2018/0418DeepLearningAI13/img12.png" alt><br>其中pc是指在CNN中输出命中某目标的概率。针对上图，算法第一轮循环首先找到右车0.9的框，删除0.6、0.7的框，第二轮循环找出左车0.8的框，删除0.7的框。</p>
+<p>我的问题是：在一张图中有两个同类型的目标，该怎么标注呢？答案非常简单：YOLO算法是把图片切成3×3，每个格子独立标注，所以上图标注和输出都是3×3×8，不是问题。<br>问题是如果两个目标挤在1个格子里怎么处理？这是下一节讨论的问题，貌似也只能解决两个形状差异比较大的目标挤在一个格子里的情况，如果形状像似，Anchor Boxes应该也搞不定。</p>
+<h1 id="3-8-Anchor-Boxes"><a href="#3-8-Anchor-Boxes" class="headerlink" title="3.8 Anchor Boxes"></a>3.8 Anchor Boxes</h1><p>Anchor Boxes用来解决两个对象落在一个格子里的情况，不过Anchor Boxes能解决的问题还是有一些局限，比如只能解决两个形状差异比较大的物体。<br>基本思想就是：事先预设两个形状差异比较大的格子，比如细高和短粗两种，在标注时将标注结果由原先<code>3×3×8</code>改成<code>3×3×16</code>：<br><img src="/2018/04/18/2018/0418DeepLearningAI13/img13.png" alt><br>CNN的网络结构和训练方法都不变。这个思想很容易理解，但是他为什么不能解决形状相似的两个目标在一个格子里的情况呢？我想原因是因为这种标注会让机器晕掉——两个对象高重合，人可能都难以分辨两个框分别对应的是哪个对象，机器就更难了。</p>
+<h1 id="3-9-YOLO算法"><a href="#3-9-YOLO算法" class="headerlink" title="3.9 YOLO算法"></a>3.9 YOLO算法</h1><p>本节从训练和预测两个环节介绍YOLO算法的流程。</p>
+<h1 id="3-10-（选修）RPN网络"><a href="#3-10-（选修）RPN网络" class="headerlink" title="3.10 （选修）RPN网络"></a>3.10 （选修）RPN网络</h1><h1 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h1>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/18/2018/0418DeepLearningAI12/" rel="next" title="DeepLearning.ai笔记（十）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（十）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/18/2018/0418DeepLearningAI14/" rel="prev" title="DeepLearning.ai笔记（十二）">
+                DeepLearning.ai笔记（十二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/04/18/2018/0418DeepLearningAI13/" data-title="DeepLearning.ai笔记（十一）" data-url="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI13/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#3-1-目标定位"><span class="nav-number">1.</span> <span class="nav-text">3.1 目标定位</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-2-特征点检测"><span class="nav-number">2.</span> <span class="nav-text">3.2 特征点检测</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-3-目标检测"><span class="nav-number">3.</span> <span class="nav-text">3.3 目标检测</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-4-卷积的滑动窗口实现"><span class="nav-number">4.</span> <span class="nav-text">3.4 卷积的滑动窗口实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-5-Bounding-Box预测"><span class="nav-number">5.</span> <span class="nav-text">3.5 Bounding Box预测</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-6-交并比"><span class="nav-number">6.</span> <span class="nav-text">3.6 交并比</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-7-非极大值抑制"><span class="nav-number">7.</span> <span class="nav-text">3.7 非极大值抑制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-8-Anchor-Boxes"><span class="nav-number">8.</span> <span class="nav-text">3.8 Anchor Boxes</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-9-YOLO算法"><span class="nav-number">9.</span> <span class="nav-text">3.9 YOLO算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-10-（选修）RPN网络"><span class="nav-number">10.</span> <span class="nav-text">3.10 （选修）RPN网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作业"><span class="nav-number">11.</span> <span class="nav-text">作业</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="深度探索Binder,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="调用服务接口前一篇博文讲的《查找服务》其实就是“调用服务接口”，因为服务的注册与查找正是ServiceManager提供的服务接口，尤其是查找服务，既有请求又有响应。在native层和驱动层已经走了非常完备的“调用服务接口”的流程。在这一篇中我们查漏补缺，仅探索前面没有涉及到的点。">
+<meta name="keywords" content="深度探索Binder">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度探索Binder（四）调用服务接口">
+<meta property="og:url" content="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder4/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="调用服务接口前一篇博文讲的《查找服务》其实就是“调用服务接口”，因为服务的注册与查找正是ServiceManager提供的服务接口，尤其是查找服务，既有请求又有响应。在native层和驱动层已经走了非常完备的“调用服务接口”的流程。在这一篇中我们查漏补缺，仅探索前面没有涉及到的点。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.725Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深度探索Binder（四）调用服务接口">
+<meta name="twitter:description" content="调用服务接口前一篇博文讲的《查找服务》其实就是“调用服务接口”，因为服务的注册与查找正是ServiceManager提供的服务接口，尤其是查找服务，既有请求又有响应。在native层和驱动层已经走了非常完备的“调用服务接口”的流程。在这一篇中我们查漏补缺，仅探索前面没有涉及到的点。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder4/">
+
+
+
+
+
+  <title>深度探索Binder（四）调用服务接口 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深度探索Binder（四）调用服务接口</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-07T23:28:01+08:00">
+                2016-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/07/2016/0807DissectingBinder4/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/07/2016/0807DissectingBinder4/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="调用服务接口"><a href="#调用服务接口" class="headerlink" title="调用服务接口"></a>调用服务接口</h1><p>前一篇博文讲的《查找服务》其实就是“调用服务接口”，因为服务的注册与查找正是ServiceManager提供的服务接口，尤其是查找服务，既有请求又有响应。在native层和驱动层已经走了非常完备的“调用服务接口”的流程。在这一篇中我们查漏补缺，仅探索前面没有涉及到的点。<br><a id="more"></a></p>
+<h2 id="获取ServiceManager-VS-获取普通Binder的代理"><a href="#获取ServiceManager-VS-获取普通Binder的代理" class="headerlink" title="获取ServiceManager VS 获取普通Binder的代理"></a>获取ServiceManager VS 获取普通Binder的代理</h2><p>Client端获取ServiceManager和获取普通Binder代理其实是一模一样的，这里的Client端是相对而言，通常所说的Client/Server是指Service的请求方和提供方，二者在请求ServiceManager服务的时候，又都是该服务的Client。<br>在讲注册服务<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#初始化sm">初始化sm</a>一节中，有如下代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/libs/binder/IServiceManager.cpp</span></span><br><span class="line"><span class="comment">// #33</span></span><br><span class="line">sp&lt;IServiceManager&gt; defaultServiceManager()</span><br><span class="line">&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    gDefaultServiceManager = interface_cast&lt;IServiceManager&gt;(</span><br><span class="line">        ProcessState::self()-&gt;getContextObject(<span class="literal">NULL</span>));  </span><br><span class="line">        ... ...</span><br><span class="line">    <span class="keyword">return</span> gDefaultServiceManager;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这是为了获取ServiceManager，在那一节中我们分析过<code>ProcessState::self()-&gt;getContextObject(NULL)</code>生成一个BpBinder(0)，<code>interface_cast&lt;IServiceManager&gt;()</code>把该对象交给BpServiceManager的构造函数产生一个BpServiceManager，再转型为IServiceManager。</p>
+<p>再看普通Binder代理的获取方式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TestClient.cpp:16</span></span><br><span class="line">sp &lt; IBinder &gt; binder = sm-&gt;getService(String16(<span class="string">"service.testservice"</span>));</span><br><span class="line">sp&lt;ITestService&gt; cs = interface_cast &lt; ITestService &gt; (binder);</span><br></pre></td></tr></table></figure></p>
+<p><code>sm-&gt;getService(...)</code>就是让驱动生成一个在本地唯一的整形数即handle，返回对象BpBinder(handle)，第二行把该对象交给BpTestService的构造函数，产生一个BpTestService，再转型为ITestService。</p>
+<p>二者的不同之处仅在于ServiceManager的handle是约定好的0，而普通Binder的handle是由驱动层分配的。</p>
+<h2 id="Client端如何把函数调用打包成数据"><a href="#Client端如何把函数调用打包成数据" class="headerlink" title="Client端如何把函数调用打包成数据"></a>Client端如何把函数调用打包成数据</h2><p>ServiceManager是怎么把函数调用打包成数据的？它的函数接口不多，定义在<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/include/binder/IServiceManager.h30</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IServiceManager</span> :</span> <span class="keyword">public</span> IInterface</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    DECLARE_META_INTERFACE(ServiceManager);</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">virtual</span> sp&lt;IBinder&gt;         getService( <span class="keyword">const</span> String16&amp; name) <span class="keyword">const</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">virtual</span> sp&lt;IBinder&gt;         checkService( <span class="keyword">const</span> String16&amp; name) <span class="keyword">const</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t            <span class="title">addService</span><span class="params">( <span class="keyword">const</span> String16&amp; name,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">const</span> sp&lt;IBinder&gt;&amp; service,</span></span></span><br><span class="line"><span class="function"><span class="params">                                            <span class="keyword">bool</span> allowIsolated = <span class="literal">false</span>)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">virtual</span> Vector&lt;String16&gt;    listServices() = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">enum</span> &#123;</span><br><span class="line">        GET_SERVICE_TRANSACTION = IBinder::FIRST_CALL_TRANSACTION,</span><br><span class="line">        CHECK_SERVICE_TRANSACTION,</span><br><span class="line">        ADD_SERVICE_TRANSACTION,</span><br><span class="line">        LIST_SERVICES_TRANSACTION,</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>四个虚函数就是ServiceManager提供的全部服务接口，每个函数对应一个枚举类型的变量，相当于给每个函数编了号。函数实现在<br><code>frameworks/natvie/libs/binder/IServiceManager.cpp:126</code>。<br>每个函数把自己对应的编号以及参数塞到Parcel对象里，写入binder文件，数据到了服务端再按照同样的编号解析，找到对应函数并执行。</p>
+<p>再来看客户端请求普通的服务接口：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TestClient.cpp</span></span><br><span class="line"><span class="keyword">void</span> BpTestService::test() &#123;</span><br><span class="line">    ... ...</span><br><span class="line">    Parcel data, reply;</span><br><span class="line">    data.writeInterfaceToken(ITestService::getInterfaceDescriptor());</span><br><span class="line">    remote()-&gt;transact(TEST, data, &amp;reply);</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>何其相似，TEST也是自定义的枚举变量，用来给每个函数编号。而且比较好的做法是只提供一份头文件，让Client端和Server端公用，这样才不容易产生歧义。</p>
+<h2 id="Server端如何把数据包拆解成函数调用"><a href="#Server端如何把数据包拆解成函数调用" class="headerlink" title="Server端如何把数据包拆解成函数调用"></a>Server端如何把数据包拆解成函数调用</h2><p>其实在《深度探索Binder（二）注册服务》的<a href="https://palanceli.github.io/2016/08/06/2016/0806DissectingBinder2/#循环内做了什么？">循环内做了什么</a>已经讲了一半：客户端对Service的请求被封装成数据包，其中最重要的数据就是Binder的handle、请求接口的编号以及参数。该数据包在驱动层会被修改，主要是根据handle找到对应的<code>binder_node</code>，并把handle字段替换成影子对象——binder以及binder对象——cookie。到了Server端则直接拿cookie提领出Binder对象：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/libs/binder/IPCThreadState.cpp:947</span></span><br><span class="line"><span class="keyword">status_t</span> IPCThreadState::executeCommand(<span class="keyword">int32_t</span> cmd)</span><br><span class="line">&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">case</span> BR_TRANSACTION:</span><br><span class="line">        &#123;</span><br><span class="line">            binder_transaction_data tr;</span><br><span class="line">            result = mIn.read(&amp;tr, <span class="keyword">sizeof</span>(tr));</span><br><span class="line">            ... ...</span><br><span class="line">            Parcel reply;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">if</span> (tr.target.ptr) &#123;</span><br><span class="line">                sp&lt;BBinder&gt; b((BBinder*)tr.cookie);</span><br><span class="line">                error = b-&gt;transact(tr.code, buffer, &amp;reply, tr.flags);</span><br><span class="line">            &#125; <span class="keyword">else</span> </span><br><span class="line">            ... ...</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// frameworks/native/libs/binder/Binder.cpp:97</span></span><br><span class="line"><span class="keyword">status_t</span> BBinder::transact(</span><br><span class="line">    <span class="keyword">uint32_t</span> code, <span class="keyword">const</span> Parcel&amp; data, Parcel* reply, <span class="keyword">uint32_t</span> flags)</span><br><span class="line">&#123;   <span class="comment">// code     TEST</span></span><br><span class="line">    data.setDataPosition(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err = NO_ERROR;</span><br><span class="line">    <span class="keyword">switch</span> (code) &#123;</span><br><span class="line">        <span class="keyword">case</span> PING_TRANSACTION:</span><br><span class="line">            reply-&gt;writeInt32(pingBinder());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            err = onTransact(code, data, reply, flags);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (reply != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        reply-&gt;setDataPosition(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>onTransact(...)</code>是一个虚函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BBinder</span> :</span> <span class="keyword">public</span> IBinder</span><br><span class="line">&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> status_t    <span class="title">onTransact</span><span class="params">( <span class="keyword">uint32_t</span> code,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">const</span> Parcel&amp; data,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    Parcel* reply,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    <span class="keyword">uint32_t</span> flags = <span class="number">0</span>)</span></span>;</span><br><span class="line">    ... ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>tr.cookie的值是在<code>addService</code>是添加的，它是在Server端<code>main()</code>函数中<code>new BnTestService()</code>的对象地址。所以在<code>IPCThreadState::executeCommand(...)</code>函数中尽管使用<code>BBinder</code>类型来提领，实际的内容仍然是个<code>BnTestService</code>对象。他继承自<code>BnInterface</code>，后者继承自<code>BBinder</code>，因此调用其虚函数<code>onTransact(...)</code>最终落地到<code>BnTestService::onTransact(...)</code>，该函数对定义在TestServer.cpp中，根据code的值调用对应的函数。</p>
+<p>作为Binder机制的使用者来说，要写的代码其实很简单：</p>
+<ul>
+<li>定义好服务接口以及编号。</li>
+<li>Server端定义服务的子类BnTestService，并覆盖虚函数<code>onTransact(...)</code>，实现每个服务接口。</li>
+<li>Client端定义服务的子类BpTestService，并实现每个服务接口的转发——将参数塞入Parcel，调用<code>remote()-&gt;transact(...)</code>把服务编号和参数发往Server端。</li>
+</ul>
+<h2 id="应用层的代码结构"><a href="#应用层的代码结构" class="headerlink" title="应用层的代码结构"></a>应用层的代码结构</h2><p>我们的测试程序共四个文件：</p>
+<ul>
+<li>Test.h    提供Client和Server公用的ITestService接口定义以及函数编号枚举定义</li>
+<li>TestClient.cpp    Client端代码，定义BpTestService</li>
+<li>TestServer.cpp    Server端代码，定义BnTestService</li>
+<li>ITestService.cpp    定义Server端基类ITestService中与业务逻辑无关的函数，可以用一条宏IMPLEMENT_META_INTERFACE替代所有代码，但为了方便调试，我把宏展开了。</li>
+</ul>
+<h2 id="testservice的调试"><a href="#testservice的调试" class="headerlink" title="testservice的调试"></a>testservice的调试</h2><p>最后再补充一点关于调试的碎碎念，目前我还只会用gdb/gdbserver来调试，每次调试都有一些固定的步骤，我把它们记录下来每次拷贝/粘贴就好了。</p>
+<h3 id="前期的准备工作："><a href="#前期的准备工作：" class="headerlink" title="前期的准备工作："></a>前期的准备工作：</h3><p>编译testservice：<br><code>$ mmm external/testservice</code> </p>
+<p>启动模拟器：<br><code>$ emulator&amp;</code>   </p>
+<p>把文件拷到模拟器的/data/local/tmp/testservice下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ adb push out/debug/target/product/generic/obj/EXECUTABLES/TestServer_intermediates/LINKED/TestServer /data/<span class="built_in">local</span>/tmp/testservice    </span><br><span class="line">$ adb push out/debug/target/product/generic/obj/EXECUTABLES/TestClient_intermediates/LINKED/TestClient /data/<span class="built_in">local</span>/tmp/testservice</span><br></pre></td></tr></table></figure></p>
+<p>赋予可执行权限：<br><code>$ adb shell chmod 755 /data/local/tmp/testservice/*</code></p>
+<h3 id="调试Client端"><a href="#调试Client端" class="headerlink" title="调试Client端"></a>调试Client端</h3><p>调试Client端代码最好同时开启三个终端：</p>
+<ul>
+<li>在模拟器上运行Server<br><code>$ adb shell /data/local/tmp/testservice/TestServer</code></li>
+<li>在模拟器上通过gdbserver运行客户端<br><code>$ adb shell gdbserver :1234 /data/local/tmp/testservice/TestClient</code></li>
+<li>在调试机上运行gdb<ul>
+<li>forward端口<br><code>$ adb forward tcp:1234 tcp:1234</code></li>
+<li>启动gdb<br>`$./prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-gdb out/debug/target/product/generic/obj/EXECUTABLES/TestClient_intermediates/LINKED/TestClient</li>
+<li>target端口<br><code>(gdb) target remote :1234</code></li>
+<li>调试吧<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(gdb) b main</span><br><span class="line">Breakpoint 1 at 0xb6f321fc: file external/testservice/TestClient.cpp, line 14.</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">... ...</span><br><span class="line">Breakpoint 1, main () at external/testservice/TestClient.cpp:14</span><br><span class="line">14  int <span class="function"><span class="title">main</span></span>() &#123;</span><br><span class="line">(gdb) <span class="built_in">set</span> solib-absolute-prefix out/debug/target/product/generic/symbols/</span><br><span class="line">Reading symbols from out/debug/target/product/generic/symbols/system/bin/linker...done.</span><br><span class="line">... ...</span><br><span class="line">(gdb) b IPCThreadState.cpp:730</span><br><span class="line">... ...</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>调试Server端和Client端没什么差别，只是需要用gdbserver跑Server程序。</p>
+<h3 id="调试ServiceManager"><a href="#调试ServiceManager" class="headerlink" title="调试ServiceManager"></a>调试ServiceManager</h3><p>偶尔也需要调试ServiceManager，跟调Client/Server都不太一样，通常至少要同时开四个终端</p>
+<ul>
+<li>在模拟器上运行Server<br><code>$ adb shell /data/local/tmp/testservice/TestServer</code></li>
+<li>找到ServiceManager的pid，并用gdbserver启动<br><code>$ adb shell ps |grep servicemanager</code><br><code>$ adb shell /data/local/tmp/gdbserver :1234 --attach &lt;servicemanager pid&gt;</code></li>
+<li>在调试机上运行gdb，第二个参数是端口号<br><code>$ gdbclient &lt;servicemanager pid&gt; 1234</code></li>
+<li>在第四个终端上运行Client，触发ServiceManager中要调试的逻辑<br><code>$ adb shell /data/local/tmp/testservice/TestClient</code></li>
+</ul>
+<p>也可以把一些反复、连续用到的命令写到gdb脚本中，在我的<a href="https://github.com/palanceli/androidex/blob/master/external-testservice/debug.gdb" target="_blank" rel="noopener">debug.gdb</a>中就是这类命令，把他们封装成函数。启动gdb后只需调用<br><code>(gdb) source ../androidex/external-testservice/debug.gdb</code><br>即可载入gdb脚本，然后直接敲入函数名如：<br><code>(gdb) common</code><br>即可直接执行。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/深度探索Binder/" rel="tag"># 深度探索Binder</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/07/2016/0807DissectingBinder3/" rel="next" title="深度探索Binder（三）查找服务">
+                <i class="fa fa-chevron-left"></i> 深度探索Binder（三）查找服务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/12/2016/0812macOS下NDK的安装/" rel="prev" title="macOS 下NDK的安装">
+                macOS 下NDK的安装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/08/07/2016/0807DissectingBinder4/" data-title="深度探索Binder（四）调用服务接口" data-url="http://palanceli.github.io/2016/08/07/2016/0807DissectingBinder4/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#调用服务接口"><span class="nav-number">1.</span> <span class="nav-text">调用服务接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#获取ServiceManager-VS-获取普通Binder的代理"><span class="nav-number">1.1.</span> <span class="nav-text">获取ServiceManager VS 获取普通Binder的代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Client端如何把函数调用打包成数据"><span class="nav-number">1.2.</span> <span class="nav-text">Client端如何把函数调用打包成数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Server端如何把数据包拆解成函数调用"><span class="nav-number">1.3.</span> <span class="nav-text">Server端如何把数据包拆解成函数调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用层的代码结构"><span class="nav-number">1.4.</span> <span class="nav-text">应用层的代码结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#testservice的调试"><span class="nav-number">1.5.</span> <span class="nav-text">testservice的调试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前期的准备工作："><span class="nav-number">1.5.1.</span> <span class="nav-text">前期的准备工作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试Client端"><span class="nav-number">1.5.2.</span> <span class="nav-text">调试Client端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试ServiceManager"><span class="nav-number">1.5.3.</span> <span class="nav-text">调试ServiceManager</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

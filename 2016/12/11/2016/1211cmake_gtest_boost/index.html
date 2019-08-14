@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="googletest CMake boost,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近参与一个跨平台协作的项目，其中的CMake、googletest的引入以及支撑层基础模块的组织形式，是我之前的项目里没有接触过的。很快我也需要组织一个类似的跨平台项目，所以趁这次参与，把相关的工具摸索一遍。">
+<meta name="keywords" content="googletest CMake boost">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CMake + gtest + boost">
+<meta property="og:url" content="http://palanceli.github.io/2016/12/11/2016/1211cmake_gtest_boost/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="最近参与一个跨平台协作的项目，其中的CMake、googletest的引入以及支撑层基础模块的组织形式，是我之前的项目里没有接触过的。很快我也需要组织一个类似的跨平台项目，所以趁这次参与，把相关的工具摸索一遍。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.786Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CMake + gtest + boost">
+<meta name="twitter:description" content="最近参与一个跨平台协作的项目，其中的CMake、googletest的引入以及支撑层基础模块的组织形式，是我之前的项目里没有接触过的。很快我也需要组织一个类似的跨平台项目，所以趁这次参与，把相关的工具摸索一遍。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/12/11/2016/1211cmake_gtest_boost/">
+
+
+
+
+
+  <title>CMake + gtest + boost | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/12/11/2016/1211cmake_gtest_boost/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CMake + gtest + boost</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-11T19:18:37+08:00">
+                2016-12-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/11/2016/1211cmake_gtest_boost/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/11/2016/1211cmake_gtest_boost/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近参与一个跨平台协作的项目，其中的CMake、googletest的引入以及支撑层基础模块的组织形式，是我之前的项目里没有接触过的。很快我也需要组织一个类似的跨平台项目，所以趁这次参与，把相关的工具摸索一遍。<a id="more"></a></p>
+<h1 id="用CMake实现跨平台项目配置"><a href="#用CMake实现跨平台项目配置" class="headerlink" title="用CMake实现跨平台项目配置"></a>用CMake实现跨平台项目配置</h1><p>以前在Windows下写代码就是用Visual Studio生成solution，并在里面配置，同时把solution文件上传svn，在macOS下则使用xcode做同样的事情。但如果一个项目需要跨平台协作，需要在Windows、Linux、macOS下同时编译，这种方式就有很大的问题：项目需要引入哪些模块、模块之间的依赖关系，要在各平台下的IDE工具里各自完成，但他们之间无法相互同步，这就引入了很多重复工作，并且不同平台下可能是不同的RD在负责，很容易带来不一致。</p>
+<p>这个时候就需要CMake出场了，它用来描述一个工程的组织形式，需要编译成可执行文件还是静态/动态库文件，各模块的编译选项、链接选项等等这些都是通过代码来实现的。CMake可以用这一套代码在各平台下生成指定IDE工具的工程文件，它支持的IDE包括Visual Studio、XCode、Makefiles、Eclipse等。</p>
+<p>其实以前仅在Windows下使用Visual Studio的时候，也会遇到一个项目需要编译成多种形式的情况，比如最常见的32位、64位各自的项目配置需要同步，更复杂一些的对于同一份代码要编译出不同的形式，比如要把正式版的exe中部分模块以DEBUG Lib库的形式编译给另一个exe以完成单元测试。以前我就是用VS生成多套项目配置，当项目大到有百十个模块，一旦某些模块之间的依赖关系或者编译、链接选项有变化时，就十分痛苦，同样的设置要做N遍。</p>
+<p>这都是CMake可以解决的问题。引入CMake以后，各IDE的工程文件就成了CMake的输出结果，因此只需要把CMakelists.txt上传svn，sln、xcodeproj之类工具相关的工程配置文件都不用再上传，每次生成就好了。</p>
+<h1 id="让模块真正成为积木"><a href="#让模块真正成为积木" class="headerlink" title="让模块真正成为积木"></a>让模块真正成为积木</h1><p>以前项目缺乏模块统一管理：A需要压缩，就下一份ziplib的代码放到工程里；B需要下载，再下一份libcurl；C也需要压缩，却不知道工程里已经有一份ziplib的代码，自己又弄了一套libzip过来，几年下来，工程混乱不堪，积重难返。</p>
+<p>理想的做法应该是在选型的时候，对基础模块作出评估，找到质量最高、最稳定的模块，放到公共模块池里，这个模块池是独立于业务项目的。业务项目文件里仅存放自己开发的代码，用一个脚本把需要的基础模块从公共模块池中check out出来，然后再用CMake生成sln文件。这样，一个项目可能包含百十个模块，可是仅在svn中管理自己的代码，这样可以大大减少SVN的体积。</p>
+<h1 id="让单元测试成为习惯"><a href="#让单元测试成为习惯" class="headerlink" title="让单元测试成为习惯"></a>让单元测试成为习惯</h1><p>这一点就不再多说了，以前我自己做过几个测试框架，针对不同特点的项目，曾经用C++、python做过各种自测机制。一个牛逼的开发，能够以一当十，除了高效，还要有高稳定性，不让测试整天追在屁股后头改bug。Googletest为此做了很不错的支撑。</p>
+<h1 id="坚决抵制闭门造车"><a href="#坚决抵制闭门造车" class="headerlink" title="坚决抵制闭门造车"></a>坚决抵制闭门造车</h1><p>在做项目的时候经常遇到对造车轮有瘾的人，如果这种人主导项目，那将是噩梦。今天的开源世界已经非常广阔且成熟，能针对需求找到最好的开源模块，把它吃透、应用到自己的项目当中绝对是开发能力的一部分。善于发现和使用优秀的开源项目好处多多，他们的设计、实现原理以及编码规范都能成为程序员之间沟通的标准协议。过去自己写的很多东西都能在开源世界里找到代替品，程序员每隔几年也应该升级一下自己大脑里的操作系统，把那些陈旧的东西永久删除，配备上最新的模块。</p>
+<p>其实boost也不是啥新东西了，我的项目里大部分模块有一个公共需求，就是命令行参数解析，当年很多开发都为此各自实现一套，导致各自能接收的参数格式都不统一。我当年是从Solaris里拆出来的getopt，改吧改吧实现出Windows版本。前天写个小代码遇到第一件事儿又是参数解析，发现其实boost的program options已经有很完备的实现了，立马放弃自己的破玩意，改投boost。</p>
+<h1 id="组织一个test项目"><a href="#组织一个test项目" class="headerlink" title="组织一个test项目"></a>组织一个test项目</h1><p>接下来就把这几个玩具怎么拼接在一起记录下来。我的代码结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sgdxtest/</span><br><span class="line">├── co.bat</span><br><span class="line">└── src</span><br><span class="line">    ├── CMakeLists.txt</span><br><span class="line">    └── main</span><br><span class="line">        └── program_options_unittest.cpp</span><br></pre></td></tr></table></figure></p>
+<h2 id="组织公共模块"><a href="#组织公共模块" class="headerlink" title="组织公共模块"></a>组织公共模块</h2><p>其中co.bat用于checkout公共模块，在本项目中就是googletest，其内容如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># co.bat</span></span><br><span class="line">svn co http://svn.xxx.com/svn/sgdxmodules/googletest-1.8.0 src/</span><br></pre></td></tr></table></figure></p>
+<p>执行了co.bat之后，代码树为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sgdxtest/</span><br><span class="line">├── co.bat</span><br><span class="line">└── src</span><br><span class="line">    ├── CMakeLists.txt</span><br><span class="line">    ├── googletest</span><br><span class="line">    │   └── ... ...</span><br><span class="line">    └── main</span><br><span class="line">        └── program_options_unittest.cpp</span><br></pre></td></tr></table></figure></p>
+<p>googletest是从github下载的稳定版本，放到自己的svn公共模块池里。</p>
+<h2 id="编写CMakeLists-txt"><a href="#编写CMakeLists-txt" class="headerlink" title="编写CMakeLists.txt"></a>编写CMakeLists.txt</h2><p>CMakeLists.txt的内容如下：<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION 3.7)</span><br><span class="line"></span><br><span class="line">project(SGDXTest)</span><br><span class="line"></span><br><span class="line">set(CMAKE_CXX_STANDARD 11)</span><br><span class="line">set(CMAKE_CXX_STANDARD_REQUIRED ON)</span><br><span class="line">message(STATUS <span class="string">"C++11 support has been enabled by default."</span>)</span><br><span class="line"></span><br><span class="line">set(Boost_USE_STATIC_LIBS ON)  <span class="comment"># 静态链接boost，并制定需要的lib库</span></span><br><span class="line">find_package(Boost 1.62.0 COMPONENTS program_options REQUIRED)</span><br><span class="line"></span><br><span class="line">if(NOT Boost_FOUND)</span><br><span class="line">  message(<span class="string">"未发现Boost!"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置googletest的include目录</span></span><br><span class="line">include_directories($&#123;PROJECT_SOURCE_DIR&#125;/googletest/<span class="keyword">include</span> $&#123;Boost_INCLUDE_DIRS&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加googletest子项目</span></span><br><span class="line">add_subdirectory($&#123;PROJECT_SOURCE_DIR&#125;/googletest)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定生成的可执行文件以及需要链接的库文件</span></span><br><span class="line">add_executable(sgdx_test $&#123;PROJECT_SOURCE_DIR&#125;/main/program_options_unittest.cpp)</span><br><span class="line">target_link_libraries(sgdx_test gtest gtest_main)</span><br><span class="line">target_link_libraries(sgdx_test $&#123;Boost_LIBRARIES&#125;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="编写TestCase"><a href="#编写TestCase" class="headerlink" title="编写TestCase"></a>编写TestCase</h2><p>program_options_unitest.cpp内容如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iterator&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;gtest/gtest.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;boost/program_options.hpp&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> boost_test&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> po = boost::program_options;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProgramOptionsTest</span> :</span> <span class="keyword">public</span> testing::Test&#123;</span><br><span class="line">        <span class="keyword">protected</span>:</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">SetUpTestCase</span><span class="params">()</span></span>&#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">TearDownTestCase</span><span class="params">()</span></span>&#123;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br><span class="line">TEST_F(ProgramOptionsTest, Test1)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="keyword">int</span> opt;</span><br><span class="line">        po::<span class="function">options_description <span class="title">desc</span><span class="params">(<span class="string">"Allowed options"</span>)</span></span>;</span><br><span class="line">        desc.add_options()</span><br><span class="line">        (<span class="string">"help,h"</span>, <span class="string">"product help message"</span>)</span><br><span class="line">        (<span class="string">"optimization_level"</span>, po::value&lt;<span class="keyword">int</span>&gt;(&amp;opt)-&gt;default_value(<span class="number">10</span>))</span><br><span class="line">        (<span class="string">"include-dir,I"</span>, po::value&lt; <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; &gt;(), <span class="string">"include path"</span>)</span><br><span class="line">        ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// a.out --optimization_level 2 -I"c:/boost/include", "gtest/include"</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">char</span>* argv[] = &#123;<span class="string">"a.out"</span>, <span class="string">"--optimization_level"</span>, <span class="string">"2"</span>, <span class="string">"-I"</span>, <span class="string">"c:/boost/include"</span>, <span class="string">"-I"</span>, <span class="string">"gtest/include"</span> &#125;;</span><br><span class="line">        <span class="keyword">int</span> argc = <span class="number">7</span>;</span><br><span class="line"></span><br><span class="line">        po::variables_map vm;</span><br><span class="line">        po::store(po::parse_command_line(argc, argv, desc), vm);</span><br><span class="line">        po::notify(vm);</span><br><span class="line"></span><br><span class="line">        ASSERT_EQ(vm.count(<span class="string">"help"</span>), <span class="number">0</span>);</span><br><span class="line">        ASSERT_EQ(vm.count(<span class="string">"optimization_level"</span>), <span class="number">1</span>);</span><br><span class="line">        ASSERT_EQ(vm[<span class="string">"optimization_level"</span>].as&lt;<span class="keyword">int</span>&gt;(), <span class="number">2</span>);</span><br><span class="line">        ASSERT_EQ(opt, <span class="number">2</span>);</span><br><span class="line">        ASSERT_EQ(vm.count(<span class="string">"include-dir"</span>), <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; vct = vm[<span class="string">"include-dir"</span>].as&lt; <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt; &gt;();</span><br><span class="line">        ASSERT_EQ(vct.size(), <span class="number">2</span>);</span><br><span class="line">        ASSERT_EQ(vct[<span class="number">0</span>], <span class="string">"c:/boost/include"</span>);</span><br><span class="line">        ASSERT_EQ(vct[<span class="number">1</span>], <span class="string">"gtest/include"</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>它写了一个用例，用于测试boost::program_options的用法，为了让代码能编译，需要安装boost。</p>
+<h2 id="安装boost"><a href="#安装boost" class="headerlink" title="安装boost"></a>安装boost</h2><p>在macOS下，安装boost非常简单，只需要执行<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install boost</span><br></pre></td></tr></table></figure></p>
+<p>即可。我试了在Windows下编译源码，也非常简单，只需要执行<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">booststrap.bat</span><br><span class="line">b2.exe</span><br></pre></td></tr></table></figure></p>
+<p>即可。</p>
+<h2 id="使用CMake生成工程文件"><a href="#使用CMake生成工程文件" class="headerlink" title="使用CMake生成工程文件"></a>使用CMake生成工程文件</h2><p>接下来即可使用CMake生成工程文件，我是在macOS下，然后使用make完成编译：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> sgdxtest/src</span><br><span class="line">$ mkdir build</span><br><span class="line">$ <span class="built_in">cd</span> build</span><br><span class="line">$ cmake ..</span><br><span class="line">$ make</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/googletest-CMake-boost/" rel="tag"># googletest CMake boost</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/27/2016/1127gtest/" rel="next" title="googletest在mac下的使用">
+                <i class="fa fa-chevron-left"></i> googletest在mac下的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/31/2016/1121ServiceStarting2/" rel="prev" title="Service启动过程学习笔记（二）——进程内绑定Service组件">
+                Service启动过程学习笔记（二）——进程内绑定Service组件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/12/11/2016/1211cmake_gtest_boost/" data-title="CMake + gtest + boost" data-url="http://palanceli.github.io/2016/12/11/2016/1211cmake_gtest_boost/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#用CMake实现跨平台项目配置"><span class="nav-number">1.</span> <span class="nav-text">用CMake实现跨平台项目配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#让模块真正成为积木"><span class="nav-number">2.</span> <span class="nav-text">让模块真正成为积木</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#让单元测试成为习惯"><span class="nav-number">3.</span> <span class="nav-text">让单元测试成为习惯</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#坚决抵制闭门造车"><span class="nav-number">4.</span> <span class="nav-text">坚决抵制闭门造车</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#组织一个test项目"><span class="nav-number">5.</span> <span class="nav-text">组织一个test项目</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#组织公共模块"><span class="nav-number">5.1.</span> <span class="nav-text">组织公共模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写CMakeLists-txt"><span class="nav-number">5.2.</span> <span class="nav-text">编写CMakeLists.txt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写TestCase"><span class="nav-number">5.3.</span> <span class="nav-text">编写TestCase</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装boost"><span class="nav-number">5.4.</span> <span class="nav-text">安装boost</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用CMake生成工程文件"><span class="nav-number">5.5.</span> <span class="nav-text">使用CMake生成工程文件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章会把附近图片的经纬度标到地图上。本章要点：  获取Google地图API key 显示Google地图 在Google地图上标注位置">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记三十四">
+<meta property="og:url" content="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章会把附近图片的经纬度标到地图上。本章要点：  获取Google地图API key 显示Google地图 在Google地图上标注位置">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/img04.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.175Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记三十四">
+<meta name="twitter:description" content="本章会把附近图片的经纬度标到地图上。本章要点：  获取Google地图API key 显示Google地图 在Google地图上标注位置">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记三十四 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记三十四</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T20:00:00+08:00">
+                2017-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/14/2017/1114AndroidProgrammingBNRG34/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/14/2017/1114AndroidProgrammingBNRG34/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章会把附近图片的经纬度标到地图上。<br>本章要点：</p>
+<ul>
+<li>获取Google地图API key</li>
+<li>显示Google地图</li>
+<li>在Google地图上标注位置<a id="more"></a>
+</li>
+</ul>
+<h1 id="获取地图API-key"><a href="#获取地图API-key" class="headerlink" title="获取地图API key"></a>获取地图API key</h1><p>使用Map API需要在AndroidManifest.xml文件中配置一个API key，该API key是用来证明此app已经获得了Google Map Service的授权。在<a href="https://developers.google.com/maps/documentation/" target="_blank" rel="noopener">《Google Maps API》</a>有官方说明。具体操作步骤可以follow AndroidStudio的指示，包名右键 &gt; New &gt; Activity &gt; Gallery<br><img src="/2017/11/14/2017/1114AndroidProgrammingBNRG34/img01.png" alt><br>选择Google Maps Activity：<br><img src="/2017/11/14/2017/1114AndroidProgrammingBNRG34/img02.png" alt><br>这会生成<code>MapsActivity.java</code>和<code>google_maps_api.xml</code>两个文件，打开后者：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    <span class="doctag">TODO:</span> Before you run your application, you need a Google Maps API key.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    To get one, follow this link, follow the directions and press "Create" at the end:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&amp;keyType=CLIENT_SIDE_ANDROID&amp;r=84:99:B8:6F:79:C0:48:5E:A0:3D:F5:2B:3A:E3:EC:ED:A3:BE:A6:A8%3Bcom.bnrg.locatr</span></span><br><span class="line"><span class="comment">    ...</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">"google_maps_key"</span> <span class="attr">templateMergeStrategy</span>=<span class="string">"preserve"</span> </span></span><br><span class="line"><span class="tag">    <span class="attr">translatable</span>=<span class="string">"false"</span>&gt;</span>AIzaSyBFYVpfsIF7k4MJa3vxDHZDpbmKNS9UPxA<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>按照提示生成<code>API密钥</code>，将其填入<code>google_maps_key</code>，注意要设置<code>密钥限制</code>为<code>Android应用</code>。我在运行的时候还是出现了如下错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">E/Google Maps Android API: Authorization failure.  </span><br><span class="line">    Please see https://developers.google.com/maps/documentation/android-api/start for how to correctly set up the map.</span><br><span class="line">E/Google Maps Android API: In the Google Developer Console (https://console.developers.google.com)</span><br><span class="line">    Ensure that the &quot;Google Maps Android API v2&quot; is enabled.</span><br><span class="line">    Ensure that the following Android Key exists:</span><br><span class="line">    API Key: xxxxxx</span><br><span class="line">    Android Application (&lt;cert_fingerprint&gt;;&lt;package_name&gt;):xx:xx:xx:xx....;com.bnrg.locatr</span><br></pre></td></tr></table></figure></p>
+<p>可以将提示中指出的证书指纹和包名添加到服务端即可：<br><img src="/2017/11/14/2017/1114AndroidProgrammingBNRG34/img03.png" alt></p>
+<blockquote>
+<p>书中提到：引入MapsActivity会自动添加依赖<code>com.google.android.gms:pla-services</code>，这玩意儿会带来巨大的代码量，导致method limit爆表。因为Android app支持的最大方法数是65536个，如果要多于这个方法数，就必须使用multidex。本节给出的方法是在app/build.gradle中删除<code>compile &#39;com.google.android.gms:play.services:11.6.0&#39;</code>。但是我在引入MapsActivity之后并没有在gradle文件中找到这么一行。</p>
+</blockquote>
+<h1 id="显示地图"><a href="#显示地图" class="headerlink" title="显示地图"></a>显示地图</h1><p>可以使用<code>MapView</code>来显示地图，使用它和普通的View最大的差别在于：必须要把所有生命周期回调函数转发给它，例如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    ...</span><br><span class="line">    mMapView.onCreate(savedInstanceState);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>好烦！可以使用<code>SupportMapFragment</code>让它完成这些转发，我们要做的只是让我们的Fragment成为它的子类即可，<code>SupportMapFragment</code>内部维护着一个MapView实例。</p>
+<h2 id="从Flickr获取返回的位置数据"><a href="#从Flickr获取返回的位置数据" class="headerlink" title="从Flickr获取返回的位置数据"></a>从Flickr获取返回的位置数据</h2><p>在前一节中，请求Flickr数据时，会带上当前所在位置：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">buildUrl</span><span class="params">(Location location)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ENDPOINT.buildUpon()</span><br><span class="line">                .appendQueryParameter(<span class="string">"method"</span>, SEARCH_METHOD)</span><br><span class="line">                .appendQueryParameter(<span class="string">"lat"</span>, <span class="string">""</span> + location.getLatitude())   </span><br><span class="line">                .appendQueryParameter(<span class="string">"lon"</span>, <span class="string">""</span> + location.getLongitude())</span><br><span class="line">                .build().toString();    <span class="comment">// lat和lon为当前位置</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在还需要告诉服务器端：请在返回数据中包含每张图片所在的位置：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Uri ENDPOINT = Uri.parse(<span class="string">"https://api.flickr.com/services/rest/"</span>)</span><br><span class="line">            .buildUpon()</span><br><span class="line">            .appendQueryParameter(<span class="string">"api_key"</span>, API_KEY)</span><br><span class="line">            .appendQueryParameter(<span class="string">"format"</span>, <span class="string">"json"</span>)</span><br><span class="line">            .appendQueryParameter(<span class="string">"nojsoncallback"</span>, <span class="string">"1"</span>)</span><br><span class="line">            .appendQueryParameter(<span class="string">"extras"</span>, <span class="string">"url_s,geo"</span>)  <span class="comment">// geo要求返回图片位置</span></span><br><span class="line">            .build();</span><br></pre></td></tr></table></figure></p>
+<p>当请求收到应答数据后，解析并获取图片的位置信息：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parseItems</span><span class="params">(List&lt;GalleryItem&gt; items, JSONObject jsonBody)</span>...</span>&#123;</span><br><span class="line">        JSONObject photosJsonObject = jsonBody.getJSONObject(<span class="string">"photos"</span>);</span><br><span class="line">        JSONArray photoJsonArray = photosJsonObject.getJSONArray(<span class="string">"photo"</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;photoJsonArray.length(); i++)&#123;</span><br><span class="line">            JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);</span><br><span class="line">            GalleryItem item = <span class="keyword">new</span> GalleryItem();</span><br><span class="line">            ...</span><br><span class="line">            item.setLat(photoJsonObject.getDouble(<span class="string">"latitude"</span>));</span><br><span class="line">            item.setLon(photoJsonObject.getDouble(<span class="string">"longitude"</span>));</span><br><span class="line">            items.add(item);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>把前面的机制层串在一起：带着当前位置请求Flickr，得到距离当前位置最近的item，并获取图片：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">SearchTask</span> <span class="keyword">extends</span> <span class="title">AsyncTask</span>&lt;<span class="title">Location</span>, <span class="title">Void</span>, <span class="title">Void</span>&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> GalleryItem mGalleryItem;</span><br><span class="line">        <span class="keyword">private</span> Bitmap mBitmap;</span><br><span class="line">        <span class="keyword">private</span> Location mLocation;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> Void <span class="title">doInBackground</span><span class="params">(Location ... params)</span></span>&#123;</span><br><span class="line">            mLocation = params[<span class="number">0</span>]; <span class="comment">// 传入的当前位置</span></span><br><span class="line">            FlickrFetchr fetchr = <span class="keyword">new</span> FlickrFetchr();</span><br><span class="line">            List&lt;GalleryItem&gt; items = fetchr.searchPhotos(params[<span class="number">0</span>]);</span><br><span class="line">            ...</span><br><span class="line">            mGalleryItem = items.get(<span class="number">0</span>); <span class="comment">// 离当前位置最近的item</span></span><br><span class="line">            <span class="keyword">try</span>&#123; <span class="comment">// 获取最近的item包含的图片</span></span><br><span class="line">                <span class="keyword">byte</span>[] bytes = fetchr.getUrlBytes(mGalleryItem.getUrl());</span><br><span class="line">                mBitmap = BitmapFactory.decodeByteArray(bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">            &#125;...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostExecute</span><span class="params">(Void result)</span></span>&#123;</span><br><span class="line">            <span class="comment">// 将成功下载到的数据更新给宿主类LocatrFragment</span></span><br><span class="line">            mMapImage = mBitmap;</span><br><span class="line">            mMapItem = mGalleryItem;</span><br><span class="line">            mCurrentLocation = mLocation; </span><br><span class="line">            updateUI();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="显示地图并标注位置"><a href="#显示地图并标注位置" class="headerlink" title="显示地图并标注位置"></a>显示地图并标注位置</h2><p><code>SupportMapFragment</code>内部维护一个<code>MapView</code>实例，但要想提领到该实例，需要使用异步函数<code>getMapAsync(...)</code>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// LocatrFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocatrFragment</span> <span class="keyword">extends</span> <span class="title">SupportMapFragment</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        getMapAsync(<span class="keyword">new</span> OnMapReadyCallback() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onMapReady</span><span class="params">(GoogleMap googleMap)</span> </span>&#123;</span><br><span class="line">                mMap = googleMap; <span class="comment">// ① 当得到ViewMap的实例，会通过回调赋给mMap。</span></span><br><span class="line">                updateUI(); <span class="comment">// ②a</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">SearchTask</span> <span class="keyword">extends</span> <span class="title">AsyncTask</span>&lt;<span class="title">Location</span>, <span class="title">Void</span>, <span class="title">Void</span>&gt;</span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostExecute</span><span class="params">(Void result)</span></span>&#123;</span><br><span class="line">            mMapImage = mBitmap;</span><br><span class="line">            mMapItem = mGalleryItem;</span><br><span class="line">            mCurrentLocation = mLocation;</span><br><span class="line">            updateUI(); <span class="comment">// ②b</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">updateUI</span><span class="params">()</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        LatLng itemPoint = <span class="keyword">new</span> LatLng(mMapItem.getLat(),</span><br><span class="line">                mMapItem.getLon()); <span class="comment">// 附近图片经纬度</span></span><br><span class="line">        LatLng myPoint = <span class="keyword">new</span> LatLng(mCurrentLocation.getLatitude(),</span><br><span class="line">                mCurrentLocation.getLongitude()); <span class="comment">// 当前所在经纬度</span></span><br><span class="line"></span><br><span class="line">        BitmapDescriptor itemBitmap =</span><br><span class="line">                BitmapDescriptorFactory.fromBitmap(mMapImage);</span><br><span class="line">        MarkerOptions itemMarker = <span class="keyword">new</span> MarkerOptions()</span><br><span class="line">                .position(itemPoint)</span><br><span class="line">                .icon(itemBitmap); <span class="comment">// 附近图片直接显示在地图上</span></span><br><span class="line">        MarkerOptions myMarker = <span class="keyword">new</span> MarkerOptions()</span><br><span class="line">                .position(myPoint); <span class="comment">// 当前所在经纬度显示图钉</span></span><br><span class="line">        mMap.clear();</span><br><span class="line">        mMap.addMarker(itemMarker);</span><br><span class="line">        mMap.addMarker(myMarker);   <span class="comment">// ③添加定位点</span></span><br><span class="line"></span><br><span class="line">        LatLngBounds bounds = <span class="keyword">new</span> LatLngBounds.Builder()</span><br><span class="line">                .include(itemPoint)</span><br><span class="line">                .include(myPoint)</span><br><span class="line">                .build();           <span class="comment">// ④</span></span><br><span class="line">        <span class="keyword">int</span> margin = getResources().getDimensionPixelOffset(</span><br><span class="line">                R.dimen.map_inset_margin); <span class="comment">// ⑤</span></span><br><span class="line">        CameraUpdate update =</span><br><span class="line">                CameraUpdateFactory.newLatLngBounds(bounds, margin);</span><br><span class="line">        mMap.animateCamera(update); <span class="comment">// ⑥</span></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>②当初始化完成或者当下到新的附近图片的信息，将刷新地图界面。<br>③在地图上添加两个定位点，一个是当前位置，用图钉表示；另一个是附近图片，直接在对应位置上显示图片。<br>④构造一个LatLngBounds实例，它的作用是圈定地图显示的范围，可以把你关心的点include到LatLngBounds里，<code>build()</code>会生成包含这些点的矩形区域。<br>⑤指定LatLngBounds区域距离MapView的边距。④和⑤共同组成了地图当前显示的位置和比例尺。<br>⑥可以通过两种方式更新地图：<code>moveCamera(CameraUpdate)</code>或<code>animateCamera(CameraUpdate)</code></p>
+<p>运行后的结果如下：<br><img src="/2017/11/14/2017/1114AndroidProgrammingBNRG34/img04.png" alt><br>可以在模拟器的Extended control中设置当前位置。宇宙中心的经纬度是：东经116.332°, 北纬39.993°。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/13/2017/1113AndroidProgrammingBNRG33/" rel="next" title="《Android Programming BNRG》笔记三十三">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记三十三
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/15/2017/1115AndroidProgrammingBNRG35/" rel="prev" title="《Android Programming BNRG》笔记三十五">
+                《Android Programming BNRG》笔记三十五 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/11/14/2017/1114AndroidProgrammingBNRG34/" data-title="《Android Programming BNRG》笔记三十四" data-url="http://palanceli.github.io/2017/11/14/2017/1114AndroidProgrammingBNRG34/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#获取地图API-key"><span class="nav-number">1.</span> <span class="nav-text">获取地图API key</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#显示地图"><span class="nav-number">2.</span> <span class="nav-text">显示地图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从Flickr获取返回的位置数据"><span class="nav-number">2.1.</span> <span class="nav-text">从Flickr获取返回的位置数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#显示地图并标注位置"><span class="nav-number">2.2.</span> <span class="nav-text">显示地图并标注位置</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

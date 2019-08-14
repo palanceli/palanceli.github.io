@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章添加了新的Activity，用于显示作弊界面。由原来的Activity可以跳转到新界面，并在两个Activity之间可以传递数据。本章要点：  添加Activity，并为之生成布局 从一个Activity跳转到另一个Activity 在两个Activity之间传递数据">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记五">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章添加了新的Activity，用于显示作弊界面。由原来的Activity可以跳转到新界面，并在两个Activity之间可以传递数据。本章要点：  添加Activity，并为之生成布局 从一个Activity跳转到另一个Activity 在两个Activity之间传递数据">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img08.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.080Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记五">
+<meta name="twitter:description" content="本章添加了新的Activity，用于显示作弊界面。由原来的Activity可以跳转到新界面，并在两个Activity之间可以传递数据。本章要点：  添加Activity，并为之生成布局 从一个Activity跳转到另一个Activity 在两个Activity之间传递数据">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记五 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记五</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-16T23:00:00+08:00">
+                2017-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG05/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/16/2017/1016AndroidProgrammingBNRG05/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章添加了新的Activity，用于显示作弊界面。由原来的Activity可以跳转到新界面，并在两个Activity之间可以传递数据。<br>本章要点：</p>
+<ul>
+<li>添加Activity，并为之生成布局</li>
+<li>从一个Activity跳转到另一个Activity</li>
+<li>在两个Activity之间传递数据</li>
+</ul>
+<a id="more"></a>
+<h1 id="怎样添加Activity"><a href="#怎样添加Activity" class="headerlink" title="怎样添加Activity"></a>怎样添加Activity</h1><p>在Android视图中，找到java/&lt;包名&gt; 右键 &gt; New &gt; Activity &gt; Empty Activity：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img01.png" alt><br>在弹出的面板中填写Activity Name<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img02.png" alt><br>点击完成。该步骤：</p>
+<ol>
+<li>生成两个文件：activity_cheat.xml布局文件，CheatActivity.java代码文件</li>
+<li>修改AndroidManifest.xml文件，在其中添加CheatActivity</li>
+</ol>
+<h2 id="添加Activity后AndroidManifest文件的改动"><a href="#添加Activity后AndroidManifest文件的改动" class="headerlink" title="添加Activity后AndroidManifest文件的改动"></a>添加Activity后AndroidManifest文件的改动</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">"com.palanceli.ime.bnrg01"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span></span></span><br><span class="line"><span class="tag">        <span class="attr">...</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:theme</span>=<span class="string">"@style/AppTheme"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".QuizActivity"</span>&gt;</span></span><br><span class="line">            ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 会在这里插入新activity --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".CheatActivity"</span>&gt;</span><span class="tag">&lt;/<span class="name">activity</span>&gt;</span> </span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>activity的必填属性是android:name，其值由<code>.</code>开头，表示它的包名和manifest的package相同。</p>
+<h2 id="如何预览横竖屏布局"><a href="#如何预览横竖屏布局" class="headerlink" title="如何预览横竖屏布局"></a>如何预览横竖屏布局</h2><p>找到预览视图左上角的屏幕旋转标志，点开选择Portrait或Landscape：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img03.png" alt></p>
+<h1 id="tools-text属性"><a href="#tools-text属性" class="headerlink" title="tools:text属性"></a>tools:text属性</h1><p>在xml布局文件中，可以为widget添加tools属性，它可以用于覆盖widget的任何属性，使得widget在Android Studio预览时的性质发生变化。例如：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/answer_text_view"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:padding</span>=<span class="string">"24dp"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">tools:text</span>=<span class="string">"Answer"</span></span></span><br><span class="line"><span class="tag">    /&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>该TextView的内容是在运行时设置，因此不会给它的<code>android:text</code>定义默认值，但是可以定义<code>tools:text</code>，这样在Android Studio预览时，它就会显示为Answer。</p>
+<h1 id="启动一个Activity"><a href="#启动一个Activity" class="headerlink" title="启动一个Activity"></a>启动一个Activity</h1><p>通过调用Activity的startActivity(Intent intent)函数，可以启动另一个Activity：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img04.png" alt><br>这个调用会将启动Activity的请求发送到ActivityManager，由ActivityManager创建新Activity并调用它的onCreate(Bundle)函数，这个过程在之前分析安卓源码的时候已经走查过了。结合本章的例子，过程如下：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img05.png" alt><br>代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mCheatButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">        Intent intent = <span class="keyword">new</span> Intent(QuizActivity.<span class="keyword">this</span>, CheatActivity.class);</span><br><span class="line">        startActivity(intent);	<span class="comment">// 启动intent中指定的Activity</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>Intent构造函数的原型为：<br><code>public Intent(Context packageContext, Class&lt;?&gt; cls)</code>，其中Context告诉ActivityManager在哪个package中找到Activity类；cls指定该Activity类。</p>
+<h2 id="启动本应用内的Activity的要求"><a href="#启动本应用内的Activity的要求" class="headerlink" title="启动本应用内的Activity的要求"></a>启动本应用内的Activity的要求</h2><p>在启动activity之前，ActivityManager会检查包里的manifest文件，是否声明了该类名的activity，如果没有声明，会抛出ActivityNotFoundException异常。因此，如果你想让你的app启动某个activity，必须在manifest文件中声明它。</p>
+<p>关于显式和隐式Intent，本节只是提了一笔。显式Intent用于启动应用内的activity，隐式Intent则用于跨进程启动Activity，在以后的章节会有介绍。</p>
+<p>个人觉得这本书写得太散，一个概念或主题往往提出来而不讲透，需要拉扯到后面再来补充，这一点比iOS行文要差。</p>
+<h1 id="如何在Activity间传递数据"><a href="#如何在Activity间传递数据" class="headerlink" title="如何在Activity间传递数据"></a>如何在Activity间传递数据</h1><p>包含两种情况：1、向启动的Activity传递数据；2、启动的Activity向发起者返回数据。</p>
+<h2 id="向启动的Activity传递数据"><a href="#向启动的Activity传递数据" class="headerlink" title="向启动的Activity传递数据"></a>向启动的Activity传递数据</h2><p>一、发起方调用Intent::putExtra(…)，向Intent中写入Extra。Extra是一个key-value对，是在Intent中夹带的数据，用于在Activity间传递。</p>
+<p>本章中的例子是QuizActivity启动了CheatActivity，本应在QuizActivity中创建Intent，写入Extra，再传入startActivity(Intent)，但这种做法的复用性不好，因为可能还有别的Activity启动CheatActivity，那就需要在别的Activity里再写一遍同样的代码咯？</p>
+<p>比较好的做法是把Intent的创建作为静态函数封装到CheatActivity里，代码如下。<br>在本节的业务逻辑中，QuizActivity会告诉CheatActivity当前问题的答案是True还是False，由CheatActivity负责把该结果显示出来。因此需要在Intent中传入answerIsTrue参数。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CheatActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String EXTRA_ANSWER_IS_TURE = <span class="string">"com.palanceli.ime.bnrg01.answer_is_true"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 根据参数创建Intent</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Intent <span class="title">newIntent</span><span class="params">(Context packageContext, <span class="keyword">boolean</span> answerIsTrue)</span></span>&#123;</span><br><span class="line">        Intent intent = <span class="keyword">new</span> Intent(packageContext, CheatActivity.class);</span><br><span class="line">        intent.putExtra(EXTRA_ANSWER_IS_TURE, answerIsTrue);</span><br><span class="line">        <span class="keyword">return</span> intent;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在QuizActivity启动CheatActivity时调用该函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> Button mCheatButton;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        mCheatButton = (Button)findViewById(R.id.cheat_button);</span><br><span class="line">        mCheatButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">                <span class="comment">// 创建Intent，启动Activity</span></span><br><span class="line">                <span class="keyword">boolean</span> answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();</span><br><span class="line">                Intent intent = CheatActivity.newIntent(QuizActivity.<span class="keyword">this</span>, answerIsTrue);</span><br><span class="line">                startActivity(intent);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    updateQuestion();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>二、被启动的Activity在其onCreate(Bundle)中通过Intent::getxxxExtra(…)接收数据，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CheatActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String EXTRA_ANSWER_IS_TURE = <span class="string">"com.palanceli.ime.bnrg01.answer_is_true"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mAnswerIsTrue;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TURE, <span class="keyword">false</span>);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Activity::getIntent()返回该activity启动时传入的Intent。</p>
+<h2 id="从启动的Activity返回数据"><a href="#从启动的Activity返回数据" class="headerlink" title="从启动的Activity返回数据"></a>从启动的Activity返回数据</h2><p>如果需要从启动的Activity中获取返回数据需要完成如下步骤：<br>一、启动Activity时调用Activity的成员函数<br><code>public void startActivityForResult(Intent intent, int requestCode)</code><br>第一个参数含义同<code>public void startActivityForResult(Intent intent)</code>版本，<br>第二个参数是给被启动的activity绑定了一个id，这在Activity启动多个activity时比较有用，通过这个requestCode来区分返回值来自哪个activity</p>
+<p>二、在被启动的activity结束时设置返回值，调用的函数有两种形式：<br><code>public final void setResult(int resultCode)</code><br><code>public final void setResult(int resultCode, Intent data)</code><br>第一个版本可以返回一个简单的数字，如<code>Activity.RESULT_OK</code>或<code>Activity.RESULT_CANCELED</code>或基于<code>Activity.RESULT_FIRST_USER</code>的累加值；<br>第二个版本还可以追加一个Intent参数。</p>
+<p>三、被启动的Activity通过Back返回后，父Activity会收到回调：<br><code>protected void onActivityResult(int requestCode, int resultCode, Intent data)</code><br>其中requestCode是在启动时传入的requestCode，后两个参数是子Activity调用<code>setResult(...)</code>时传入的两个参数，即返回值信息。</p>
+<p>下图给出了整个过程的时序：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img06.png" alt></p>
+<p>具体代码如下：<br>一、在QuizActivity.java中启动activity时要求有返回值<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST_CODE_CHEAT = <span class="number">0</span>; <span class="comment">// 定义requestCode</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mIsCheater;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        mCheatButton = (Button)findViewById(R.id.cheat_button);</span><br><span class="line">        mCheatButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">                <span class="keyword">boolean</span> answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();</span><br><span class="line">                Intent intent = CheatActivity.newIntent(QuizActivity.<span class="keyword">this</span>, answerIsTrue);</span><br><span class="line">                <span class="comment">// 启动Activity，要求返回值</span></span><br><span class="line">                startActivityForResult(intent, REQUEST_CODE_CHEAT);  </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        updateQuestion();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>二、在CheatActivity.java中回传返回值<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CheatActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String EXTRA_ANSWER_SHOW = <span class="string">"com.palanceli.ime.bnrg01.answer_show"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        mShowAnswerButton = (Button)findViewById(R.id.show_answer_button);</span><br><span class="line">        mShowAnswerButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(mAnswerIsTrue)</span><br><span class="line">                    mAnswerTextView.setText(R.string.true_button);</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    mAnswerTextView.setText(R.string.false_button);</span><br><span class="line">                setAnswerShowResult(<span class="keyword">true</span>);  <span class="comment">// 生成回传数据</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setAnswerShowResult</span><span class="params">(<span class="keyword">boolean</span> isAnswerShown)</span></span>&#123;</span><br><span class="line">        <span class="comment">// 组织回传Intent数据</span></span><br><span class="line">        Intent data = <span class="keyword">new</span> Intent();</span><br><span class="line">        data.putExtra(EXTRA_ANSWER_SHOW, isAnswerShown);</span><br><span class="line">        setResult(RESULT_OK, data);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 解析回传数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">wasAnswerShown</span><span class="params">(Intent result)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> result.getBooleanExtra(EXTRA_ANSWER_SHOW, <span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>和“向启动的activity传递数据”类似，数据的组织在CheatActivity中完成，这样便于代码复用，未来方便CheatActivity向更多的Activity返回数据。<code>wasAnswerShown(...)</code>负责解析Intent。<br>三、启动方QuizActivity.java接收回传数据<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST_CODE_CHEAT = <span class="number">0</span>; <span class="comment">// 定义requestCode</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mIsCheater;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(resultCode != RESULT_OK)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span>(requestCode == REQUEST_CODE_CHEAT)&#123;</span><br><span class="line">            <span class="keyword">if</span>(data == <span class="keyword">null</span>)</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            <span class="comment">// 如果有回传数据，则接收解析</span></span><br><span class="line">            mIsCheater = CheatActivity.wasAnswerShown(data);</span><br><span class="line">            <span class="keyword">if</span>(mIsCheater)</span><br><span class="line">                Log.d(TAG, <span class="string">"mIsCheater=1"</span>);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                Log.d(TAG, <span class="string">"mIsCheater=0"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="点击了app图标后，系统做了什么"><a href="#点击了app图标后，系统做了什么" class="headerlink" title="点击了app图标后，系统做了什么"></a>点击了app图标后，系统做了什么</h1><p>之前在分析Android源码时已经深入了解过，当点击app图标后，OS并不直接启动应用进程，而是启动该应用的launcher activity。在AndroidManifest.xml中有定义该app的launcher activity：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span>  <span class="attr">...</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".QuizActivity"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.MAIN"</span> /&gt;</span></span><br><span class="line">                <span class="comment">&lt;!-- launcher activity --&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">"android.intent.category.LAUNCHER"</span> /&gt;</span> </span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>启动该Activity后，可以通过它上面的按钮再启动新的Activity。每一个activity，点击Back后都会被Destroy。系统中的activity的启动和退出是一个进栈/出栈的过程，系统所有应用共享同一个栈。因此当在桌面上启动app，再back后露出的是桌面；在launcher里启动app，再back后露出的是launcher。</p>
+<p><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img07.png" alt><br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG05/img08.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG04/" rel="next" title="《Android Programming BNRG》笔记四">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记四
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/17/2017/1017AndroidProgrammingBNRG06/" rel="prev" title="《Android Programming BNRG》笔记六">
+                《Android Programming BNRG》笔记六 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/16/2017/1016AndroidProgrammingBNRG05/" data-title="《Android Programming BNRG》笔记五" data-url="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG05/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#怎样添加Activity"><span class="nav-number">1.</span> <span class="nav-text">怎样添加Activity</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#添加Activity后AndroidManifest文件的改动"><span class="nav-number">1.1.</span> <span class="nav-text">添加Activity后AndroidManifest文件的改动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何预览横竖屏布局"><span class="nav-number">1.2.</span> <span class="nav-text">如何预览横竖屏布局</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#tools-text属性"><span class="nav-number">2.</span> <span class="nav-text">tools:text属性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动一个Activity"><span class="nav-number">3.</span> <span class="nav-text">启动一个Activity</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#启动本应用内的Activity的要求"><span class="nav-number">3.1.</span> <span class="nav-text">启动本应用内的Activity的要求</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何在Activity间传递数据"><span class="nav-number">4.</span> <span class="nav-text">如何在Activity间传递数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#向启动的Activity传递数据"><span class="nav-number">4.1.</span> <span class="nav-text">向启动的Activity传递数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从启动的Activity返回数据"><span class="nav-number">4.2.</span> <span class="nav-text">从启动的Activity返回数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#点击了app图标后，系统做了什么"><span class="nav-number">5.</span> <span class="nav-text">点击了app图标后，系统做了什么</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

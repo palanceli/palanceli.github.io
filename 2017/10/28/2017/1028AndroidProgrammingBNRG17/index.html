@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章创建了适配tablet的界面布局——在phone下默认是list，点击item后展现detail；在tablet下是list|detail双视图模式。本章要点：  为资源创建别名 为不同尺寸的屏幕创建不同的布局">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记十七">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章创建了适配tablet的界面布局——在phone下默认是list，点击item后展现detail；在tablet下是list|detail双视图模式。本章要点：  为资源创建别名 为不同尺寸的屏幕创建不同的布局">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.129Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记十七">
+<meta name="twitter:description" content="本章创建了适配tablet的界面布局——在phone下默认是list，点击item后展现detail；在tablet下是list|detail双视图模式。本章要点：  为资源创建别名 为不同尺寸的屏幕创建不同的布局">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/img04.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记十七 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记十七</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-28T20:00:00+08:00">
+                2017-10-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/28/2017/1028AndroidProgrammingBNRG17/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/28/2017/1028AndroidProgrammingBNRG17/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章创建了适配tablet的界面布局——在phone下默认是list，点击item后展现detail；在tablet下是list|detail双视图模式。<br><img src="/2017/10/28/2017/1028AndroidProgrammingBNRG17/img04.png" alt><br>本章要点：</p>
+<ul>
+<li>为资源创建别名</li>
+<li>为不同尺寸的屏幕创建不同的布局<a id="more"></a>
+</li>
+</ul>
+<h1 id="使用资源别名"><a href="#使用资源别名" class="headerlink" title="使用资源别名"></a>使用资源别名</h1><p>在<code>res/values右键</code> &gt; <code>New</code> &gt; <code>Values Resource File</code>：<br><img src="/2017/10/28/2017/1028AndroidProgrammingBNRG17/img01.png" alt><br>创建文件<code>res/values/refs.xml</code>如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"activity_masterdetail"</span> </span></span><br><span class="line"><span class="tag">    <span class="attr">type</span>=<span class="string">"layout"</span>&gt;</span>@layout/activity_fragment<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>这就为<code>R.layout.activity_fragment</code>创建了一个别名<code>R.layout.activity_masterdetail</code>，原先使用前者的地方，现在可以直接使用后者：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListActivity.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListActivity</span> <span class="keyword">extends</span> <span class="title">SingleFragmentActivity</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">getLayoutResId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> R.layout.activity_masterdetail;</span><br><span class="line">        <span class="comment">// return R.layout.activity_fragment; // 这两行代码是等价的</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="根据设备尺寸为指定资源生成两套实现"><a href="#根据设备尺寸为指定资源生成两套实现" class="headerlink" title="根据设备尺寸为指定资源生成两套实现"></a>根据设备尺寸为指定资源生成两套实现</h2><p>本节为设备宽度大于600dp时创建了refs.xml的另一套实现，操作步骤为：<code>res/values右键</code> &gt; <code>New</code> &gt; <code>Values Resource File</code> &gt; 弹出New Resource File &gt; 在<code>Available qualifiers</code>中选择<code>Smallest Screen Width</code> &gt; 点击 <code>&gt;&gt;</code> &gt; 在<code>Smallest Screen Width：</code>中填写600 &gt; 点击OK：<br><img src="/2017/10/28/2017/1028AndroidProgrammingBNRG17/img02.png" alt><br><code>sw</code>是<code>smallest width</code>的缩写，<code>sw600dp</code>表示当设备的宽度大于600dp时，使用版本<code>refs.xml(sw600dp)</code>否则使用版本<code>refs.xml</code>。<code>res/values/refs.xml(sw600dp)</code>文件内容为：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"activity_masterdetail"</span> </span></span><br><span class="line"><span class="tag">    <span class="attr">type</span>=<span class="string">"layout"</span>&gt;</span>@layout/activity_twopane<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>在屏幕宽度＜600dp的phone下，<code>activity_masterdetail</code>=<code>@layout/activity_fragment</code>；<br>在屏幕宽度≥600dp的tablet，<code>activity_masterdetail</code>=<code>@layout/activity_twopane</code>。<br>在代码中使用<code>activity_masterdetail</code>，同时实现<code>activity_twopane</code>的布局，即可完成目标效果。</p>
+<h1 id="适配tablet的布局"><a href="#适配tablet的布局" class="headerlink" title="适配tablet的布局"></a>适配tablet的布局</h1><p>目标是：让布局在phone下是List &gt; 点击 &gt; Details模式，在tablet下是List|Details模式，需要修改：<br>1、修改SingleFragmentActivity，使得它的布局不是hardcode写死的<br>2、创建新的布局，包含两个fragment容器<br>3、修改CrimeListActivity，使之在phone下加载一个Fragment容器，在tablet下加载两个容器</p>
+<h2 id="1-修改SingleFragmentActivity"><a href="#1-修改SingleFragmentActivity" class="headerlink" title="1.修改SingleFragmentActivity"></a>1.修改SingleFragmentActivity</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">SingleFragmentActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> Fragment <span class="title">createFragment</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@LayoutRes</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">getLayoutResId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> R.layout.activity_fragment;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(getLayoutResId());	<span class="comment">// 修改此处，不再hardcode</span></span><br><span class="line"></span><br><span class="line">        FragmentManager fm = getSupportFragmentManager();</span><br><span class="line">        Fragment fragment = fm.findFragmentById(R.id.fragment_container);</span><br><span class="line">        <span class="keyword">if</span>(fragment  == <span class="keyword">null</span>)&#123;</span><br><span class="line">            fragment = createFragment();</span><br><span class="line">            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>把原先写死的加载布局<code>R.layout.activity_fragment</code>改成了从函数获取，这样子类就有机会重写函数<code>getLayoutResId()</code>，也就可以在子类中重新定义需要加载的布局了。<br><code>SingleFragmentActivity</code>有两个子类：<code>CrimeListActivity</code>和<code>CrimeActivity</code>。要修改的是前者：在phone下只包含一个CrimeListFragment，在tablet下包含CrimeListFragment和CrimeFragment。</p>
+<h3 id="LayoutRes关键字"><a href="#LayoutRes关键字" class="headerlink" title="@LayoutRes关键字"></a>@LayoutRes关键字</h3><p>前面那段代码中使用了@LayoutRes关键字，见书中P2464，表明该函数一定返回一个合法的layout资源ID。</p>
+<h2 id="2-创建容纳两个Fragment的新布局"><a href="#2-创建容纳两个Fragment的新布局" class="headerlink" title="2.创建容纳两个Fragment的新布局"></a>2.创建容纳两个Fragment的新布局</h2><p>activity_twopane.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">LinearLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">              <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">              <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">              <span class="attr">android:divider</span>=<span class="string">"?android:attr/dividerHorizontal"</span></span></span><br><span class="line"><span class="tag">              <span class="attr">android:orientation</span>=<span class="string">"horizontal"</span></span></span><br><span class="line"><span class="tag">              <span class="attr">android:showDividers</span>=<span class="string">"middle"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">FrameLayout</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/fragment_container"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"0dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_weight</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">FrameLayout</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">FrameLayout</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/detail_fragment_container"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"0dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_weight</span>=<span class="string">"3"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">FrameLayout</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="3-让CrimeListActivity兼容tablet"><a href="#3-让CrimeListActivity兼容tablet" class="headerlink" title="3.让CrimeListActivity兼容tablet"></a>3.让CrimeListActivity兼容tablet</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListActivity.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListActivity</span> <span class="keyword">extends</span> <span class="title">SingleFragmentActivity</span></span></span><br><span class="line"><span class="class"><span class="keyword">implements</span> <span class="title">CrimeListFragment</span>.<span class="title">Callbacks</span>, <span class="title">CrimeFragment</span>.<span class="title">Callbacks</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Fragment <span class="title">createFragment</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CrimeListFragment();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">getLayoutResId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> R.layout.activity_masterdetail;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这三步组合的逻辑是：<code>SingleFragmentActivity</code>根据子类提供的LayoutResId决定要加载的布局，并把子类提供的Fragment添加到Activity。<br>对于<code>CrimeListActivity</code>，在屏幕宽度＜600dp的phone下，加载到的布局是单Fragment，创建的Fragment是CrimeListFragment;在屏幕宽度≥600dp的tablet下，加载到的布局是双Fragment，创建的Fragment也是CrimeListFragment，并对应到fragment_container上。<br><img src="/2017/10/28/2017/1028AndroidProgrammingBNRG17/img03.png" alt></p>
+<font color="red">有个问题需要回头再研究的：Fragment和布局里的id究竟是怎么关联起来的呢？我记得在FragmentManager的事务中，id仅用来做标识的。</font>
+
+<h2 id="4-展现detail视图"><a href="#4-展现detail视图" class="headerlink" title="4.展现detail视图"></a>4.展现detail视图</h2><p>其实仅这三步并没有完成对tablet的适配，因为details还没有出场。一般的想法是在CrimeListFragment中响应item点击，让CrimeFragment展现出来，但这样会导致list和detail视图之间的耦合，他们是平级的，相互之间应该解耦，这属于上层CrimeListActivity的业务逻辑，应该交给它处理。</p>
+<h3 id="设置回调"><a href="#设置回调" class="headerlink" title="设置回调"></a>设置回调</h3><p>因此在本节由CrimeListActivity提供回调函数给CrimeListFragment，当item被点击时，后者只负责回调该函数，并不知道其内部细节。本节处理这块的手法非常精妙：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> Callbacks mCallbacks;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callbacks</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">onCrimeSelected</span><span class="params">(Crime crime)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onAttach</span><span class="params">(Context context)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onAttach(context);</span><br><span class="line">        mCallbacks = (Callbacks)context;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDetach</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onDetach();</span><br><span class="line">        mCallbacks = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>它定义了一个接口类，该类必须有一个<code>void onCrimeUpdated(Crime crime)</code>接口。<br>回顾<a href="http://localhost:4000/2016/10/18/2017/1018AndroidProgrammingBNRG07/#fragment的生命周期" target="_blank" rel="noopener">笔记七·fragment的生命周期</a>，当CrimeListFragment被载入Activity时，Activity会调用它的<code>onAttach(Context)</code>函数，并把自己当做参数传入，即这个Contetxt其实是宿主Activity，他又被赋给了Callbacks类型的成员变量，这就要求宿主Activity必须有<code>void onCrimeUpdated(Crime crime)</code>接口，否则会出编译错误。</p>
+<h3 id="实现回调"><a href="#实现回调" class="headerlink" title="实现回调"></a>实现回调</h3><p>接下来需要让宿主Activity遵守该接口，并响应点击事件：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListActivity</span> <span class="keyword">extends</span> <span class="title">SingleFragmentActivity</span></span></span><br><span class="line"><span class="class"><span class="keyword">implements</span> <span class="title">CrimeListFragment</span>.<span class="title">Callbacks</span>, <span class="title">CrimeFragment</span>.<span class="title">Callbacks</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Fragment <span class="title">createFragment</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CrimeListFragment();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">getLayoutResId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> R.layout.activity_masterdetail;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCrimeSelected</span><span class="params">(Crime crime)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(findViewById(R.id.detail_fragment_container) == <span class="keyword">null</span>)&#123;</span><br><span class="line">            Intent intent = CrimePagerActivity.newIntent(<span class="keyword">this</span>, crime.getId());</span><br><span class="line">            startActivity(intent);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            Fragment newDetail = CrimeFragment.newInstance(crime.getId());</span><br><span class="line">            getSupportFragmentManager().beginTransaction().replace(R.id.detail_fragment_container,</span><br><span class="line">                    newDetail).commit();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>回顾<a href="http://localhost:4000/2016/10/28/2017/1028AndroidProgrammingBNRG17/#2-创建容纳两个Fragment的新布局" target="_blank" rel="noopener">“创建容纳两个Fragment的新布局”</a>，<code>R.id.detail_fragment_container</code>是在<code>activity_twopane.xml</code>中定义的。<br>再回顾<a href="http://localhost:4000/2016/10/28/2017/1028AndroidProgrammingBNRG17/#3-让CrimeListActivity兼容tablet" target="_blank" rel="noopener">“让CrimeListActivity兼容tablet”</a>：</p>
+<ul>
+<li>在phone下它提供的布局是<code>activity_fragment</code>，因此找不到资源<code>R.id.detail_fragment_container</code>，if分支为真，将启动<code>CrimePagerActivity</code>；</li>
+<li>在tablet下它提供的布局是<code>activity_twopane</code>，走else分支，使用<code>CrimeFragment</code>替换掉<code>R.id.detail_fragment_container</code>。</li>
+</ul>
+<h3 id="调用回调"><a href="#调用回调" class="headerlink" title="调用回调"></a>调用回调</h3><p>最后一步是在点击菜单“+”或点击item时调用回调函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeHolder</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">View</span>.<span class="title">OnClickListener</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View view)</span></span>&#123; <span class="comment">// 响应item点击</span></span><br><span class="line">            mCallbacks.onCrimeSelected(mCrime);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span></span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (item.getItemId())&#123;</span><br><span class="line">            <span class="keyword">case</span> R.id.new_crime:        <span class="comment">// 响应“+”</span></span><br><span class="line">                Crime crime = <span class="keyword">new</span> Crime();</span><br><span class="line">                CrimeLab.get(getActivity()).addCrime(crime);</span><br><span class="line">                updateUI();</span><br><span class="line">                mCallbacks.onCrimeSelected(crime);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="5-更新CrimeListFragment"><a href="#5-更新CrimeListFragment" class="headerlink" title="5.更新CrimeListFragment"></a>5.更新CrimeListFragment</h2><p>完善业务逻辑，还需要在CrimeFragment中的数据被编辑更新后，同步更新左侧的CrimeListFragmen，手法和<a href="http://localhost:4000/2016/10/28/2017/1028AndroidProgrammingBNRG17/#4-展现detail视图" target="_blank" rel="noopener">展现detail视图</a>是一模一样的：在CrimeFragment中定义内部接口类，让CrimeListActivity遵守该接口类，并定义回调，供CrimeFragment调用。没什么新内容，这里就不再重复了。</p>
+<h1 id="设备尺寸决定的配置"><a href="#设备尺寸决定的配置" class="headerlink" title="设备尺寸决定的配置"></a>设备尺寸决定的配置</h1><p>在Android3.2之前使用设备的具体尺寸修饰资源文件，使得该资源文件能匹配不同的设备尺寸，具体的尺寸被分为四类：small, normal, large和xlarge，下表给出这四类对应的屏幕最小尺寸：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Minimum screen size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>small</td>
+<td>320×426dp</td>
+</tr>
+<tr>
+<td>normal</td>
+<td>320×470dp</td>
+</tr>
+<tr>
+<td>large</td>
+<td>480×640dp</td>
+</tr>
+<tr>
+<td>xlarge</td>
+<td>720×960dp</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>到了Android3.2之后具体尺寸修饰方式被废掉了，取代它的是维度修饰：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Qualifier format</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wXXXdp</td>
+<td>可用宽度≥XXXdp</td>
+</tr>
+<tr>
+<td>hXXXdp</td>
+<td>可用高度≥XXXdp</td>
+</tr>
+<tr>
+<td>swXXXdp</td>
+<td>最小宽度或高度≥XXXdp</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>例如为宽度≥300dp的屏幕创建布局文件，应为res/layout-w300dp。<br>sw的含义是最小宽度，例如在1024×800的屏幕sw就是800，在800×1024的屏幕，sw依然是800。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/27/2017/1027AndroidProgrammingBNRG16/" rel="next" title="《Android Programming BNRG》笔记十六">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记十六
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/29/2017/1029AndroidProgrammingBNRG18/" rel="prev" title="《Android Programming BNRG》笔记十八">
+                《Android Programming BNRG》笔记十八 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/28/2017/1028AndroidProgrammingBNRG17/" data-title="《Android Programming BNRG》笔记十七" data-url="http://palanceli.github.io/2017/10/28/2017/1028AndroidProgrammingBNRG17/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用资源别名"><span class="nav-number">1.</span> <span class="nav-text">使用资源别名</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#根据设备尺寸为指定资源生成两套实现"><span class="nav-number">1.1.</span> <span class="nav-text">根据设备尺寸为指定资源生成两套实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#适配tablet的布局"><span class="nav-number">2.</span> <span class="nav-text">适配tablet的布局</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-修改SingleFragmentActivity"><span class="nav-number">2.1.</span> <span class="nav-text">1.修改SingleFragmentActivity</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LayoutRes关键字"><span class="nav-number">2.1.1.</span> <span class="nav-text">@LayoutRes关键字</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-创建容纳两个Fragment的新布局"><span class="nav-number">2.2.</span> <span class="nav-text">2.创建容纳两个Fragment的新布局</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-让CrimeListActivity兼容tablet"><span class="nav-number">2.3.</span> <span class="nav-text">3.让CrimeListActivity兼容tablet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-展现detail视图"><span class="nav-number">2.4.</span> <span class="nav-text">4.展现detail视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置回调"><span class="nav-number">2.4.1.</span> <span class="nav-text">设置回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现回调"><span class="nav-number">2.4.2.</span> <span class="nav-text">实现回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用回调"><span class="nav-number">2.4.3.</span> <span class="nav-text">调用回调</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-更新CrimeListFragment"><span class="nav-number">2.5.</span> <span class="nav-text">5.更新CrimeListFragment</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设备尺寸决定的配置"><span class="nav-number">3.</span> <span class="nav-text">设备尺寸决定的配置</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

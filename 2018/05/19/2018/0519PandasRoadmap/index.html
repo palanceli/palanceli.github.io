@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="机器学习,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="基本概念pandas中的主要数据结构被实现为以下两类：  DataFrame，可以将它想象成一个关系型数据表格，其中包含多个行和已命名的列。 Series，它是单一列。  DataFrame 中包含一个或多个 Series，每个 Series 均有一个名称。">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pandas知识地图">
+<meta property="og:url" content="http://palanceli.github.io/2018/05/19/2018/0519PandasRoadmap/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="基本概念pandas中的主要数据结构被实现为以下两类：  DataFrame，可以将它想象成一个关系型数据表格，其中包含多个行和已命名的列。 Series，它是单一列。  DataFrame 中包含一个或多个 Series，每个 Series 均有一个名称。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/05/19/2018/0519PandasRoadmap/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.341Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pandas知识地图">
+<meta name="twitter:description" content="基本概念pandas中的主要数据结构被实现为以下两类：  DataFrame，可以将它想象成一个关系型数据表格，其中包含多个行和已命名的列。 Series，它是单一列。  DataFrame 中包含一个或多个 Series，每个 Series 均有一个名称。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/05/19/2018/0519PandasRoadmap/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/05/19/2018/0519PandasRoadmap/">
+
+
+
+
+
+  <title>Pandas知识地图 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/05/19/2018/0519PandasRoadmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Pandas知识地图</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-19T14:00:00+08:00">
+                2018-05-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/知识地图/" itemprop="url" rel="index">
+                    <span itemprop="name">知识地图</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/19/2018/0519PandasRoadmap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/05/19/2018/0519PandasRoadmap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>pandas中的主要数据结构被实现为以下两类：</p>
+<ul>
+<li>DataFrame，可以将它想象成一个关系型数据表格，其中包含多个行和已命名的列。</li>
+<li>Series，它是单一列。</li>
+</ul>
+<p>DataFrame 中包含一个或多个 Series，每个 Series 均有一个名称。</p>
+<a id="more"></a>
+<h2 id="构造Series和DataFrame"><a href="#构造Series和DataFrame" class="headerlink" title="构造Series和DataFrame"></a>构造Series和DataFrame</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc1</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">''' 构造数据 '''</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line"></span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    logging.info(df)</span><br></pre></td></tr></table></figure>
+<p>如果 Series 在长度上不一致，系统会用特殊的 NA/NaN 值填充缺失的值。上例的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    City name       Population</span><br><span class="line">0  San Francisco      852469</span><br><span class="line">1       San Jose     1015785</span><br><span class="line">2     Sacramento      485199</span><br><span class="line">3            NaN      312342</span><br></pre></td></tr></table></figure></p>
+<h2 id="从文件中加载数据"><a href="#从文件中加载数据" class="headerlink" title="从文件中加载数据"></a>从文件中加载数据</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc2</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">''' 从文件中加载数据 '''</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line"></span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    df.to_csv(<span class="string">'temp.csv'</span>, sep=<span class="string">','</span>, index=<span class="number">0</span>) <span class="comment"># 不保留索引列</span></span><br><span class="line">    df2 = pd.read_csv(<span class="string">'temp.csv'</span>, sep=<span class="string">','</span>)</span><br><span class="line">    logging.info(df2)</span><br></pre></td></tr></table></figure>
+<h2 id="统计"><a href="#统计" class="headerlink" title="统计"></a>统计</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc3</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">''' 统计数据 '''</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line"></span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    logging.info(df.describe()) <span class="comment"># 统计数据</span></span><br><span class="line">    logging.info(df.head())     <span class="comment"># 前几行数据</span></span><br></pre></td></tr></table></figure>
+<p>它的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Population</span><br><span class="line">count  4.000000e+00 # 记录的条数</span><br><span class="line">mean   6.664488e+05 # 平均值</span><br><span class="line">std    3.239765e+05 # 标准差</span><br><span class="line">min    3.123420e+05 # 最小值</span><br><span class="line">25%    4.419848e+05 # 四分位数</span><br><span class="line">50%    6.688340e+05 # 二分位数</span><br><span class="line">75%    8.932980e+05 # 75%分位数</span><br><span class="line">max    1.015785e+06 # 最大值</span><br><span class="line"></span><br><span class="line">City name  Population</span><br><span class="line">0  San Francisco      852469</span><br><span class="line">1       San Jose     1015785</span><br><span class="line">2     Sacramento      485199</span><br><span class="line">3            NaN      312342</span><br></pre></td></tr></table></figure></p>
+<h2 id="画直方图"><a href="#画直方图" class="headerlink" title="画直方图"></a>画直方图</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> matplotlib</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc4</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">''' 画出直方图 '''</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line"></span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    df.hist()</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+<p>显示直方图为：<br><img src="/2018/05/19/2018/0519PandasRoadmap/img01.png" alt></p>
+<h1 id="访问数据"><a href="#访问数据" class="headerlink" title="访问数据"></a>访问数据</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc7</span><span class="params">(self)</span>:</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    logging.info(df[<span class="string">'City name'</span>])       <span class="comment"># 访问一列</span></span><br><span class="line">    logging.info(df[<span class="string">'City name'</span>][<span class="number">1</span>])    <span class="comment"># 访问指定列的指定行</span></span><br><span class="line">    logging.info(df[<span class="number">0</span>:<span class="number">2</span>])               <span class="comment"># 访问前2行</span></span><br></pre></td></tr></table></figure>
+<p>输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">18:06 0088 INFO     </span><br><span class="line">0    San Francisco</span><br><span class="line">1         San Jose</span><br><span class="line">2       Sacramento</span><br><span class="line">3              NaN</span><br><span class="line">Name: City name, dtype: object</span><br><span class="line"></span><br><span class="line">18:06 0089 INFO     San Jose</span><br><span class="line"></span><br><span class="line">18:06 0090 INFO            </span><br><span class="line">City name  Population</span><br><span class="line">0  San Francisco      852469</span><br><span class="line">1       San Jose     1015785</span><br></pre></td></tr></table></figure></p>
+<h1 id="控制数据"><a href="#控制数据" class="headerlink" title="控制数据"></a>控制数据</h1><p>可以对一列直接执行算术运算和逻辑运算：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc8</span><span class="params">(self)</span>:</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    logging.info(population/<span class="number">1000</span>)   <span class="comment"># 将整列除以1000</span></span><br><span class="line">    logging.info(population.apply(<span class="keyword">lambda</span> val: val &gt; <span class="number">1000000</span>)) <span class="comment"># 返回该列是否大于100万</span></span><br></pre></td></tr></table></figure></p>
+<p>它的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">18:11 0096 INFO     </span><br><span class="line">0     852.469</span><br><span class="line">1    1015.785</span><br><span class="line">2     485.199</span><br><span class="line">3     312.342</span><br><span class="line">dtype: float64</span><br><span class="line"></span><br><span class="line">18:11 0097 INFO     </span><br><span class="line">0    False</span><br><span class="line">1     True</span><br><span class="line">2    False</span><br><span class="line">3    False</span><br><span class="line">dtype: bool</span><br></pre></td></tr></table></figure></p>
+<p>可以对DataFrame直接插入列：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc9</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">''' 控制数据：插入列 '''</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    df[<span class="string">'Area square miles'</span>] = pd.Series([<span class="number">46.87</span>, <span class="number">176.53</span>, <span class="number">97.92</span>]) <span class="comment"># 插入面积字段</span></span><br><span class="line">    df[<span class="string">'Population density'</span>] = df[<span class="string">'Population'</span>] / df[<span class="string">'Area square miles'</span>]   <span class="comment"># 插入单位面积人口字段</span></span><br><span class="line">    logging.info(df)</span><br></pre></td></tr></table></figure></p>
+<p>它的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">18:16 0108 INFO            </span><br><span class="line">        City name  Population  Area square miles  Population density</span><br><span class="line">0  San Francisco      852469              46.87        18187.945381</span><br><span class="line">1       San Jose     1015785             176.53         5754.177760</span><br><span class="line">2     Sacramento      485199              97.92         4955.055147</span><br><span class="line">3            NaN      312342                NaN                 NaN</span><br><span class="line">.</span><br></pre></td></tr></table></figure></p>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><p>Series和DataFrame对象均定义了index属性，该属性会向每行记录赋一个整型id。调用<code>.reindex</code>可以手动重新为各行定义index：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc10</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">''' 索引 '''</span></span><br><span class="line">    city_names = pd.Series([<span class="string">'San Francisco'</span>, <span class="string">'San Jose'</span>, <span class="string">'Sacramento'</span>])</span><br><span class="line">    population = pd.Series([<span class="number">852469</span>, <span class="number">1015785</span>, <span class="number">485199</span>, <span class="number">312342</span>])</span><br><span class="line">    df = pd.DataFrame(&#123; <span class="string">'City name'</span>: city_names, <span class="string">'Population'</span>: population &#125;)</span><br><span class="line">    logging.info(df)</span><br><span class="line">    logging.info(df.reindex([<span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>]))</span><br></pre></td></tr></table></figure></p>
+<p>它的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">20:08 0115 INFO            </span><br><span class="line">        City name  Population</span><br><span class="line">0  San Francisco      852469</span><br><span class="line">1       San Jose     1015785</span><br><span class="line">2     Sacramento      485199</span><br><span class="line">3            NaN      312342</span><br><span class="line"></span><br><span class="line">20:08 0116 INFO            </span><br><span class="line">        City name  Population</span><br><span class="line">2     Sacramento      485199</span><br><span class="line">1       San Jose     1015785</span><br><span class="line">0  San Francisco      852469</span><br><span class="line">3            NaN      312342</span><br></pre></td></tr></table></figure></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://apachecn.github.io/pandas-doc-zh/10min.html" target="_blank" rel="noopener">十分钟搞定 pandas</a><br><a href="http://pandas.pydata.org/pandas-docs/stable/index.html" target="_blank" rel="noopener">pandas: powerful Python data analysis toolkit</a><br><a href="https://github.com/apachecn" target="_blank" rel="noopener"></a><br><a href="https://colab.research.google.com/notebooks/mlcc/intro_to_pandas.ipynb?hl=zh-cn#scrollTo=TIFJ83ZTBctl" target="_blank" rel="noopener">Pandas 简介</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/19/2018/0519KerasRoadmap/" rel="next" title="Keras知识地图">
+                <i class="fa fa-chevron-left"></i> Keras知识地图
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/19/2018/0519TensorFlowRoadmap/" rel="prev" title="TensorFlow知识地图">
+                TensorFlow知识地图 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/05/19/2018/0519PandasRoadmap/" data-title="Pandas知识地图" data-url="http://palanceli.github.io/2018/05/19/2018/0519PandasRoadmap/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本概念"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#构造Series和DataFrame"><span class="nav-number">1.1.</span> <span class="nav-text">构造Series和DataFrame</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从文件中加载数据"><span class="nav-number">1.2.</span> <span class="nav-text">从文件中加载数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#统计"><span class="nav-number">1.3.</span> <span class="nav-text">统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#画直方图"><span class="nav-number">1.4.</span> <span class="nav-text">画直方图</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#访问数据"><span class="nav-number">2.</span> <span class="nav-text">访问数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#控制数据"><span class="nav-number">3.</span> <span class="nav-text">控制数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引"><span class="nav-number">4.</span> <span class="nav-text">索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

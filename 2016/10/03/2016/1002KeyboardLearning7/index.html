@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="键盘消息处理学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="承接《键盘消息处理学习笔记（五）》Step3：12345// 如果当前活动窗口和正在启动的窗口不是同一个窗口，则当前焦点会发生改变if (focusChanged) &amp;#123;    // 🏁把正在启动的窗口注册到InputDispatcher中，以便它可以将键盘事件分发给窗口    mInputMonitor.setInputFocusLw(mCurrentFocus, false /*up">
+<meta name="keywords" content="键盘消息处理学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="键盘消息处理学习笔记（七）——创建新窗口在InputDispatcher更新的注册信息">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning7/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="承接《键盘消息处理学习笔记（五）》Step3：12345// 如果当前活动窗口和正在启动的窗口不是同一个窗口，则当前焦点会发生改变if (focusChanged) &amp;#123;    // 🏁把正在启动的窗口注册到InputDispatcher中，以便它可以将键盘事件分发给窗口    mInputMonitor.setInputFocusLw(mCurrentFocus, false /*up">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.749Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="键盘消息处理学习笔记（七）——创建新窗口在InputDispatcher更新的注册信息">
+<meta name="twitter:description" content="承接《键盘消息处理学习笔记（五）》Step3：12345// 如果当前活动窗口和正在启动的窗口不是同一个窗口，则当前焦点会发生改变if (focusChanged) &amp;#123;    // 🏁把正在启动的窗口注册到InputDispatcher中，以便它可以将键盘事件分发给窗口    mInputMonitor.setInputFocusLw(mCurrentFocus, false /*up">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning7/">
+
+
+
+
+
+  <title>键盘消息处理学习笔记（七）——创建新窗口在InputDispatcher更新的注册信息 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">键盘消息处理学习笔记（七）——创建新窗口在InputDispatcher更新的注册信息</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-03T20:09:28+08:00">
+                2016-10-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/03/2016/1002KeyboardLearning7/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/03/2016/1002KeyboardLearning7/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>承接<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning5/" target="_blank" rel="noopener">《键盘消息处理学习笔记（五）》</a>Step3：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果当前活动窗口和正在启动的窗口不是同一个窗口，则当前焦点会发生改变</span></span><br><span class="line"><span class="keyword">if</span> (focusChanged) &#123;</span><br><span class="line">    <span class="comment">// 🏁把正在启动的窗口注册到InputDispatcher中，以便它可以将键盘事件分发给窗口</span></span><br><span class="line">    mInputMonitor.setInputFocusLw(mCurrentFocus, <span class="keyword">false</span> <span class="comment">/*updateInputWindows*/</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过函数mInputMonitor.setInputFocusLw(…)，把当前活动窗口注册到InputDispatcher中，以便它可以将键盘事件分发给窗口，本文继续深入这个注册函数。<br>需要注意的是：该函数是应用程序创建Activi时，通过WindowSession代理向WindowManagerService发送跨进程请求时，WindowManagerService响应执行的代码，所以该段代码所在的进程空间是WindowManagerService所在的进程，而不是应用程序进程。<br><a id="more"></a></p>
+<p>mInputMonitor在WindowManagerService的块中完成初始化：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java:7550</span></span><br><span class="line">    <span class="keyword">final</span> InputMonitor mInputMonitor = <span class="keyword">new</span> InputMonitor(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure></p>
+<h1 id="Step1-InputMonitor-setInputFocusLw-…"><a href="#Step1-InputMonitor-setInputFocusLw-…" class="headerlink" title="Step1: InputMonitor::setInputFocusLw(…)"></a>Step1: InputMonitor::setInputFocusLw(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/wm/InputMontor.java:398</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setInputFocusLw</span><span class="params">(WindowState newWindow, <span class="keyword">boolean</span> updateInputWindows)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">if</span> (newWindow != mInputFocus) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// mInputFocus用来描述当前活动窗口</span></span><br><span class="line">            mInputFocus = newWindow;</span><br><span class="line">            setUpdateInputWindowsNeededLw();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (updateInputWindows) &#123;</span><br><span class="line">                <span class="comment">// 🏁将mInputFocus注册到InputDispatcher</span></span><br><span class="line">                updateInputWindowsLw(<span class="keyword">false</span> <span class="comment">/*force*/</span>);  </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step2-InputMonitor-updateInputWindowsLw-…"><a href="#Step2-InputMonitor-updateInputWindowsLw-…" class="headerlink" title="Step2: InputMonitor::updateInputWindowsLw(…)"></a>Step2: InputMonitor::updateInputWindowsLw(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/wm/InputMontor.java:229</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateInputWindowsLw</span><span class="params">(<span class="keyword">boolean</span> force)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        mUpdateInputWindowsNeeded = <span class="keyword">false</span>;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// Add all windows on the default display.</span></span><br><span class="line">        <span class="comment">// mDisplayContents中保存了所有的显示设备</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> numDisplays = mService.mDisplayContents.size();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> displayNdx = <span class="number">0</span>; displayNdx &lt; numDisplays; ++displayNdx) &#123;</span><br><span class="line">            WindowList windows = mService.mDisplayContents.valueAt(displayNdx).getWindowList();</span><br><span class="line">            <span class="comment">// windows中保存了所有需要接收键盘事件的窗口</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> winNdx = windows.size() - <span class="number">1</span>; winNdx &gt;= <span class="number">0</span>; --winNdx) &#123;</span><br><span class="line">                <span class="keyword">final</span> WindowState child = windows.get(winNdx);</span><br><span class="line">                <span class="keyword">final</span> InputChannel inputChannel = child.mInputChannel;</span><br><span class="line">                <span class="keyword">final</span> InputWindowHandle inputWindowHandle = child.mInputWindowHandle;</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="keyword">if</span> (addInputConsumerHandle</span><br><span class="line">                        &amp;&amp; inputWindowHandle.layer &lt;= mService.mInputConsumer.mWindowHandle.layer) &#123;</span><br><span class="line">                    addInputWindowHandleLw(mService.mInputConsumer.mWindowHandle);</span><br><span class="line">                    addInputConsumerHandle = <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="comment">// 遍历所有现实设备下所有需要接收键盘事件的窗口，把他们添加到</span></span><br><span class="line">                <span class="comment">// mInputWindowHandles中</span></span><br><span class="line">                addInputWindowHandleLw(inputWindowHandle, child, flags, type, isVisible, hasFocus,</span><br><span class="line">                        hasWallpaper);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Send windows to native code.</span></span><br><span class="line">        <span class="comment">// 🏁把mInputWindowHandles中的窗口重新注册到InputDispatcher中</span></span><br><span class="line">        mService.mInputManager.setInputWindows(mInputWindowHandles); </span><br><span class="line"></span><br><span class="line">        <span class="comment">// Clear the list in preparation for the next round.</span></span><br><span class="line">        clearInputWindowHandlesLw();</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>InputMonitor::mService的类型为WindowManagerService。<br>此处把所有需要接收键盘事件的应用窗口都添加到mInputWindowHandles中了。mInputWindowHandles是一个InputWindowHandle数组，函数<code>addInputWindowHandleLw</code>把参数所代表的窗口添加到该数组中。InputManagerService::setInputWindows(…)负责把这些窗口重新注册到InputDispatcher中，以便InputDispatcher知道哪些窗口需要接收键盘事件，那个窗口是当前活动窗口。</p>
+<h1 id="Step3-InputManagerService-setInputWindows-…"><a href="#Step3-InputManagerService-setInputWindows-…" class="headerlink" title="Step3: InputManagerService::setInputWindows(…)"></a>Step3: InputManagerService::setInputWindows(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/input/InputManagerService.java:1249</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setInputWindows</span><span class="params">(InputWindowHandle[] windowHandles)</span> </span>&#123;</span><br><span class="line">        nativeSetInputWindows(mPtr, windowHandles);     <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step4-nativeSetInputWindows-…"><a href="#Step4-nativeSetInputWindows-…" class="headerlink" title="Step4: nativeSetInputWindows(…)"></a>Step4: nativeSetInputWindows(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/jni/com_android_server_input_InputManagerService.cpp:1232</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">nativeSetInputWindows</span><span class="params">(JNIEnv* env, jclass <span class="comment">/* clazz */</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        jlong ptr, jobjectArray windowHandleObjArray)</span> </span>&#123;</span><br><span class="line">    NativeInputManager* im = <span class="keyword">reinterpret_cast</span>&lt;NativeInputManager*&gt;(ptr);</span><br><span class="line"></span><br><span class="line">    im-&gt;setInputWindows(env, windowHandleObjArray);     <span class="comment">// 🏁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step5-NativeInputManager-setInputWindows-…"><a href="#Step5-NativeInputManager-setInputWindows-…" class="headerlink" title="Step5: NativeInputManager::setInputWindows(…)"></a>Step5: NativeInputManager::setInputWindows(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/jni/com_android_server_input_InputManagerService.cpp:662</span></span><br><span class="line"><span class="keyword">void</span> NativeInputManager::setInputWindows(JNIEnv* env, </span><br><span class="line">                    jobjectArray windowHandleObjArray) &#123;</span><br><span class="line">    Vector&lt;sp&lt;InputWindowHandle&gt; &gt; windowHandles;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将java层的InputWindowHandle对象转成C++层对象，并保存到windowHandles</span></span><br><span class="line">    <span class="keyword">if</span> (windowHandleObjArray) &#123;</span><br><span class="line">        jsize length = env-&gt;GetArrayLength(windowHandleObjArray);</span><br><span class="line">        <span class="keyword">for</span> (jsize i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">            jobject windowHandleObj = env-&gt;GetObjectArrayElement(windowHandleObjArray, i);</span><br><span class="line">            <span class="keyword">if</span> (! windowHandleObj) &#123;</span><br><span class="line">                <span class="keyword">break</span>; <span class="comment">// found null element indicating end of used portion of the array</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            sp&lt;InputWindowHandle&gt; windowHandle =</span><br><span class="line">                    android_server_InputWindowHandle_getHandle(env, windowHandleObj);</span><br><span class="line">            <span class="keyword">if</span> (windowHandle != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                windowHandles.push(windowHandle);</span><br><span class="line">            &#125;</span><br><span class="line">            env-&gt;DeleteLocalRef(windowHandleObj);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 🏁前面把JAVA对象们转换成C++对象，然后在C++层执行注册操作</span></span><br><span class="line">    mInputManager-&gt;getDispatcher()-&gt;setInputWindows(windowHandles);     </span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step6-InputDispatcher-setInputWindows-…"><a href="#Step6-InputDispatcher-setInputWindows-…" class="headerlink" title="Step6: InputDispatcher::setInputWindows(…)"></a>Step6: InputDispatcher::setInputWindows(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputDispatcher.cpp:2822</span></span><br><span class="line"><span class="keyword">void</span> InputDispatcher::setInputWindows(<span class="keyword">const</span> Vector&lt;sp&lt;InputWindowHandle&gt; &gt;&amp;</span><br><span class="line">                                        inputWindowHandles) &#123;</span><br><span class="line">... ...</span><br><span class="line">        Vector&lt;sp&lt;InputWindowHandle&gt; &gt; oldWindowHandles = mWindowHandles;</span><br><span class="line">        mWindowHandles = inputWindowHandles; <span class="comment">// 重新保存所有需要接收键盘事件的窗口</span></span><br><span class="line"></span><br><span class="line">        sp&lt;InputWindowHandle&gt; newFocusedWindowHandle;</span><br><span class="line">        <span class="keyword">bool</span> foundHoveredWindow = <span class="literal">false</span>;</span><br><span class="line">        <span class="comment">// 重新检查一遍，把不需要接收键盘事件的窗口删除，顺便获得当前焦点窗口</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; mWindowHandles.size(); i++) &#123;</span><br><span class="line">            <span class="keyword">const</span> sp&lt;InputWindowHandle&gt;&amp; windowHandle = mWindowHandles.itemAt(i);</span><br><span class="line">            <span class="keyword">if</span> (!windowHandle-&gt;updateInfo() || windowHandle-&gt;getInputChannel() == <span class="literal">NULL</span>) &#123;</span><br><span class="line">                mWindowHandles.removeAt(i--);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (windowHandle-&gt;getInfo()-&gt;hasFocus) &#123;</span><br><span class="line">                newFocusedWindowHandle = windowHandle;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (windowHandle == mLastHoverWindowHandle) &#123;</span><br><span class="line">                foundHoveredWindow = <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!foundHoveredWindow) &#123;</span><br><span class="line">            mLastHoverWindowHandle = <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mFocusedWindowHandle != newFocusedWindowHandle) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mFocusedWindowHandle != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            mFocusedWindowHandle = newFocusedWindowHandle;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// ↑从for循环到这里，收集到所有需要接收键盘事件的应用窗口并找到当前新的活动窗口</span></span><br><span class="line">    ... ...</span><br><span class="line">    <span class="comment">// Wake up poll loop since it may need to make new input dispatching choices.</span></span><br><span class="line">    mLooper-&gt;wake();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>费这么大劲，只是为了把当前所有需要接收键盘事件的窗口重新记录一遍，同时也重新记录当前活动窗口的信息。而且Android6的代码多了一坨对Hover窗口的处理，不知道具体目的是什么。先不管，往后看。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这段代码是在系统中有新的Activity创建时被调用的，以后如果研究Activity的启动过程应该还会遇到。这里遇到的疑问比较多：为什么每创建一个新Activity，都要让InputDispatcher更新一遍系统中所有接收键盘事件的窗口信息？没有更便捷的方式么？这让Activity的启动成本挺高的，而且这段在键盘消息处理机制中起了什么作用呢？<br>我猜测应该就是InputDispatcher保留了系统所有需要接收键盘事件的应用程序窗口列表，以及知道当前的活动窗口是谁。InputDispatcher的主要职责就是分发键盘事件，未来当它需要履行该指责的时候，就可以根据这张列表决定事件分发的目的地。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/键盘消息处理学习笔记/" rel="tag"># 键盘消息处理学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/02/2016/1002KeyboardLearning6/" rel="next" title="键盘消息处理学习笔记（六）——注册Server端InputChannel">
+                <i class="fa fa-chevron-left"></i> 键盘消息处理学习笔记（六）——注册Server端InputChannel
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/03/2016/1002KeyboardLearning8/" rel="prev" title="键盘消息处理学习笔记（八）注册Client端InputChannel">
+                键盘消息处理学习笔记（八）注册Client端InputChannel <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/03/2016/1002KeyboardLearning7/" data-title="键盘消息处理学习笔记（七）——创建新窗口在InputDispatcher更新的注册信息" data-url="http://palanceli.github.io/2016/10/03/2016/1002KeyboardLearning7/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-InputMonitor-setInputFocusLw-…"><span class="nav-number">1.</span> <span class="nav-text">Step1: InputMonitor::setInputFocusLw(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-InputMonitor-updateInputWindowsLw-…"><span class="nav-number">2.</span> <span class="nav-text">Step2: InputMonitor::updateInputWindowsLw(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-InputManagerService-setInputWindows-…"><span class="nav-number">3.</span> <span class="nav-text">Step3: InputManagerService::setInputWindows(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-nativeSetInputWindows-…"><span class="nav-number">4.</span> <span class="nav-text">Step4: nativeSetInputWindows(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step5-NativeInputManager-setInputWindows-…"><span class="nav-number">5.</span> <span class="nav-text">Step5: NativeInputManager::setInputWindows(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step6-InputDispatcher-setInputWindows-…"><span class="nav-number">6.</span> <span class="nav-text">Step6: InputDispatcher::setInputWindows(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

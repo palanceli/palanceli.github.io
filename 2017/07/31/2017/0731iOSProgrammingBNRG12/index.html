@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章进一步通过子类化UITableViewCell实现自定义的样式展现。本章要点：  子类化UITableViewCell 让字体随系统设置动态调整">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记十二">
+<meta property="og:url" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章进一步通过子类化UITableViewCell实现自定义的样式展现。本章要点：  子类化UITableViewCell 让字体随系统设置动态调整">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img10.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.978Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记十二">
+<meta name="twitter:description" content="本章进一步通过子类化UITableViewCell实现自定义的样式展现。本章要点：  子类化UITableViewCell 让字体随系统设置动态调整">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记十二 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记十二</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-31T23:00:00+08:00">
+                2017-07-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/31/2017/0731iOSProgrammingBNRG12/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/31/2017/0731iOSProgrammingBNRG12/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章进一步通过子类化UITableViewCell实现自定义的样式展现。<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img01.png" alt><br>本章要点：</p>
+<ul>
+<li>子类化UITableViewCell</li>
+<li>让字体随系统设置动态调整<a id="more"></a>
+</li>
+</ul>
+<p>在Interface Builder上点击Prototype Cells发现它对应的Class是UITableViewCell。因此，子类化UITableViewCell的方法应该是派生该类的子类，并将Interface Builder中的Prototype Cells的Class对应到该子类上去。具体做法是在Prototype Cells的面板上拖入需要的子控件，关联到子类的outlets变量。</p>
+<h1 id="1-子类化UITableViewCell"><a href="#1-子类化UITableViewCell" class="headerlink" title="1 子类化UITableViewCell"></a>1 子类化UITableViewCell</h1><h2 id="1-1-子类化UITableViewCell的基本思路"><a href="#1-1-子类化UITableViewCell的基本思路" class="headerlink" title="1.1 子类化UITableViewCell的基本思路"></a>1.1 子类化UITableViewCell的基本思路</h2><p>和布局一个普通的View没什么差别：</p>
+<ol>
+<li>派生UITableViewCell的子类</li>
+<li>在Interface Builder中将Prototype Cells的Style设置为Custome，将Class对应到该子类</li>
+<li>关联Interface Builder中的控件、消息与子类中的outlets变量、消息处理函数关联起来</li>
+</ol>
+<p>需要注意的是：子控件应当添加到UITableViewCell的contentView中，而不是直接添加到cell上。因为当进入Editing模式后，cell的左右两侧会多出删除、移动的子控件，添加到contentView中能避免这两个子控件覆盖新加入的控件。书中的图12.2描述了他们之间的布局关系。<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img02.png" alt></p>
+<h2 id="1-2-子类化UITableViewCell的步骤"><a href="#1-2-子类化UITableViewCell的步骤" class="headerlink" title="1.2 子类化UITableViewCell的步骤"></a>1.2 子类化UITableViewCell的步骤</h2><ol>
+<li>派生UITableViewCell的子类，取名ItemCell</li>
+<li>在Interface Builder中设置Prototype Cells的Style设置为Custom：<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img03.png" alt><br>将Class为ItemCell：<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img04.png" alt></li>
+<li>在Prototype Cells中修改布局，添加子控件。如果要修改高度，需要先勾选Row Height的Custom，再修改值：<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img05.png" alt></li>
+</ol>
+<h2 id="1-3-怎么把Interface-Builder-中Prototype-Cells上的控件关联到ItemCell的成员变量"><a href="#1-3-怎么把Interface-Builder-中Prototype-Cells上的控件关联到ItemCell的成员变量" class="headerlink" title="1.3 怎么把Interface Builder 中Prototype Cells上的控件关联到ItemCell的成员变量"></a>1.3 怎么把Interface Builder 中Prototype Cells上的控件关联到ItemCell的成员变量</h2><p>以前都是将IB控件关联到VC的成员变量，因此在Interface Builder中从VC Ctrl拖拽到控件，而此处要关联到ItemCell的成员变量，拖拽的起点应该是哪呢？步骤如下：</p>
+<ol>
+<li>Ctrl-click Prototype Cells，会弹出如下UITableViewCell面板</li>
+<li>拖拽nameLable、serialNumberLabel和valueLabel右侧的加号到Prototype Cells中对应的子控件完成关联<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img06.png" alt></li>
+</ol>
+<h2 id="1-4-将自定义TableViewCell显示到TableView的步骤"><a href="#1-4-将自定义TableViewCell显示到TableView的步骤" class="headerlink" title="1.4 将自定义TableViewCell显示到TableView的步骤"></a>1.4 将自定义TableViewCell显示到TableView的步骤</h2><p>一、修改了cell的高度，需要告诉tableView：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">override func viewDidLoad() &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line"></span><br><span class="line">    let statusBarHeight = <span class="built_in">UIApplication</span>.shared.statusBarFrame.height</span><br><span class="line">    let insets = <span class="built_in">UIEdgeInsets</span>(top:statusBarHeight, left:<span class="number">0</span>, bottom:<span class="number">0</span>, right:<span class="number">0</span>)</span><br><span class="line">    tableView.contentInset = insets</span><br><span class="line">    tableView.scrollIndicatorInsets = insets</span><br><span class="line">    </span><br><span class="line">    tableView.rowHeight = <span class="number">65</span>	<span class="comment">// 告知tableView每一行的高度</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<font color="red">没有修改高度时，是在哪里以及什么时机告知的呢？</font>
+
+<p>二、在Interface Builder中修改Prototype Cells的Identifier属性：<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img07.png" alt><br>这个属性在第11章介绍过，是用于可复用的cell。当然也可以不改，只要与第三步一致即可。<br>三、修改tableView(_:cellForRowAt:)函数，让它每次返回一个自定义的Cell实例：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">override func tableView(_ tableView: <span class="built_in">UITableView</span>, cellForRowAt indexPath: IndexPath) -&gt; <span class="built_in">UITableViewCell</span> &#123;</span><br><span class="line">    <span class="comment">// 此处修改了Identifier，并强制转换成ItemCell对象，因为接下来要设置其成员变量</span></span><br><span class="line">    <span class="comment">//  let cell = tableView.dequeueReusableCell(withIdentifier: "UITableViewCell", for: indexPath)</span></span><br><span class="line">    let cell = tableView.dequeueReusableCell(withIdentifier: <span class="string">"ItemCell"</span>, <span class="keyword">for</span>: indexPath) as! ItemCell</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Configure the cell...</span></span><br><span class="line">    let item = itemStore.allItems[indexPath.row]</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//  cell.textLabel?.text = item.name					// 原先的字段都改成新的</span></span><br><span class="line">    <span class="comment">//  cell.detailTextLabel?.text = "$\(item.valueInDollars)"</span></span><br><span class="line">    cell.nameLable.text = item.name</span><br><span class="line">    cell.serialNumberLabel.text = item.serialNumber</span><br><span class="line">    cell.valueLabel.text = <span class="string">"$\(item.valueInDollars)"</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> cell</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>每次调用<code>dequeueResableCell</code>返回UITableViewCell对象，这个对象一定是此前创建好的，这里只是从队列里取出来，在什么时候创建的呢？我判断应该是加载storyboard时，知道此UITableView的Cell类型，并为之创建所需要的Cell对象，之后塞到队列里。</p>
+</blockquote>
+<h2 id="1-5-动态设定cell的行高"><a href="#1-5-动态设定cell的行高" class="headerlink" title="1.5 动态设定cell的行高"></a>1.5 动态设定cell的行高</h2><p>自动选择Cell的高度作为tableView的行高。具体步骤分两步：<br>一、添加从nameLabel到serialNumberLabel的Vertical Spacing约束<br>二、修改tableView的viewDidLoad()函数中的行高设置</p>
+<font color="red">书中说：UITableViewCell的约束应该足以让它知道自己的高度，而目前的约束还不够，这是为什么？为什么添加了一就够了呢？
+P365，在本步中选中nameLabel，Ctrl拖拽到serialNumberLabel，并选择Vertical Spacing，为什么要这么操作？在Prototype Cells这个界面上一共设置了几个约束项？</font>
+此前在P356中设置过5个：
+1. 左上Label添加了上、左距离容器的边距
+2. 左下Label添加了与左上Label的左对齐
+3. 左下Label添加了下距离容器的边距
+4. 右Label添加了与容器的右边距，并添加了竖直方向居中
+5. 左下Label在size inspector中设置Vertical Content Hugging Priority=250，Vertical Content Compression Resistance Priority=749 <font color="rdd">说是第13章讲具体含义</font>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">override func viewDidLoad() &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Uncomment the following line to preserve selection between presentations</span></span><br><span class="line">    <span class="comment">// self.clearsSelectionOnViewWillAppear = false</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Uncomment the following line to display an Edit button in the navigation bar for this view controller.</span></span><br><span class="line">    <span class="comment">// self.navigationItem.rightBarButtonItem = self.editButtonItem()</span></span><br><span class="line">    let statusBarHeight = <span class="built_in">UIApplication</span>.shared.statusBarFrame.height</span><br><span class="line">    let insets = <span class="built_in">UIEdgeInsets</span>(top:statusBarHeight, left:<span class="number">0</span>, bottom:<span class="number">0</span>, right:<span class="number">0</span>)</span><br><span class="line">    tableView.contentInset = insets</span><br><span class="line">    tableView.scrollIndicatorInsets = insets</span><br><span class="line">    </span><br><span class="line">    tableView.rowHeight = <span class="built_in">UITableViewAutomaticDimension</span></span><br><span class="line">    tableView.estimatedRowHeight = <span class="number">65</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<font color="red">书中说：设置tableView的行高为UITableViewAutomaticDimension可以提高性能，与其在tableView加载时请求每个单元格的高度，不如设置此属性允许将部分性能成本推迟到用户开始滚动为止。原因是什么呢？为什么可以提高性能？</font>
+
+<h1 id="2-让字体随系统设置动态调整"><a href="#2-让字体随系统设置动态调整" class="headerlink" title="2 让字体随系统设置动态调整"></a>2 让字体随系统设置动态调整</h1><h2 id="2-1-系统设置如何影响app内字体"><a href="#2-1-系统设置如何影响app内字体" class="headerlink" title="2.1 系统设置如何影响app内字体"></a>2.1 系统设置如何影响app内字体</h2><p>在系统设置 &gt; 通用 &gt; 辅助功能 &gt; 更大字体 可以调整字号，在app内部通过简单的配置就能让字体随该设置变化。<br>一、在Interface Builder中对字体作如下设置：<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img08.png" alt><br>系统对于不同类型的字体做了如下定义：<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img09.png" alt><br>二、覆盖ItemCell的awakeFromNib()函数。<br>书中说：当对象实例从文件中加载时（此处是storyboard文件），会对该对象调用此函数。<br>此时，我们将ItemCell内所有文本控件的<code>adjustsFontForContentSizeCategory</code> 开关置为true，表明它的字体要参照系统设置。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">override func awakeFromNib() &#123;</span><br><span class="line">    <span class="keyword">super</span>.awakeFromNib()</span><br><span class="line">    <span class="comment">// Initialization code</span></span><br><span class="line">    nameLabel.adjustsFontForContentSizeCategory = <span class="literal">true</span></span><br><span class="line">    serialNumberLabel.adjustsFontForContentSizeCategory = <span class="literal">true</span></span><br><span class="line">    valueLabel.adjustsFontForContentSizeCategory = <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果没有第二步，新创建的cell里的字体会随系统设置，例如：<br><img src="/2017/07/31/2017/0731iOSProgrammingBNRG12/img10.png" alt><br>最初系统设置了小字体，创建前三行数据，之后把系统字体调为大字体，再回到app新创建的后两行数据就是大字体，但前面的不会被刷新。只有在第二步中设置了<code>adjustsFontForContentSizeCategory</code>开关，控件才会在重新显示的时候刷新字体。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/30/2017/0730iOSProgrammingBNRG11/" rel="next" title="《iOS Programming BNRG》笔记十一">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记十一
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/01/2017/0801iOSProgrammingBNRG13/" rel="prev" title="《iOS Programming BNRG》笔记十三">
+                《iOS Programming BNRG》笔记十三 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/07/31/2017/0731iOSProgrammingBNRG12/" data-title="《iOS Programming BNRG》笔记十二" data-url="http://palanceli.github.io/2017/07/31/2017/0731iOSProgrammingBNRG12/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-子类化UITableViewCell"><span class="nav-number">1.</span> <span class="nav-text">1 子类化UITableViewCell</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-子类化UITableViewCell的基本思路"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 子类化UITableViewCell的基本思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-子类化UITableViewCell的步骤"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 子类化UITableViewCell的步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-怎么把Interface-Builder-中Prototype-Cells上的控件关联到ItemCell的成员变量"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 怎么把Interface Builder 中Prototype Cells上的控件关联到ItemCell的成员变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-将自定义TableViewCell显示到TableView的步骤"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 将自定义TableViewCell显示到TableView的步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-动态设定cell的行高"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 动态设定cell的行高</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-让字体随系统设置动态调整"><span class="nav-number">2.</span> <span class="nav-text">2 让字体随系统设置动态调整</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-系统设置如何影响app内字体"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 系统设置如何影响app内字体</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

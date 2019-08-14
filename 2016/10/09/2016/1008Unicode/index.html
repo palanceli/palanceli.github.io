@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Unicode,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="早上老板报了一个生僻字，左边卒，右边瓦：这字在unicode.org的Unihan中念“cèi”，在汉典中念“suì”。可是这字在输入法里敲不出来，在Windows、macOS、iOS和Android下的浏览器里，显示各不相同，这是为什么呢？">
+<meta name="keywords" content="Unicode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unicode字符集和字形">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="早上老板报了一个生僻字，左边卒，右边瓦：这字在unicode.org的Unihan中念“cèi”，在汉典中念“suì”。可是这字在输入法里敲不出来，在Windows、macOS、iOS和Android下的浏览器里，显示各不相同，这是为什么呢？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/cei-Windows.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/cei-mac.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/cei-iOS.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/cei-Android.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/img02.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.752Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unicode字符集和字形">
+<meta name="twitter:description" content="早上老板报了一个生僻字，左边卒，右边瓦：这字在unicode.org的Unihan中念“cèi”，在汉典中念“suì”。可是这字在输入法里敲不出来，在Windows、macOS、iOS和Android下的浏览器里，显示各不相同，这是为什么呢？">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/10/09/2016/1008Unicode/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/09/2016/1008Unicode/">
+
+
+
+
+
+  <title>Unicode字符集和字形 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/09/2016/1008Unicode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Unicode字符集和字形</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-09T00:21:10+08:00">
+                2016-10-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/09/2016/1008Unicode/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/09/2016/1008Unicode/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>早上老板报了一个生僻字，左边卒，右边瓦：<br><img src="/2016/10/09/2016/1008Unicode/img01.png" alt="卒瓦"><br>这字在unicode.org的Unihan中念<a href="http://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=24b62" target="_blank" rel="noopener">“cèi”</a>，在汉典中念<a href="http://www.zdic.net/z/97/js/24B62.htm" target="_blank" rel="noopener">“suì”</a>。<br>可是这字在输入法里敲不出来，在Windows、macOS、iOS和Android下的浏览器里，显示各不相同，这是为什么呢？<br><a id="more"></a><br>Windows下：<br><img src="/2016/10/09/2016/1008Unicode/cei-Windows.png" alt="cei@Windows"><br>只有Windows下显示是正常的。</p>
+<p>macOS下：<br><img src="/2016/10/09/2016/1008Unicode/cei-mac.png" alt="cei@macOS"><br>iOS下：<br><img src="/2016/10/09/2016/1008Unicode/cei-iOS.png" alt="cei@iOS"><br>Android下：<br><img src="/2016/10/09/2016/1008Unicode/cei-Android.png" alt="cei@Android"></p>
+<p>原因是这样的：这个字的Unicode编码是0x24B62，落在了Unicode CJK扩展B的集合中。不同操作系统对于不同编码范围的字符集的字形支持度是不一样的，即使在Windows下，不同的版本也是不一样的。上面的截图是在Win7下截到的，Win7针对扩展B自带了一个字库，而WinXP是没有的，因此如果是在WinXP下面，就应该也看不到这个字。</p>
+<h1 id="关于Unicode的概念"><a href="#关于Unicode的概念" class="headerlink" title="关于Unicode的概念"></a>关于Unicode的概念</h1><p>Unicode的目的就写在Unicode<a href="http://www.unicode.org/" target="_blank" rel="noopener">官网首页</a>：让世界上使用任何语言的人们都能使用计算机。其实是让计算机能支持世界上任何一种语言。</p>
+<p>语言是由字或字符组成的，拉丁语系下大部分语言都是通过有限的字母拼合而成，所以计算机只要支持这些有限的字母即可。而像汉字这种象形文字则包含了几万个字，如果计算机要支持世界上所有的语言体系，就必须给每个语言下的每个字符编个号，大家都认这个编号。过去不同国家会制定自己的编码标准，也就是给自己语言体系中的字符编号，不同标准之间可能会冲突。比如同一个号码序列，在欧洲表示“abc”，在中国就表示“你我他”，数据在相互交换之前就必须指明了我的编码采用的什么标准，到了对端再依照不同的标准做转换。这相当于给计算机限定了国界，可是互联网是无国界的。这不只是跟互联网文化相冲突，也给跨区域使用带来了现实上的不便。为了解决这个问题，Unicode组织说：“我来指定一套规范，能覆盖所有语言，给所有语言下的所有字符规定一套编码，大家都遵守我的编码规范，这个问题自然就解决了！”</p>
+<h1 id="Unicode码位的组织"><a href="#Unicode码位的组织" class="headerlink" title="Unicode码位的组织"></a>Unicode码位的组织</h1><p>到2016年的Unicode 9.0为止，Unicode共使用了从0到0x10FFFF的编码，每一个数字代表一个字符。为了便于理解，它把这些码位按照前16位和后16位做了逻辑分区，前16位每个编码叫做一个Plane（平面），于是每个平面下就包含了0xFFFF个码位。例如前面说的“卒瓦”的编码是0x24B62，就可以在Plane2下的0x4B62处找到。</p>
+<h2 id="Basic-Multilingual-Plane（BMP）"><a href="#Basic-Multilingual-Plane（BMP）" class="headerlink" title="Basic Multilingual Plane（BMP）"></a>Basic Multilingual Plane（BMP）</h2><p>把Plane0下包含的编码称作<strong>多语言基本面 Basic Multilingual Plane</strong>，简称<strong>BMP</strong>。Unicode的编码方案在制定时考虑到了各语言的书写、使用方便，尽量把常用的往前排，符合哈夫曼编码原则；尽量把一个区域的字符编在相邻的位置。BMP下包含了世界各语言下比较常用的字符，所以才被称为基本面~在这个BMP中，包含了<code>27,973</code>个汉字。<br><img src="/2016/10/09/2016/1008Unicode/img02.png" alt="Plane"></p>
+<h2 id="Supplementary-Multilingual-Plane（SMP）"><a href="#Supplementary-Multilingual-Plane（SMP）" class="headerlink" title="Supplementary Multilingual Plane（SMP）"></a>Supplementary Multilingual Plane（SMP）</h2><p>把Plane1下包含的编码称作<strong>多语言补充面 Supplementary Multilingual Plane</strong>，简称<strong>SMP</strong>。位于这个面字符或者不太常用，或者是为了特殊含义专门造的，或者是表意符号，或者是BMP字符的不常用的变种。</p>
+<h2 id="Supplementary-Ideographic-Plane（SIP）"><a href="#Supplementary-Ideographic-Plane（SIP）" class="headerlink" title="Supplementary Ideographic Plane（SIP）"></a>Supplementary Ideographic Plane（SIP）</h2><p>把Plane2下包含的编码称作<strong>表意补充面 Supplementary Ideographic Plane</strong>，简称<strong>SIP</strong>。这个区域主要是为中日韩象形文字开辟的一块扩展空间，用于存放不适合放到BMP中的生僻字。这个区域除了有少量常用CJK字符外（如广东话里的常用字），绝大部分都是非常罕见的生僻字。</p>
+<h2 id="Supplementary-Special-purpose-Plane（SSP）"><a href="#Supplementary-Special-purpose-Plane（SSP）" class="headerlink" title="Supplementary Special-purpose Plane（SSP）"></a>Supplementary Special-purpose Plane（SSP）</h2><p>把Plane14下包含的编码称作<strong>特殊用途补充面 Supplementary Special-purpose Plane</strong>，简称<strong>SSP</strong>。这个区域的字符基本上都是更不常用的格式控制符。</p>
+<h2 id="Private-Use-Planes"><a href="#Private-Use-Planes" class="headerlink" title="Private Use Planes"></a>Private Use Planes</h2><p>还剩下Plane15、Plane16两个面，用于私有用途。这两个区域包含了131,068个字符，用于补充BMP中6400个代理去码位，具体细节在后面讲到UTF-16编码时再解释。</p>
+<h1 id="汉字在Unicode中的分布"><a href="#汉字在Unicode中的分布" class="headerlink" title="汉字在Unicode中的分布"></a>汉字在Unicode中的分布</h1><p>在Unicode中，中日韩的汉字集中在几个区域，但是它们之间是混在一起的。这几个区域分别是：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>块名称</th>
+<th>位置</th>
+<th>汉字个数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CJK Unified Ideographs</td>
+<td>4E00–9FFF</td>
+<td>20,991</td>
+<td>常用字</td>
+</tr>
+<tr>
+<td>CJK Unified Ideographs Extension A</td>
+<td>3400–4DBF</td>
+<td>6591</td>
+<td>生僻字</td>
+</tr>
+<tr>
+<td>CJK Unified Ideographs Extension B</td>
+<td>20000–2A6DF</td>
+<td>42,719</td>
+<td>古汉字遗留的生僻字</td>
+</tr>
+<tr>
+<td>CJK Unified Ideographs Extension C</td>
+<td>2A700–2B73F</td>
+<td>4,159</td>
+<td>古汉字遗留的生僻字</td>
+</tr>
+<tr>
+<td>CJK Unified Ideographs Extension D</td>
+<td>2B740–2B81F</td>
+<td>223</td>
+<td>现在还在用，但使用较少</td>
+</tr>
+<tr>
+<td>CJK Unified Ideographs Extension E</td>
+<td>2B820–2CEAF</td>
+<td>5,775</td>
+<td>古汉字遗留的生僻字</td>
+</tr>
+<tr>
+<td>CJK Compatibility Ideographs</td>
+<td>F900–FAFF</td>
+<td>511</td>
+<td>重复的变体字</td>
+</tr>
+<tr>
+<td>CJK Compatibility Ideographs Supplement</td>
+<td>2F800–2FA1F</td>
+<td>543</td>
+<td>变体字</td>
+</tr>
+<tr>
+<td>总计</td>
+<td></td>
+<td>81,432</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>关于变体字，有些看起来是一样的，比如<code>F902 車  8ECA 車</code>，<code>F907 龜  F908  龜 9F9C  龜</code>，这是因为在某些编码中同时存在了同一个字的若干写法（就是字形相似，且编码不同），为了兼容，才给了这么个区域，Unicode 组织不建议再使用这些字符。</p>
+<h1 id="关于编码的实现方案"><a href="#关于编码的实现方案" class="headerlink" title="关于编码的实现方案"></a>关于编码的实现方案</h1><p>过去一直把Unicode标准与实现方案搞不清楚，Unicode标准给每个字符规定一个数字编号，由于这个数字较长，在计算机里具体怎么存储和传输，也需要定义一个规范了。比如同样都是说2016年10月8日，有的书写规范写成2016/10/08，有的就写成16/10/08，还有16/08/10的……</p>
+<p>既然编码方案都统一了，为什么实现方案不统一成一个呢？这是因为实现方案是根据用途不同而设计的，在不同的使用场景下有各自的优势。比如UTF-8是变长实现方案，Unicode中常用的字符集中在前面，UTF-8采用较少的字节就能表示，不常用的字符集中在后面，UTF-8需要使用较长的字节来表示。这种实现方案的好处就是节省字节数，缺点就是比较复杂，因为它是变长的。</p>
+<p>定长的方案也有：UTF-32，跟Unicode标准完全一致，直观明了，但是缺点就是浪费字节数。</p>
+<p>还有UTF-16，长期以来我以为Windows默认采用的UNCIODE编码就是UTF-16，其实正宗的UTF-16也是类似UTF-8的变长编码方式，以后有空再详细介绍。而Windows采用的只是它的阉割版，用定长的2字节表示BMP中的字符，至于其他平面大于等于0x10000的字符，就不能支持了。</p>
+<h1 id="几个平台下的字体支持"><a href="#几个平台下的字体支持" class="headerlink" title="几个平台下的字体支持"></a>几个平台下的字体支持</h1><p>编码规范收录了，编码实现方案支持了，还需要有字体支持才能显示出来。拿python+<a href="https://github.com/fonttools/fonttools" target="_blank" rel="noopener">fonttools</a>写段脚本，可以跑出来每个平台下的字体文件各自包含什么区域的多少汉字。我把代码放在<a href="https://github.com/palanceli/blog/blob/master/source/_posts/2016/1008Unicode/ParseFont.py" target="_blank" rel="noopener">这里</a>了。结果如下：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>字体</th>
+<th>CJK UI</th>
+<th>ExtA</th>
+<th>ExtB</th>
+<th>ExtC</th>
+<th>ExtD</th>
+<th>ExtE</th>
+<th>CJK CI</th>
+<th>CJK CIS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WinXP</td>
+<td>微软雅黑</td>
+<td>20,909</td>
+<td>6,582</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>0</td>
+</tr>
+<tr>
+<td>WinXP</td>
+<td>宋体</td>
+<td>20,902</td>
+<td>52</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Win7</td>
+<td>微软雅黑</td>
+<td>20,909</td>
+<td>6,582</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Win7</td>
+<td>宋体</td>
+<td>20,910</td>
+<td>6,582</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Android7.1</td>
+<td>Droid Sans Fall back</td>
+<td>20,902</td>
+<td>6,582</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>302</td>
+<td>0</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>苹方</td>
+<td>20,929</td>
+<td>6,582</td>
+<td>1,088</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>95</td>
+<td>11</td>
+</tr>
+<tr>
+<td>iOS9</td>
+<td>苹方</td>
+<td>20,929</td>
+<td>6,582</td>
+<td>1,088</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>95</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>貌似各自在ExtB上区别不大，反而苹方还有一千多个字，Windows下宋体字库完全没有对ExtB上的支持，为什么Win7可以正常显示这个字呢？</p>
+<h1 id="Windows的字体链接对生僻字的支持"><a href="#Windows的字体链接对生僻字的支持" class="headerlink" title="Windows的字体链接对生僻字的支持"></a>Windows的字体链接对生僻字的支持</h1><h2 id="字体链接"><a href="#字体链接" class="headerlink" title="字体链接"></a>字体链接</h2><p>在Windows下有种技术叫做字体链接。可以给指定的字体注册一串链接字体，当该字体不支持某个字形的时候，系统会依次尝试链接串上的其它字体，直到找出能支持的字体把他显示出来，或者把一串链接字体都遍历完后依然找不到，才不显示。<br>在注册表位置<code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink</code>，找到某一字体，比如宋体<code>SimSun</code>，发现该项的值为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MICROSS.TTF,108,122</span><br><span class="line">MICROSS.TTF</span><br><span class="line">MINGLIU.TTC,PMingLiU</span><br><span class="line">MSMINCHO.TTC,MS PMincho</span><br><span class="line">BATANG.TTC,Batang</span><br></pre></td></tr></table></figure></p>
+<p>可是我把这些字体遍历之后发现他们也没有ExtB的字体。</p>
+<h2 id="SurrogateFallback"><a href="#SurrogateFallback" class="headerlink" title="SurrogateFallback"></a>SurrogateFallback</h2><p>还有一个注册表项专门记录了ExtB的字体位置：<code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\LanguagePack\SurrogateFallback</code>，<code>Plane2</code>下的值为<code>SimSun-ExtB</code>。然后去到<code>C:\Windows\Fonts</code>下找到<code>SimSun-ExtB</code>，发现其对应的字体文件为<code>simsunb.ttf</code>。跑一下这个文件结果如下：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>字体</th>
+<th>CJK UI</th>
+<th>ExtA</th>
+<th>ExtB</th>
+<th>ExtC</th>
+<th>ExtD</th>
+<th>ExtE</th>
+<th>CJK CI</th>
+<th>CJK CIS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>simsunb</td>
+<td>0</td>
+<td>0</td>
+<td>42,711</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unicode/" rel="tag"># Unicode</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/04/2016/1004KeyboardLearning11/" rel="next" title="键盘消息处理学习笔记（十一）">
+                <i class="fa fa-chevron-left"></i> 键盘消息处理学习笔记（十一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/21/2016/10DayDayUp/" rel="prev" title="2016年10月DayDayUp">
+                2016年10月DayDayUp <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/09/2016/1008Unicode/" data-title="Unicode字符集和字形" data-url="http://palanceli.github.io/2016/10/09/2016/1008Unicode/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于Unicode的概念"><span class="nav-number">1.</span> <span class="nav-text">关于Unicode的概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unicode码位的组织"><span class="nav-number">2.</span> <span class="nav-text">Unicode码位的组织</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Basic-Multilingual-Plane（BMP）"><span class="nav-number">2.1.</span> <span class="nav-text">Basic Multilingual Plane（BMP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Supplementary-Multilingual-Plane（SMP）"><span class="nav-number">2.2.</span> <span class="nav-text">Supplementary Multilingual Plane（SMP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Supplementary-Ideographic-Plane（SIP）"><span class="nav-number">2.3.</span> <span class="nav-text">Supplementary Ideographic Plane（SIP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Supplementary-Special-purpose-Plane（SSP）"><span class="nav-number">2.4.</span> <span class="nav-text">Supplementary Special-purpose Plane（SSP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Private-Use-Planes"><span class="nav-number">2.5.</span> <span class="nav-text">Private Use Planes</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#汉字在Unicode中的分布"><span class="nav-number">3.</span> <span class="nav-text">汉字在Unicode中的分布</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于编码的实现方案"><span class="nav-number">4.</span> <span class="nav-text">关于编码的实现方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#几个平台下的字体支持"><span class="nav-number">5.</span> <span class="nav-text">几个平台下的字体支持</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Windows的字体链接对生僻字的支持"><span class="nav-number">6.</span> <span class="nav-text">Windows的字体链接对生僻字的支持</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#字体链接"><span class="nav-number">6.1.</span> <span class="nav-text">字体链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SurrogateFallback"><span class="nav-number">6.2.</span> <span class="nav-text">SurrogateFallback</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

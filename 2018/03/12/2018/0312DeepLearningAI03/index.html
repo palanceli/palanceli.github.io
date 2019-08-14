@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《神经网络和深度学习》第三周《浅层神经网络》。本节的题目是浅层神经网络，开始接触多层结构，此时才真正接触到了神经网络模型。其实运用到的理论知识和上一节的逻辑回归相比，几乎没有新东西。 为了便于描述，我把前一节运算出来的a称为一个神经元（这是我的直观理解，并无出处~），该神经元与输入数据直接关联，并直接输出为二分结果。真实世界人脑的思考过程通常没有这么简单，有很多与之相关的成语比如“深思熟虑”、“三">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（二）">
+<meta property="og:url" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《神经网络和深度学习》第三周《浅层神经网络》。本节的题目是浅层神经网络，开始接触多层结构，此时才真正接触到了神经网络模型。其实运用到的理论知识和上一节的逻辑回归相比，几乎没有新东西。 为了便于描述，我把前一节运算出来的a称为一个神经元（这是我的直观理解，并无出处~），该神经元与输入数据直接关联，并直接输出为二分结果。真实世界人脑的思考过程通常没有这么简单，有很多与之相关的成语比如“深思熟虑”、“三">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img11.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.194Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（二）">
+<meta name="twitter:description" content="《神经网络和深度学习》第三周《浅层神经网络》。本节的题目是浅层神经网络，开始接触多层结构，此时才真正接触到了神经网络模型。其实运用到的理论知识和上一节的逻辑回归相比，几乎没有新东西。 为了便于描述，我把前一节运算出来的a称为一个神经元（这是我的直观理解，并无出处~），该神经元与输入数据直接关联，并直接输出为二分结果。真实世界人脑的思考过程通常没有这么简单，有很多与之相关的成语比如“深思熟虑”、“三">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（二） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（二）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-12T10:00:00+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/12/2018/0312DeepLearningAI03/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/12/2018/0312DeepLearningAI03/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《神经网络和深度学习》第三周《浅层神经网络》。<br>本节的题目是浅层神经网络，开始接触多层结构，此时才真正接触到了神经网络模型。其实运用到的理论知识和上一节的逻辑回归相比，几乎没有新东西。</p>
+<p>为了便于描述，我把前一节运算出来的a称为一个神经元（这是我的直观理解，并无出处~），该神经元与输入数据直接关联，并直接输出为二分结果。真实世界人脑的思考过程通常没有这么简单，有很多与之相关的成语比如“深思熟虑”、“三思而行”、“深谋远虑”……都是指有深度、反复的思考。本节课程正是通过增加神经元的层次、以及每一层的个数来增强思考的深度和广度。<br><a id="more"></a></p>
+<h1 id="3-1-神经网络概览"><a href="#3-1-神经网络概览" class="headerlink" title="3.1 神经网络概览"></a>3.1 神经网络概览</h1><p>神经网络通常是具备两层以上的结构，但在原理上，仅是上一节内容的应用，并没有增加新的理论知识。在符号表示上使用方括号上标$z^{[1]}、a^{[1]}$来表示第几层，这与上一节的$x^{(i)}$是不同的，后者表示第i个样本。</p>
+<p>在概念上，中间层的每一个节点都是应用了上一节的算法计算出来的，对于单样本逻辑回归，模型如下：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img01.png" alt><br>由此根据正向算法那计算神经元和成本函数：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img02.png" alt><br>神经网络则在逻辑回归的基础上增加了中间的z/a层，以及每一层的多个节点：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img03.png" alt><br>其中每个节点对上一层节点均使用了逻辑回归的正向算法，最后通过梯度下降法计算成本函数$L(a^{[2]}, y)$：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img04.png" alt></p>
+<h1 id="3-2-神经网络表示"><a href="#3-2-神经网络表示" class="headerlink" title="3.2 神经网络表示"></a>3.2 神经网络表示</h1><p>这是一个最简单的神经网络，它具有双层结构，这两层指的是隐藏层和输出层：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img05.png" alt><br>输入层通常不作为一层，因为$a^{[1]}$是通过输入层X与构造出的参数$W^{[1]}和b^{[1]}$叠加运算而成，而$a^{[2]}$是$a^{[1]}$与构造出的参数$W^{[2]}和b^{[2]}$叠加运算而成。W和b构成了模型的本质，它们只有两层，因此说这是一个双层的神经网络模型。<br>对于单样本，假设输入层共$n^{[0]}$个特征，隐藏层共$n^{[1]}$个节点，输出层共$n^{[2]}$个节点，显然$n^{[2]}$=1，则</p>
+<p>$X= \left\lgroup \matrix{x<em>{1} \cr x</em>{2} \cr … \cr x<em>{n</em>{[0]}} } \right \rgroup \<br>z<em>{1}^{[1]} = w</em>{1}^{[1]}·X + b^{[1]} = [w<em>{1}, w</em>{2}, …, w<em>{n^{[0]}}] · \left\lgroup \matrix{x</em>{1} \cr x<em>{2} \cr … \cr x</em>{n^{[0]}} } \right \rgroup + b^{[1]} \in \mathbb{R}$</p>
+<p>隐藏层共有$n^{[1]}$个节点，于是：</p>
+<p>$z^{[1]}=\left\lgroup \matrix{z<em>{1}^{[1]} \cr z</em>{2}^{[1]} \cr … \cr z<em>{n^{[1]}}^{[1]} } \right \rgroup \in \mathbb{R}^{n^{[1]}\,× 1} 　　\; w^{[1]}=\begin{bmatrix}—w</em>{1}—\—w<em>{2}—\\vdots\—w</em>{n^{[1]}}—\end{bmatrix} \in \mathbb{R}^{n^{[1]}\,×n^{[0]}}$</p>
+<h1 id="3-3-计算神经网络的输出"><a href="#3-3-计算神经网络的输出" class="headerlink" title="3.3 计算神经网络的输出"></a>3.3 计算神经网络的输出</h1><p>计算神经网络的输出就是应用神经元的计算法则，逐个节点求解：</p>
+<p>$z^{[1]}=\left\lgroup \matrix{z<em>{1}^{[1]} \cr z</em>{2}^{[1]} \cr … \cr x<em>{n</em>{[1]}}^{[1]} } \right \rgroup=\left\lgroup \matrix{w<em>{1}^{[1]}·X + b</em>{1}^{[1]} \cr w<em>{2}^{[1]}·X + b</em>{2}^{[1]} \cr … \cr w<em>{n^{[1]}}^{[1]}·X + b</em>{n^{[1]}}^{[1]} } \right \rgroup=\begin{bmatrix}—w<em>{1}^{[1]}— \cr —w</em>{2}^{[1]}— \cr … \cr —w<em>{n^{[1]}}^{[1]}— \end{bmatrix}·X + \begin{bmatrix}b</em>{1}^{[1]} \cr b<em>{2}^{[1]} \cr … \cr b</em>{n^{[1]}}^{[1]} \end{bmatrix}$</p>
+<p>$a^{[1]} = \begin{bmatrix}a<em>{1}^{[1]} \cr a</em>{2}^{[1]} \cr … \cr a_{n^{[1]}}^{[1]} \end{bmatrix}=σ(z^{[1]})$</p>
+<p>同理总结如下：</p>
+<p>$z^{[1]}=w^{[1]}·x + b^{[1]} \ a^{[1]} = σ(z^{[1]}) \ z^{[2]}=w^{[2]}·a^{[1]} + b^{[2]} \ a^{[2]} = σ(z^{[2]})$</p>
+<h1 id="3-4-多样本的向量化"><a href="#3-4-多样本的向量化" class="headerlink" title="3.4 多样本的向量化"></a>3.4 多样本的向量化</h1><p>当有m个样本时，需要遍历每一个样本，当然实际操作是使用向量化而不是循环，再利用前面的方法求解ŷ。循环的伪码形式和向量化的表达分别为：</p>
+<p>$for \, i \, in \, range(1, m):$<br>　$z^{[1]{(}i{)}} = w^{[1]}· x^{(i)} + b^{[1]}$ 　　　【向量化】 $Z^{[1]} = W^{[1]}·X + b^{[1]}$<br>　$a^{[1]{(}i{)}} = σ(z^{[1]{(}i{)}})  　　　　　　　【向量化】A^{[1]} = σ(Z^{[1]})$<br>　$z^{[2]{(}i{)}} = w^{[2]}·a^{[1]{(}i{)}} + b^{[2]}  　　【向量化】Z^{[2]}=W^{[2]}·A^{[1]}+b^{[2]}$<br>　$a^{[2]{(}i{)}}=σ(z^{[2]{(}i{)}}) 　　　　　　【向量化】A^{[2]}=σ(Z^{[2]})$</p>
+<p>于是得出$Z^{[1]}=\begin{bmatrix}\mid&amp;\mid&amp;&amp;\mid\Z^{[1]{(}1{)}}&amp;Z^{[1] {(}2{)}} &amp; \cdots &amp;Z^{[1]{(}m{)}}\\mid&amp;\mid&amp;&amp;\mid\end{bmatrix}$，横向表示不同样本的处的神经元，个数等于样本数；纵向表示不同特征的权重，个数等于上一层的节点数。</p>
+<h1 id="3-5-向量化实现的解释"><a href="#3-5-向量化实现的解释" class="headerlink" title="3.5 向量化实现的解释"></a>3.5 向量化实现的解释</h1><p>$Z^{[1]}=\begin{bmatrix}\mid&amp;\mid&amp;&amp;\mid\Z^{[1]{(}1{)}}&amp;Z^{[1]{(}2{)}}&amp;\cdots&amp;Z^{[1]{(}m{)}}\\mid&amp;\mid&amp;&amp;\mid\end{bmatrix}$<br>$=\begin{bmatrix}w<em>{1}^{[1]}·x^{(1)}+b^{[1]} &amp;  w</em>{1}^{[1]}·x^{(2)}+b^{[1]} &amp; … &amp; w<em>{1}^{[1]}·x^{(m)}+b^{[1]} \cr w</em>{2}^{[1]}·x^{(1)}+b^{[1]} &amp;  w<em>{2}^{[1]}·x^{(2)}+b^{[1]} &amp; … &amp; w</em>{2}^{[1]}·x^{(m)}+b^{[1]} \cr … &amp; … &amp; … &amp; … \cr w<em>{1}^{[1]}·x^{(1)}+b^{[1]} &amp;  w</em>{1}^{[1]}·x^{(2)}+b^{[1]} &amp; … &amp; w<em>{1}^{[1]}·x^{(m)}+b^{[1]} \end{bmatrix} \<br>=\begin{bmatrix}—w</em>{1}^{[1]}— \cr —w<em>{2}^{[1]}— \cr … \cr —w</em>{n^{[1]}}^{[1]}— \end{bmatrix}·\begin{bmatrix}\mid&amp;\mid&amp;&amp;\mid\x^{(1)}&amp;x^{(2)}&amp;\cdots&amp;x^{(m)}\ \mid&amp;\mid&amp;&amp;\mid\end{bmatrix} + b^{[1]} \<br>=W^{[1]}·X+b^{[1]}$</p>
+<h1 id="3-6-激活函数"><a href="#3-6-激活函数" class="headerlink" title="3.6 激活函数"></a>3.6 激活函数</h1><p>在以前的章节中，都采用σ函数作为激活函数，在实际应用中通常使用它的变种$tanh(z)=\frac{e^{z}-e^{z}}{e^{z}+e^{z}}$来作为激活函数，它是将σ函数向下平移0.5：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img06.png" alt><br>我们用g(z)来表示激活函数。</p>
+<p>还有一个更常用的激活函数是ReLU（修正线性单元 Rectified linear unit），g(z)=max(0, z)：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img07.png" alt><br>以及它的变种Leaky ReLU，gz(z)=max(0.01z, z)：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img08.png" alt></p>
+<p>tanh和σ函数有一个共同的缺陷是当z取值过大时，g的变化率过小，这会导致每轮训练效果不明显，学习速度很慢。ReLU系函数则没有这样的缺点。一般情况下，当不确定隐藏层的激活函数该用什么时，通常就采用ReLU。</p>
+<p>尽管对于ReLU当z＜0时斜率为0，但在实践中有足够多的隐藏单元令z＞0，所以通常使用ReLU就足够了。</p>
+<h1 id="3-7-为什么要用非线性激活函数"><a href="#3-7-为什么要用非线性激活函数" class="headerlink" title="3.7 为什么要用非线性激活函数"></a>3.7 为什么要用非线性激活函数</h1><p>$z^{[1]}=w^{[1]}·x + b^{[1]} \ a^{[1]} = g^{[1]}(z^{[1]}) \ z^{[2]}=w^{[2]}·a^{[1]} + b^{[2]} \ a^{[2]} = g^{[1]}(z^{[2]})$</p>
+<p>$如果a^{[1]}=z^{[1]}\ 则z^{[2]}=w^{[2]}(w^{[1]}·x+b^{[1]}) + b^{[2]}=w’·x+b’$</p>
+<p>这和单层网络是等效的，也就是说它会令神经网络的层次失效，因此激活函数需要使用非线性函数。</p>
+<h1 id="3-8-激活函数的导数"><a href="#3-8-激活函数的导数" class="headerlink" title="3.8 激活函数的导数"></a>3.8 激活函数的导数</h1><h2 id="对于tanh函数"><a href="#对于tanh函数" class="headerlink" title="对于tanh函数"></a>对于tanh函数</h2><p>$g(z) = tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}$</p>
+<p>$g’(z) = (e^{z} - e^{-z})’·(e^{z} + e^{-z}) + (e^{z} - e^{-z})[(e^{z} + e^{-z})]’\=\frac{(e^{z} - e^{-z})}{(e^{z} + e^{-z})} + (e^{z} - e^{-z})(-1)(e^{z} + e^{-z})^{-2}(e^{z} - e^{-z})\=1-(\frac{(e^{z} - e^{-z})}{(e^{z} + e^{-z})})^{2}\=1-tanh^{2}(z)$</p>
+<p>此处应用的链式法则是：$[g(x)·f(x)]’=g’(x)·f(x)+g(x)·f’(x)$</p>
+<h2 id="对于ReLU"><a href="#对于ReLU" class="headerlink" title="对于ReLU"></a>对于ReLU</h2><p>$g(z)=max(0, z)\g’(z)=\begin{cases}0　z＜0\1　z≥0\end{cases}$</p>
+<p>$g(z)=max(0.01z, z)\g’(z)=\begin{cases}0.01　z＜0\1　　　z≥0\end{cases}$</p>
+<p>当z=0时，两个函数均不可导，但在实际应用中z取0的概率非常小，此时导数取什么值，问题都不大，因此可以将此时导数定义为1。</p>
+<h1 id="3-9-神经网络的梯度下降法"><a href="#3-9-神经网络的梯度下降法" class="headerlink" title="3.9 神经网络的梯度下降法"></a>3.9 神经网络的梯度下降法</h1><p>对于成本函数$J(w^{[1]}，b^{[1]}，w^{[2]}，b^{[2]})=\frac{1}{m}\sum_{i=1}^{m}L(ŷ, y)$，其梯度下降法可写作：</p>
+<p>$Repeat{<br>\　dw^{[1]}=\frac{dL}{dw^{[1]}}, \; db^{[1]}=\frac{dL}{db^{[1]}}<br>\　dw^{[2]}=\frac{dL}{dw^{[2]}}, \; db^{[2]}=\frac{dL}{db^{[2]}}<br>\　w^{[1]}:=w^{[1]} - α·dw^{[1]}, \; b^{[1]}:=b^{[1]} - α·db^{[1]}<br>\　w^{[2]}:=w^{[2]} - α·dw^{[2]}, \; b^{[2]}:=b^{[2]} - α·db^{[2]}<br>\}$</p>
+<p>使用前向算法：</p>
+<p>$Z^{[1]}=W^{[1]}·X + b^{[1]}\<br>A^{[1]}=g^{[1]}(Z^{[1]})\<br>Z^{[2]}=W^{[2]}·A^{[1]} + b^{[2]}\<br>A^{[2]}=g^{[2]}(Z^{[2]})$</p>
+<p>使用后向算法：</p>
+<p>$dZ^{[2]}=A^{[2]}-Y，其中Y=[y^{(1)} y^{(1)} … y^{(1)}]\<br>dW^{[2]}=\frac{1}{m}dZ^{[2]}·A^{[1]}\<br>db^{[2]}=\frac{1}{m}np.sum(dZ^{[2]}, axis=1, keepdims=True)\<br>dZ^{[1]}=W^{[2]}·dZ^{[2]}·g^{‘[1]}(z^{[1]})　　①\<br>dW^{[1]}=\frac{1}{m}dZ^{[1]}X\<br>db^{[1]}=\frac{1}{m}np.sum(dZ^{[1]}, axis=1, keepdims=True)$</p>
+<p>其中①的计算思路，根据链式规则：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img04.png" alt><br>$dZ^{[1]}=\frac{dL}{dz^{[1]}}=\frac{dL}{da^{[2]}}·\frac{da^{[2]}}{dz^{[2]}}·\frac{dZ^{[2]}}{da^{[1]}}·\frac{da^{[1]}}{dz^{[1]}}　……前两项=dZ^{[2]}，第三项=W^{[2]}\<br>=dZ^{[2]}·W^{[2]}·g^{‘[1]}(z^{[1]})$</p>
+<h2 id="3-11-随机初始化"><a href="#3-11-随机初始化" class="headerlink" title="3.11 随机初始化"></a>3.11 随机初始化</h2><p>在设定初始化参数$w^{[1]}和b^{[1]}$时，应该注意不要把$w<em>{1}^{[1]}、w</em>{2}^{[1]}…、w_{n^{[1]}}^{[1]}$设成相等的值，因为这会导致该层神经元完全一致，这应该就是所谓的“一根筋”吧~ 其结果就是在该层设置的多个节点就失效了。这和人脑的思考也很相似，要做到“兼听则明”，多角度考虑。正确的做法是：<br>$W^{[1]}=np.random.rand((n^{[1]}, n^{[0]}))×0.01\<br>b^{[1]}=np.zeros((n^{[1]}, 1))\<br>W^{[2]}=np.random.rand((1, n^{[1]}))×0.01\<br>b^{[2]}=np.zeros((n^{[1]}, 1))$</p>
+<p>其中$W^{[1]}和W{[2]}$乘以0.01的系数是为了确保取值尽量靠近0点，是的当激活函数取σ或tanh时，有较大的学习率，从而得到较快的学习速度。</p>
+<h1 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h1><p>本节的作业是随机生成400个点，一半是红色一半是蓝色，要求训练一个模型可以把两类点分开：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img09.png" alt><br>下面是采用逻辑回归计算的结果：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img10.png" alt><br>需要特别关注的是这个图形的绘制——它的背景是通过绘制带填充色的等高线图来实现的，它把原先的红蓝豆豆图按照步长为0.01绘制纵横网格，然后把网格每一个交叉点作为测试数据输入给模型，得到每个点的预测颜色，然后根据这些点绘制带填充色的等高线图，就是这个效果了。</p>
+<p>接下来使用隐藏层有4个节点的双层神经网络，计算结果如下：<br><img src="/2018/03/12/2018/0312DeepLearningAI03/img11.png" alt></p>
+<blockquote>
+<p>注意：网上的版本有个bug：<code>load_planar_dataset()</code>函数返回$X\in (2, 400)， Y\in(1, 400)$，而在绘制这些点的时候<br> <code>plt.scatter(X[0, :], X[1, :], c=y, cmap=plt.cm.Spectral)</code><br>其中的颜色参数c直接传入Y是有问题的，需要做如下转换：<br><code>plt.scatter(X[0, :], X[1, :], c=y.reshape(X.shape[1]), cmap=plt.cm.Spectral)</code></p>
+</blockquote>
+<p>我开始体会到了使用神经网络是一种编程思维的切换。</p>
+<p>本节的作业在<a href="https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py" target="_blank" rel="noopener">https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py</a>中的<code>class Coding1_2</code>。</p>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>神经网络一方面增加了神经元的层次，提高思考的深度，另一方面也在同一层次上布局了多个神经元，提高了思考的广度。这些神经元彼此连接便成了“神经网络”。再次申明，这都是我的直观理解，并没有理论依据。这么做增加了思考的抽象程度，但是也更加让思考过程变得越发不可理解。为什么经过这么多层的运算就比简单“神经元”有效？每一层的含义是什么？神经网络的深度、每一层的神经元个数与模型的效果是什么关系？我不知道！继续学习吧。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/11/2018/0311DeepLearningAI02/" rel="next" title="DeepLearning.ai笔记（一）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/17/2018/0317DeepLearningAI04/" rel="prev" title="DeepLearning.ai笔记（三）">
+                DeepLearning.ai笔记（三） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/03/12/2018/0312DeepLearningAI03/" data-title="DeepLearning.ai笔记（二）" data-url="http://palanceli.github.io/2018/03/12/2018/0312DeepLearningAI03/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#3-1-神经网络概览"><span class="nav-number">1.</span> <span class="nav-text">3.1 神经网络概览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-2-神经网络表示"><span class="nav-number">2.</span> <span class="nav-text">3.2 神经网络表示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-3-计算神经网络的输出"><span class="nav-number">3.</span> <span class="nav-text">3.3 计算神经网络的输出</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-4-多样本的向量化"><span class="nav-number">4.</span> <span class="nav-text">3.4 多样本的向量化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-5-向量化实现的解释"><span class="nav-number">5.</span> <span class="nav-text">3.5 向量化实现的解释</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-6-激活函数"><span class="nav-number">6.</span> <span class="nav-text">3.6 激活函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-7-为什么要用非线性激活函数"><span class="nav-number">7.</span> <span class="nav-text">3.7 为什么要用非线性激活函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-8-激活函数的导数"><span class="nav-number">8.</span> <span class="nav-text">3.8 激活函数的导数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对于tanh函数"><span class="nav-number">8.1.</span> <span class="nav-text">对于tanh函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对于ReLU"><span class="nav-number">8.2.</span> <span class="nav-text">对于ReLU</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-9-神经网络的梯度下降法"><span class="nav-number">9.</span> <span class="nav-text">3.9 神经网络的梯度下降法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-11-随机初始化"><span class="nav-number">9.1.</span> <span class="nav-text">3.11 随机初始化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作业"><span class="nav-number">10.</span> <span class="nav-text">作业</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#思考"><span class="nav-number">11.</span> <span class="nav-text">思考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

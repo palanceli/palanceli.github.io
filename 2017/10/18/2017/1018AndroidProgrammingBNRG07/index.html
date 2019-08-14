@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章开启了一个新的应用，list-details模式，在接下来的几章中都会完善该应用。本章只实现了details的部分。引入了Fragment，用于显示details的信息。本章要点：  fragment的概念、使用步骤、使用原则 Android依赖关系的引入">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记七">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章开启了一个新的应用，list-details模式，在接下来的几章中都会完善该应用。本章只实现了details的部分。引入了Fragment，用于显示details的信息。本章要点：  fragment的概念、使用步骤、使用原则 Android依赖关系的引入">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img08.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.097Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记七">
+<meta name="twitter:description" content="本章开启了一个新的应用，list-details模式，在接下来的几章中都会完善该应用。本章只实现了details的部分。引入了Fragment，用于显示details的信息。本章要点：  fragment的概念、使用步骤、使用原则 Android依赖关系的引入">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/img09.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记七 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记七</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-18T20:00:00+08:00">
+                2017-10-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/18/2017/1018AndroidProgrammingBNRG07/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/18/2017/1018AndroidProgrammingBNRG07/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章开启了一个新的应用，list-details模式，在接下来的几章中都会完善该应用。本章只实现了details的部分。引入了Fragment，用于显示details的信息。<br><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img09.png" alt><br>本章要点：</p>
+<ul>
+<li>fragment的概念、使用步骤、使用原则</li>
+<li>Android依赖关系的引入</li>
+</ul>
+<a id="more"></a>
+<h1 id="什么是fragment？"><a href="#什么是fragment？" class="headerlink" title="什么是fragment？"></a>什么是fragment？</h1><p>fragment用来解决UI和事件的分离问题。当app在横竖屏间切换的时候，activity会被销毁重建，如果其中正在执行一些任务，例如下载以及表示下载进度的进度条。如果连进度条信息都要保存和读取，会大大增加代码的复杂性。通过引入UI fragment和工作fragment，让工作不随UI的重建而重建。</p>
+<h2 id="fragment的两种实现版本"><a href="#fragment的两种实现版本" class="headerlink" title="fragment的两种实现版本"></a>fragment的两种实现版本</h2><p>native fragment和support fragment。</p>
+<ul>
+<li>native fragment被编译到了设备中，不同版本的Android系统下，native fragment实现可能会有细微的差别。</li>
+<li>support fragment被编译到你的app include的库里，因此不管当前运行的Android版本是什么，support fragment的表现是完全一致的。</li>
+</ul>
+<p>使用support fragment的好处在于它可以随你的app更新，Google每年会更新support fragment很多次，当新的feature被添加到fragment API，它也同时会被添加到support fragment中。</p>
+<h2 id="两种部署fragment的方法"><a href="#两种部署fragment的方法" class="headerlink" title="两种部署fragment的方法"></a>两种部署fragment的方法</h2><ul>
+<li><p>使用activity的layout。这种方法基本上没什么意义，因为它缺乏弹性，不能在运行时动态调整、替换fragment。而引入fragment的目的就是为了这种弹性，引入的代价是复杂度增加。使用这种方式只有代价没有好处，所以我认为没意义。</p>
+</li>
+<li><p>使用java代码。书中说尽管会带来复杂度，但这是唯一一种能动态调整fragment，在运行时增加、删除、替换fragment的方法。</p>
+</li>
+</ul>
+<h2 id="添加fragment的步骤"><a href="#添加fragment的步骤" class="headerlink" title="添加fragment的步骤"></a>添加fragment的步骤</h2><p>第一步 定义容纳fragment的view，本节是Listing7.5定义在activity_crime.xml中的FrameLayout。这是一个完全通用的空容器，可以用来容纳任何fragment。activity_crime.xml代码如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">android.support.constraint.ConstraintLayout</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/fragment_container"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>其中最重要的是<code>android:id</code>标签，这在后面将Fragment添加到Activity时还会用到。<br>第二步 创建fragment UI。这个步骤和创建activity UI一致：</p>
+<ol>
+<li><p>在layout文件中布局控件。res/layout右键，选择New &gt; Layout resource file<br><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img04.png" alt><br>填写File name: <code>fragment_crime</code>，Root element:<code>LinearLayout</code><br><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img05.png" alt><br>在生成的fragment_crime.xml文件中布局控件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">android.support.constraint.ConstraintLayout</span></span></span><br><span class="line"><span class="tag"><span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag"><span class="attr">xmlns:app</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag"><span class="attr">xmlns:tools</span>=<span class="string">"http://schemas.android.com/tools"</span></span></span><br><span class="line"><span class="tag"><span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag"><span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag"><span class="attr">android:layout_margin</span>=<span class="string">"16dp"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">TextView</span> <span class="attr">...</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">EditText</span> <span class="attr">...</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">TextView</span> <span class="attr">...</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Button</span> <span class="attr">...</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">CheckBox</span> <span class="attr">...</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">android.support.constraint.ConstraintLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在java代码中添加变量，关联到布局中的控件，并为之实现消息响应代码。新建CrimeFragment.java，派生自Fragment。系统有两个Fragment：android.app.Fragment 和 android.support.v4.app.Fragment，前者是native fragment，后者是support fragment，这里使用后者。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">import</span> android.support.v4.app.Fragment;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Crime mCrime;</span><br><span class="line">    <span class="keyword">private</span> EditText mTitleField;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstance)</span></span>&#123;</span><br><span class="line">        uper.onCreate(savedInstance);</span><br><span class="line">        mCrime = <span class="keyword">new</span> Crime();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container, Bundle savedInstance)</span></span>&#123;</span><br><span class="line">        <span class="comment">// 创建Fragment View的实例，container是该View的父View，第三个参数表示是否把创建的Fragment View实例添加到它的父View</span></span><br><span class="line">        View v = inflater.inflate(R.layout.fragment_crime, container, <span class="keyword">false</span>);</span><br><span class="line">        <span class="comment">// 关联到控件，Activity调用的是Activity::findViewById(...)，此处调用的是View::findViewById(...)</span></span><br><span class="line">        mTtitleField = (EditText)v.findViewById(R.id.crime_title);</span><br><span class="line">        mTitleField.addTextChangedListener(<span class="keyword">new</span> TextWatcher()&#123;	<span class="comment">// 实现消息响应代码</span></span><br><span class="line">            ...</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onTextChanged</span><span class="params">(CharSequence s, <span class="keyword">int</span> start, <span class="keyword">int</span> count)</span></span>&#123;</span><br><span class="line">                mCrime.setTitle(s.toString());</span><br><span class="line">            &#125;</span><br><span class="line">            ...</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> v;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>需要注意：</p>
+<ul>
+<li>Fragment的生命周期接口都是public，而Activity的对应接口是protected的。</li>
+<li>和Activity类似，Fragment也可以把它的状态信息存取到bundle内，通过覆盖Fragment::onSaveInstanceStat(…)来完成存取。</li>
+<li>在Fragment::onCreate(…)中只加载了数据Model，在Fragment::onCreateView(…)中加载和关联界面元素。</li>
+<li>在Fragment::onCreateView(…)中调用inflater.inflate(…)用于加载子视图。其中第一个参数是布局的sourceID，第二个参数是该布局的父View，第三个参数表示是否把创建的Fragment View实例添加到container中。</li>
+<li>在Fragment::onCreateView(…)中调用View::findViewById(int)来获取视图对象，而不像在Activity中调用Activity::findViewById(int)</li>
+</ul>
+<p>第三步 把fragment加入Activity。向Activity的FragmentManager添加Fragment UI，FragmentManager负责管理Fragments，并且把它们的View添加到Activity View的层次结构中。FragmentManager负责处理两件事：fragment的list和fragment事务栈。FragmentManager和Activity的关系如下：<br><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img06.png" alt><br>代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_crime);</span><br><span class="line">        </span><br><span class="line">        FragmentManager fm = getSupportFragmentManager();</span><br><span class="line">        <span class="comment">// 先检查该fm的list中是否已经存在fragment，如果屏幕旋转导致activity被销毁，</span></span><br><span class="line">        <span class="comment">// FragmentManager保存list，该list里面的fragment不会因为旋转屏幕而重建，</span></span><br><span class="line">        <span class="comment">// 当activity重建后，FragmentManager会加载该list</span></span><br><span class="line">        Fragment fragment = fm.findFragmentById(R.id.fragment_container);</span><br><span class="line">        <span class="keyword">if</span>(fragment  == nuLL)&#123;	<span class="comment">// 如果不存在则创建</span></span><br><span class="line">            fragment = <span class="keyword">new</span> CrimeFragment();</span><br><span class="line">            <span class="comment">// 向fm的list中添加fragment</span></span><br><span class="line">            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需要注意：</p>
+<ul>
+<li><p>如果Activity派生自AppCompatActivity，调用getSupportFragmentManager()来获取Support Fragment Manager；如果Activity派生自Activity，调用getFragmentManager()来获取Native Fragment Manager</p>
+</li>
+<li><p><code>FragmentManager::beginTransaction()</code>返回<code>FragmentTransaction</code>。<br><code>FragmentTransaction::add(...)</code>的一个参数是Fragment的ContainerID，第二个参数是Fragment对象，第三个参数是Fragment的tag名，指定tag的好处是可以通过<code>Fragment1 frag = getSupportFragmentManager().findFragmentByTag(&quot;f1&quot;)</code>从FragmentManager中查找Fragment对象。</p>
+</li>
+<li><p>ContainerID有两个作用：1、告诉FragmentManager加入的fragment应该展现到activity view的什么地方；2、作为Fragment list中的UID<br>如果两个Fragment都要加入到同一个Activity中，那应该怎么写呢？在书中P578提到：应该为每个fragment分别创建Container View，每个Container有各自的ID。</p>
+<font color="red">本节的容器就是activity的布局，如何在一个Activity中容纳多个fragment？</font>
+</li>
+<li><p><code>commit()</code>是异步操作，内部通过<code>mManager.enqueueAction()</code>加入处理队列。对应的同步方法为<code>commitNow()</code>。commit()内部会有checkStateLoss()操作，如果开发人员使用不当（比如commit()操作在onSaveInstanceState()之后），可能会抛出异常，而commitAllowingStateLoss()方法则是不会抛出异常版本的commit()方法，但是尽量使用commit()，而不要使用commitAllowingStateLoss()。<font color="red">为什么？checkStateLoss()做了什么？为什么会抛异常？</font></p>
+</li>
+<li><p><code>addToBackStack(&quot;fname&quot;)</code>是可选的。FragmentManager拥有回退栈（BackStack），类似于Activity的任务栈，如果添加了该语句，就把该事务加入回退栈，当用户点击返回按钮，会回退该事务（回退指的是如果事务是add(frag1)，那么回退操作就是remove(frag1)）；如果没添加该语句，用户点击返回按钮会直接销毁Activity。</p>
+</li>
+</ul>
+<blockquote>
+<p><a href="https://mp.weixin.qq.com/s/dUuGSVhWinAnN9uMiBaXgw" target="_blank" rel="noopener">《Android基础：Fragment，看这篇就够了》</a>中提到：<br>Fragment有一个常见的问题，即Fragment重叠问题，这是由于Fragment被系统杀掉，并重新初始化时再次将fragment加入activity，因此通过在外围加if语句能判断此时是否是被系统杀掉并重新初始化的情况。<br>该异常出现的原因是：commit()在onSaveInstanceState()后调用。首先，onSaveInstanceState()在onPause()之后，onStop()之前调用。onRestoreInstanceState()在onStart()之后，onResume()之前。</p>
+<font color="red">没有理解根本原因是什么。</font>
+
+</blockquote>
+<h2 id="向创建的Fragment传入参数"><a href="#向创建的Fragment传入参数" class="headerlink" title="向创建的Fragment传入参数"></a>向创建的Fragment传入参数</h2><p>需要通过<code>setArguments(Bundle bundle)</code>的方式添加，而不是在构造函数传入。因为通过<code>setArguments()</code>方式添加，当内存紧张导致Fragment被系统杀掉并回复时能保留这些数据。</p>
+<p>传入的参数可以在Fragment的<code>onAttach()</code>中通过<code>getArgments()</code>获得。</p>
+<h2 id="fragment的生命周期"><a href="#fragment的生命周期" class="headerlink" title="fragment的生命周期"></a>fragment的生命周期</h2><p><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img07.png" alt><br>和Activity的回调名称都是一样的，差别在于：<br>fragment的生命周期回调是被其所在的activity调用，而activity的生命周期回调则是被OS调用的，OS并不知道fragment的存在，fragment是activity的内部逻辑。</p>
+<p>由FragmentManager负责调用fragment的生命周期函数：</p>
+<ul>
+<li>当向FragmentManager添加fragment时，会调用它的onAttach(Context), onCreate(Bundle)和onCreateView(…)函数</li>
+<li>当fragment所在的activity的onCreate(Bundle)函数调用完成后，会调用它的onActivityCreated(Bundle)函数</li>
+</ul>
+<p>如果activity已经处于resumed状态，此时再加入fragment，FragmentManager会遍历其list中的fragments，并逐个调用其生命周期函数：<br>onAttach(Context)<br>onCreate(Bundle)<br>onCreateView(…)<br>onActivityCreated(Bundle)<br>onStart()<br>onResume()<br>确保fragement和其所在的activity的状态是同步的，之后activity的状态发生变化，将同步调用其fragment对应的生命周期函数。</p>
+<font color="red">为什么使用fragment可以避免Activity销毁重建的复杂性？
+如果fragment可以避免该复杂性，为什么还要用activity？或者至少应该让fragment成为Activity的标配吧？
+</font>
+
+<h2 id="使用fragment的原则"><a href="#使用fragment的原则" class="headerlink" title="使用fragment的原则"></a>使用fragment的原则</h2><p>书中提到，把每个可重用的组件都是用fragment来实现，这是不对的；fragment是用来封装主要的业务逻辑，而不是用来封装底层机制的；建议的做法是把小的底层的机制层做成自定义view，把大的策略层封装成fragment，一个界面不要使用超过三个fragment。</p>
+<p>如果需要使用fragment，尽量在一开始就引入，而不要在需要的时候才添加，因为中途添加fragment是个雷区，会导致一堆疑难杂症。所以书中提出AUF原则：Always Use Fragments。</p>
+<h1 id="关于gradle"><a href="#关于gradle" class="headerlink" title="关于gradle"></a>关于gradle</h1><h2 id="两个build-gradle的作用"><a href="#两个build-gradle的作用" class="headerlink" title="两个build.gradle的作用"></a>两个build.gradle的作用</h2><p>在你的project里面有两个build.gradle，一个是project总的，一个是app模块的。</p>
+<h2 id="gradle中dependence是什么含义？"><a href="#gradle中dependence是什么含义？" class="headerlink" title="gradle中dependence是什么含义？"></a>gradle中dependence是什么含义？</h2><p>在app/build.gradle中的dependencies有如下记录：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile fileTree(dir: &apos;libs&apos;, include: [&apos;*.jar&apos;])</span><br><span class="line">    ...</span><br><span class="line">    compile &apos;com.android.support:appcompat-v7:25.3.1&apos;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中第一个compile表示此工程依赖其libs目录下的所有.jar文件；<br>第二个compile表示工程此工程依赖由Android Studio自动包含的库appcompat-v7，其格式为<code>groupId:artifactId:version</code>，<code>groupId</code>（com.android.support）为该库在Maven repository中的uid，<code>artifactId</code>（appcompat-v7）是库名，<code>version</code>（25.3.1）是最低版本号。通过指定dependencies，可以不必把文件拷贝到你的项目目录中。在app编译时，gradle会查找、下载并包含这些依赖文件。</p>
+<p>还可以通过Project Sturcture来配置，这和修改build.gradle是等效的：<br><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img01.png" alt><br><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img02.png" alt></p>
+<p>AppCompat是谷歌的兼容库，它里面包含了support fragment，再添加了dependencies之后，让你的Activity派生自<code>AppCompatActivity</code>，如果编译通过，说明添加依赖生效了。</p>
+<h1 id="listSeparatorTextViewStyle的作用"><a href="#listSeparatorTextViewStyle的作用" class="headerlink" title="listSeparatorTextViewStyle的作用"></a>listSeparatorTextViewStyle的作用</h1><p>P526在布局TextView时加入了listSeparatorTextViewStyle的风格，如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag"><span class="attr">style</span>=<span class="string">"?android:listSeparatorTextViewStyle"</span></span></span><br><span class="line"><span class="tag"><span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag"><span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag"><span class="attr">android:text</span>=<span class="string">"@string/crime_title_label"</span></span></span><br><span class="line"><span class="tag"><span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag"><span class="attr">app:layout_constraintLeft_toLeftOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag"><span class="attr">app:layout_constraintRight_toRightOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag"><span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag"><span class="attr">app:layout_constraintVertical_bias</span>=<span class="string">"0.25"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>这会在TextView下面加一条分割线<br><img src="/2017/10/18/2017/1018AndroidProgrammingBNRG07/img08.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/17/2017/1017AndroidProgrammingBNRG06/" rel="next" title="《Android Programming BNRG》笔记六">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记六
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/19/2017/1019AndroidProgrammingBNRG08/" rel="prev" title="《Android Programming BNRG》笔记八">
+                《Android Programming BNRG》笔记八 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/18/2017/1018AndroidProgrammingBNRG07/" data-title="《Android Programming BNRG》笔记七" data-url="http://palanceli.github.io/2017/10/18/2017/1018AndroidProgrammingBNRG07/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是fragment？"><span class="nav-number">1.</span> <span class="nav-text">什么是fragment？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#fragment的两种实现版本"><span class="nav-number">1.1.</span> <span class="nav-text">fragment的两种实现版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#两种部署fragment的方法"><span class="nav-number">1.2.</span> <span class="nav-text">两种部署fragment的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加fragment的步骤"><span class="nav-number">1.3.</span> <span class="nav-text">添加fragment的步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#向创建的Fragment传入参数"><span class="nav-number">1.4.</span> <span class="nav-text">向创建的Fragment传入参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fragment的生命周期"><span class="nav-number">1.5.</span> <span class="nav-text">fragment的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用fragment的原则"><span class="nav-number">1.6.</span> <span class="nav-text">使用fragment的原则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于gradle"><span class="nav-number">2.</span> <span class="nav-text">关于gradle</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#两个build-gradle的作用"><span class="nav-number">2.1.</span> <span class="nav-text">两个build.gradle的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gradle中dependence是什么含义？"><span class="nav-number">2.2.</span> <span class="nav-text">gradle中dependence是什么含义？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#listSeparatorTextViewStyle的作用"><span class="nav-number">3.</span> <span class="nav-text">listSeparatorTextViewStyle的作用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

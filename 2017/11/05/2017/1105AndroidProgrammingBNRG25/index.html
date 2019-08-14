@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章搭起了一个简单框架，通过http请求flickr图片数据，并展现出来。 本章要点：  联网操作 json数据解析 主线程和后台线程">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记二十五">
+<meta property="og:url" content="http://palanceli.github.io/2017/11/05/2017/1105AndroidProgrammingBNRG25/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章搭起了一个简单框架，通过http请求flickr图片数据，并展现出来。 本章要点：  联网操作 json数据解析 主线程和后台线程">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.154Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记二十五">
+<meta name="twitter:description" content="本章搭起了一个简单框架，通过http请求flickr图片数据，并展现出来。 本章要点：  联网操作 json数据解析 主线程和后台线程">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/11/05/2017/1105AndroidProgrammingBNRG25/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记二十五 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/11/05/2017/1105AndroidProgrammingBNRG25/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记二十五</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-05T20:00:00+08:00">
+                2017-11-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/05/2017/1105AndroidProgrammingBNRG25/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/05/2017/1105AndroidProgrammingBNRG25/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章搭起了一个简单框架，通过http请求flickr图片数据，并展现出来。</p>
+<p>本章要点：</p>
+<ul>
+<li>联网操作</li>
+<li>json数据解析</li>
+<li>主线程和后台线程<a id="more"></a>
+</li>
+</ul>
+<h1 id="联网操作"><a href="#联网操作" class="headerlink" title="联网操作"></a>联网操作</h1><h2 id="权限申请"><a href="#权限申请" class="headerlink" title="权限申请"></a>权限申请</h2><p>联网操作被Android视为一般性权限，大部分app都需要改权限。只需要在AndroidManifest.xml中声明该权限即可，在安装app的时候会询问用户是否允许，更加隐私的权限常常需要在运行时申请的。<code>AndroidManifest.xml</code>的声明如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.INTERNET"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="请求数据"><a href="#请求数据" class="headerlink" title="请求数据"></a>请求数据</h2><p>很程式化的步骤，直接在代码里注释了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">byte</span>[] getUrlBytes(String urlSpec) <span class="keyword">throws</span> IOException&#123;</span><br><span class="line">    URL url = <span class="keyword">new</span> URL(urlSpec);</span><br><span class="line">    <span class="comment">// ① 创建连接对象</span></span><br><span class="line">    HttpURLConnection connection = (HttpURLConnection)url.openConnection();</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        ByteArrayOutputStream out = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">        <span class="comment">// ② 发起连接，对于POST可以调用getOutputStream()</span></span><br><span class="line">        InputStream in = connection.getInputStream();   </span><br><span class="line">        <span class="comment">// ③ 获得响应码</span></span><br><span class="line">        <span class="keyword">if</span>(connection.getResponseCode() != HttpURLConnection.HTTP_OK) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IOException(connection.getResponseMessage() + <span class="string">": with "</span> + urlSpec);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> bytesRead = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];</span><br><span class="line">        <span class="keyword">while</span>((bytesRead = in.read(buffer)) &gt; <span class="number">0</span>)&#123; <span class="comment">// ④ 读取数据</span></span><br><span class="line">            out.write(buffer, <span class="number">0</span>, bytesRead);</span><br><span class="line">        &#125;</span><br><span class="line">        out.close();</span><br><span class="line">        <span class="keyword">return</span> out.toByteArray();</span><br><span class="line">    &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">        connection.disconnect();    <span class="comment">// ⑤ 关闭连接</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="组织URL"><a href="#组织URL" class="headerlink" title="组织URL"></a>组织URL</h2><p>需要吧域名、参数组织在一起：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fetchItems</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        String url = Uri.parse(<span class="string">"https://api.flickr.com/services/rest/"</span>)</span><br><span class="line">                .buildUpon()</span><br><span class="line">                .appendQueryParameter(<span class="string">"method"</span>, <span class="string">"flickr.photos.getRecent"</span>)</span><br><span class="line">                .appendQueryParameter(<span class="string">"api_key"</span>, API_KEY)</span><br><span class="line">                .appendQueryParameter(<span class="string">"format"</span>, <span class="string">"json"</span>)</span><br><span class="line">                .appendQueryParameter(<span class="string">"nojsoncallback"</span>, <span class="string">"1"</span>)</span><br><span class="line">                .appendQueryParameter(<span class="string">"extras"</span>, <span class="string">"url_s"</span>)</span><br><span class="line">                .build().toString();</span><br><span class="line">        String jsonString = getUrlString(url);</span><br><span class="line">        ...</span><br><span class="line">    &#125;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>它组织起来的url为：<br><code>https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&amp;api_key=&lt;API_KEY&gt;&amp;format=json&amp;nojsoncallback=1</code></p>
+<h1 id="解析Json数据"><a href="#解析Json数据" class="headerlink" title="解析Json数据"></a>解析Json数据</h1><p>返回的json数据形如：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"photos"</span>:&#123;</span><br><span class="line">    <span class="attr">"page"</span>:<span class="number">1</span>,</span><br><span class="line">    <span class="attr">"pages"</span>:<span class="number">10</span>,</span><br><span class="line">    <span class="attr">"perpage"</span>:<span class="number">100</span>,</span><br><span class="line">    <span class="attr">"total"</span>:<span class="number">1000</span>,</span><br><span class="line">    <span class="attr">"photo"</span>:[</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"id"</span>:<span class="string">"24560174998"</span>, <span class="attr">"owner"</span>:<span class="string">"140909859@N05"</span>,</span><br><span class="line">            <span class="attr">"secret"</span>:<span class="string">"bb960eabc6"</span>, <span class="attr">"server"</span>:<span class="string">"4530"</span>,</span><br><span class="line">            <span class="attr">"farm"</span>:<span class="number">5</span>, <span class="attr">"title"</span>:<span class="string">"imsi20171115033551"</span>,</span><br><span class="line">            <span class="attr">"ispublic"</span>:<span class="number">1</span>, <span class="attr">"isfriend"</span>:<span class="number">0</span>, <span class="attr">"isfamily"</span>:<span class="number">0</span></span><br><span class="line">        &#125;,...,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"id"</span>:<span class="string">"38431317441"</span>, <span class="attr">"owner"</span>:<span class="string">"153803854@N08"</span>,</span><br><span class="line">            <span class="attr">"secret"</span>:<span class="string">"7851f9d792"</span>, <span class="attr">"server"</span>:<span class="string">"4581"</span>,</span><br><span class="line">            <span class="attr">"farm"</span>:<span class="number">5</span>,<span class="attr">"title"</span>:<span class="string">"\u6797\u90c1\u8ed2_3"</span>,</span><br><span class="line">            <span class="attr">"ispublic"</span>:<span class="number">1</span>, <span class="attr">"isfriend"</span>:<span class="number">0</span>, <span class="attr">"isfamily"</span>:<span class="number">0</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">    &#125;,</span><br><span class="line"><span class="attr">"stat"</span>:<span class="string">"ok"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>解析这段数据的代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parseItems</span><span class="params">(List&lt;GalleryItem&gt; items, JSONObject jsonBody)</span></span></span><br><span class="line"><span class="function">                        <span class="keyword">throws</span> IOException, JSONException</span>&#123;</span><br><span class="line">    <span class="comment">// 解析根部字典</span></span><br><span class="line">    JSONObject photosJsonObject = jsonBody.getJSONObject(<span class="string">"photos"</span>);</span><br><span class="line">    <span class="comment">// 解析photo数组</span></span><br><span class="line">    JSONArray photoJsonArray = photosJsonObject.getJSONArray(<span class="string">"photo"</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;photoJsonArray.length(); i++)&#123; <span class="comment">// 解析数组中每一项</span></span><br><span class="line">        JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);</span><br><span class="line">        GalleryItem item = <span class="keyword">new</span> GalleryItem();</span><br><span class="line">        item.setId(photoJsonObject.getString(<span class="string">"id"</span>));</span><br><span class="line">        item.setCaption(photoJsonObject.getString(<span class="string">"title"</span>));</span><br><span class="line">        <span class="keyword">if</span>(!photoJsonObject.has(<span class="string">"url_s"</span>))&#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        item.setUrl(photoJsonObject.getString(<span class="string">"url_s"</span>));</span><br><span class="line">        items.add(item);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="主线程和工作线程"><a href="#主线程和工作线程" class="headerlink" title="主线程和工作线程"></a>主线程和工作线程</h1><p>Android不允许在主线程中做长程操作，例如在主线程长时间的网络阻塞会导致<code>NetworkOnMainThreadException</code>异常。主线程负责运行所有与UI响应、更新相关的代码，包括响应不同的UI事件——启动Activity、按钮按下等等。主线程也常常被称为UI线程。</p>
+<p>当Android的watchdog发现应用程序的主线程失去响应，将会触发ANR。所以需要创建一个后台工作现成来完成诸如网络操作这类的长程操作。</p>
+<p>通过如下代码实现后台线程：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PhotoGalleryFragment.java</span></span><br><span class="line"><span class="comment">// ① 定义后台线程类</span></span><br><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">FetchItemsTask</span> <span class="keyword">extends</span> <span class="title">AsyncTask</span>&lt;<span class="title">Void</span>, <span class="title">Void</span>, <span class="title">Void</span>&gt;</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Void <span class="title">doInBackground</span><span class="params">(Void ... params)</span></span>&#123; <span class="comment">// ② 实现工作接口</span></span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            String result = <span class="keyword">new</span> FlickrFetchr()</span><br><span class="line">                    .getUrlString(<span class="string">"https://www.bignerdranch.com"</span>);</span><br><span class="line">            ...</span><br><span class="line">        &#125;...</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">new</span> FetchItemsTask().execute(); <span class="comment">// ③ 执行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="从后台工作线程回归到前台"><a href="#从后台工作线程回归到前台" class="headerlink" title="从后台工作线程回归到前台"></a>从后台工作线程回归到前台</h2><p>在本节，Fragment被加载后，首先启动工作线程，需要等待该线程完成数据下载后再更新界面，怎么完成由后台到前台的通知呢？在<code>AsyncTask::doInBackground(...)</code>完成后，<code>AsyncTask::onPostExecute(...)</code>将被执行，而且是在主线程里执行，这正符合我们的诉求。接下来贴出PhotoGalleryFragment.java的完整代码，涉及到RecyclerView的配合，我们使用①②③来标出逻辑顺序：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PhotoGalleryFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PhotoGalleryFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"PhotoGalleryFragment"</span>;</span><br><span class="line">    <span class="keyword">private</span> RecyclerView mPhotoRecyclerView;</span><br><span class="line">    <span class="keyword">private</span> List&lt;GalleryItem&gt; mItems = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">FetchItemsTask</span> <span class="keyword">extends</span> <span class="title">AsyncTask</span>&lt;<span class="title">Void</span>, <span class="title">Void</span>, <span class="title">List</span>&lt;<span class="title">GalleryItem</span>&gt;&gt;</span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> List&lt;GalleryItem&gt; <span class="title">doInBackground</span><span class="params">(Void ... params)</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> FlickrFetchr().fetchItems(); <span class="comment">// ② 下载数据</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostExecute</span><span class="params">(List&lt;GalleryItem&gt; items)</span></span>&#123;</span><br><span class="line">            mItems = items;</span><br><span class="line">            setupAdapter(); <span class="comment">// ③ 返回数据，并在主线程中更新界面</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> PhotoGalleryFragment <span class="title">newInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> PhotoGalleryFragment();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setRetainInstance(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">new</span> FetchItemsTask().execute();<span class="comment">// ①启动后台线程</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container,</span></span></span><br><span class="line"><span class="function"><span class="params">                             Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">        View v = inflater.inflate(R.layout.fragment_photo_gallery,</span><br><span class="line">                container, <span class="keyword">false</span>);</span><br><span class="line">        mPhotoRecyclerView = (RecyclerView)v.findViewById(R.id.photo_recycler_view);</span><br><span class="line">        mPhotoRecyclerView.setLayoutManager(<span class="keyword">new</span> GridLayoutManager(getActivity(), <span class="number">3</span>));</span><br><span class="line">        setupAdapter();</span><br><span class="line">        <span class="keyword">return</span> v;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setupAdapter</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(isAdded())&#123;  <span class="comment">// ④ 设置adapter</span></span><br><span class="line">            mPhotoRecyclerView.setAdapter(<span class="keyword">new</span> PhotoAdapter(mItems));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">PhotoHolder</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span></span>&#123;</span><br><span class="line">        <span class="keyword">private</span> TextView mTitleTextView;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">PhotoHolder</span><span class="params">(View itemView)</span></span>&#123;</span><br><span class="line">            <span class="keyword">super</span>(itemView);</span><br><span class="line">            mTitleTextView = (TextView)itemView;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bindGalleryItem</span><span class="params">(GalleryItem itme)</span></span>&#123;</span><br><span class="line">            mTitleTextView.setText(itemView.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">PhotoAdapter</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">Adapter</span>&lt;<span class="title">PhotoHolder</span>&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> List&lt;GalleryItem&gt; mGalleryItems;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">PhotoAdapter</span><span class="params">(List&lt;GalleryItem&gt; galleryItems)</span></span>&#123;</span><br><span class="line">            mGalleryItems = galleryItems;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> PhotoHolder <span class="title">onCreateViewHolder</span><span class="params">(ViewGroup viewGroup, <span class="keyword">int</span> viewType)</span></span>&#123;</span><br><span class="line">            TextView textView = <span class="keyword">new</span> TextView(getActivity());</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> PhotoHolder(textView);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBindViewHolder</span><span class="params">(PhotoHolder photoHolder, <span class="keyword">int</span> position)</span></span>&#123;</span><br><span class="line">            GalleryItem galleryItem = mGalleryItems.get(position);</span><br><span class="line">            photoHolder.bindGalleryItem(galleryItem);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getItemCount</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> mGalleryItems.size();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>有几处需要说明：</p>
+<ul>
+<li><p>FetchItemsTask类的第1个模板参数表示传入<code>execute()</code>的参数，该参数将被传入<code>doInBackground(...)</code>。使用方法为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">AsyncTask&lt;String, Void, Void&gt; task = <span class="keyword">new</span> AsyncTask&lt;String, Void, Void&gt;()&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Void <span class="title">doInBackground</span><span class="params">(String ... params)</span></span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(String parameter : params)&#123;</span><br><span class="line">            Log.i(TAG, <span class="string">"Received parameter:"</span> + parameter);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">task.execute(<span class="string">"First parameter"</span>, <span class="string">"Second parameter"</span>, <span class="string">"Etc."</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>FetchItemsTask类的第2个模板参数用来表示进度的类型。如下面的代码，在工作线程中调用<code>publishProgress(...)</code>设置进度，UI线程将调用<code>onProgressUpdate(...)</code>显示进度：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ProgressBar gestationProgressBar = gestationProgressBar.setMax(<span class="number">42</span>);</span><br><span class="line">AsyncTask&lt;Void, Integer, Void&gt; task = <span class="keyword">new</span> AsyncTask&lt;Void, Integer, Void&gt;()&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Void <span class="title">doInBackground</span><span class="params">(Void ... params)</span></span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">10</span>; i++)&#123;</span><br><span class="line">            Integer progress = <span class="keyword">new</span> Integer(i);</span><br><span class="line">            publishProgress(progress);</span><br><span class="line">            sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onProgressUpdate</span><span class="params">(Integer ... params)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> progress = params[<span class="number">0</span>];</span><br><span class="line">        gestationProgressBar.setProgress(progress);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">task.execute();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>FetchItemsTask类的第3个模板参数表示<code>doInBackground(...)</code>的返回值以及<code>onPostExecute(...)</code>的输入参数，当<code>doInBackground(...)</code>被执行完成后，把返回值传入<code>onPostExecute(...)</code>。</p>
+</li>
+<li>④ 在设置adapter之前先调用了<code>isAdded()</code>，用来判断Fragment是否被attach到Activity，只有activity就绪了，才能设置adapter。之前没有做过此判断是因为以前fragment的函数都是被activity回调的，之所以能被会调说明activity一定已经加载了。而本章引入了后台线程，fragment的函数有可能被该线程调用，那就不能保证activity一定就绪，所以需要有<code>isAdded()</code>的判断。</li>
+</ul>
+<h2 id="结束后台线程"><a href="#结束后台线程" class="headerlink" title="结束后台线程"></a>结束后台线程</h2><p>调用<code>AsyncTask::cancel(boolean)</code>可以终止后台线程，有两种方式：</p>
+<ul>
+<li><code>AsyncTask::cancel(false)</code>是一种更柔和的方式，它将<code>isCancelled()</code>置为true，在<code>doInBackground(...)</code>会根据这个值判断是否退出。</li>
+<li><code>AsyncTask::cancel(true)</code>则更粗暴，它直接终止线程，应尽量避免这么使用。</li>
+</ul>
+<font color="red">本节的最后简单提到了AsyncTaskLoader，当系统配置发生变化而导致重建时，LoaderManager会确保loader不会因此导致重建，因此它有更好的数据延续性。此处需要进一步确认：普通的AsyncTask也不会被重建吧？</font>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/04/2017/1104AndroidProgrammingBNRG24/" rel="next" title="《Android Programming BNRG》笔记二十四">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记二十四
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/06/2017/1106AndroidProgrammingBNRG26/" rel="prev" title="《Android Programming BNRG》笔记二十六">
+                《Android Programming BNRG》笔记二十六 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/11/05/2017/1105AndroidProgrammingBNRG25/" data-title="《Android Programming BNRG》笔记二十五" data-url="http://palanceli.github.io/2017/11/05/2017/1105AndroidProgrammingBNRG25/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#联网操作"><span class="nav-number">1.</span> <span class="nav-text">联网操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#权限申请"><span class="nav-number">1.1.</span> <span class="nav-text">权限申请</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求数据"><span class="nav-number">1.2.</span> <span class="nav-text">请求数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组织URL"><span class="nav-number">1.3.</span> <span class="nav-text">组织URL</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解析Json数据"><span class="nav-number">2.</span> <span class="nav-text">解析Json数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#主线程和工作线程"><span class="nav-number">3.</span> <span class="nav-text">主线程和工作线程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从后台工作线程回归到前台"><span class="nav-number">3.1.</span> <span class="nav-text">从后台工作线程回归到前台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结束后台线程"><span class="nav-number">3.2.</span> <span class="nav-text">结束后台线程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

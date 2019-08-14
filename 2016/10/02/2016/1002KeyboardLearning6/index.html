@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="键盘消息处理学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="承接《键盘消息处理学习笔记（五）》之Step3，在创建一对互联的InputChannel之后，通过函数mInputManager.registerInputChannel(…)，把Server端InputChannel注册到InputManager，本文继续深入这个注册函数。">
+<meta name="keywords" content="键盘消息处理学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="键盘消息处理学习笔记（六）——注册Server端InputChannel">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning6/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="承接《键盘消息处理学习笔记（五）》之Step3，在创建一对互联的InputChannel之后，通过函数mInputManager.registerInputChannel(…)，把Server端InputChannel注册到InputManager，本文继续深入这个注册函数。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.749Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="键盘消息处理学习笔记（六）——注册Server端InputChannel">
+<meta name="twitter:description" content="承接《键盘消息处理学习笔记（五）》之Step3，在创建一对互联的InputChannel之后，通过函数mInputManager.registerInputChannel(…)，把Server端InputChannel注册到InputManager，本文继续深入这个注册函数。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning6/">
+
+
+
+
+
+  <title>键盘消息处理学习笔记（六）——注册Server端InputChannel | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">键盘消息处理学习笔记（六）——注册Server端InputChannel</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-02T23:35:08+08:00">
+                2016-10-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/02/2016/1002KeyboardLearning6/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/02/2016/1002KeyboardLearning6/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>承接<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning5/#Step3-WindowManagerService-addWindow-…" target="_blank" rel="noopener">《键盘消息处理学习笔记（五）》之Step3</a>，在创建一对互联的InputChannel之后，通过函数mInputManager.registerInputChannel(…)，把Server端InputChannel注册到InputManager，本文继续深入这个注册函数。<br><a id="more"></a></p>
+<h1 id="Step1-InputManagerService-registerInputChannel-…"><a href="#Step1-InputManagerService-registerInputChannel-…" class="headerlink" title="Step1: InputManagerService::registerInputChannel(…)"></a>Step1: InputManagerService::registerInputChannel(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/input/InputManagerService.java:481</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerInputChannel</span><span class="params">(InputChannel inputChannel,</span></span></span><br><span class="line"><span class="function"><span class="params">            InputWindowHandle inputWindowHandle)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        nativeRegisterInputChannel(mPtr, inputChannel, inputWindowHandle, <span class="keyword">false</span>); <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning5/" target="_blank" rel="noopener">《键盘消息处理学习笔记（五）》</a>Step3中，传入regisgetInputChannel函数的第一个参数正是刚刚创建的Server端InputChannel：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mInputManager.registerInputChannel(win.mInputChannel, win.mInputWindowHandle);</span><br></pre></td></tr></table></figure></p>
+<p>在《键盘消息处理学习笔记（一）》的<a href="http://palanceli.com/2016/10/01/2016/0904KeyboardLearning1/img02.png" target="_blank" rel="noopener">对象关系图中</a>可以看到InputManagerService::mPtr是指向NativeInputManager对象的指针。</p>
+<h1 id="Step2-nativeRegisterInputChannel-…"><a href="#Step2-nativeRegisterInputChannel-…" class="headerlink" title="Step2: nativeRegisterInputChannel(…)"></a>Step2: nativeRegisterInputChannel(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/jni/com_android_server_input_InputManagerService.cpp:1142</span></span><br><span class="line"><span class="comment">// inputChannelObj     Server端InputChannel</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">nativeRegisterInputChannel</span><span class="params">(JNIEnv* env, jclass <span class="comment">/* clazz */</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        jlong ptr, jobject inputChannelObj, jobject inputWindowHandleObj, </span></span></span><br><span class="line"><span class="function"><span class="params">        jboolean monitor)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    NativeInputManager* im = <span class="keyword">reinterpret_cast</span>&lt;NativeInputManager*&gt;(ptr);    </span><br><span class="line">    <span class="comment">// 把java层的InputChannel转换为C++层InputChannel</span></span><br><span class="line">    sp&lt;InputChannel&gt; inputChannel = android_view_InputChannel_getInputChannel(env, inputChannelObj);   </span><br><span class="line">    ... ...</span><br><span class="line">    sp&lt;InputWindowHandle&gt; inputWindowHandle =</span><br><span class="line">            android_server_InputWindowHandle_getHandle(env, inputWindowHandleObj);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> status = im-&gt;registerInputChannel(</span><br><span class="line">            env, inputChannel, inputWindowHandle, monitor);     <span class="comment">// 🏁</span></span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (! monitor) &#123;</span><br><span class="line">        android_view_InputChannel_setDisposeCallback(env, inputChannelObj,</span><br><span class="line">                handleInputChannelDisposed, im);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step3-NativeInputManager-registerInputChannel-…"><a href="#Step3-NativeInputManager-registerInputChannel-…" class="headerlink" title="Step3: NativeInputManager.registerInputChannel(…)"></a>Step3: NativeInputManager.registerInputChannel(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/jni/com_android_server_input_InputManagerService.cpp:377</span></span><br><span class="line"><span class="comment">// inputChannel     Server端InputChannel</span></span><br><span class="line"><span class="keyword">status_t</span> NativeInputManager::registerInputChannel(JNIEnv* <span class="comment">/* env */</span>,</span><br><span class="line">        <span class="keyword">const</span> sp&lt;InputChannel&gt;&amp; inputChannel,</span><br><span class="line">        <span class="keyword">const</span> sp&lt;InputWindowHandle&gt;&amp; inputWindowHandle, <span class="keyword">bool</span> monitor) &#123;</span><br><span class="line">    <span class="keyword">return</span> mInputManager-&gt;getDispatcher()-&gt;registerInputChannel(</span><br><span class="line">            inputChannel, inputWindowHandle, monitor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参见《键盘消息处理学习笔记（一）》的<a href="http://palanceli.com/2016/10/01/2016/0904KeyboardLearning1/img02.png" target="_blank" rel="noopener">对象关系图</a>mInputManager-&gt;getDispatcher()返回其mDispatcher成员，其类型是InputDispatcher。</p>
+<h1 id="Step4-InputDispatcher-registerInputChannel-…"><a href="#Step4-InputDispatcher-registerInputChannel-…" class="headerlink" title="Step4: InputDispatcher::registerInputChannel(…)"></a>Step4: InputDispatcher::registerInputChannel(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/services/inputflinger/InputDispatcher.cpp:3311</span></span><br><span class="line"><span class="keyword">status_t</span> InputDispatcher::registerInputChannel(<span class="keyword">const</span> sp&lt;InputChannel&gt;&amp; inputChannel,</span><br><span class="line">        <span class="keyword">const</span> sp&lt;InputWindowHandle&gt;&amp; inputWindowHandle, <span class="keyword">bool</span> monitor) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// 如果inputChannel已经注册过了，则返回错误</span></span><br><span class="line">        <span class="keyword">if</span> (getConnectionIndexLocked(inputChannel) &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">return</span> BAD_VALUE;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        sp&lt;Connection&gt; connection = <span class="keyword">new</span> Connection(inputChannel, inputWindowHandle, monitor);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> fd = inputChannel-&gt;getFd();     <span class="comment">// Server端的scoket描述符</span></span><br><span class="line">        <span class="comment">// 以fd为关键字，保存inputChannel对应的Connection对象</span></span><br><span class="line">        mConnectionsByFd.add(fd, connection);</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// 把fd注册到mLooper，当fd收到数据时，mLooper将被唤醒</span></span><br><span class="line">        mLooper-&gt;addFd(fd, <span class="number">0</span>, ALOOPER_EVENT_INPUT, handleReceiveCallback, <span class="keyword">this</span>);</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>回顾一下inputChannel是在<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning5/" target="_blank" rel="noopener">《键盘消息处理学习笔记（五）》</a>Step6中，通过InputChannel::openInputChannelPair(…)创建的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String8 serverChannelName = name;</span><br><span class="line">serverChannelName.append(<span class="string">" (server)"</span>);</span><br><span class="line">outServerChannel = <span class="keyword">new</span> InputChannel(serverChannelName, sockets[<span class="number">0</span>]);</span><br><span class="line">String8 clientChannelName = name;</span><br><span class="line">clientChannelName.append(<span class="string">" (client)"</span>);</span><br><span class="line">outClientChannel = <span class="keyword">new</span> InputChannel(clientChannelName, sockets[<span class="number">1</span>]);</span><br><span class="line"><span class="keyword">return</span> OK;</span><br></pre></td></tr></table></figure></p>
+<p>在构造函数中传入的第二个参数正是fd，它是Server端和Client端相互连接的一对socket中Server端的描述符：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/include/input/InputTransport.h:143</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InputChannel</span> :</span> <span class="keyword">public</span> RefBase &#123;</span><br><span class="line"></span><br><span class="line">    InputChannel(<span class="keyword">const</span> String8&amp; name, <span class="keyword">int</span> fd);</span><br><span class="line">    ... ...</span><br><span class="line">    InputChannel(<span class="keyword">const</span> String8&amp; name, <span class="keyword">int</span> fd);</span><br><span class="line">    ... ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本节和上一节是个关键，我初次学习的时候也是在这里首先晕掉的，因为Binder机制模糊了进程的边界，这给操作带来了很大便利，却也给理解蒙上一层迷雾，一不留神就搞不清楚当前是在哪个进程空间。</p>
+<p>当一个窗体创建时，它会向WindowManagerService发送请求，要求WindowManagerService为之创建一对用socket实现的InputChannel。本节把其中一个（Server端的）InputChannel的socket描述符注册到InputManagerService的InputDispatcher线程的mLooper中。<br>还记得在《键盘消息处理学习笔记（三）》中<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning3/#InputDispatcherThread的启动" target="_blank" rel="noopener">InputDispatcherThreader的启动</a>一节我们探讨过的，当时这个线程通过<code>mLooper-&gt;pollOnce(...)</code>等待在了默认描述符mWakeEventFd处。结合本节的内容，<strong>系统每创建一个可以接收键盘事件的Activity，就会向InputManagerService的InputDispatcher线程的mLooper注册一个InputChannel，以便纳入InputManagerService的监控。</strong>“Server端Channel”的命名也是因此而来。具体怎么个用法，我们后面再探索。</p>
+<hr>
+<h1 id="疑问一：InputChannel如何能跨进程传输？"><a href="#疑问一：InputChannel如何能跨进程传输？" class="headerlink" title="疑问一：InputChannel如何能跨进程传输？"></a>疑问一：InputChannel如何能跨进程传输？</h1><p>此处我还有个疑问：Binder为进程间通信提供了便利，可是细想这里面是有大坑的，比如socket对是在WindowManagerService进程中创建的，这个描述符显然不能跨进程使用；再如Binder只能在进程间传递与进程无关的数据，与进程相关的比如抽象数据类型，如果要传递，必须转成与进程无关才可以。而《键盘消息处理学习笔记（五）》中，ViewRootImpl::setView(…)开头便是：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setView</span><span class="params">(View view, WindowManager.LayoutParams attrs, View panelParentView)</span> </span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    mInputChannel = <span class="keyword">new</span> InputChannel();</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="comment">// 把本地对象通过Binder代理传给mWindowSession</span></span><br><span class="line">    res = mWindowSession.addToDisplay(mWindow, mSeq, mWindowAttributes,</span><br><span class="line">            getHostVisibility(), mDisplay.getDisplayId(),</span><br><span class="line">            mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,</span><br><span class="line">            mAttachInfo.mOutsets, mInputChannel);</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>它把一个本地对象传给了WindowSession的Binder代理，这是什么思想感情呢？</p>
+<p>在查看InputChannel的定义时我找到了这个问题的答案：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/InputChannel.java:30</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">InputChannel</span> <span class="keyword">implements</span> <span class="title">Parcelable</span> </span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeToParcel</span><span class="params">(Parcel out, <span class="keyword">int</span> flags)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        nativeWriteToParcel(out);</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Parcelable很眼熟，是的，在Binder中用于将一个本地对象“拍扁”的工具，“拍扁”后的对象即可用于进程间传递。派生自Parcelable，说明InputChannel可以用于进程间传递。这个类的Java层定义没有什么数据成员，只有一个指向jni层的指针，说明它的定义全在c++层，再看它的“拍扁”接口<code>writeToParcel(...)</code>也定义在jni层。</p>
+<p>先看看c++层InputChannel的定义，也只有两个数据成员，名称和描述符：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/include/input/InputTransport.h:138</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InputChannel</span> :</span> <span class="keyword">public</span> RefBase &#123;</span><br><span class="line">    ... ...</span><br><span class="line">    String8 mName;</span><br><span class="line">    <span class="keyword">int</span> mFd;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>再来看它的“拍扁”逻辑：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputChannel.cpp:222</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">android_view_InputChannel_nativeWriteToParcel</span><span class="params">(JNIEnv* env, jobject obj,</span></span></span><br><span class="line"><span class="function"><span class="params">        jobject parcelObj)</span> </span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    sp&lt;InputChannel&gt; inputChannel = nativeInputChannel-&gt;getInputChannel();</span><br><span class="line"></span><br><span class="line">    parcel-&gt;writeInt32(<span class="number">1</span>);</span><br><span class="line">    parcel-&gt;writeString8(inputChannel-&gt;getName());</span><br><span class="line">    parcel-&gt;writeDupFileDescriptor(inputChannel-&gt;getFd());</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>不过是把名字和文件描述符传了出去，到了对端再根据这些数据组装成本地对象，这就解答了InputChannel如何跨进程传输的问题。<br>不过疑云并没有彻底散去：这个只有在本地才有效的文件描述符传到对端有什么意义呢？在本节中，还没有遇到跨进程使用描述符的情况（相信不可能遇到），因为两个互联的socket是在WindowManagerService中创建，本节中又交给InputManagerService中的InputDispatcherThreader线程等待，他们都在同一个进程空间，这当然没什么问题。可是把InputChannel在进程间传来传去的，只是在物理意义上消除了进程间的界限，在逻辑上关系上却始终要注意“这个描述符是在哪里创建的，我能不能使用”，我感觉这是比C++的内存泄漏更大的陷阱呢？<br>好吧，疑云先驱散到这里，我觉得更多的得往后继续推进才能获得解答。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/键盘消息处理学习笔记/" rel="tag"># 键盘消息处理学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/02/2016/1002KeyboardLearning5/" rel="next" title="键盘消息处理学习笔记（五）——InputChannel的创建">
+                <i class="fa fa-chevron-left"></i> 键盘消息处理学习笔记（五）——InputChannel的创建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/03/2016/1002KeyboardLearning7/" rel="prev" title="键盘消息处理学习笔记（七）——创建新窗口在InputDispatcher更新的注册信息">
+                键盘消息处理学习笔记（七）——创建新窗口在InputDispatcher更新的注册信息 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/02/2016/1002KeyboardLearning6/" data-title="键盘消息处理学习笔记（六）——注册Server端InputChannel" data-url="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning6/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-InputManagerService-registerInputChannel-…"><span class="nav-number">1.</span> <span class="nav-text">Step1: InputManagerService::registerInputChannel(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-nativeRegisterInputChannel-…"><span class="nav-number">2.</span> <span class="nav-text">Step2: nativeRegisterInputChannel(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-NativeInputManager-registerInputChannel-…"><span class="nav-number">3.</span> <span class="nav-text">Step3: NativeInputManager.registerInputChannel(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-InputDispatcher-registerInputChannel-…"><span class="nav-number">4.</span> <span class="nav-text">Step4: InputDispatcher::registerInputChannel(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#疑问一：InputChannel如何能跨进程传输？"><span class="nav-number">6.</span> <span class="nav-text">疑问一：InputChannel如何能跨进程传输？</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

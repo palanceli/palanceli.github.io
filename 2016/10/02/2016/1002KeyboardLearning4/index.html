@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="键盘消息处理学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在《键盘消息处理学习笔记（三）》中，InputSispatcher::dispatchOnce()函数里，消息的等待落到了Looper::pollOnce(…)函数中，本文就来专门研究一下Looper这个类。该类可以用来监控一组文件描述符的事件，当任意一个它所维护的文件描述符有新消息时，将被唤醒，否则就一直等待。">
+<meta name="keywords" content="键盘消息处理学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="键盘消息处理学习笔记（四）——Looper机制">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning4/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="在《键盘消息处理学习笔记（三）》中，InputSispatcher::dispatchOnce()函数里，消息的等待落到了Looper::pollOnce(…)函数中，本文就来专门研究一下Looper这个类。该类可以用来监控一组文件描述符的事件，当任意一个它所维护的文件描述符有新消息时，将被唤醒，否则就一直等待。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning4/img1.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.747Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="键盘消息处理学习笔记（四）——Looper机制">
+<meta name="twitter:description" content="在《键盘消息处理学习笔记（三）》中，InputSispatcher::dispatchOnce()函数里，消息的等待落到了Looper::pollOnce(…)函数中，本文就来专门研究一下Looper这个类。该类可以用来监控一组文件描述符的事件，当任意一个它所维护的文件描述符有新消息时，将被唤醒，否则就一直等待。">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning4/img1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning4/">
+
+
+
+
+
+  <title>键盘消息处理学习笔记（四）——Looper机制 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">键盘消息处理学习笔记（四）——Looper机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-02T11:30:41+08:00">
+                2016-10-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/02/2016/1002KeyboardLearning4/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/02/2016/1002KeyboardLearning4/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在<a href="http://palanceli.com/2016/10/02/2016/1002KeyboardLearning3/" target="_blank" rel="noopener">《键盘消息处理学习笔记（三）》</a>中，InputSispatcher::dispatchOnce()函数里，消息的等待落到了Looper::pollOnce(…)函数中，本文就来专门研究一下Looper这个类。该类可以用来监控一组文件描述符的事件，当任意一个它所维护的文件描述符有新消息时，将被唤醒，否则就一直等待。</p>
+<a id="more"></a>
+<h1 id="Looper的构造函数"><a href="#Looper的构造函数" class="headerlink" title="Looper的构造函数"></a>Looper的构造函数</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// system/core/libutils/Looper.cpp:71</span></span><br><span class="line">Looper::Looper(<span class="keyword">bool</span> allowNonCallbacks) :</span><br><span class="line">        mAllowNonCallbacks(allowNonCallbacks), mSendingMessage(<span class="literal">false</span>),</span><br><span class="line">        mPolling(<span class="literal">false</span>), mEpollFd(<span class="number">-1</span>), mEpollRebuildRequired(<span class="literal">false</span>),</span><br><span class="line">        mNextRequestSeq(<span class="number">0</span>), mResponseIndex(<span class="number">0</span>), mNextMessageUptime(LLONG_MAX) &#123;</span><br><span class="line">    mWakeEventFd = eventfd(<span class="number">0</span>, EFD_NONBLOCK);</span><br><span class="line">    ... ...</span><br><span class="line">    rebuildEpollLocked();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>函数eventfd()创建一个事件对象的描述符，该对象可以用于事件的等待/通知机制。其原型如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/eventfd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">eventfd</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> initval, <span class="keyword">int</span> flags)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>该对象在内核维护着一个计数器，初始值为initval。它有两个函数：</p>
+<ul>
+<li>ssize_t write(int fd, const void* buf, size_t count)<br>从buf中取出8字节的整型值，加到计数器上。如果计数器的值达到0xfffffffffffffffe就会阻塞，直到被read。</li>
+<li>ssize_t read(int fd, void* buf, size_t count)<br>读取计数器的值，并把计数器重置为0。如果计数器的值不为0，则读取成功返回该值；如果为0，非阻塞模式时直接返回失败，并把error置为EINVAL，阻塞模式则一直阻塞到计数器非0。<br><img src="/2016/10/02/2016/1002KeyboardLearning4/img1.png" alt="事件对象"></li>
+</ul>
+<p>mWakeEventFd正是这样一种对象，Looper默认生成这么一个eventfd对象，Looper::pollOnce(…)等待该对象被写入内容，一旦被写入，Looper::pollOnce(…)函数就会返回。这就是组成消息泵的重要部件——消息的发送者发出消息后向mWakeEventFd写入内容，Looper::pollOnce(…)被唤醒，然后执行消息处理，处理完成后再次睡眠等待，直到下次再发来消息。Android应用程序的消息处理就采用了这种模式。</p>
+<p>Looper也支持多个描述符的同时监听，可以通过Looper::addFd(…)添加多个描述符，Looper使用一个数组mRequests保存这些描述符。任何一个描述符被写入数据，Looper::pollOnce(…)都会被唤醒，Android应用程序键盘消息处理就采用了这种模式。</p>
+<h2 id="Looper-rebuildEpollLocked"><a href="#Looper-rebuildEpollLocked" class="headerlink" title="Looper::rebuildEpollLocked()"></a>Looper::rebuildEpollLocked()</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Looper::rebuildEpollLocked() &#123;</span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Allocate the new epoll instance and register the wake pipe.</span></span><br><span class="line">    <span class="comment">// 创建一个epoll实例，该实例可以监控一组已注册的描述符，任何一个描述符发生了</span></span><br><span class="line">    <span class="comment">// 写入，对该epoll实例的wait都会返回，否则会一直阻塞</span></span><br><span class="line">    mEpollFd = epoll_create(EPOLL_SIZE_HINT);</span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">eventItem</span>;</span></span><br><span class="line">    <span class="built_in">memset</span>(&amp; eventItem, <span class="number">0</span>, <span class="keyword">sizeof</span>(epoll_event)); <span class="comment">// zero out unused members of data field union</span></span><br><span class="line">    eventItem.events = EPOLLIN;</span><br><span class="line">    eventItem.data.fd = mWakeEventFd;</span><br><span class="line">    <span class="comment">// mWakeEventFd注册到mEpollFd中，成为默认被监控的描述符</span></span><br><span class="line">    <span class="keyword">int</span> result = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, mWakeEventFd, &amp; eventItem);</span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; mRequests.size(); i++) &#123;</span><br><span class="line">        <span class="keyword">const</span> Request&amp; request = mRequests.valueAt(i);</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">eventItem</span>;</span></span><br><span class="line">        request.initEventItem(&amp;eventItem);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> epollResult = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, request.fd, &amp; eventItem);</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中mRequests是一个vector，初始没有元素：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// system/core/include/utils/Looper.h:136</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Looper</span> :</span> <span class="keyword">public</span> RefBase &#123;</span><br><span class="line">...</span><br><span class="line"><span class="comment">// :464</span></span><br><span class="line">KeyedVector&lt;<span class="keyword">int</span>, Request&gt; mRequest:s;  <span class="comment">// guarded by mLock</span></span><br><span class="line">...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>因此<code>Looper::rebuildEpollLocked()</code>首次调用，for循环不会被执行。</p>
+<h1 id="Looper-addFd-…"><a href="#Looper-addFd-…" class="headerlink" title="Looper::addFd(…)"></a>Looper::addFd(…)</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> Looper::addFd(<span class="keyword">int</span> fd, <span class="keyword">int</span> ident, <span class="keyword">int</span> events, </span><br><span class="line">            <span class="keyword">const</span> sp&lt;LooperCallback&gt;&amp; callback, <span class="keyword">void</span>* data) &#123;</span><br><span class="line">    ... ...</span><br><span class="line">        Request request;</span><br><span class="line">        request.fd = fd;</span><br><span class="line">        request.ident = ident;</span><br><span class="line">        request.events = events;</span><br><span class="line">        request.seq = mNextRequestSeq++;</span><br><span class="line">        request.callback = callback;</span><br><span class="line">        request.data = data;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">eventItem</span>;</span></span><br><span class="line">        request.initEventItem(&amp;eventItem);</span><br><span class="line">            <span class="comment">// 注册描述符</span></span><br><span class="line">            <span class="keyword">int</span> epollResult = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, fd, &amp; eventItem);</span><br><span class="line">            ... ...</span><br><span class="line">            mRequests.add(fd, request); <span class="comment">// 保存到mRequests数组</span></span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Looper-pollOnce-…"><a href="#Looper-pollOnce-…" class="headerlink" title="Looper::pollOnce(…)"></a>Looper::pollOnce(…)</h1><p>前面注册了若干描述符，函数pollOnce(timeoutMillis)则用来等待这些描述符，最长等待timeoutMillis毫秒。等待期间，任何一个描述符发生读写事件，则该函数立刻返回。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// system/core/include/utils/Looper.h</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Looper</span> :</span> <span class="keyword">public</span> RefBase &#123;</span><br><span class="line">... ...</span><br><span class="line"><span class="comment">// : 263</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">pollOnce</span><span class="params">(<span class="keyword">int</span> timeoutMillis, <span class="keyword">int</span>* outFd, <span class="keyword">int</span>* outEvents, <span class="keyword">void</span>** outData)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">int</span> <span class="title">pollOnce</span><span class="params">(<span class="keyword">int</span> timeoutMillis)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> pollOnce(timeoutMillis, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>); <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br><span class="line">... ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// system/core/libutils/Looper.cpp:184</span></span><br><span class="line"><span class="keyword">int</span> Looper::pollOnce(<span class="keyword">int</span> timeoutMillis, <span class="keyword">int</span>* outFd, <span class="keyword">int</span>* outEvents, <span class="keyword">void</span>** outData) &#123;</span><br><span class="line">    <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">... ...</span><br><span class="line">        <span class="keyword">if</span> (result != <span class="number">0</span>) &#123;</span><br><span class="line">... ...</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        result = pollInner(timeoutMillis); <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该函数不断调用pollInner(…)查询是否有新消息需要处理。如果有，pollInner(…)返回非0，跳出循环。</p>
+<h2 id="Looper-pollInner-…"><a href="#Looper-pollInner-…" class="headerlink" title="Looper::pollInner(…)"></a>Looper::pollInner(…)</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// system/core/libutils/Looper.cpp:220</span></span><br><span class="line"><span class="keyword">int</span> Looper::pollInner(<span class="keyword">int</span> timeoutMillis) &#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">eventItems</span>[<span class="title">EPOLL_MAX_EVENTS</span>];</span></span><br><span class="line">    <span class="comment">// 阻塞，等待在这里，直到有写入事件</span></span><br><span class="line">    <span class="keyword">int</span> eventCount = epoll_wait(mEpollFd, eventItems, EPOLL_MAX_EVENTS, timeoutMillis);</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="comment">// 检查是哪一个描述符发生了读写事件</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; eventCount; i++) &#123;</span><br><span class="line">        <span class="keyword">int</span> fd = eventItems[i].data.fd;</span><br><span class="line">        <span class="keyword">uint32_t</span> epollEvents = eventItems[i].events;</span><br><span class="line">        <span class="keyword">if</span> (fd == mWakeEventFd) &#123;</span><br><span class="line">            <span class="keyword">if</span> (epollEvents &amp; EPOLLIN) &#123;</span><br><span class="line">                awoken();   <span class="comment">// 🏁把mWakeEventFd中的数据读出，以清空缓存</span></span><br><span class="line">            &#125; </span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">ssize_t</span> requestIndex = mRequests.indexOfKey(fd);</span><br><span class="line">            <span class="keyword">if</span> (requestIndex &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> events = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">if</span> (epollEvents &amp; EPOLLIN) events |= EVENT_INPUT;</span><br><span class="line">                <span class="keyword">if</span> (epollEvents &amp; EPOLLOUT) events |= EVENT_OUTPUT;</span><br><span class="line">                <span class="keyword">if</span> (epollEvents &amp; EPOLLERR) events |= EVENT_ERROR;</span><br><span class="line">                <span class="keyword">if</span> (epollEvents &amp; EPOLLHUP) events |= EVENT_HANGUP;</span><br><span class="line">                pushResponse(events, mRequests.valueAt(requestIndex));</span><br><span class="line">            &#125; </span><br><span class="line">            ... ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">Done: ;</span><br><span class="line">... ...</span><br><span class="line">    <span class="comment">// Invoke all response callbacks.</span></span><br><span class="line">    <span class="comment">// 如果通过addFd(...)注册的描述符还有附加的callback，则依次执行</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; mResponses.size(); i++) &#123;</span><br><span class="line">        Response&amp; response = mResponses.editItemAt(i);</span><br><span class="line">        <span class="keyword">if</span> (response.request.ident == POLL_CALLBACK) &#123;</span><br><span class="line">            <span class="keyword">int</span> fd = response.request.fd;</span><br><span class="line">            <span class="keyword">int</span> events = response.events;</span><br><span class="line">            <span class="keyword">void</span>* data = response.request.data;</span><br><span class="line">... ...</span><br><span class="line">            <span class="comment">// Invoke the callback.  Note that the file descriptor may be closed by</span></span><br><span class="line">            <span class="comment">// the callback (and potentially even reused) before the function returns so</span></span><br><span class="line">            <span class="comment">// we need to be a little careful when removing the file descriptor afterwards.</span></span><br><span class="line">            <span class="keyword">int</span> callbackResult = response.request.callback-&gt;handleEvent(fd, events, data);</span><br><span class="line">            <span class="keyword">if</span> (callbackResult == <span class="number">0</span>) &#123;</span><br><span class="line">                removeFd(fd, response.request.seq);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Clear the callback reference in the response structure promptly because we</span></span><br><span class="line">            <span class="comment">// will not clear the response vector itself until the next poll.</span></span><br><span class="line">            response.request.callback.clear();</span><br><span class="line">            result = POLL_CALLBACK;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">... ...</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如下面介绍，Looper::awoken()只不过把mWakeEventFd中的数据读出，具体是什么数据其实并不需要关心，因为mWakeEventFd的作用只是当一个信号灯，数据写入会让信号灯亮，亮了以后要做什么则是业务层的职责了。mWakeEventFd只负责等待灯亮后，放行业务层来处理。</p>
+<p>而mRequests中的描述符被写入，则不应该在这里读出数据，因为这些描述符是业务层创建、维护，只是注册到Looper中，利用了Looper阻塞、等待的机制，一旦信号灯亮，Looper会把这些描述符交给业务层处理。</p>
+<p>这就好比学校传达室的大爷，他自己定个闹钟，到点了，他会去敲学校的钟，告诉大家要上课了，当然敲钟之前他会自己把闹钟按掉。这就是mWakeEventFd机制。<br>此外，他还会帮大家代收快递，这也相当于是等待的过程。一旦来了快递，他会通知收件人过来取件，而不会自己把包裹处理掉，这就是通过addFd(…)添加进来的描述符的机制。</p>
+<p>在<code>Done:</code>后面还有一大坨代码是更高级的机制：每个通过addFd(…)添加进来的描述符还可以指定一个回调函数，每次有信号发生时，先执行该回调，再通知业务层。这就好比我们提前跟传达室的大爷打好招呼，如果有人找我，先把他请到休息室，茶水招待上，再通知我过来接待。</p>
+<h2 id="Looper-awoken"><a href="#Looper-awoken" class="headerlink" title="Looper::awoken()"></a>Looper::awoken()</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// system/core/libutils/Looper.cpp:418</span></span><br><span class="line"><span class="keyword">void</span> Looper::awoken() &#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">uint64_t</span> counter;</span><br><span class="line">    TEMP_FAILURE_RETRY(read(mWakeEventFd, &amp;counter, <span class="keyword">sizeof</span>(<span class="keyword">uint64_t</span>)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>TEMP_FAILURE_RETRY</code>的定义为<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TEMP_FAILURE_RETRY(expression) \  </span></span><br><span class="line">  (__extension__\  </span><br><span class="line">   (&#123; <span class="keyword">long</span> <span class="keyword">int</span> __result;\  </span><br><span class="line">       <span class="keyword">do</span> __result = (<span class="keyword">long</span> <span class="keyword">int</span>)(expression);\  </span><br><span class="line">       <span class="keyword">while</span>(__result == <span class="number">-1L</span>&amp;&amp; errno == EINTR);\  </span><br><span class="line">       __result;&#125;)\  </span><br><span class="line">#endif</span><br></pre></td></tr></table></figure></p>
+<p>直到读出一个正数才返回。</p>
+<h1 id="Looper-wake"><a href="#Looper-wake" class="headerlink" title="Looper::wake()"></a>Looper::wake()</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// system/core/libutils/Looper.cpp:404</span></span><br><span class="line"><span class="keyword">void</span> Looper::wake() &#123;</span><br><span class="line"> ... ...</span><br><span class="line">    <span class="keyword">uint64_t</span> inc = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">ssize_t</span> nWrite = TEMP_FAILURE_RETRY(write(mWakeEventFd, &amp;inc, <span class="keyword">sizeof</span>(<span class="keyword">uint64_t</span>)));</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>显然Looper构造了一个完整的消息泵逻辑，poll系列的函数从该泵中获取信号，如果没有信号则一直等待；wake()函数负责向该泵发送信号。</p>
+<h1 id="关于epoll"><a href="#关于epoll" class="headerlink" title="关于epoll"></a>关于epoll</h1><p>epoll在Looper中以及键盘消息处理机制中都有被使用，这里简单描述一下它的原理和使用方法。epoll是用来替代select，但和select相比，它不会随着监听fd数目的增长而降低效率。epoll的接口很简单，共三个函数。</p>
+<h2 id="int-epoll-create-int-size"><a href="#int-epoll-create-int-size" class="headerlink" title="int epoll_create(int size)"></a>int epoll_create(int size)</h2><p>创建一个epoll句柄，size用来告诉内核这个监听的数目一共有多大。需要注意，当创建好epoll句柄后，它会占用一个fd值，在linux下如果查看/proc/进程id/fd/，是能够看到这个fd的，所以在使用完epoll后，必须调用close()关闭，否则可能导致fd被耗尽。</p>
+<h2 id="int-epoll-ctl-int-epfd-int-op-int-fd-struct-epoll-event-event"><a href="#int-epoll-ctl-int-epfd-int-op-int-fd-struct-epoll-event-event" class="headerlink" title="int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)"></a>int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)</h2><p>epoll的事件注册函数。第一个参数是epoll_create()的返回值，第二个参数表示动作，用三个宏来表示：<br>EPOLL_CTL_ADD：注册新的fd到epfd中；<br>EPOLL_CTL_MOD：修改已经注册的fd的监听事件；<br>EPOLL_CTL_DEL：从epfd中删除一个fd；<br>第三个参数是需要监听的fd，第四个参数是告诉内核需要监听什么事，struct epoll_event结构如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">union</span> epoll_data &#123;</span><br><span class="line">    <span class="keyword">void</span> *ptr;</span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">__uint32_t</span> u32;</span><br><span class="line">    <span class="keyword">__uint64_t</span> u64;</span><br><span class="line">&#125; <span class="keyword">epoll_data_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> &#123;</span></span><br><span class="line">    <span class="keyword">__uint32_t</span> events; <span class="comment">/* Epoll events */</span></span><br><span class="line">    <span class="keyword">epoll_data_t</span> data; <span class="comment">/* User data variable */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>events可以是以下几个宏的集合：<br>EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭）；<br>EPOLLOUT：表示对应的文件描述符可以写；<br>EPOLLPRI：表示对应的文件描述符有紧急的数据可读（这里应该表示有带外数据到来）；<br>EPOLLERR：表示对应的文件描述符发生错误；<br>EPOLLHUP：表示对应的文件描述符被挂断；<br>EPOLLET： 将EPOLL设为边缘触发(Edge Triggered)模式，这是相对于水平触发(Level Triggered)来说的。<br>EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个socket加入到EPOLL队列里</p>
+<h2 id="int-epoll-wait-int-epfd-struct-epoll-event-events-int-maxevents-int-timeout"><a href="#int-epoll-wait-int-epfd-struct-epoll-event-events-int-maxevents-int-timeout" class="headerlink" title="int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout)"></a>int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout)</h2><p>等待事件的产生。参数events用来从内核得到事件的集合，maxevents表示events有多大，这个 maxevents的值不能大于创建epoll_create()时的size，参数timeout是超时时间（毫秒，0会立即返回，-1将永久阻塞）。该函数返回需要处理的事件数目，如返回0表示已超时。</p>
+<h2 id="epoll的使用模式"><a href="#epoll的使用模式" class="headerlink" title="epoll的使用模式"></a>epoll的使用模式</h2><p>几乎所有的epoll程序都是用如下框架：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>( ; ; ) &#123; </span><br><span class="line">    nfds=epoll_wait(epfd, events, maxevents, timeoutMilliSec); </span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;nfds;++i)&#123; <span class="comment">//处理所发生的所有事件</span></span><br><span class="line">        <span class="keyword">if</span>(events[i].data.fd==listenfd)&#123;    <span class="comment">// 监听事件</span></span><br><span class="line">            connfd = accept(listenfd,(sockaddr *)&amp;clientaddr, &amp;clilen); </span><br><span class="line">            ev.data.fd = connfd;            <span class="comment">// 设置用于读操作的文件描述符 </span></span><br><span class="line">            ev.events = EPOLLIN | EPOLLET;  <span class="comment">// 设置用于注测的读操作事件 </span></span><br><span class="line">            epoll_ctl(epfd,EPOLL_CTL_ADD,connfd,&amp;ev); <span class="comment">// 注册ev事件 </span></span><br><span class="line">       &#125;<span class="keyword">else</span> <span class="keyword">if</span>(events[i].events&amp;EPOLLIN)&#123;  <span class="comment">// 读事件</span></span><br><span class="line">            <span class="keyword">if</span> ( (sockfd = events[i].data.fd) &lt; <span class="number">0</span>) </span><br><span class="line">                <span class="keyword">continue</span>; </span><br><span class="line">            read(sockfd, line, MAXLINE);</span><br><span class="line"></span><br><span class="line">            ev.data.fd = sockfd;            <span class="comment">// 设置用于写操作的文件描述符 </span></span><br><span class="line">            ev.events = EPOLLOUT | EPOLLET; <span class="comment">// 设置用于注测的写操作事件 </span></span><br><span class="line">            epoll_ctl(epfd, EPOLL_CTL_MOD, sockfd, &amp;ev); <span class="comment">//修改sockfd上要处理的事件为EPOLLOUT </span></span><br><span class="line">       &#125;<span class="keyword">else</span> <span class="keyword">if</span>(events[i].events&amp;EPOLLOUT)&#123; <span class="comment">// 写事件</span></span><br><span class="line">            sockfd = events[i].data.fd; </span><br><span class="line">            write(sockfd, line, n);</span><br><span class="line"></span><br><span class="line">            ev.data.fd=sockfd;              <span class="comment">//设置用于读操作的文件描述符 </span></span><br><span class="line">            ev.events=EPOLLIN | EPOLLET;    <span class="comment">//设置用于注册的读操作事件 </span></span><br><span class="line">            epoll_ctl(epfd,EPOLL_CTL_MOD,sockfd,&amp;ev); <span class="comment">//修改sockfd上要处理的事件为EPOLIN </span></span><br><span class="line">        &#125; </span><br><span class="line">     &#125; </span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/键盘消息处理学习笔记/" rel="tag"># 键盘消息处理学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/02/2016/1002KeyboardLearning3/" rel="next" title="键盘消息处理学习笔记（三）——InputDispatcherThread和InputReaderThread两个线程函数">
+                <i class="fa fa-chevron-left"></i> 键盘消息处理学习笔记（三）——InputDispatcherThread和InputReaderThread两个线程函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/02/2016/1002KeyboardLearning5/" rel="prev" title="键盘消息处理学习笔记（五）——InputChannel的创建">
+                键盘消息处理学习笔记（五）——InputChannel的创建 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/02/2016/1002KeyboardLearning4/" data-title="键盘消息处理学习笔记（四）——Looper机制" data-url="http://palanceli.github.io/2016/10/02/2016/1002KeyboardLearning4/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Looper的构造函数"><span class="nav-number">1.</span> <span class="nav-text">Looper的构造函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Looper-rebuildEpollLocked"><span class="nav-number">1.1.</span> <span class="nav-text">Looper::rebuildEpollLocked()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Looper-addFd-…"><span class="nav-number">2.</span> <span class="nav-text">Looper::addFd(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Looper-pollOnce-…"><span class="nav-number">3.</span> <span class="nav-text">Looper::pollOnce(…)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Looper-pollInner-…"><span class="nav-number">3.1.</span> <span class="nav-text">Looper::pollInner(…)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Looper-awoken"><span class="nav-number">3.2.</span> <span class="nav-text">Looper::awoken()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Looper-wake"><span class="nav-number">4.</span> <span class="nav-text">Looper::wake()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于epoll"><span class="nav-number">5.</span> <span class="nav-text">关于epoll</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#int-epoll-create-int-size"><span class="nav-number">5.1.</span> <span class="nav-text">int epoll_create(int size)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#int-epoll-ctl-int-epfd-int-op-int-fd-struct-epoll-event-event"><span class="nav-number">5.2.</span> <span class="nav-text">int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#int-epoll-wait-int-epfd-struct-epoll-event-events-int-maxevents-int-timeout"><span class="nav-number">5.3.</span> <span class="nav-text">int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#epoll的使用模式"><span class="nav-number">5.4.</span> <span class="nav-text">epoll的使用模式</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

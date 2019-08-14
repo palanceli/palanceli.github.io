@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章引入iOS一种常用的UI元素——UITableView，本章介绍它的数据呈现方法，下一章介绍编辑。本章要点：  UITableView的运作原理 初始化函数 依赖倒置原则">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记十">
+<meta property="og:url" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章引入iOS一种常用的UI元素——UITableView，本章介绍它的数据呈现方法，下一章介绍编辑。本章要点：  UITableView的运作原理 初始化函数 依赖倒置原则">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img09.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.969Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记十">
+<meta name="twitter:description" content="本章引入iOS一种常用的UI元素——UITableView，本章介绍它的数据呈现方法，下一章介绍编辑。本章要点：  UITableView的运作原理 初始化函数 依赖倒置原则">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记十 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记十</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-29T23:00:00+08:00">
+                2017-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/29/2017/0729iOSProgrammingBNRG10/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/29/2017/0729iOSProgrammingBNRG10/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章引入iOS一种常用的UI元素——UITableView，本章介绍它的数据呈现方法，下一章介绍编辑。<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img01.png" alt><br>本章要点：</p>
+<ul>
+<li>UITableView的运作原理</li>
+<li>初始化函数</li>
+<li>依赖倒置原则<a id="more"></a>
+</li>
+</ul>
+<h1 id="1-UITableViewController"><a href="#1-UITableViewController" class="headerlink" title="1 UITableViewController"></a>1 UITableViewController</h1><h2 id="1-1-UITableViewController的运作原理"><a href="#1-1-UITableViewController的运作原理" class="headerlink" title="1.1 UITableViewController的运作原理"></a>1.1 UITableViewController的运作原理</h2><p>在Windows下制作ListCtrl的基本步骤是创建ListCtrl的实例后，向该实例循环插入数据。UITableViewConroller的运作模式则完全不同：它把MVC的职责划分更明确，</p>
+<ol>
+<li>引入了data source的角色，只负责提供数据，即Model。通过协议来实现这个角色。</li>
+<li>View在需要显示数据的时候，从data source取数据，他们之间通过data source 协议来通讯。因此在Windows下操作ListCtrl的生成数据并添加到ListCtrl的这种循环操作就作为这一层的业务逻辑被VC封装起来，不必程序员自己写了</li>
+<li>通常由VC自己扮演data source，因此VC需要实现其协议。</li>
+</ol>
+<p>可以做一个类比：当按钮被按下，按钮会把这个消息委托给VC来处理，因为按钮只知道怎么展现按下、抬起的状态，而VC能拿到数据，只有它才知道该怎么处理。UITableView是把“该展现多少行数据”、“每一行数据是什么”这些逻辑也封装成了类似“按钮被按下”的消息，委托给data source来处理了。所以你不必在关心如何把数据初始化给View，而只需要完成数据本身的初始化，并提供相应的协议接口，等着view来调用就好了。</p>
+<p>书中的图10.4描述了TableView下的各MVC之间的关系，UITableViewController除了要遵守UITableViewDataSource协议，履行Model的职责以外，还要遵守UITableViewDelegate协议，这是要履行Controller的职责。这是因为TableView不像Button那么简单，Button只有一个被按下的操作，而TableView有一系列复杂操作，这些操作都要委托给Controller来做，因此需要用UITableViewDelegate协议来定义这些操作。<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img02.png" alt></p>
+<h2 id="1-2-UITableViewController这种运作方式的好处"><a href="#1-2-UITableViewController这种运作方式的好处" class="headerlink" title="1.2 UITableViewController这种运作方式的好处"></a>1.2 UITableViewController这种运作方式的好处</h2><p>之前多次提到过的，通过这种方式把UI逻辑和业务逻辑分离开了。UI逻辑包括行为逻辑和数据逻辑，行为逻辑如点击某个Item、显示某行等，数据逻辑包括包含多少Item项，每一项是什么等；业务逻辑则是点击了某个Item之后应该展现什么View以及什么数据。</p>
+<p>分离开的好处在与如果没有特殊的定制，各个模块可以独立编写，工程上便于分工，如果现实模块发生变化，可以很快地把数据嫁接到别的视图，便于复用。</p>
+<h2 id="1-3-UITableDataSource都提供什么"><a href="#1-3-UITableDataSource都提供什么" class="headerlink" title="1.3 UITableDataSource都提供什么"></a>1.3 UITableDataSource都提供什么</h2><p>具体需要查看Xcode 的Document and API reference，它有两个必须实现的接口：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">func tableView(<span class="built_in">UITableView</span>, cellForRowAt: IndexPath)	<span class="comment">// 返回指定位置的cell</span></span><br><span class="line">func tableView(<span class="built_in">UITableView</span>, numberOfRowsInSection: Int)	<span class="comment">// 某一段有多少行</span></span><br></pre></td></tr></table></figure></p>
+<p>其余的接口都是可选的。</p>
+<h2 id="1-4-UITableView的默认形态"><a href="#1-4-UITableView的默认形态" class="headerlink" title="1.4 UITableView的默认形态"></a>1.4 UITableView的默认形态</h2><p>每行cell对象的展现形态构成了UITableView的展现形态。Cell可以分为两部分：contentView和AccessoryView<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img03.png" alt><br>其中AccessoryView可以是icon、button或什么都没有，这通过UITableViewCellAccessoryType枚举类型来设置，默认为UITableViewCellAccessoryType.none。contentView又包含三部分：两个UILabel和一个UIImageView。<br>他们的关系为：<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img04.png" alt><br>表现在界面上就是：<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img05.png" alt><br>通过风格设定可以调整这三个字段的布局关系。</p>
+<h2 id="1-5-创建UITableViewController的基本步骤"><a href="#1-5-创建UITableViewController的基本步骤" class="headerlink" title="1.5 创建UITableViewController的基本步骤"></a>1.5 创建UITableViewController的基本步骤</h2><p>第一步，引入TableView相关类和控件。<br>本书是把TableVC作为启动app时的初始VC，因此它把Xcode默认创建的VC相关文件模板都删掉了。重新创建新的UITableViewController子类文件，从控件库中创先新的TableViewController，并关联到新创建的子类上，设置为Initial VC。<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img06.png" alt><br>第二步，定义数据。<br>本书中是Item、ItemStore类，前者记录一条数据，后者记录Item的集合。</p>
+<p>第三步，改写VC的三个接口。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">func numberOfSections(<span class="keyword">in</span> : <span class="built_in">UITableView</span>) -&gt; Int	<span class="comment">// 返回TableView有几个段</span></span><br><span class="line">func tableView(_ : <span class="built_in">UITableView</span>, numberOfRowsInSection : Int) -&gt; Int	<span class="comment">// 返回指定的段有几行数据</span></span><br><span class="line">func tableView(_ : <span class="built_in">UITableView</span>, cellForRowAt : IndexPath) -&gt; <span class="built_in">UITableViewCell</span>	<span class="comment">// 返回指定位置的cell</span></span><br></pre></td></tr></table></figure></p>
+<p>TableView可以把数据分段显示，如系统通讯录就是按照字母分段：<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img07.png" alt><br>第一个接口是Xcode自动生成的，默认返回0，在本章只显示1个段，因此改为1。<br>因为只有1段，所以第二个接口不必判断段号，直接返回数据条数即可。<br>第三个接口Xcode自动生成的代码里使用了可重用队列来保存cell，暂时先注掉，每次都创建cell并返回。</p>
+<h2 id="1-6-可重用UITableViewCells的作用是什么"><a href="#1-6-可重用UITableViewCells的作用是什么" class="headerlink" title="1.6 可重用UITableViewCells的作用是什么"></a>1.6 可重用UITableViewCells的作用是什么</h2><p>Xcode自动生成了如下代码：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">override func tableView(_ tableView: <span class="built_in">UITableView</span>, cellForRowAt indexPath: IndexPath) -&gt; <span class="built_in">UITableViewCell</span> &#123;</span><br><span class="line">    let cell = tableView.dequeueReusableCell(withIdentifier: <span class="string">"reuseIdentifier"</span>, <span class="keyword">for</span>: indexPath)</span><br><span class="line">    <span class="comment">// Configure the cell...</span></span><br><span class="line">    <span class="keyword">return</span> cell</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>func tableView(_ : UITableView, cellForRowAt : IndexPath) -&gt; UITableViewCell</code>返回的内容通过<code>UITableViewCell</code>封装起来，这就好像通过码头的货物要使用集装箱封装起来。<br>货物从一个港口装箱运到另一个港口，如果一船只能装100个箱子，运送1000箱货物其实不需要1000个箱子，有100个就够了。<br>数据从屏幕的顶部滚动到屏幕底部，再滚出屏幕，也不是有多少数据就构造多少个<code>UITableViewCell</code>，移出屏幕的Cell实例就可以继续复用盛放即将移入的数据了。显然通过可重用UITableViewCells可以节省内存开销。</p>
+<h2 id="1-7-怎么使用可重用UITableViewCells"><a href="#1-7-怎么使用可重用UITableViewCells" class="headerlink" title="1.7 怎么使用可重用UITableViewCells"></a>1.7 怎么使用可重用UITableViewCells</h2><p>第一步：选中TableViewController中的Prototype Cells，为这里的Cell取一个ID填入Identifier<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img08.png" alt><br>第二步：向tableView.dequeueReusableCell申请该ID的Cell对象<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">override func tableView(_ tableView: <span class="built_in">UITableView</span>, cellForRowAt indexPath: IndexPath) -&gt; <span class="built_in">UITableViewCell</span> &#123;</span><br><span class="line">    let cell = <span class="built_in">UITableViewCell</span>(style: .value1, reuseIdentifier: <span class="string">"UITableViewCell"</span>)</span><br><span class="line">    <span class="comment">// Get a new or recycled cell</span></span><br><span class="line">    let cell = tableView.dequeueReusableCell(withIdentifier: <span class="string">"UITableViewCell"</span>, <span class="keyword">for</span>: indexPath) </span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> cell</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>实现一个可重用队列只要代码就可以了，为什么还要在InterfaceBuilder中设置Identifier呢？它背后做了什么？<br>一个datasource可能服务于多个UITableView，不同的UITableView可能使用不同的UITableCell对象。当集装箱服务于不同的货船的时候后，可能他们的尺寸规格都不一样，显然应该使用独立的队列来保存这些集装箱，ID就是用来标识这些队列的。</p>
+</blockquote>
+<font color="red">可重用对象池里坑的个数依赖一屏可以容纳几行Cell，队列是怎么知道该留多少个坑呢？</font>
+
+<h2 id="1-8-怎样让UITableView顶部留白以让出状态栏？"><a href="#1-8-怎样让UITableView顶部留白以让出状态栏？" class="headerlink" title="1.8 怎样让UITableView顶部留白以让出状态栏？"></a>1.8 怎样让UITableView顶部留白以让出状态栏？</h2><p>iOS的状态栏会透明显示在app的上面，所以始终要考虑不要出现文字叠加的情况：<br><img src="/2017/07/29/2017/0729iOSProgrammingBNRG10/img09.png" alt><br>任何视图顶部如果有文字，都要让出状态栏的位置。代码如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">override func viewDidLoad() &#123; </span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">    <span class="comment">// Get the height of the status bar</span></span><br><span class="line">    let statusBarHeight = <span class="built_in">UIApplication</span>.shared.statusBarFrame.height</span><br><span class="line">    let insets = <span class="built_in">UIEdgeInsets</span>(top: statusBarHeight, left: <span class="number">0</span>, bottom: <span class="number">0</span>, right: <span class="number">0</span>) </span><br><span class="line">    tableView.contentInset = insets</span><br><span class="line">    tableView.scrollIndicatorInsets = insets</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<font color="red">在[第6章](/2017/07/26/2017/0726iOSProgrammingBNRG06/#2-4-怎么让View的上边缘让出系统状态栏？)我们通过rootView.layoutMarginsGuide.leadingAnchor锚点对齐，使得位于地图顶部的SegmentedControl控件让出了状态栏，这里能否使用类似的做法呢？</font>
+
+<h1 id="2-初始化函数"><a href="#2-初始化函数" class="headerlink" title="2 初始化函数"></a>2 初始化函数</h1><h2 id="2-1-什么是designated-initializer和convenience-initializer？"><a href="#2-1-什么是designated-initializer和convenience-initializer？" class="headerlink" title="2.1 什么是designated initializer和convenience initializer？"></a>2.1 什么是designated initializer和convenience initializer？</h2><p>Designated initializer是一个类的主初始化器，是该类初始化的必经之路；必须在该初始化器中完成所有成员属性的初始化；该初始化器需要调用合适的父类初始化器来完成完整的初始化过程。<br>Convenience initializer是Designated initializer的helper方法，每个类只要有一个designated initializer，convenience initializer则可有可无。Convenience initializer需要缀上关键字：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">convenience init(random: Bool = <span class="literal">false</span>) &#123; </span><br><span class="line">    <span class="keyword">if</span> random &#123;</span><br><span class="line">        let adjectives = [<span class="string">"Fluffy"</span>, <span class="string">"Rusty"</span>, <span class="string">"Shiny"</span>]</span><br><span class="line">        let nouns = [<span class="string">"Bear"</span>, <span class="string">"Spork"</span>, <span class="string">"Mac"</span>]</span><br><span class="line">        </span><br><span class="line">        var let idx = arc4random_uniform(<span class="built_in">UInt32</span>(adjectives.count))</span><br><span class="line">        idx let randomAdjective = adjectives[Int(idx)]</span><br><span class="line">        idx = arc4random_uniform(<span class="built_in">UInt32</span>(nouns.count))</span><br><span class="line">        let randomNoun = nouns[Int(idx)] </span><br><span class="line"></span><br><span class="line">        let randomName = <span class="string">"\(randomAdjective) \(randomNoun)"</span></span><br><span class="line">        let randomValue = Int(arc4random_uniform(<span class="number">100</span>))</span><br><span class="line">        let randomSerialNumber = UUID().uuidString.components(separatedBy: <span class="string">"-"</span>).first!</span><br><span class="line"></span><br><span class="line">        <span class="keyword">self</span>.init(name: randomName, serialNumber: randomSerialNumber, valueInDollars: randomValue)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.init(name: <span class="string">""</span>, serialNumber: <span class="literal">nil</span>, valueInDollars: <span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-2-discardableResult关键字"><a href="#2-2-discardableResult关键字" class="headerlink" title="2.2 @discardableResult关键字"></a>2.2 @discardableResult关键字</h2><p>表示调用者可以忽略该函数的返回值，如果没有此关键字且调用者忽略了返回值，会得到一个编译警告<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@discardableResult func createItem() -&gt; Item &#123; </span><br><span class="line">    let newItem = Item(random: <span class="literal">true</span>)</span><br><span class="line">    allItems.append(newItem)</span><br><span class="line">    <span class="keyword">return</span> newItem </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// This is OK</span></span><br><span class="line">let newItem = itemStore.createItem()</span><br><span class="line"></span><br><span class="line"><span class="comment">// This is also OK; the result is not assigned to a variable </span></span><br><span class="line">itemStore.createItem()</span><br></pre></td></tr></table></figure></p>
+<h1 id="3-依赖倒置原则"><a href="#3-依赖倒置原则" class="headerlink" title="3 依赖倒置原则"></a>3 依赖倒置原则</h1><h2 id="3-1-什么是依赖倒置原则"><a href="#3-1-什么是依赖倒置原则" class="headerlink" title="3.1 什么是依赖倒置原则"></a>3.1 什么是依赖倒置原则</h2><p>依赖倒置原则包含两条：</p>
+<ol>
+<li>高级别的对象不要依赖低级别的对象，他们都依赖于抽象</li>
+<li>抽象不要依赖具体细节，细节应该依赖于抽象</li>
+</ol>
+<p>高级别是指业务逻辑，低级别是指机制。比如文件系统就是一层抽象，上层的文件操作逻辑不依赖具体的文件类型，而只负责数据读写，文件系统负责处理具体不同文件类型的操作；上层的业务细节依赖文件系统的抽象层。</p>
+<blockquote>
+<p>抽象层调用具体文件类型的细节怎么解释呢？不就和第2条矛盾了吗？<br>答案是：这两条规则描述的是模块之间的依赖原则，文件系统的抽象层调用文件系统的实现层这是模块内部，这叫封装，不叫依赖。<br>在本节中UITableView需要数据的时候问datasource请求，也是遵循了这样一个原则，data source是数据的抽象层，UITableView是UI逻辑的细节，是高级别的对象，datasource是数据抽象，是低级别的抽象，再往底层从文件获取数据或者从数据库获取数据则是数据的低级别具体。</p>
+</blockquote>
+<h2 id="3-2-在本章中哪里体现了依赖倒置原则"><a href="#3-2-在本章中哪里体现了依赖倒置原则" class="headerlink" title="3.2 在本章中哪里体现了依赖倒置原则"></a>3.2 在本章中哪里体现了依赖倒置原则</h2><p>没有在VC直接操作Item的集合，体现了这一原则。VC操作Item集合的增删改查，ItemStore把这些操作封装起来，成为一个抽象层。</p>
+<h2 id="3-3-什么是依赖注入，本章中如何使用依赖注入？"><a href="#3-3-什么是依赖注入，本章中如何使用依赖注入？" class="headerlink" title="3.3 什么是依赖注入，本章中如何使用依赖注入？"></a>3.3 什么是依赖注入，本章中如何使用依赖注入？</h2><p>依赖注入是指通过构造函数或setter函数或直接在执行函数直接传参，把细节相关的对象传入业务层，之后业务层只访问传入对象的接口，而不关心细节。由此达成业务逻辑只依赖抽象的目的。<br>比如Button的响应函数的传入参数是UIButton，而不关心具体是哪个按钮，这就是通过执行函数直接传参的方式实现了依赖注入。</p>
+<h1 id="4-应用程序启动"><a href="#4-应用程序启动" class="headerlink" title="4 应用程序启动"></a>4 应用程序启动</h1><h2 id="4-1-AppDelegate的职责？"><a href="#4-1-AppDelegate的职责？" class="headerlink" title="4.1 AppDelegate的职责？"></a>4.1 AppDelegate的职责？</h2><p>负责处理app的状态变化。</p>
+<font color="red">app都有哪些状态？会怎么变化？AppDelegate需要怎么处理这些变化？</font>
+
+<h2 id="4-2-AppDelegate-application-didFinishLaunchingWithOptions"><a href="#4-2-AppDelegate-application-didFinishLaunchingWithOptions" class="headerlink" title="4.2 AppDelegate::application(_:didFinishLaunchingWithOptions:)"></a>4.2 AppDelegate::application(_:didFinishLaunchingWithOptions:)</h2><p>当应用程序首次启动时，该函数会被调用。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">func application(_ application: <span class="built_in">UIApplication</span>, didFinishLaunchingWithOptions launchOptions: [<span class="built_in">UIApplicationLaunchOptionsKey</span> : Any]?) -&gt; Bool &#123;</span><br><span class="line">    <span class="comment">// Override point for customization after application launch.</span></span><br><span class="line">    <span class="comment">// Create an ItemStore</span></span><br><span class="line">    let itemStore = ItemStore()</span><br><span class="line">    <span class="comment">// Access the ItemsViewController and set its item store</span></span><br><span class="line">    let itemsController = window!.rootViewController as! ItemsViewController <span class="comment">// 这句该怎么理解？</span></span><br><span class="line">    itemsController.itemStore = itemStore  </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>上面代码中注视的那句该怎么理解呢？<br>首次遇到带了两个感叹号，我们来分析一下。<code>window</code>是<code>AppDelegate</code>的optional变量，但在运行到<code>AppDelegate::application(_:didFinishLaunchingWithOptions:)</code>时，这个<code>window</code>变量及其<code>rootViewController</code>属性肯定不会是空，所以使用了强制展开。但是按照<a href="/2017/07/22/2017/0722iOSProgrammingBNRG02/#2-3-展开optional变量">第二章</a>介绍的optional原则，是不是应该使用if-let更好呢。</p>
+</blockquote>
+<p><br></p>
+<blockquote>
+<p><font color="red">下面这段代码为什么变量itemStore尾部加了感叹号，编译不出现ItemsViewController没有初始化器的错误了？<br>没有感叹号的时候，出现这个错误可以理解：它要求所有成员都应该被designated initializer初始化，现在缺少这个initializer。可是为什么加了感叹号就没问题了呢？<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> ItemsViewController: <span class="built_in">UITableViewController</span> &#123;</span><br><span class="line">    <span class="comment">// 如果没有感叹号会提示ItemsViewController没有初始化器</span></span><br><span class="line">    var itemStore: ItemStore!</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></font></p>
+</blockquote>
+<p>&lt;/font&gt;</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/28/2017/0728iOSProgrammingBNRG09/" rel="next" title="《iOS Programming BNRG》笔记九">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记九
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/30/2017/0730iOSProgrammingBNRG11/" rel="prev" title="《iOS Programming BNRG》笔记十一">
+                《iOS Programming BNRG》笔记十一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/07/29/2017/0729iOSProgrammingBNRG10/" data-title="《iOS Programming BNRG》笔记十" data-url="http://palanceli.github.io/2017/07/29/2017/0729iOSProgrammingBNRG10/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-UITableViewController"><span class="nav-number">1.</span> <span class="nav-text">1 UITableViewController</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-UITableViewController的运作原理"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 UITableViewController的运作原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-UITableViewController这种运作方式的好处"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 UITableViewController这种运作方式的好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-UITableDataSource都提供什么"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 UITableDataSource都提供什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-UITableView的默认形态"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 UITableView的默认形态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-创建UITableViewController的基本步骤"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 创建UITableViewController的基本步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-可重用UITableViewCells的作用是什么"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 可重用UITableViewCells的作用是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-7-怎么使用可重用UITableViewCells"><span class="nav-number">1.7.</span> <span class="nav-text">1.7 怎么使用可重用UITableViewCells</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-8-怎样让UITableView顶部留白以让出状态栏？"><span class="nav-number">1.8.</span> <span class="nav-text">1.8 怎样让UITableView顶部留白以让出状态栏？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-初始化函数"><span class="nav-number">2.</span> <span class="nav-text">2 初始化函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-什么是designated-initializer和convenience-initializer？"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 什么是designated initializer和convenience initializer？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-discardableResult关键字"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 @discardableResult关键字</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-依赖倒置原则"><span class="nav-number">3.</span> <span class="nav-text">3 依赖倒置原则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-什么是依赖倒置原则"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 什么是依赖倒置原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-在本章中哪里体现了依赖倒置原则"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 在本章中哪里体现了依赖倒置原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-什么是依赖注入，本章中如何使用依赖注入？"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 什么是依赖注入，本章中如何使用依赖注入？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-应用程序启动"><span class="nav-number">4.</span> <span class="nav-text">4 应用程序启动</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-AppDelegate的职责？"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 AppDelegate的职责？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-AppDelegate-application-didFinishLaunchingWithOptions"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 AppDelegate::application(_:didFinishLaunchingWithOptions:)</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

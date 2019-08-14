@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="第八章实现了一些简单的动画。本章要点：  animate函数的使用">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记八">
+<meta property="og:url" content="http://palanceli.github.io/2017/07/28/2017/0727iOSProgrammingBNRG08/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="第八章实现了一些简单的动画。本章要点：  animate函数的使用">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/28/2017/0727iOSProgrammingBNRG08/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.968Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记八">
+<meta name="twitter:description" content="第八章实现了一些简单的动画。本章要点：  animate函数的使用">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/07/28/2017/0727iOSProgrammingBNRG08/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/07/28/2017/0727iOSProgrammingBNRG08/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记八 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/07/28/2017/0727iOSProgrammingBNRG08/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记八</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-28T23:00:00+08:00">
+                2017-07-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/28/2017/0727iOSProgrammingBNRG08/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/28/2017/0727iOSProgrammingBNRG08/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第八章实现了一些简单的动画。本章要点：</p>
+<ul>
+<li>animate函数的使用<a id="more"></a>
+</li>
+</ul>
+<h1 id="1-闭包"><a href="#1-闭包" class="headerlink" title="1. 闭包"></a>1. 闭包</h1><h2 id="1-1-什么是闭包"><a href="#1-1-什么是闭包" class="headerlink" title="1.1 什么是闭包"></a>1.1 什么是闭包</h2><p>闭包就是一个代码块，可以参数或者返回值的形式被传递。</p>
+<h2 id="1-2-声明、定义、使用闭包的形式"><a href="#1-2-声明、定义、使用闭包的形式" class="headerlink" title="1.2 声明、定义、使用闭包的形式"></a>1.2 声明、定义、使用闭包的形式</h2><p>声明：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(arguments) -&gt; returnType</span><br></pre></td></tr></table></figure></p>
+<p>定义：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123; (arguments) -&gt; returnType <span class="keyword">in</span></span><br><span class="line">    <span class="comment">// code</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中arguments是参数列表，returnType是返回值类型，in是关键字，在code处写要执行的代码</p>
+<p>使用：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let animation = &#123;()-&gt;Void <span class="keyword">in</span></span><br><span class="line">    <span class="keyword">self</span>.labelA.alpha = <span class="number">1</span></span><br><span class="line">&#125;	<span class="comment">// 定义闭包，并赋值给变量animation</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">UIView</span>.animate(withDuration: <span class="number">0.5</span>, animations: animation)</span><br></pre></td></tr></table></figure></p>
+<p>对于参数和返回均为空的闭包，也可以写作：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIView</span>.animate(withDuration: <span class="number">0.5</span>, animations: &#123;<span class="keyword">self</span>.lableA.alpha = <span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-3-闭包写法的若干变种"><a href="#1-3-闭包写法的若干变种" class="headerlink" title="1.3 闭包写法的若干变种"></a>1.3 闭包写法的若干变种</h2><p>假设Array有一个sorted(by:)函数用于排序，它接收一个闭包用于比较两个元素的大小。一般的写法如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let volunteerCounts = [<span class="number">1</span>,<span class="number">3</span>,<span class="number">40</span>,<span class="number">32</span>,<span class="number">2</span>,<span class="number">53</span>,<span class="number">77</span>,<span class="number">13</span>]</span><br><span class="line">let volunteersSorted = volunteerCounts.sorted(by: &#123; </span><br><span class="line">    (i: Int, j: Int) -&gt; Bool <span class="keyword">in</span></span><br><span class="line">    <span class="keyword">return</span> i &lt; j</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p><strong>省略参数和返回类型</strong><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let volunteersSorted = volunteerCounts.sorted(by: &#123; i, j <span class="keyword">in</span> i &lt; j &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>它省略了返回值类型，因为通过<code>i&lt;j</code>就能推断出返回值类型为<code>Bool</code>；<br>它省略了参数类型，我认为应该是根据sorted(by:)的原型推断出来的；<br>它省略了<code>return</code>关键词，这是因为闭包只有一条语句，如果包含一条以上的语句，<code>return</code>是不能省略的。</p>
+<p><strong>省略参数名称</strong><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let volunteersSorted = volunteerCounts.sorted(by: &#123; $<span class="number">0</span> &lt; $<span class="number">1</span>&gt; &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>Swift为闭包提供了参数的速记名称，使用<code>$0</code>、<code>$1</code>、<code>$2</code>……即可，编译器的类型推断可以分辨出每个参数应该是什么类型。</p>
+<p><strong>tailing closure</strong><br>上面的闭包还可以进一步简化：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let volunteersSorted = volunteerCounts.sorted&#123; $<span class="number">0</span> &lt; $<span class="number">1</span>&gt; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果函数的最后一个参数是闭包，可以把这个闭包尾随到函数的外面。本例中sorted(by:)只有一个参数，因此可以省略参数列表，函数名后面直接尾随闭包。</p>
+<h1 id="2-动效函数"><a href="#2-动效函数" class="headerlink" title="2. 动效函数"></a>2. 动效函数</h1><p>本章介绍的动画都是由这个函数实现的<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> func animate(withDuration duration: TimeInterval, animations: @escaping () -&gt; Void)</span><br></pre></td></tr></table></figure></p>
+<p>使用这个函数和在keynote里制作动画很像，它不需要写多复杂的运动算法，只需要告诉它起始、终止位置，动画时长，加速度等参数，它就能生成动画效果。听起来好像很局限，其实对于一般应用来说已经足够用了。</p>
+<h2 id="2-1-怎么实现渐现-渐隐动画"><a href="#2-1-怎么实现渐现-渐隐动画" class="headerlink" title="2.1 怎么实现渐现/渐隐动画"></a>2.1 怎么实现渐现/渐隐动画</h2><p>只需要给animate函数传入动画时长和终局时控件的透明度即可：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@IBAction func onButton(_ sender: <span class="built_in">UIButton</span>)&#123;</span><br><span class="line">    labelA.alpha = <span class="number">0</span> 	<span class="comment">// 每次点击按钮先把labelA设为不可见</span></span><br><span class="line">    labelB.alpha = <span class="number">1</span>	<span class="comment">// 把labelB设为可见</span></span><br><span class="line">    <span class="comment">// 执行动画，时间长度5秒，最终效果是labelA可见，labelB不可见</span></span><br><span class="line">    <span class="built_in">UIView</span>.animate(withDuration: <span class="number">5</span>,</span><br><span class="line">                  animations: &#123;</span><br><span class="line">       <span class="keyword">self</span>.labelA.alpha = <span class="number">1</span></span><br><span class="line">       <span class="keyword">self</span>.labelB.alpha = <span class="number">0</span></span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-2-怎么实现飞入-飞出动画"><a href="#2-2-怎么实现飞入-飞出动画" class="headerlink" title="2.2 怎么实现飞入/飞出动画"></a>2.2 怎么实现飞入/飞出动画</h2><p>原理和2.1一样，通过设置动画时长，终局时控件位置就可以生成动画。<br>有两种方式都能设置终局位置：</p>
+<ol>
+<li>直接设置要挪动的控件坐标；</li>
+<li>给控件添加约束，为约束关联outlet变量，设置该约束变量的值。</li>
+</ol>
+<p>本章使用了第2种方式，它的好处在于：在Interface Builder中对控件做了完备的约束。如果采用第1种方式，只能在Interface Builder中不加某个方向的约束，这会因约束不足而被warning。</p>
+<blockquote>
+<p>注意：对于一个view，如果加了约束同时又设置了它的坐标，生效的是约束，对坐标的设置无效。</p>
+</blockquote>
+<h2 id="2-3-通过设置终局位置实现飞入-飞出动画"><a href="#2-3-通过设置终局位置实现飞入-飞出动画" class="headerlink" title="2.3 通过设置终局位置实现飞入/飞出动画"></a>2.3 通过设置终局位置实现飞入/飞出动画</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@IBOutlet var labelC:<span class="built_in">UILabel</span>!</span><br><span class="line">    </span><br><span class="line">override func viewWillAppear(_ animated: Bool)&#123;</span><br><span class="line">    <span class="keyword">super</span>.viewWillAppear(animated)</span><br><span class="line">    labelC.frame.origin.x = <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">@IBAction func onButton(_ sender: <span class="built_in">UIButton</span>)&#123;</span><br><span class="line">    let screenWidth = view.frame.width</span><br><span class="line">    labelC.frame.origin.x = <span class="number">0</span>	<span class="comment">// 从屏幕的左侧用5秒钟时间飞到屏幕右侧</span></span><br><span class="line">    <span class="built_in">UIView</span>.animate(withDuration: <span class="number">5</span>,</span><br><span class="line">                    animations: &#123;</span><br><span class="line">        <span class="keyword">self</span>.labelC.frame.origin.x = screenWidth</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-4-为约束关联outlet变量"><a href="#2-4-为约束关联outlet变量" class="headerlink" title="2.4 为约束关联outlet变量"></a>2.4 为约束关联outlet变量</h2><p>约束是在Interface Builder中创建的，要通过代码修改它的值，必须在代码中为之关联变量。在Interface Builder中的任何对象，都可以在代码中为之创建outlets变量。<br>第一步：在Interface Builder中为labelA创建水平居中的约束。<br>第二步：在VC中声明约束变量<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> ViewController: <span class="built_in">UIViewController</span> &#123;</span><br><span class="line">    @IBOutlet var labelA:<span class="built_in">UILabel</span>!</span><br><span class="line">    @IBOutlet var labelB:<span class="built_in">UILabel</span>!</span><br><span class="line">    </span><br><span class="line">    @IBOutlet var labelAConstraint: <span class="built_in">NSLayoutConstraint</span>!</span><br><span class="line">    @IBOutlet var labelBConstraint: <span class="built_in">NSLayoutConstraint</span>!</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第三步：在Interface Builder中完成对象到outlets变量的关联：<br><img src="/2017/07/28/2017/0727iOSProgrammingBNRG08/img01.png" alt></p>
+<h2 id="2-5-通过设置终局约束实现飞入-飞出动画"><a href="#2-5-通过设置终局约束实现飞入-飞出动画" class="headerlink" title="2.5 通过设置终局约束实现飞入/飞出动画"></a>2.5 通过设置终局约束实现飞入/飞出动画</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> ViewController: <span class="built_in">UIViewController</span> &#123;</span><br><span class="line">    @IBOutlet var labelA:<span class="built_in">UILabel</span>!</span><br><span class="line">    @IBOutlet var labelAConstraint: <span class="built_in">NSLayoutConstraint</span>!  <span class="comment">// 已完成关联，并在Interface Builder中设置居中</span></span><br><span class="line">    </span><br><span class="line">    override func viewWillAppear(_ animated: Bool)&#123;</span><br><span class="line">        <span class="keyword">super</span>.viewWillAppear(animated)</span><br><span class="line">        </span><br><span class="line">        labelA.alpha = <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @IBAction func onButton(_ sender: <span class="built_in">UIButton</span>)&#123;</span><br><span class="line">        let screenWidth = view.frame.width</span><br><span class="line">        labelA.alpha = <span class="number">0</span></span><br><span class="line">        labelAConstraint.constant = <span class="number">0</span></span><br><span class="line">        <span class="keyword">self</span>.view.layoutIfNeeded()</span><br><span class="line">        <span class="comment">// 设置终局时labelA的水平约束值为screenWidth，即向屏幕右侧出去半个屏幕的宽度</span></span><br><span class="line">        <span class="built_in">UIView</span>.animate(withDuration: <span class="number">5</span>,	</span><br><span class="line">                       animations: &#123;</span><br><span class="line">            <span class="keyword">self</span>.labelA.alpha = <span class="number">1</span></span><br><span class="line">            <span class="keyword">self</span>.labelAConstraint.constant = screenWidth</span><br><span class="line">            <span class="keyword">self</span>.view.layoutIfNeeded()</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个约束值的含义和在Interface Builder中体现的一模一样：0表示居中，屏幕左边缘是<code>-view.frame.width / 2</code>；右边缘是<code>view.frame.width / 2</code>。</p>
+<h2 id="2-6-为什么要使用layoutIfNeed-函数"><a href="#2-6-为什么要使用layoutIfNeed-函数" class="headerlink" title="2.6 为什么要使用layoutIfNeed()函数"></a>2.6 为什么要使用layoutIfNeed()函数</h2><p>需要特别注意，如果要修改视图的约束值，必须调用layoutIfNeed()函数，否则会看不到动画。而直接修改视图的坐标值则不存在这样的问题。<br>书中的解释是：约束修改后，系统需要重新计算所有相关视图的frame值，如果任何一个约束条件发生变化就立刻触发该计算，这在性能上非常不划算。因此应该在修改了所有约束之后，一次调用layoutIfNeeded()函数，这样重新计算就只会发生一次。</p>
+<h2 id="2-7-Xcode支持本地化时的bug"><a href="#2-7-Xcode支持本地化时的bug" class="headerlink" title="2.7 Xcode支持本地化时的bug"></a>2.7 Xcode支持本地化时的bug</h2><p>常常发现在修改了本地化文件的内容，再运行app后，修改并不生效，这是Xcode的一个bug。解决办法：在iOS中删除app，在Xcode中clean并重新编译项目。再次运行即可。</p>
+<h2 id="2-8-怎样调整动画的变化速度曲线？"><a href="#2-8-怎样调整动画的变化速度曲线？" class="headerlink" title="2.8 怎样调整动画的变化速度曲线？"></a>2.8 怎样调整动画的变化速度曲线？</h2><p>还是使用animate函数，只是用更多参数的版本，本质上还是对终局和过程做设置：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> func animate(withDuration duration: TimeInterval, </span><br><span class="line">    delay: TimeInterval, </span><br><span class="line">    usingSpringWithDamping dampingRatio: <span class="built_in">CGFloat</span>, <span class="comment">// 弹簧运动的阻尼比</span></span><br><span class="line">    initialSpringVelocity velocity: <span class="built_in">CGFloat</span>, </span><br><span class="line">    options: <span class="built_in">UIViewAnimationOptions</span> = [], 	<span class="comment">// 设置动画的加速度、是否循环播放</span></span><br><span class="line">    animations: @escaping () -&gt; Void, </span><br><span class="line">    completion: ((Bool) -&gt; Void)? = <span class="literal">nil</span>)	<span class="comment">// 动画结束时要执行的块</span></span><br></pre></td></tr></table></figure></p>
+<p>这个函数的用法应该反复使用，体会每个参数的含义。</p>
+<h2 id="2-9-函数的外部参数名"><a href="#2-9-函数的外部参数名" class="headerlink" title="2.9 函数的外部参数名"></a>2.9 函数的外部参数名</h2><p>经常看到函数的参数列表中有一条下划线：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">override func viewWillAppear(_ animated: Bool)</span><br></pre></td></tr></table></figure></p>
+<p>这是因为Swift函数可以有外部名，比如：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">func printPersonalGreeting(to name: String)&#123;</span><br><span class="line">    print(<span class="string">"Hello \(name), welcome to your playground."</span>)</span><br><span class="line">&#125;</span><br><span class="line">printPersonalGreeting(to: <span class="string">"Matt"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>to:就是外部参数名。如果省略外部参数名，就可以用下划线来占位：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">func printPersonalGreeting(_ name: String)&#123;</span><br><span class="line">    print(<span class="string">"Hello \(name), welcome to your playground."</span>)</span><br><span class="line">&#125;</span><br><span class="line">printPersonalGreeting(<span class="string">"Matt"</span>)</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/27/2017/0727iOSProgrammingBNRG07/" rel="next" title="《iOS Programming BNRG》笔记七">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记七
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/28/2017/0728iOSProgrammingBNRG09/" rel="prev" title="《iOS Programming BNRG》笔记九">
+                《iOS Programming BNRG》笔记九 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/07/28/2017/0727iOSProgrammingBNRG08/" data-title="《iOS Programming BNRG》笔记八" data-url="http://palanceli.github.io/2017/07/28/2017/0727iOSProgrammingBNRG08/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-闭包"><span class="nav-number">1.</span> <span class="nav-text">1. 闭包</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-什么是闭包"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 什么是闭包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-声明、定义、使用闭包的形式"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 声明、定义、使用闭包的形式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-闭包写法的若干变种"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 闭包写法的若干变种</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-动效函数"><span class="nav-number">2.</span> <span class="nav-text">2. 动效函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-怎么实现渐现-渐隐动画"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 怎么实现渐现/渐隐动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-怎么实现飞入-飞出动画"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 怎么实现飞入/飞出动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-通过设置终局位置实现飞入-飞出动画"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 通过设置终局位置实现飞入/飞出动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-为约束关联outlet变量"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 为约束关联outlet变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-通过设置终局约束实现飞入-飞出动画"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 通过设置终局约束实现飞入/飞出动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-为什么要使用layoutIfNeed-函数"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 为什么要使用layoutIfNeed()函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-Xcode支持本地化时的bug"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 Xcode支持本地化时的bug</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-8-怎样调整动画的变化速度曲线？"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 怎样调整动画的变化速度曲线？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-9-函数的外部参数名"><span class="nav-number">2.9.</span> <span class="nav-text">2.9 函数的外部参数名</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

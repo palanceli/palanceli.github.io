@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章引入了一个Service，用来下载缩略图，如果有新的内容则弹出通知。本章要点：  Service 检测网络是否可用 AlarmManager PendingIntent Notifications">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记二十八">
+<meta property="og:url" content="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章引入了一个Service，用来下载缩略图，如果有新的内容则弹出通知。本章要点：  Service 检测网络是否可用 AlarmManager PendingIntent Notifications">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/img02.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.157Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记二十八">
+<meta name="twitter:description" content="本章引入了一个Service，用来下载缩略图，如果有新的内容则弹出通知。本章要点：  Service 检测网络是否可用 AlarmManager PendingIntent Notifications">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记二十八 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记二十八</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-08T20:00:00+08:00">
+                2017-11-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/08/2017/1108AndroidProgrammingBNRG28/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/08/2017/1108AndroidProgrammingBNRG28/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章引入了一个Service，用来下载缩略图，如果有新的内容则弹出通知。<br>本章要点：</p>
+<ul>
+<li>Service</li>
+<li>检测网络是否可用</li>
+<li>AlarmManager</li>
+<li>PendingIntent</li>
+<li>Notifications<a id="more"></a>
+</li>
+</ul>
+<h1 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h1><p>Service用于无需界面展现、交互，只需在后台工作的情况。</p>
+<font color="red">为什么不使用线程？</font>
+
+<h2 id="创建IntentService"><a href="#创建IntentService" class="headerlink" title="创建IntentService"></a>创建IntentService</h2><h3 id="1-定义IntentService类"><a href="#1-定义IntentService类" class="headerlink" title="1.定义IntentService类"></a>1.定义IntentService类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PollService.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PollService</span> <span class="keyword">extends</span> <span class="title">IntentService</span> </span>&#123; <span class="comment">// ①</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"PollService"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Intent <span class="title">newIntent</span><span class="params">(Context context)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Intent(context, PollService.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">PollService</span><span class="params">()</span></span>&#123; <span class="keyword">super</span>(TAG); &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onHandleIntent</span><span class="params">(Intent intent)</span></span>&#123; <span class="comment">// ②</span></span><br><span class="line">        Log.i(TAG, <span class="string">"Received an intent: "</span> + intent);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>① 定义派生自IntentService的类。<br>② 实现<code>onHandleIntent(...)</code>方法。</p>
+<p>Service的Intent被称为命令，命令被发送给Service通知它完成约定的任务。<br>当收到第一条命令，IntentService被启动，并启动一个后台线程，将命令排队。在后台线程中，IntentService调用<code>onHandleIntent(...)</code>方法依次处理队列中的命令。新的命令可以继续入队，当队列中的命令被处理完，Service将终止和销毁。下图展现了这一过程：<br><img src="/2017/11/08/2017/1108AndroidProgrammingBNRG28/img01.png" alt></p>
+<h3 id="2-在AndroidManifest-xml声明"><a href="#2-在AndroidManifest-xml声明" class="headerlink" title="2.在AndroidManifest.xml声明"></a>2.在AndroidManifest.xml声明</h3><p>和Activity类似，Service需要响应来自内部或外部的intents，所以要在<code>AndroidManifest.xml</code>中声明：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="tag">&lt;<span class="name">service</span> <span class="attr">android:name</span>=<span class="string">".PollService"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="3-调用"><a href="#3-调用" class="headerlink" title="3.调用"></a>3.调用</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent i = PollService.newIntent(getActivity());</span><br><span class="line">getActivity().startService(i);</span><br></pre></td></tr></table></figure>
+<p>不是说好收到第一个命令后，会自动档调起吗？为什么此处变手动挡呢？自动挡在下面引入定时Alarm的时候会用上，下面是定时向PollService发送请求：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每10秒钟发一次</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> POLL_INTERVAL_MS = </span><br><span class="line">                                    TimeUnit.SECONDS.toMillis(<span class="number">10</span>);</span><br><span class="line">...</span><br><span class="line">Intent i = <span class="keyword">new</span> Intent(context, PollService.class);</span><br><span class="line">PendingIntent pi = PendingIntent.getService(context, <span class="number">0</span>, i, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">AlarmManager alarmManager = </span><br><span class="line">        (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);</span><br><span class="line">alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, </span><br><span class="line">        SystemClock.elapsedRealtime(),POLL_INTERVAL_MS, pi);</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="Service是什么"><a href="#Service是什么" class="headerlink" title="Service是什么"></a>Service是什么</h2><p>和Activity一样，Service是应用程序的一类组件，它提供生命周期回调函数给应用程序的主线程调用。<strong>注意：这些回调是在主线程中调用的。</strong>大部分的Service都需要配备一个后台线程辅以工作，IntentService提供了后台线程并管理它，所以通常建议使用IntentService。</p>
+<h2 id="Service的生命周期"><a href="#Service的生命周期" class="headerlink" title="Service的生命周期"></a>Service的生命周期</h2><ul>
+<li><code>onCreate(...)</code> 在Service被创建的时候调用。</li>
+<li><code>onStartCommand(Intent, int, int)</code> 每次通过<code>startService(Intent)</code>启动service的时候都会被调用。第一个整型参数是一个标志位，表明该Intent是被重复发送还是首次发送；第二个整型参数的值每次都不同，用来区分每次调用的startID。</li>
+<li><code>onDestroy()</code> Service在销毁前被调用。根据不同类型的Service，<code>onDestroy()</code>的调用时机会有不同。<code>onStartCommand(Intent, int, int)</code>用返回值来表明Service的类型。</li>
+</ul>
+<h3 id="Service的类型"><a href="#Service的类型" class="headerlink" title="Service的类型"></a>Service的类型</h3><p>按照是否Sticky分为两类：</p>
+<ul>
+<li><code>Non-sticky Service</code> 该类型的Service主动声明自己停止，<code>onStartCommand(Intent, int, int)</code>返回<code>START_NOT_STICKY</code>或<code>START_REDELIVER_INTENT</code>时，属于这种类型。Service通过调用<code>stopSelf()</code>或<code>stopSelf(int)</code>来终止自己，前者是无条件终止，不管<code>onStartCommand(...)</code>被调用过多少次；后者则根据<code>onStartCommand(...)</code>的参数startID，停止与它最接近的那个。</li>
+<li><code>Sticky Service</code> 该类型的Service需要等别人调用<code>Context.stopService(Intent)</code>才会停止。<code>onStartCommand(Intent, int, int)</code>返回<code>START_STICKY</code>时，属于这种类型。</li>
+</ul>
+<p>更细的，按照<code>onStartCommand(...)</code>的返回值，分为三类：</p>
+<ul>
+<li><code>START_NOT_STICKY</code> 当Service运行的进程被Android系统强制杀掉之后，不会重新创建该Service，如果想重新实例化该Service，就必须重新调用<code>startService(...)</code>来启动。如果Service在执行工作中被中断几次无关紧要或者对“Android内存紧张的情况下需要被杀掉且不立即重新创建”也可接受的话，可以设置该值，如定时从服务器中获取最新数据。</li>
+<li><code>START_REDELIVER_INTENT</code> 当Service运行的进程被Android系统强制杀掉之后，Android系统会将再次重新创建该Service，并执行<code>onStartCommand(...)</code>回调方法，并将Service在被杀掉之前最后一次传入onStartCommand方法中的Intent再次保留下来并再次传入到重新创建的Service的<code>onStartCommand(...)</code>方法中。如果我们的Service需要依赖具体的Intent才能运行（需要从Intent中读取相关数据信息等），并且在强制销毁后有必要重新创建运行，这种情况就适合使用START_REDELIVER_INTENT。</li>
+<li><code>START_STICKY</code> 当Service运行的进程被Android系统强制杀掉之后，Android系统会将该Service依然设置为started状态（即运行状态），但是不再保存onStartCommand方法传入的intent对象，然后Android系统会尝试再次重新创建该Service，并执行<code>onStartCommand(...)</code>回调方法，这时该回调的Intent参数为null，即虽然会执行但是获取不到intent信息。如果你的Service可以在任意时刻运行或结束都没什么问题，而且不需要intent信息，就可以使用这种类型，比如一个用来播放背景音乐的Service就适合返回该值。</li>
+</ul>
+<h2 id="bind-Service"><a href="#bind-Service" class="headerlink" title="bind Service"></a>bind Service</h2><p>调用<code>bindService(Intent, ServiceConnection, int)</code>，可以有机会直接调用Service的方法。<code>ServiceConnection</code>用来接收和binding相关的回调。书中提供这样一段示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> ServiceConnection mServiceConnection = <span class="keyword">new</span> ServiceConnection()&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName className, IBinder service)</span></span>&#123;</span><br><span class="line">        MyBinder binder = (MyBinder)service;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName className)</span></span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    Intent i = <span class="keyword">new</span> Intent(getActivity(), MyService.class);</span><br><span class="line">    getActivity().bindService(i, mServiceConnection, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onDestroy();</span><br><span class="line">    getActivity().unbindService(mServiceConnection);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在Service侧，binding引入了两个生命周期回调：</p>
+<ul>
+<li><code>onBind(Intent)</code> 每次Service被bind，并通过<code>ServiceConnection::onServiceConnected(...)</code>返回IBind对象时被调用。</li>
+<li><code>onUnbind(Intent)</code> 每次binding终止时被调用。</li>
+</ul>
+<h3 id="本地service-binding"><a href="#本地service-binding" class="headerlink" title="本地service binding"></a>本地service binding</h3><p>如果service存在于本进程内，这就是本地binding，此时它会提供直接调用service的函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">MyBinder</span> <span class="keyword">extends</span> <span class="title">IBinder</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> MyService <span class="title">getService</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> MyService.<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBind</span><span class="params">(Intent intent)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="function">enw <span class="title">MyBinder</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>但是不建议这么用，因为如果MyBinder存在于本地，直接调用就好了，为什么要通过Binder来绕弯子？</p>
+<h3 id="远端service-binding"><a href="#远端service-binding" class="headerlink" title="远端service binding"></a>远端service binding</h3><p>这是binding Service的主要用途，因为它提供了跨进程调用的机制。</p>
+<font color="red">本书没有详细讲解具体用法，稍后应该回过头来把它和android源码的binder打通。</font>
+
+<h1 id="检测是否有网络可用"><a href="#检测是否有网络可用" class="headerlink" title="检测是否有网络可用"></a>检测是否有网络可用</h1><p>在Android系统下，用户可以关闭后台应用的联网权限，这对于控制手机的低功耗运行非常有帮助。应用程序需要对此作出判断，如果网络不可用，就不要再做后续的联网尝试了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isNetworkAvailableAndConnected</span><span class="params">()</span></span>&#123;</span><br><span class="line">    ConnectivityManager cm = (ConnectivityManager)</span><br><span class="line">                            getSystemService(CONNECTIVITY_SERVICE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ①如果系统关闭了“允许后台联网的开关”</span></span><br><span class="line">    <span class="keyword">boolean</span> isNetworkAvailable = (cm.getActiveNetworkInfo() != <span class="keyword">null</span>);</span><br><span class="line">    <span class="comment">// ②如果开关是打开的，但网络连不上</span></span><br><span class="line">    <span class="keyword">boolean</span> isNetConnected = (isNetworkAvailable &amp;&amp;</span><br><span class="line">                            cm.getActiveNetworkInfo().isConnected());</span><br><span class="line">    <span class="keyword">return</span> isNetConnected;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在<code>AndroidManifest.xml</code>中声明<code>ACCESS_NETWORK_STATE</code>才有权限调用以上函数：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.ACCESS_NETWORK_STATE"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="定期被动通知"><a href="#定期被动通知" class="headerlink" title="定期被动通知"></a>定期被动通知</h1><p>本节中需要一种机制，能定期发送Service命令，让后台Service工作起来。<br>一种备选方案是<code>Handle::sendMessageDelayed(...)</code>或<code>Handle::PostDelayed(...)</code>，这种方案的缺陷在于：如果用户退出了所有Activity，进程也将退出，所有Handle就不会被执行了。<br>更好的方案是采用<code>AlarmManager</code>，它借助系统服务可以向你发送Intents，不管发送方的进程是否还活着。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> POLL_INTERVAL_MS = TimeUnit.MINUTES.toMillis(<span class="number">1</span>);</span><br><span class="line">...</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setServiceAlarm</span><span class="params">(Context context, <span class="keyword">boolean</span> isOn)</span></span>&#123;</span><br><span class="line">    Intent i = PollService.newIntent(context);</span><br><span class="line">    PendingIntent pi = PendingIntent.getService(context, <span class="number">0</span>, i, <span class="number">0</span>);</span><br><span class="line">    AlarmManager alarmManager = (AlarmManager)</span><br><span class="line">                    context.getSystemService(Context.ALARM_SERVICE);</span><br><span class="line">    <span class="keyword">if</span>(isOn)&#123;</span><br><span class="line">        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,</span><br><span class="line">                SystemClock.elapsedRealtime(),</span><br><span class="line">                POLL_INTERVAL_MS, pi);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        alarmManager.cancel(pi);</span><br><span class="line">        pi.cancel();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="PendingIntent"><a href="#PendingIntent" class="headerlink" title="PendingIntent"></a>PendingIntent</h2><p>PendingIntent是一种特殊的Intent，主要的区别在于Intent立刻执行，随所在的activity 消失而消失。而PendingIntent不是立刻执行，可以看作是对intent的包装，它执行的操作实质上是参数Intent传进来的的操作。<br>通常用<code>getActivity(...)</code>、<code>getBroadcast(...)</code>、<code>getService(...)</code>来得到PendingIntent的实例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">PendingIntent <span class="title">getService</span> <span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    Context context,  // 启动service的context</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> requestCode,  // 用来区分发送端</span></span></span><br><span class="line"><span class="function"><span class="params">    Intent intent,    // 描述待启动service的intent</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> flags)</span>        <span class="comment">// 控制创建PendingItent的标志位</span></span></span><br></pre></td></tr></table></figure></p>
+<p>当前Activity并不马上启动PendingIntent所包含的Intent，而是在外部执行PendingIntent时，调用Intent。<br>由于在PendingIntent中保存了当前App的Context，使它赋予外部App可以如同当前App一样的执行PendingIntent里的 Intent，就算在执行时当前App已经不存在了，也能通过PendingIntent里的Context执行Intent。<br>Intent一般是用作Activity、Sercvice、BroadcastReceiver之间传递数据，而Pendingintent，一般用在 Notification上。</p>
+<p>可以调用<code>PendingIntent::send()</code>立刻发出Intent，此时执行发出的是系统，发出者仍然是当前app。可以把PendingIntent转交给其他人发出，此时发出者还是当前app。调用了<code>cancel()</code>的PendingIntent，即使<code>send()</code>也不会再被发出了。</p>
+<p>对于同一个Intentqq请求两次PendingIntent得到的是同一个实例。在flag中传入<code>PendingIntent::FLAG_NO_CREATE</code>，当PendingIntent已经存在时，返回该存在的实例，如果不存在则返回null。</p>
+<h2 id="AlarmManager"><a href="#AlarmManager" class="headerlink" title="AlarmManager"></a>AlarmManager</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setRepeating</span> <span class="params">(<span class="keyword">int</span> type,            // alarm类型</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">long</span> triggerAtMillis,   // 首次启动alarm的时间</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">long</span> intervalMillis,    // 每次间隔毫秒数</span></span></span><br><span class="line"><span class="function"><span class="params">                PendingIntent operation)</span><span class="comment">// 要执行的操作</span></span></span><br></pre></td></tr></table></figure>
+<p>其中type可以取值为<code>RTC_WAKEUP</code>、<code>RTC</code>、<code>ELAPSED_REALTIME_WAKEUP</code>或<code>ELAPSED_REALTIME</code>。<br><code>RTCxxx</code>表示绝对时间（System.currentTimeMillis()）<br><code>ELAPSED_REALTIMExxx</code>表示相对于系统启动的时间（SystemClock.elapsedRealtime()）<br><code>xxx_WAKEUP</code> 如果设备处于休眠模式，如灭屏时，强制alarm唤醒设备<br>没有<code>_WAKEUP</code> 的版本当设备处于休眠模式时，不会强制唤醒设备</p>
+<p><code>setRepeating(...)</code>并不会精确地按照<code>intervalMillis</code>唤醒alarm，主要是系统处于功耗的考虑。如果系统有10个应用，分别15分钟唤醒一次，如果他们完全错开，最差的情况会让系统在一小时内被唤醒40次。系统会尽量把他们的唤醒时间安排在一起，比较好的情况是一小时内系统只被唤醒4次了。如果需要绝对精准，可以调用<code>AlarmManager::setWindow(...)</code>或<code>AlarmManager::setExact(...)</code></p>
+<p><code>AlarmManager::Cancel(Pending)</code>用于取消alarm。</p>
+<h1 id="Notifications"><a href="#Notifications" class="headerlink" title="Notifications"></a>Notifications</h1><p>系统顶部有通知栏，下拉显示通知列表。但是按照本书的写法，在AndroidO上不能正常运行，会弹出如下错误：<br><img src="/2017/11/08/2017/1108AndroidProgrammingBNRG28/img03.png" alt><br>因为在AndroidO中引入了通知频道（Notification Channel）的概念，开发者为需要发送的每个不同的通知类型创建一个通知渠道，所有发布至通知渠道的通知都具有相同的行为。当用户修改任何<code>重要性</code>、<code>声音</code>、<code>光</code>、<code>振动</code>、<code>在锁屏上显示</code>、<code>替换免打扰模式</code>这些特性的行为时，修改将作用于通知渠道。</p>
+<p>先来看一下通知的交互逻辑和对应字段：<br><img src="/2017/11/08/2017/1108AndroidProgrammingBNRG28/img02.png" alt></p>
+<p>创建Notification实例可以发送通知。一个Notification至少需要包含：</p>
+<font color="red">此处应该贴个图</font>
+具体代码如下：
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doNotifiy</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Resources resources = getResources();</span><br><span class="line">    Intent i = PhotoGalleryActivity.newIntent(<span class="keyword">this</span>);</span><br><span class="line">    PendingIntent pi = PendingIntent.getActivity(<span class="keyword">this</span>, <span class="number">0</span>, i, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    NotificationManager notificationManager =</span><br><span class="line">            (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);</span><br><span class="line">    <span class="comment">// 创建通知频道</span></span><br><span class="line">    String notificationChannelId = getString(R.string.notify_channel_id);</span><br><span class="line">    CharSequence channelName = getString(R.string.notify_channel_name);</span><br><span class="line">    String channelDescription = getString(R.string.notify_channel_description);</span><br><span class="line">    <span class="keyword">int</span> channelImportance = NotificationManager.IMPORTANCE_HIGH;</span><br><span class="line">    <span class="comment">// 传入频道ID、名称和级别</span></span><br><span class="line">    NotificationChannel notificationChannel = <span class="keyword">new</span> NotificationChannel(</span><br><span class="line">            notificationChannelId, channelName, channelImportance);</span><br><span class="line">    notificationChannel.setDescription(channelDescription);</span><br><span class="line">    notificationChannel.enableLights(<span class="keyword">true</span>); <span class="comment">// 闪光灯和颜色</span></span><br><span class="line">    notificationChannel.setLightColor(Color.RED);</span><br><span class="line">    notificationChannel.enableVibration(<span class="keyword">true</span>);  <span class="comment">// 震动和节奏</span></span><br><span class="line">    notificationChannel.setVibrationPattern(<span class="keyword">new</span> <span class="keyword">long</span>[]&#123;<span class="number">100</span>, <span class="number">200</span>, <span class="number">300</span>, <span class="number">400</span>, <span class="number">500</span>, <span class="number">400</span>, <span class="number">300</span>, <span class="number">200</span>, <span class="number">400</span>&#125;);</span><br><span class="line">    notificationManager.createNotificationChannel(notificationChannel);</span><br><span class="line">    <span class="comment">// 创建通知Builder</span></span><br><span class="line">    Notification notification = <span class="keyword">new</span></span><br><span class="line">            Notification.Builder(<span class="keyword">this</span>)</span><br><span class="line">            .setTicker(resources.getString(R.string.new_pictures_title))</span><br><span class="line">            .setSmallIcon(android.R.drawable.ic_menu_report_image)</span><br><span class="line">            .setContentTitle(resources.getString(R.string.new_pictures_title))</span><br><span class="line">            .setContentText(resources.getString(R.string.new_pictures_text))</span><br><span class="line">            .setContentIntent(pi)</span><br><span class="line">            .setAutoCancel(<span class="keyword">true</span>)</span><br><span class="line">            .setChannelId(notificationChannelId)</span><br><span class="line">            .build();</span><br><span class="line">    <span class="comment">// 弹出通知</span></span><br><span class="line">    notificationManager.notify(<span class="number">0</span>, notification);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+# JobScheduler 和JobService
+Android Lollipop引入了`JobScheduler`和`JobService`，可以更方便地完成诸如本节的“定期跑任务，跑起之前检查是否已经有该任务在跑，检查网络是否可用”这套组合拳。
+<font color="red">但是本节讲得太浅，就不在这总结了。回头应该进一步扩展阅读，补上这一节。</font>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/07/2017/1107AndroidProgrammingBNRG27/" rel="next" title="《Android Programming BNRG》笔记二十七">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记二十七
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/09/2017/1109AndroidProgrammingBNRG29/" rel="prev" title="《Android Programming BNRG》笔记二十九">
+                《Android Programming BNRG》笔记二十九 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/11/08/2017/1108AndroidProgrammingBNRG28/" data-title="《Android Programming BNRG》笔记二十八" data-url="http://palanceli.github.io/2017/11/08/2017/1108AndroidProgrammingBNRG28/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Service"><span class="nav-number">1.</span> <span class="nav-text">Service</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建IntentService"><span class="nav-number">1.1.</span> <span class="nav-text">创建IntentService</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-定义IntentService类"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.定义IntentService类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-在AndroidManifest-xml声明"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.在AndroidManifest.xml声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-调用"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service是什么"><span class="nav-number">1.2.</span> <span class="nav-text">Service是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service的生命周期"><span class="nav-number">1.3.</span> <span class="nav-text">Service的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Service的类型"><span class="nav-number">1.3.1.</span> <span class="nav-text">Service的类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bind-Service"><span class="nav-number">1.4.</span> <span class="nav-text">bind Service</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本地service-binding"><span class="nav-number">1.4.1.</span> <span class="nav-text">本地service binding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远端service-binding"><span class="nav-number">1.4.2.</span> <span class="nav-text">远端service binding</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#检测是否有网络可用"><span class="nav-number">2.</span> <span class="nav-text">检测是否有网络可用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定期被动通知"><span class="nav-number">3.</span> <span class="nav-text">定期被动通知</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PendingIntent"><span class="nav-number">3.1.</span> <span class="nav-text">PendingIntent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AlarmManager"><span class="nav-number">3.2.</span> <span class="nav-text">AlarmManager</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Notifications"><span class="nav-number">4.</span> <span class="nav-text">Notifications</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

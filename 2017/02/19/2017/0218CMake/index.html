@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="CMake,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近在新的Windows系统下使用CMake+Boost，不慎踩了好多坑，浪费不少时间。备忘如下：">
+<meta name="keywords" content="CMake">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用CMake+Boost中遇到的几个问题">
+<meta property="og:url" content="http://palanceli.github.io/2017/02/19/2017/0218CMake/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="最近在新的Windows系统下使用CMake+Boost，不慎踩了好多坑，浪费不少时间。备忘如下：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.806Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用CMake+Boost中遇到的几个问题">
+<meta name="twitter:description" content="最近在新的Windows系统下使用CMake+Boost，不慎踩了好多坑，浪费不少时间。备忘如下：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/02/19/2017/0218CMake/">
+
+
+
+
+
+  <title>使用CMake+Boost中遇到的几个问题 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/02/19/2017/0218CMake/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用CMake+Boost中遇到的几个问题</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-19T22:45:00+08:00">
+                2017-02-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/19/2017/0218CMake/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/19/2017/0218CMake/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近在新的Windows系统下使用CMake+Boost，不慎踩了好多坑，浪费不少时间。备忘如下：<br><a id="more"></a></p>
+<h1 id="安装Boost前先安装python"><a href="#安装Boost前先安装python" class="headerlink" title="安装Boost前先安装python"></a>安装Boost前先安装python</h1><p>前文曾经介绍过，安装使用Boost本来是很简单的，只要执行<code>booststrap.bat</code>和<code>b2.exe</code>即可。注意：一定要仔细看二者的执行结果，<code>b2.exe</code>好像依赖python，如果没有安装python，这个编译会报错。python安装完成后要把<code>python.exe</code>的路径添加到环境变量<code>PATH</code>中。</p>
+<h1 id="编译Boost"><a href="#编译Boost" class="headerlink" title="编译Boost"></a>编译Boost</h1><p>编译参数形式如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b2.exe --build-dir=build --stagedir=./stage/x64 --build-type=complete address-model=64 threading=multi --toolset=msvc-14.0 runtime-link=static -j 12</span><br></pre></td></tr></table></figure></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>variant=debug/release</td>
+<td>编译版本类型，debug版文件名有_d，release版没有，生成_d也必然使用debug版的C++运行时库，因此_gd是同时出现的</td>
+</tr>
+<tr>
+<td>link=static/shared</td>
+<td>编译为静态库还是动态库，生成.lib还是.dll，对应文件中的BOOST_LIB_PREFIX</td>
+</tr>
+<tr>
+<td>threading=single/multi</td>
+<td>使用单线程还是多线程CRT，多线程版文件名有_mt，单线程版没有。对应文件中的BOOST_LIB_THREAD_OPT</td>
+</tr>
+<tr>
+<td>runtime-link=static/shared</td>
+<td>静态还是动态链接CRT，静态链接文件名有_s，对应文件中的BOOST_LIB_THREAD_OPT</td>
+</tr>
+<tr>
+<td>address-model=32/64</td>
+<td>32位或64位编译</td>
+</tr>
+<tr>
+<td>—toolset</td>
+<td>C++编译器</td>
+</tr>
+<tr>
+<td>—build-dir=[builddir]</td>
+<td>存放编译的临时文件</td>
+</tr>
+<tr>
+<td>—stagedir=[stagedir]</td>
+<td>存放编译后的库文件，默认是stage</td>
+</tr>
+<tr>
+<td>—build-type=complete</td>
+<td>编译所有版本，否则只编译一小部分版本（相当于:variant=release, threading=multi;link=shared/static;runtime-link=shared）</td>
+</tr>
+<tr>
+<td>—with-[library]</td>
+<td>只编译指定的库，如输入—with-regex就只编译regex库了。</td>
+</tr>
+<tr>
+<td>—show-libraries</td>
+<td>显示需要编译的库名称</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="生成文件的命名规则"><a href="#生成文件的命名规则" class="headerlink" title="生成文件的命名规则"></a>生成文件的命名规则</h2><p>以<code>libboost_regex-vc71-mt-d-1_34.lib</code>为例：</p>
+<ul>
+<li><code>lib</code>  前缀：除了Microsoft Windows之外，每一个Boost库的名字都以此字符串开始。在Windows上，只有普通的静态库使用lib前缀；导入库和DLL不使用。</li>
+<li><code>boost_regex</code> 库名称：所有boost库名文件以boost_开头。</li>
+<li><code>-vc71</code> Toolset 标记：标识了构建该库所用的toolset和版本。</li>
+<li><code>-mt</code> Threading 标记：标识构建该库启用了多线程支持。不支持多线程的库没有-mt。</li>
+<li><code>-d</code> ABI标记：对于每一种特性，向标记中添加一个字母：</li>
+</ul>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>标记</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>s</td>
+<td>静态链接CRT</td>
+</tr>
+<tr>
+<td>g</td>
+<td>使用调试版本的CRT</td>
+</tr>
+<tr>
+<td>d</td>
+<td>构建调试版本的Boost</td>
+</tr>
+<tr>
+<td>y</td>
+<td>使用Python的特殊调试构建</td>
+</tr>
+<tr>
+<td>p</td>
+<td>使用STLPort标准库而不是编译器提供的默认库</td>
+</tr>
+<tr>
+<td>n</td>
+<td>使用STLPort已被弃用的“native iostreams”</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li><code>-1_34</code><br>版本标记：完整的Boost发布号，下划线代替点。例如，1.31.1版本将被标记为“-1_31_1”。</li>
+<li><code>.lib</code><br>扩展名：取决于操作系统。在大多数unix平台上，.a是静态库，.so是共享库。在Windows上，.dll表示共享库，.lib是静态或导入库。</li>
+</ul>
+<p>可见，32位或64位信息并不体现在文件命名中，因此需要分目录存放。通常在生成库文件时，要执行如下两条命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">b2.exe --build-dir=build --stagedir=./stage/x64 --build-type=complete address-model=64 threading=multi --toolset=msvc-14.0 runtime-link=static -j 12</span><br><span class="line">b2.exe --build-dir=build --stagedir=./stage/win32 --build-type=complete address-model=32 threading=multi --toolset=msvc-14.0 runtime-link=static -j 12</span><br></pre></td></tr></table></figure></p>
+<h1 id="使用Boost"><a href="#使用Boost" class="headerlink" title="使用Boost"></a>使用Boost</h1><h2 id="使用32-64位版本"><a href="#使用32-64位版本" class="headerlink" title="使用32/64位版本"></a>使用32/64位版本</h2><p>可以在CMake中加入如下判断并设置<code>Boost_LIBRARY_DIR</code>：<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">if</span>(CMAKE_SIZEOF_VOID_P <span class="keyword">EQUAL</span> <span class="number">8</span>)</span><br><span class="line">  <span class="keyword">set</span>(Boost_LIBRARY_DIR <span class="string">"$ENV&#123;BOOST_ROOT&#125;\\stage\\x64\\lib"</span>)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_SIZEOF_VOID_P <span class="keyword">EQUAL</span> <span class="number">4</span>)</span><br><span class="line">  <span class="keyword">set</span>(Boost_LIBRARY_DIR <span class="string">"$ENV&#123;BOOST_ROOT&#125;\\stage\\win32\\lib"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span>(Boost_USE_STATIC_LIBS <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">find_package</span>(Boost COMPONENTS program_options log REQUIRED)</span><br><span class="line"></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">"Boost_LIBRARIES:$&#123;Boost_LIBRARIES&#125;"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>执行<br><code>cmake -G &quot;Visual Studio 14 Win64&quot; ..</code><br>输出<code>Boost_LIBRARIES</code>为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-- Boost_LIBRARIES:.../stage/x64/lib/libboost_xxx-mt-s-1_62.lib;...</span><br></pre></td></tr></table></figure></p>
+<p>执行<br><code>cmake -G &quot;Visual Studio 14&quot; ..</code><br>输出<code>Boost_LIBRARIES</code>为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-- Boost_LIBRARIES:.../stage/Win32/lib/libboost_xxx-mt-s-1_62.lib;...</span><br></pre></td></tr></table></figure></p>
+<h2 id="多线程、CRT开关"><a href="#多线程、CRT开关" class="headerlink" title="多线程、CRT开关"></a>多线程、CRT开关</h2><p>使用Boost时，在CMake中有相应的选项对应不同的Boost生成库：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boost_USE_MULTITHREADED</td>
+<td>使用与单线程/多线程链接CRT的Boost（_mt），默认ON</td>
+</tr>
+<tr>
+<td>Boost_USE_STATIC_LIBS</td>
+<td>使用Boost的静态/动态库，默认OFF</td>
+</tr>
+<tr>
+<td>Boost_USE_STATIC_RUNTIME</td>
+<td>使用静态/动态链接CRT的Boost（_s），默认值依赖平台</td>
+</tr>
+<tr>
+<td>Boost_USE_DEBUG_RUNTIME</td>
+<td>使用链接了debug/release版CRT的Boost（_g)，默认为ON</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>但我发现这几个开关实际上并不是平行的各管各的，比如：<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">set</span>(Boost_USE_STATIC_LIBS <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(Boost_USE_STATIC_RUNTIME <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(Boost_USE_DEBUG_RUNTIME <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(Boost_USE_MULTITHREADED <span class="keyword">ON</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_package</span>(Boost COMPONENTS log REQUIRED)</span><br><span class="line"></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">"Boost_LIBRARIES:$&#123;Boost_LIBRARIES&#125;"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>执行<br><code>cmake -G &quot;Visual Studio 14&quot; ..</code></p>
+<p><strong> <code>Boost_USE_STATIC_LIBS=ON</code> </strong>，输出的<code>Boost_LIBRARIES</code>为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">...libboost_xxx-mt-s-1_62.lib;...</span><br></pre></td></tr></table></figure></p>
+<p><strong> <code>Boost_USE_STATIC_RUNTIME=ON</code> </strong>，<code>Boost_LIBRARIES</code>为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">optimized;...libboost_xxx-mt-s-1_62.lib;</span><br><span class="line">debug;...libboost_xxx-mt-sgd-1_62.lib;</span><br></pre></td></tr></table></figure></p>
+<p>此时如果<code>Boost_USE_DEBUG_RUNTIME=OFF</code>则不生成sgd版本。<br>如果<code>Boost_USE_STATIC_RUNTIME=OFF</code>，开关<code>Boost_USE_DEBUG_RUNTIME</code>将不起作用，<code>Boost_LIBRARIES</code>总是为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">optimized;...libboost_xxx-mt-s-1_62.lib;</span><br></pre></td></tr></table></figure></p>
+<p>所以一般静态链接Boost时，使用如下两行即可满足Debug和Release版本的链接：<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(Boost_USE_STATIC_LIBS <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">set</span>(Boost_USE_STATIC_RUNTIME <span class="keyword">ON</span>)</span><br></pre></td></tr></table></figure></p>
+<p>Release版使用：</p>
+<h1 id="编译Boost使用的VS要和CMake编译工程使用的VS版本一致"><a href="#编译Boost使用的VS要和CMake编译工程使用的VS版本一致" class="headerlink" title="编译Boost使用的VS要和CMake编译工程使用的VS版本一致"></a>编译Boost使用的VS要和CMake编译工程使用的VS版本一致</h1><p>来<code>boost_1_62_0\stage\lib</code>下，可以看到编译出来的lib文件名是包含VC版本号的，如：<br><code>libboost_atomic-vc140-mt-1_62.lib</code>。<br><code>vc140</code>对应Visual Studio 2015，如果此时CMake编译project的Visual Studio版本不是2015，而又依赖了Boost：<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(Boost_USE_STATIC_LIBS <span class="keyword">ON</span>) </span><br><span class="line"><span class="keyword">find_package</span>(Boost COMPONENTS program_options log REQUIRED)</span><br></pre></td></tr></table></figure></p>
+<p>这会导致CMake能找到Boost，却找不到需要的<code>program_options</code>和<code>log</code>组件，这是因为CMake要找与指定Visual Studio版本对应的libboost库文件。报出的错是找不到指定的Boost版本，其实跟Boost版本无关，跟编译它使用的VS版本有关。</p>
+<h1 id="环境变量BOOST-ROOT"><a href="#环境变量BOOST-ROOT" class="headerlink" title="环境变量BOOST_ROOT"></a>环境变量BOOST_ROOT</h1><p>如果指定环境变量，BOOST_ROOT的值为boost所在的上一级目录，比如我的目录如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">c:\boost_1_62_0   &lt;-- BOOST_ROOT指向这里</span><br><span class="line">    ├─bin.v2</span><br><span class="line">    ├─boost</span><br><span class="line">    ├─doc</span><br><span class="line">    ├─libs</span><br><span class="line">    ├─more</span><br><span class="line">    ├─stage</span><br><span class="line">    ├─status</span><br><span class="line">    ├─tools</span><br><span class="line">    └─...</span><br></pre></td></tr></table></figure></p>
+<p>环境变量应设为：<code>BOOST_ROOT=c:\boost_1_62_0</code>。</p>
+<p>我尝试不写这个环境变量，发现CMake依然能找到Boost，那就不要写了吧~</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CMake/" rel="tag"># CMake</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/18/2017/0218WinImmImeSample1/" rel="next" title="Windows下创建基于IMM的输入法">
+                <i class="fa fa-chevron-left"></i> Windows下创建基于IMM的输入法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/05/2017/0305macOSIMKSample1/" rel="prev" title="macOS下基于IMK的输入法（一）——创建步骤">
+                macOS下基于IMK的输入法（一）——创建步骤 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/02/19/2017/0218CMake/" data-title="使用CMake+Boost中遇到的几个问题" data-url="http://palanceli.github.io/2017/02/19/2017/0218CMake/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Boost前先安装python"><span class="nav-number">1.</span> <span class="nav-text">安装Boost前先安装python</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译Boost"><span class="nav-number">2.</span> <span class="nav-text">编译Boost</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#生成文件的命名规则"><span class="nav-number">2.1.</span> <span class="nav-text">生成文件的命名规则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用Boost"><span class="nav-number">3.</span> <span class="nav-text">使用Boost</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用32-64位版本"><span class="nav-number">3.1.</span> <span class="nav-text">使用32/64位版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多线程、CRT开关"><span class="nav-number">3.2.</span> <span class="nav-text">多线程、CRT开关</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译Boost使用的VS要和CMake编译工程使用的VS版本一致"><span class="nav-number">4.</span> <span class="nav-text">编译Boost使用的VS要和CMake编译工程使用的VS版本一致</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#环境变量BOOST-ROOT"><span class="nav-number">5.</span> <span class="nav-text">环境变量BOOST_ROOT</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

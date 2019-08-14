@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="CoreML,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章把玩苹果发布的CoreML例程以及CoreMLTools，对CoreML有个感性认识。本章要点：  怎么操作CoreML model文件是什么">
+<meta name="keywords" content="CoreML">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CoreML初探">
+<meta property="og:url" content="http://palanceli.github.io/2017/08/26/2017/0826CoreML/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章把玩苹果发布的CoreML例程以及CoreMLTools，对CoreML有个感性认识。本章要点：  怎么操作CoreML model文件是什么">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/26/2017/0826CoreML/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/26/2017/0826CoreML/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/26/2017/0826CoreML/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.035Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CoreML初探">
+<meta name="twitter:description" content="本章把玩苹果发布的CoreML例程以及CoreMLTools，对CoreML有个感性认识。本章要点：  怎么操作CoreML model文件是什么">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/08/26/2017/0826CoreML/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/08/26/2017/0826CoreML/">
+
+
+
+
+
+  <title>CoreML初探 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/08/26/2017/0826CoreML/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CoreML初探</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-26T23:00:00+08:00">
+                2017-08-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/26/2017/0826CoreML/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/26/2017/0826CoreML/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章把玩苹果发布的CoreML例程以及CoreMLTools，对CoreML有个感性认识。<br>本章要点：</p>
+<ul>
+<li>怎么操作CoreML</li>
+<li>model文件是什么<br><img src="/2017/08/26/2017/0826CoreML/img01.png" alt><a id="more"></a>
+</li>
+</ul>
+<p>首先，运行CoreML，操作系统必须大于macOS 10.13或iOS11，Xcode版本要在9或以上。Xcode9-beta稳定性还可以，而且自带iOS11 simulator，macOS 10.13现在还很不稳定，升级要慎重:P</p>
+<p>苹果官方对CoreML的资料还不多。</p>
+<p><a href="https://developer.apple.com/machine-learning/" target="_blank" rel="noopener">Build more intelligent apps with machine learning</a>对CoreML有个导入性的介绍：1、可以把当下广泛的机器学习的数据模型整合到app中，包括tree ensembles、SVMs、generalized linear和深度学习；2、可以无缝利用苹果设备的CPU和GPU为机器学习提供最高的性能和效率。<br>目前可以应用在图像识别、文本检测、目标跟踪以及自然语言处理如语言识别、词干提取等。</p>
+<p><a href="https://developer.apple.com/documentation/coreml" target="_blank" rel="noopener">Core ML</a>则是技术文档的入口。包含一个简单的例程：<a href="https://github.com/palanceli/IntegratingaCoreMLModelintoYourApp" target="_blank" rel="noopener">Integrating a Core ML Model into Your App</a>我在这个例程里加了一些自己的代码，所以url是我的github。</p>
+<h1 id="Integrating-a-Core-ML-Model-into-Your-App"><a href="#Integrating-a-Core-ML-Model-into-Your-App" class="headerlink" title="Integrating a Core ML Model into Your App"></a>Integrating a Core ML Model into Your App</h1><p>从这个例程可以对CoreML的用法有个大致了解。它根据一块地产的太阳能板个数、温室的间数和面积三个输入参数来预测这块地产的价格。CoreML和CoreData在用法上很相似，步骤如下。</p>
+<h2 id="1-把CoreML文件导入工程。"><a href="#1-把CoreML文件导入工程。" class="headerlink" title="1 把CoreML文件导入工程。"></a>1 把CoreML文件导入工程。</h2><p>Xcode支持对数据模型文件的解析和展现，输入、输出都有哪些字段，数据类型。如图这是Xcode看到的mlmodel文件：<br><img src="/2017/08/26/2017/0826CoreML/img02.png" alt="mlmodel"><br>Xcode会为mlmodel生成相应的接口文件，这个文件从工程里是找不到的，点击上图MarsHabitatPricer右侧的箭头可以打开此文件，它是对model数据的封装。</p>
+<h2 id="2-通过mlmodel接口文件访问数据："><a href="#2-通过mlmodel接口文件访问数据：" class="headerlink" title="2 通过mlmodel接口文件访问数据："></a>2 通过mlmodel接口文件访问数据：</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">let model = MarsHabitatPricer()	<span class="comment">// 创建mlmodel实例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从界面上得到三个输入参数</span></span><br><span class="line">func selectedRow(<span class="keyword">for</span> feature: Feature) -&gt; Int &#123;</span><br><span class="line">    <span class="keyword">return</span> pickerView.selectedRow(inComponent: feature.rawValue)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let solarPanels = pickerDataSource.value(<span class="keyword">for</span>: selectedRow(<span class="keyword">for</span>: .solarPanels), feature: .solarPanels)</span><br><span class="line">let greenhouses = pickerDataSource.value(<span class="keyword">for</span>: selectedRow(<span class="keyword">for</span>: .greenhouses), feature: .greenhouses)</span><br><span class="line">let size = pickerDataSource.value(<span class="keyword">for</span>: selectedRow(<span class="keyword">for</span>: .size), feature: .size)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向mlmodel输入参数，得到预测价格</span></span><br><span class="line">guard let marsHabitatPricerOutput = try? model.prediction(solarPanels: solarPanels, greenhouses: greenhouses, size: size) <span class="keyword">else</span> &#123;</span><br><span class="line">    fatalError(<span class="string">"Unexpected runtime error."</span>)</span><br><span class="line">&#125;</span><br><span class="line">let price = marsHabitatPricerOutput.price</span><br><span class="line">priceLabel.text = priceFormatter.string(<span class="keyword">for</span>: price)</span><br></pre></td></tr></table></figure>
+<p>例程的界面如下：<br><img src="/2017/08/26/2017/0826CoreML/img03.png" alt="app UI"></p>
+<p>CoreML的使用就这么简单，但越是简单的东西，越吸引人去了解它的内部构造，因为你知道它不是简单的查表，也不是一次方程算出的结果，而是根据喂进去数据训练出模型，再根据模型预测新的输入/输出关系。</p>
+<hr>
+<h1 id="mlmodel文件"><a href="#mlmodel文件" class="headerlink" title="mlmodel文件"></a>mlmodel文件</h1><p>在官方文档上说：现在大多数第三方机器学习工具产生的数据文件，都可以通过<a href="https://pypi.python.org/pypi/coremltools" target="_blank" rel="noopener">Core ML Tools</a>来转换成mlmodel文件。在<a href="https://apple.github.io/coremltools/" target="_blank" rel="noopener">coremltools 文档</a>中可以看到它的用法。</p>
+<p>coremltools的作用有三点：</p>
+<ul>
+<li>把流行的机器学习工具（包括Keras, Caffe, scikit-learn, libsvm 和 XGBoost）转成Core ML格式（.mlmodel）</li>
+<li>使用API把数据模型写成Core ML格式</li>
+<li>在指定的平台上，使用Core ML框架进行预测来验证转换</li>
+</ul>
+<h2 id="测试mltools"><a href="#测试mltools" class="headerlink" title="测试mltools"></a>测试mltools</h2><p>在我的<a href="https://github.com/palanceli/IntegratingaCoreMLModelintoYourApp/blob/master/testcoreml.py" target="_blank" rel="noopener">palanceli/IntegratingaCoreMLModelintoYourApp/testcoreml.py</a>中有对这个工具的测试。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> coremltools</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    logFmt = <span class="string">'%(asctime)s %(lineno)04d %(levelname)-8s %(message)s'</span></span><br><span class="line">    logging.basicConfig(level=logging.DEBUG, format=logFmt, datefmt=<span class="string">'%H:%M'</span>,)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    modelFilePath = os.getcwd()</span><br><span class="line">    modelFilePath += <span class="string">'/MarsHabitatPricePredictor/Resources/MarsHabitatPricer.mlmodel'</span></span><br><span class="line">    logging.debug(modelFilePath)</span><br><span class="line">    model = coremltools.models.MLModel(modelFilePath)  <span class="comment"># 加载mlmodel文件</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 打印各字段，这些是文件的概要信息</span></span><br><span class="line">    logging.info(<span class="string">'author:              %s'</span> % (model.author))</span><br><span class="line">    logging.info(<span class="string">'license:             %s'</span> % (model.license))</span><br><span class="line">    logging.info(<span class="string">'short description:   %s'</span> % (model.short_description))</span><br><span class="line">    logging.info(<span class="string">'input description:   %s'</span> % (model.input_description))</span><br><span class="line">    logging.info(<span class="string">'output description:  %s'</span> % (model.output_description))</span><br><span class="line"> </span><br><span class="line"> 	<span class="comment"># 打印spec，这里有详细的各字段信息</span></span><br><span class="line">    logging.info(model.get_spec())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 根据输入的三个字段，验证输出值</span></span><br><span class="line">    dataList = [&#123;<span class="string">'solarPanels'</span>:<span class="number">1.0</span>, <span class="string">'greenhouses'</span>:<span class="number">1.0</span>, <span class="string">'size'</span>:<span class="number">1024</span>&#125;,</span><br><span class="line">                &#123;<span class="string">'solarPanels'</span>:<span class="number">4.0</span>, <span class="string">'greenhouses'</span>:<span class="number">5.0</span>, <span class="string">'size'</span>:<span class="number">10000</span>&#125;]</span><br><span class="line">    logging.info(<span class="string">'solarPanels greenhouses size   price'</span>)</span><br><span class="line">    logging.info(<span class="string">'------------------------------------'</span>)</span><br><span class="line">    <span class="keyword">for</span> dataItem <span class="keyword">in</span> dataList:</span><br><span class="line">    	predictions = model.predict(dataItem)</span><br><span class="line">        logging.info(<span class="string">'%11.1f %11d %4d  %5d'</span> % (dataItem[<span class="string">'solarPanels'</span>], \</span><br><span class="line">        	dataItem[<span class="string">'greenhouses'</span>], dataItem[<span class="string">'size'</span>], predictions[<span class="string">'price'</span>]))</span><br></pre></td></tr></table></figure></p>
+<p>运行结果如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">$ python testcoreml.py</span><br><span class="line">07:53 0014 DEBUG    /Users/<span class="built_in">test</span>/Documents/IntegratingaCoreMLModelintoYourApp/MarsHabitatPricePredictor/Resources/MarsHabitatPricer.mlmodel</span><br><span class="line">07:53 0018 INFO     author:              Apple</span><br><span class="line">07:53 0019 INFO     license:             BSD-3</span><br><span class="line">07:53 0020 INFO     short description:   Predicts the price of a habitat on Mars.</span><br><span class="line">07:53 0021 INFO     input description:   Features(solarPanels,greenhouses,size)</span><br><span class="line">07:53 0022 INFO     output description:  Features(price)</span><br><span class="line">07:53 0025 INFO     specificationVersion: 1</span><br><span class="line">description &#123;</span><br><span class="line">  input &#123;</span><br><span class="line">    name: <span class="string">"solarPanels"</span></span><br><span class="line">    shortDescription: <span class="string">"Number of solar panels"</span></span><br><span class="line">    <span class="built_in">type</span> &#123;</span><br><span class="line">      doubleType &#123;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  input &#123;</span><br><span class="line">    name: <span class="string">"greenhouses"</span></span><br><span class="line">    shortDescription: <span class="string">"Number of greenhouses"</span></span><br><span class="line">    <span class="built_in">type</span> &#123;</span><br><span class="line">      doubleType &#123;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  input &#123;</span><br><span class="line">    name: <span class="string">"size"</span></span><br><span class="line">    shortDescription: <span class="string">"Size in acres"</span></span><br><span class="line">    <span class="built_in">type</span> &#123;</span><br><span class="line">      doubleType &#123;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  output &#123;</span><br><span class="line">    name: <span class="string">"price"</span></span><br><span class="line">    shortDescription: <span class="string">"Price of the habitat (in millions)"</span></span><br><span class="line">    <span class="built_in">type</span> &#123;</span><br><span class="line">      doubleType &#123;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  predictedFeatureName: <span class="string">"price"</span></span><br><span class="line">  metadata &#123;</span><br><span class="line">    shortDescription: <span class="string">"Predicts the price of a habitat on Mars."</span></span><br><span class="line">    author: <span class="string">"Apple"</span></span><br><span class="line">    license: <span class="string">"BSD-3"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">pipelineRegressor &#123;</span><br><span class="line">  pipeline &#123;</span><br><span class="line">    models &#123;</span><br><span class="line">      specificationVersion: 1</span><br><span class="line">      description &#123;</span><br><span class="line">        input &#123;</span><br><span class="line">          name: <span class="string">"solarPanels"</span></span><br><span class="line">          <span class="built_in">type</span> &#123;</span><br><span class="line">            doubleType &#123;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        input &#123;</span><br><span class="line">          name: <span class="string">"greenhouses"</span></span><br><span class="line">          <span class="built_in">type</span> &#123;</span><br><span class="line">            doubleType &#123;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        input &#123;</span><br><span class="line">          name: <span class="string">"size"</span></span><br><span class="line">          <span class="built_in">type</span> &#123;</span><br><span class="line">            doubleType &#123;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        output &#123;</span><br><span class="line">          name: <span class="string">"__feature_vector__"</span></span><br><span class="line">          <span class="built_in">type</span> &#123;</span><br><span class="line">            multiArrayType &#123;</span><br><span class="line">              shape: 3</span><br><span class="line">              dataType: DOUBLE</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      featureVectorizer &#123;</span><br><span class="line">        inputList &#123;</span><br><span class="line">          inputColumn: <span class="string">"solarPanels"</span></span><br><span class="line">          inputDimensions: 1</span><br><span class="line">        &#125;</span><br><span class="line">        inputList &#123;</span><br><span class="line">          inputColumn: <span class="string">"greenhouses"</span></span><br><span class="line">          inputDimensions: 1</span><br><span class="line">        &#125;</span><br><span class="line">        inputList &#123;</span><br><span class="line">          inputColumn: <span class="string">"size"</span></span><br><span class="line">          inputDimensions: 1</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    models &#123;</span><br><span class="line">      specificationVersion: 1</span><br><span class="line">      description &#123;</span><br><span class="line">        input &#123;</span><br><span class="line">          name: <span class="string">"__feature_vector__"</span></span><br><span class="line">          <span class="built_in">type</span> &#123;</span><br><span class="line">            multiArrayType &#123;</span><br><span class="line">              shape: 3</span><br><span class="line">              dataType: DOUBLE</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        output &#123;</span><br><span class="line">          name: <span class="string">"price"</span></span><br><span class="line">          <span class="built_in">type</span> &#123;</span><br><span class="line">            doubleType &#123;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        predictedFeatureName: <span class="string">"price"</span></span><br><span class="line">      &#125;</span><br><span class="line">      glmRegressor &#123;</span><br><span class="line">        weights &#123;</span><br><span class="line">          value: 136.726723178</span><br><span class="line">          value: 653.511013762</span><br><span class="line">          value: 5.8540790493</span><br><span class="line">        &#125;</span><br><span class="line">        offset: -3751.05587847</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">07:53 0030 INFO     solarPanels greenhouses size   price</span><br><span class="line">07:53 0031 INFO     ------------------------------------</span><br><span class="line">07:53 0035 INFO             1.0           1 1024   3033</span><br><span class="line">07:53 0035 INFO             4.0           5 10000  58604</span><br></pre></td></tr></table></figure></p>
+<p>可见，在mlmodel文件的description中包含了数据模型的所有信息。其中input和output包括输入/输出字段的名称、描述、数据类型，metadata是文件的概要信息。<font color="red">pipelineRegressor我猜测是数据训练的相关信息，这个要把数据是怎么生成的弄清楚才能解答了。</font></p>
+<p>最后可以看到，输入和iOS App里相同的数据，将得到相同的输出数据。</p>
+<p>到此只知道了mlmodel文件的数据框架信息，和关系数据库做个类比，相当于只知道这个文件的表结构，其中包含什么数据，有没有算法和代码还不得而知。文档里说mltools可以转其它机器学习的输出结果，但mltools自己能否直接训练数据生成模型呢？我在<a href="https://apple.github.io/coremltools/coremltools.models.html" target="_blank" rel="noopener">coremltools.models的文档</a>中发现应该可以，其中<code>coremltools.models.neural_network</code>和<code>coremltools.models.tree_ensemble</code>都是用来“construct CoreML models”，但显然还很不完整。</p>
+<h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><h2 id="关闭SIP升级numpy"><a href="#关闭SIP升级numpy" class="headerlink" title="关闭SIP升级numpy"></a>关闭SIP升级numpy</h2><p>在macOS下通过命令<code>pip install numpy --upgrade</code>升级numpy默认会失败，这是因为没有System Integrity Protection权限。解决办法：</p>
+<ol>
+<li>重启电脑，启动前按住⌘+R</li>
+<li>启动后在菜单中找到“终端”并打开，输入<code>csrutil disable</code></li>
+<li>重启电脑</li>
+<li>之后就可以成功执行<code>pip install numpy --upgrade</code>升级numpy了。</li>
+<li>完成后记得再用<code>csrutil enable</code>恢复SIP设置。</li>
+</ol>
+<h2 id="unable-to-find-utility-“coremlcompiler”错误"><a href="#unable-to-find-utility-“coremlcompiler”错误" class="headerlink" title="unable to find utility “coremlcompiler”错误"></a>unable to find utility “coremlcompiler”错误</h2><p>coremltools已经安装就虚了，初次跑会提示如下错误：<br><code>RuntimeError: Got non-zero exit code 72 from xcrun. Output was: xcrun: error: unable to find utility &quot;coremlcompiler&quot;, not a developer tool or in PATH</code></p>
+<p>这是因为命令行路径没有指向Xcode beta，在命令行下执行下面命令即可：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo xcode-select --switch /Applications/Xcode-beta.app/Contents/Developer</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CoreML/" rel="tag"># CoreML</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/12/2017/0812SwiftProgrammingBNRG14/" rel="next" title="《Swfit Programming BNRG》笔记十四">
+                <i class="fa fa-chevron-left"></i> 《Swfit Programming BNRG》笔记十四
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/27/2017/0827AndrewNGMachineLearning01/" rel="prev" title="Andrew NG Machine Learning视频学习笔记一">
+                Andrew NG Machine Learning视频学习笔记一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/08/26/2017/0826CoreML/" data-title="CoreML初探" data-url="http://palanceli.github.io/2017/08/26/2017/0826CoreML/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Integrating-a-Core-ML-Model-into-Your-App"><span class="nav-number">1.</span> <span class="nav-text">Integrating a Core ML Model into Your App</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-把CoreML文件导入工程。"><span class="nav-number">1.1.</span> <span class="nav-text">1 把CoreML文件导入工程。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-通过mlmodel接口文件访问数据："><span class="nav-number">1.2.</span> <span class="nav-text">2 通过mlmodel接口文件访问数据：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mlmodel文件"><span class="nav-number">2.</span> <span class="nav-text">mlmodel文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#测试mltools"><span class="nav-number">2.1.</span> <span class="nav-text">测试mltools</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#遇到的问题"><span class="nav-number">3.</span> <span class="nav-text">遇到的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭SIP升级numpy"><span class="nav-number">3.1.</span> <span class="nav-text">关闭SIP升级numpy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unable-to-find-utility-“coremlcompiler”错误"><span class="nav-number">3.2.</span> <span class="nav-text">unable to find utility “coremlcompiler”错误</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

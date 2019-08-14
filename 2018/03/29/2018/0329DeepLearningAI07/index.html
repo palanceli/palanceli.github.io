@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《改善深层神经网络：超参数调试、正则化以及优化》第三周《超参数调试、Batch正则化和程序框架》。本节是神经网络破茧成蝶的一节课。因为之前一直讲解理论，从零开始搭建正向传播、反向传播、梯度下降以及各个环节的优化方法。现实应用中，基于成熟的机器学习库，通常只需几行调用就能完成这些工作。本节终于开始介绍TensorFlow，然而在使用高级玩意儿之前，还得再学习一周的超参数调试方法，并把逻辑回归方法扩展">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（六）">
+<meta property="og:url" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《改善深层神经网络：超参数调试、正则化以及优化》第三周《超参数调试、Batch正则化和程序框架》。本节是神经网络破茧成蝶的一节课。因为之前一直讲解理论，从零开始搭建正向传播、反向传播、梯度下降以及各个环节的优化方法。现实应用中，基于成熟的机器学习库，通常只需几行调用就能完成这些工作。本节终于开始介绍TensorFlow，然而在使用高级玩意儿之前，还得再学习一周的超参数调试方法，并把逻辑回归方法扩展">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img08.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.219Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（六）">
+<meta name="twitter:description" content="《改善深层神经网络：超参数调试、正则化以及优化》第三周《超参数调试、Batch正则化和程序框架》。本节是神经网络破茧成蝶的一节课。因为之前一直讲解理论，从零开始搭建正向传播、反向传播、梯度下降以及各个环节的优化方法。现实应用中，基于成熟的机器学习库，通常只需几行调用就能完成这些工作。本节终于开始介绍TensorFlow，然而在使用高级玩意儿之前，还得再学习一周的超参数调试方法，并把逻辑回归方法扩展">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（六） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（六）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T10:00:00+08:00">
+                2018-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/29/2018/0329DeepLearningAI07/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/29/2018/0329DeepLearningAI07/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《改善深层神经网络：超参数调试、正则化以及优化》第三周《超参数调试、Batch正则化和程序框架》。<br>本节是神经网络破茧成蝶的一节课。因为之前一直讲解理论，从零开始搭建正向传播、反向传播、梯度下降以及各个环节的优化方法。现实应用中，基于成熟的机器学习库，通常只需几行调用就能完成这些工作。本节终于开始介绍TensorFlow，然而在使用高级玩意儿之前，还得再学习一周的超参数调试方法，并把逻辑回归方法扩展到多分类问题的解决上来。</p>
+<a id="more"></a>
+<h1 id="3-1-调试处理"><a href="#3-1-调试处理" class="headerlink" title="3.1 调试处理"></a>3.1 调试处理</h1><p>到目前接触过的超参数有：学习率α、指数加权平均参数β、$β_1、β_2、ε$、层数#layers、各隐藏层节点数#hidden units、学习衰减率learning rate decay、每个Mini-Batch子集规模Mini-Batch size。按照重要程度（经常调试的频率），将它们排序如下：<br>α<br>β、#hidden units和Mini-Batch<br>#layers、learning rate decay<br>几乎从来不会调试$β_1、β_2、ε$  </p>
+<p>本节介绍了两个选取超惨的原则：  </p>
+<ol>
+<li>随机选取。假设系统中有两个超参，事先不知道哪个超参更重要时，应当随机选取，采用方案二。因为同样的点数，假如超参2对系统的影响微不足道，那么方案一相当于只选了5个点，而方案二则是所有点在纵轴上的投影个数，显然多于方案一，而它们的运算成本是相等的。<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img01.png" alt></li>
+<li>粗调-微调。这一条很好理解，如果在某个区域训练效果比较好，接下来应该在这一区域更密集地尝试超参。<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img02.png" alt><br>原理很容易理解，我认为难点在于数据的可视化，尤其有更多超参需要调试，在多维数据上，怎么体现出取值和结果的规律性是有难度的。  </li>
+</ol>
+<h1 id="3-2-为超参选择合适的范围"><a href="#3-2-为超参选择合适的范围" class="headerlink" title="3.2 为超参选择合适的范围"></a>3.2 为超参选择合适的范围</h1><p>有的超参比如每层节点个数或层数，他们的取值范围不跨越量级，可以在范围内线性均匀取点。而另一类超参，如学习率α或指数加权平均的β，跨越量级比较大，则应先选择量级范围，再在每个范围内均匀取点。<br>如α的范围在0.0001~0.1之间，首先划分量级范围：<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img03.png" alt><br>再在每个范围内取点：<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img04.png" alt><br>代码如下，即在指数级上选取随机数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">n = <span class="number">4</span></span><br><span class="line">np.random.seed()</span><br><span class="line">r = <span class="number">-1</span> * n * np.random.rand(n)</span><br><span class="line">alpha = <span class="number">10</span> ** r</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">    logging.info(<span class="string">'%.5f'</span> % alpha[i])</span><br></pre></td></tr></table></figure></p>
+<p>指数加权平均的超参β也类似，它的取值范围在0.9~0.999，它表达的含义是向前追溯$\frac{1}{1-β}$个样本的加权平均值，因此其实应当先考虑$\frac{1}{1-β}$或1-β的量级范围，再计算β：<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img05.png" alt><br>代码如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">np.random.seed()</span><br><span class="line">r = <span class="number">1</span> + <span class="number">2</span> * np.random.rand(<span class="number">4</span>)</span><br><span class="line">logging.info(<span class="string">'1-β：'</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">    logging.info(<span class="string">'%.5f'</span> % (<span class="number">10</span> ** (-r[i])))</span><br><span class="line">beta = <span class="number">1</span> - <span class="number">10</span> **(-r)</span><br><span class="line">logging.info(<span class="string">'β：'</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">    logging.info(<span class="string">'%.5f'</span> % beta[i])</span><br></pre></td></tr></table></figure></p>
+<p>结果如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1-β： 0.00219 0.02956 0.01752 0.00592</span><br><span class="line">β：   0.99781 0.97044 0.98248 0.99408</span><br></pre></td></tr></table></figure></p>
+<p>综上所述，对于量级跨越比较大的超参，有必要先理解超参背后的含义，再确定它的选取策略。</p>
+<h1 id="3-3-超参训练的实践：Pandas-VS-Caviar"><a href="#3-3-超参训练的实践：Pandas-VS-Caviar" class="headerlink" title="3.3 超参训练的实践：Pandas VS Caviar"></a>3.3 超参训练的实践：Pandas VS Caviar</h1><p>本节介绍了两种训练模型的流派：熊猫和鱼。前者不断打磨一个模型，不断精进；后者同时训练多个模型，优胜略汰。<br>我的理解是：模型的本质就是在指定的超参数之下迭代出的参数序列。为什么作者在介绍熊猫派时也提到在精进过程中可能会修改超参数，那不就成训练不同的模型了吗？<br>我想到的答案是：差异在于是否并行。前者也并非始终都在训练同一个模型，因为在示意图上，魔性的成本函数并不是完全连续的。熊猫派的做法是在同一段时间只训练一个模型，鱼派则是同时并行多个模型。显然，只要计算资源足够，肯定选后者。我理解这其实不是流派问题，地主老财有钱当然多办事咯~</p>
+<h1 id="3-4-正则化网络的激活函数"><a href="#3-4-正则化网络的激活函数" class="headerlink" title="3.4 正则化网络的激活函数"></a>3.4 正则化网络的激活函数</h1><p>前面章节介绍过，正则化输入层有利于将原本狭长的成本函数等高线图拉伸成各方向均匀的等高线图，它的本质其实等效于“避免梯度下降每一步的方向变化率夹角太大”。既然在输入层有效，想必在隐藏层应该也是有效的，因为每个隐藏层也是下一层的输入层。所不同的是，通常对隐藏层的z而非a做正则化。<br>对于某个指定的隐藏层，其z节点分别为$z^{<a href="1">1</a>}, z^{<a href="2">1</a>}, z^{<a href="3">1</a>}, …, z^{<a href="m">1</a>}$，简写为$z^{(1)}, z^{(2)}, z^{(3)}, …, z^{(m)}$<br>$μ=\frac{1}{m}\sum<em>{i=1}^{m}z^{(i)}\<br>δ^2=\frac{1}{m}\sum</em>{i=1}^{m}(z^{(i)}-μ)^2\<br>z<em>{norm}^{(i)}=\frac{z^{(i)}-μ}{\sqrt{δ^2+ε}}　　增加ε是防止分母为0\<br>\tilde{z}^{(i)} = γ·z</em>{norm}^{(i)}+β$<br>有的情况下，不希望正则化后的z均值为0，方差为1，因此在加入两个超参数γ和β来控制正则化后的均值和方差。<br>当$γ=\sqrt{δ^2+ε}， β=μ$时，$\tilde{z}^{(i)}$就退化成了$z^{(i)}$。</p>
+<h1 id="3-5-将Batch-Norm拟合进神经网络"><a href="#3-5-将Batch-Norm拟合进神经网络" class="headerlink" title="3.5 将Batch Norm拟合进神经网络"></a>3.5 将Batch Norm拟合进神经网络</h1><p>下面的流程图很清晰地描述了引入Batch Norm后的神经网络算法：<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img06.png" alt><br>需要注意的是，$z^{[l]}=w{[l]}·α^{[l-1]}+b^{[l]}$<br>由$z^{[l]} \;→\; z<em>{norm}^{[l]}$时需要减去均值μ，因此$b^{[l]}$会失效，<br>由$z</em>{norm}^{[l]} \;→\; \tilde{z}^{[l]}$时，通过$β^{[l]}$体现出偏移：$\tilde{z}^{[l]}=γ^{[l]}·z_{norm}^{[l]}+β^{[l]}$<br>因此，引入Batch Norm方法后，每一层的b参数就不需要了。</p>
+<h1 id="3-6-Batch-Norm为什么奏效？"><a href="#3-6-Batch-Norm为什么奏效？" class="headerlink" title="3.6 Batch Norm为什么奏效？"></a>3.6 Batch Norm为什么奏效？</h1><p>除了前面讲到的正则化可以令成本函数等高线图更均匀，Batch Norm还有更深层的作用——它可以让网络中每一层有更强的适应性。神经网络的本质是经过训练得出的每一层W、b参数:<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img07.png" alt><br>如果样本的参数不够均匀，有较大的方差，它们会传导影响到后面每一层的参数，使得网络受噪声数据影响就比较大。至于课件中讲的用黑猫训练的模型是否能识别黄猫，我表示怀疑。不太符合直觉，因为只是训练样本以及由训练样本所传导生成的一系列参数做了归一化。测试数据或被预测数据是不可能参与归一化的。<br>我有一种基于直觉的猜测：归一化可能令颜色这个维度的数据变得不那么重要了，而放大了形态、质感<br>whatever……等维度的特征，从而使网络的适应性增强。可是疑问还是有的：放大什么特征、抑制什么特征，又怎么通过如此抽象的数据来把控呢？为什么受抑制的不是其它特征而是颜色呢？</p>
+<h1 id="3-7-测试是的Batch-Norm"><a href="#3-7-测试是的Batch-Norm" class="headerlink" title="3.7 测试是的Batch Norm"></a>3.7 测试是的Batch Norm</h1><h1 id="3-8-Softmax回归"><a href="#3-8-Softmax回归" class="headerlink" title="3.8 Softmax回归"></a>3.8 Softmax回归</h1><p>在以往的章节中，训练样本仅被标注为两类结果，如猫或非猫。现实世界常常要识别更多的分量，如猫、狗、鸡等等。Softmax正是用来解决此类问题。<br>和解决二分问题的神经网络非常相似，差异仅在于Softmax在输出层有多个节点，而非1个：<br><img src="/2018/03/29/2018/0329DeepLearningAI07/img08.png" alt><br>每个节点表示他对应分类的概率，因此该层节点的和应为1。这就需要在输出层的计算上需做一些额外处理：<br>$z^{[L]}=w{[L]}·a^{[L-1]}+b^{[L]}$<br>引入临时变量$t<em>i=e^{z_i^{[L]}}$，令$a^{[L]}=\frac{e^{z^{[L]}}}{\sum</em>{j=1}^{n^{[L]}}t<em>i}$<br>假设输出层有4个节点：$z^{[4]}=\begin{bmatrix}5\2\{-1}\3\end{bmatrix}$，于是$t=\begin{bmatrix}e^5\e^2\e^{-1}\e^3\end{bmatrix}=\begin{bmatrix}148.4\7.4\0.4\20.1\end{bmatrix}$<br>$\sum</em>{j=1}^4t_i=148.4+7.4+0.4+20.1=176.3$，于是$a^{[L]}=\begin{bmatrix}148.4/176.3\7.4/176.3\0.4/176.3\20.1/176.3\end{bmatrix}=\begin{bmatrix}0.842\0.042\0.002\0.114\end{bmatrix}$</p>
+<h1 id="3-9-训练一个Softmax分类器"><a href="#3-9-训练一个Softmax分类器" class="headerlink" title="3.9 训练一个Softmax分类器"></a>3.9 训练一个Softmax分类器</h1><p>Softmax正向传播算法输出的是命中个分类的概率$ŷ=\begin{bmatrix}0.842\0.042\0.002\0.114\end{bmatrix}$，而样本标注的是确定的标签$y=\begin{bmatrix}0\1\0\0\end{bmatrix}$。二者貌似不是一个量纲，损失函数怎么计算呢？<br>和二分的损失函数略有不同，定义损失函数：$L(ŷ, y)=-\sum<em>{j=1}^{n^{[L]}}y_j\log{ŷ_j}$。<br>在上例中，y通过0过滤掉非目标的选项，要让成本函数尽量小，则应ŷ尽量大。<br>故成本函数为：$J(W^{[1]}, b^{[1]}, …)=\frac{1}{m}\sum</em>{i=1}^{m}L(ŷ^{(i)}, y^{(i)})$  </p>
+<blockquote>
+<p>但在后向传播算法中，课件给出$dz^{[L]}=ŷ-y$这是怎么得出来的呢？</p>
+</blockquote>
+<h1 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h1><h2 id="执行Tensorflow的基本步骤"><a href="#执行Tensorflow的基本步骤" class="headerlink" title="执行Tensorflow的基本步骤"></a>执行Tensorflow的基本步骤</h2><ol>
+<li>创建Tensors变量</li>
+<li>创建基于这些变量的操作</li>
+<li>初始化Tensors</li>
+<li>创建一个Session</li>
+<li>运行Session</li>
+</ol>
+<p>来看第一个例程：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">y_hat = tf.constant(<span class="number">36</span>, name=<span class="string">'y_hat'</span>)      <span class="comment"># 定义常量 ŷ=36</span></span><br><span class="line">y = tf.constant(<span class="number">39</span>, name=<span class="string">'y'</span>)              <span class="comment"># 定义常量 y=39</span></span><br><span class="line">loss = tf.Variable((y - y_hat)**<span class="number">2</span>, name=<span class="string">'loss'</span>)  <span class="comment"># 定义变量，损失函数L=(y-ŷ)^2</span></span><br><span class="line"></span><br><span class="line">init = tf.global_variables_initializer()   <span class="comment"># 初始化Tensors，此时还没有开始执行任何运算</span></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> session:              <span class="comment"># 创建Session</span></span><br><span class="line">    session.run(init)                      <span class="comment"># 初始化变量</span></span><br><span class="line">    print(session.run(loss))               <span class="comment"># 运行损失函数，并打印</span></span><br></pre></td></tr></table></figure></p>
+<p>函数、值都可以定义为变量，本例子中就把损失函数定义为变量。</p>
+<h2 id="placeholder"><a href="#placeholder" class="headerlink" title="placeholder"></a>placeholder</h2><p>感觉placeholder有点格式化输出的意思：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x = tf.placeholder(tf.int64, name=<span class="string">'x'</span>)  <span class="comment"># 定义占位符</span></span><br><span class="line">init = tf.global_variables_initializer()</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> session:</span><br><span class="line">    logging.info(session.run(<span class="number">2</span>*x, feed_dict=&#123;x:<span class="number">3</span>&#125;)) <span class="comment"># 用的时候再赋值</span></span><br></pre></td></tr></table></figure></p>
+<p>通过字典<code>feed_dict</code>来定义实际值。  </p>
+<p>在sigmoid函数的定义中，我使用placeholder和Variable创建两个版本，它们是等效的：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sigmoid_placeholder</span><span class="params">(self, z)</span>:</span></span><br><span class="line">    x = tf.placeholder(tf.float32, name=<span class="string">"x"</span>)</span><br><span class="line">    sigmoid = tf.sigmoid_placeholder(x)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">        result = sess.run(sigmoid, feed_dict=&#123;x:z&#125;)            </span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sigmoid_variable</span><span class="params">(self, z)</span>:</span></span><br><span class="line">    x = tf.Variable(float(z), tf.float32)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">        sess.run(tf.global_variables_initializer())</span><br><span class="line">        result = sess.run(tf.sigmoid(x))</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure></p>
+<h2 id="成本函数"><a href="#成本函数" class="headerlink" title="成本函数"></a>成本函数</h2><p>tensorflow提供了很多比较成熟的库函数，比如以sigmoid为激活函数的成本函数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cost</span><span class="params">(self, logits, labels)</span>:</span></span><br><span class="line">    <span class="comment"># 根据最后一层z（参数logits）和y（参数labels）计算以sigmoid为激活函数的成本函数值</span></span><br><span class="line">    ...</span><br><span class="line">    cost = tf.nn.sigmoid_cross_entropy_with_logits(logits = z, labels = y)</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure></p>
+<p>掌握tensorflow关键就是熟悉这些成熟函数的调用。当然还有个前提是深刻理解背后的原理，否则只知道api怎么调用没有意义。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>自己写的第一段代码就未获通过：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tc5</span><span class="params">(self)</span>:</span></span><br><span class="line">    x = tf.Variable(<span class="number">3</span>, dtype=tf.float32)</span><br><span class="line">    f = tf.Variable(x**<span class="number">2</span>, name=<span class="string">'function'</span>)</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> session:</span><br><span class="line">        session.run(init) <span class="comment"># 问题出在这里！！！</span></span><br><span class="line">        logging.info(session.run(train))</span><br></pre></td></tr></table></figure></p>
+<font color="red">提示说是使用了未初始化的变量，先写在这备忘，待查到原因再来解答。</font>
+
+<blockquote>
+<p>本节作业可参见<a href="https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py" target="_blank" rel="noopener">https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py</a><code>class Coding2_3</code>。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/28/2018/0328DeepLearningAI06/" rel="next" title="DeepLearning.ai笔记（五）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（五）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/30/2018/0331DeepLearningAI08/" rel="prev" title="DeepLearning.ai笔记（七）">
+                DeepLearning.ai笔记（七） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/03/29/2018/0329DeepLearningAI07/" data-title="DeepLearning.ai笔记（六）" data-url="http://palanceli.github.io/2018/03/29/2018/0329DeepLearningAI07/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#3-1-调试处理"><span class="nav-number">1.</span> <span class="nav-text">3.1 调试处理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-2-为超参选择合适的范围"><span class="nav-number">2.</span> <span class="nav-text">3.2 为超参选择合适的范围</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-3-超参训练的实践：Pandas-VS-Caviar"><span class="nav-number">3.</span> <span class="nav-text">3.3 超参训练的实践：Pandas VS Caviar</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-4-正则化网络的激活函数"><span class="nav-number">4.</span> <span class="nav-text">3.4 正则化网络的激活函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-5-将Batch-Norm拟合进神经网络"><span class="nav-number">5.</span> <span class="nav-text">3.5 将Batch Norm拟合进神经网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-6-Batch-Norm为什么奏效？"><span class="nav-number">6.</span> <span class="nav-text">3.6 Batch Norm为什么奏效？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-7-测试是的Batch-Norm"><span class="nav-number">7.</span> <span class="nav-text">3.7 测试是的Batch Norm</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-8-Softmax回归"><span class="nav-number">8.</span> <span class="nav-text">3.8 Softmax回归</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-9-训练一个Softmax分类器"><span class="nav-number">9.</span> <span class="nav-text">3.9 训练一个Softmax分类器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作业"><span class="nav-number">10.</span> <span class="nav-text">作业</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#执行Tensorflow的基本步骤"><span class="nav-number">10.1.</span> <span class="nav-text">执行Tensorflow的基本步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#placeholder"><span class="nav-number">10.2.</span> <span class="nav-text">placeholder</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#成本函数"><span class="nav-number">10.3.</span> <span class="nav-text">成本函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">10.4.</span> <span class="nav-text">问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

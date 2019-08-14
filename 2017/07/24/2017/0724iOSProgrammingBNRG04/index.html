@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="第四章在此界面上修改degrees Fahrenheit的值，它会换算出degree Celsius的值。本章要点：  响应TextField的变化事件 在TextField失去焦点后收起键盘 Property observer 协议和代理">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记四">
+<meta property="og:url" content="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="第四章在此界面上修改degrees Fahrenheit的值，它会换算出degree Celsius的值。本章要点：  响应TextField的变化事件 在TextField失去焦点后收起键盘 Property observer 协议和代理">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.936Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记四">
+<meta name="twitter:description" content="第四章在此界面上修改degrees Fahrenheit的值，它会换算出degree Celsius的值。本章要点：  响应TextField的变化事件 在TextField失去焦点后收起键盘 Property observer 协议和代理">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记四 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记四</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-24T23:00:00+08:00">
+                2017-07-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/24/2017/0724iOSProgrammingBNRG04/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/24/2017/0724iOSProgrammingBNRG04/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第四章在此界面上修改degrees Fahrenheit的值，它会换算出degree Celsius的值。<br><img src="/2017/07/24/2017/0724iOSProgrammingBNRG04/img01.png" alt="base ui">本章要点：</p>
+<ul>
+<li>响应TextField的变化事件</li>
+<li>在TextField失去焦点后收起键盘</li>
+<li>Property observer</li>
+<li>协议和代理<a id="more"></a>
+</li>
+</ul>
+<h1 id="1-布局TextField-UI，并关联outlets对象"><a href="#1-布局TextField-UI，并关联outlets对象" class="headerlink" title="1 布局TextField UI，并关联outlets对象"></a>1 布局TextField UI，并关联outlets对象</h1><h2 id="1-1-为什么给TextField填了足够大的字号，但运行时还是很小？"><a href="#1-1-为什么给TextField填了足够大的字号，但运行时还是很小？" class="headerlink" title="1.1 为什么给TextField填了足够大的字号，但运行时还是很小？"></a>1.1 为什么给TextField填了足够大的字号，但运行时还是很小？</h2><p>如下图所示，Label（”degrees Fahrenheit”）的字号只有27，TextField（”100”）的字号有50，但在运行时，Label的字体尺寸却比TextField的明显大，也就是说TextField的字号设置没有生效：<br><img src="/2017/07/24/2017/0724iOSProgrammingBNRG04/img02.png" alt="Font size"><br>如果给TextField添加一个Width约束，字号才会生效。</p>
+<blockquote>
+<p>这和第3章提到的字号是隐式约束不符呢：TextField的字号隐式约束没有生效。<br>这是因为TextField和Label是不一样的，Label是一个静态控件，内容是在编译期确定的，所以它的尺寸是由内容+字体字号在编译期可以确定的。而TextField是用于在运行期输入，其内容不固定，当然不应该根据初始内容来决定其宽度。TextField有一个<code>Min Font Size</code>属性，如果这个值足够小，字号根据TextField的长宽而变小。调大这个值可以改变最小字号。</p>
+</blockquote>
+<h1 id="2-响应Editbox的变化事件"><a href="#2-响应Editbox的变化事件" class="headerlink" title="2 响应Editbox的变化事件"></a>2 响应Editbox的变化事件</h1><h2 id="2-1-如果View有多种事件，如何指定具体关联哪一种？"><a href="#2-1-如果View有多种事件，如何指定具体关联哪一种？" class="headerlink" title="2.1 如果View有多种事件，如何指定具体关联哪一种？"></a>2.1 如果View有多种事件，如何指定具体关联哪一种？</h2><p>第1章Ctrl+鼠标拖动按钮到ViewController，可以把点击按钮和ViewController中的IBAction函数关联起来，如果按钮有多种事件，如何指定具体关联哪一种呢？比如拖动EditBox到ViewController的Action函数，那么关联的是EditBox的什么消息呢？</p>
+<p>这是关联Action的第二种方式：对于消息单一的控件，直接从控件拖到ViewController即可；如果控件可以触发多种消息，先点击产生消息的控件，在Connection Inspector中选择要关联的消息，再Ctrl拖拽到ViewController，选择IBAction函数：<br><img src="/2017/07/24/2017/0724iOSProgrammingBNRG04/img03.png" alt="关联消息响应函数"></p>
+<h1 id="3-在TextField失去输入焦点后，收回键盘"><a href="#3-在TextField失去输入焦点后，收回键盘" class="headerlink" title="3 在TextField失去输入焦点后，收回键盘"></a>3 在TextField失去输入焦点后，收回键盘</h1><h2 id="3-1-TextField失去焦点会触发什么消息？"><a href="#3-1-TextField失去焦点会触发什么消息？" class="headerlink" title="3.1 TextField失去焦点会触发什么消息？"></a>3.1 TextField失去焦点会触发什么消息？</h2><p>这个问题问的不对，因为点击Background并不会导致TextField失去焦点。其实是在Background View的点击事件里执行的收回键盘。</p>
+<h2 id="3-2-怎么实现收回键盘？"><a href="#3-2-怎么实现收回键盘？" class="headerlink" title="3.2 怎么实现收回键盘？"></a>3.2 怎么实现收回键盘？</h2><p>这里的实现是给Background View关联一个Gesture Recognizer，当在此View上点击一下，通过调用TextField的<code>resignFirstResponder()</code>函数使之失去焦点。</p>
+<blockquote>
+<p>这么做有个缺点：如果当前界面上的TextField实例很多怎么办呢？每个实例调一次有点太傻了吧？<a href="/2017/08/02/2017/0802iOSProgrammingBNRG14/#1-7-点击背景View收回键盘">第14章</a>有更简洁的方法。</p>
+</blockquote>
+<h2 id="3-3-怎么给View定义和关联一个手势处理函数"><a href="#3-3-怎么给View定义和关联一个手势处理函数" class="headerlink" title="3.3 怎么给View定义和关联一个手势处理函数"></a>3.3 怎么给View定义和关联一个手势处理函数</h2><p>第一步，从Object Library中把要定义的Gesture Recognizer拖到View上，该ViewController的标题栏会为此Gesture Recognizer添加一个图标；<br>第二步，把这个Gesture Recognizer控件当做手势的触发源，从它的图标 Ctrl拖拽 到ViewController；<br>第三步，选择被关联的函数。<br>这里是把手势识别器（Gesture Recognizer）等同于按钮来处理了。尽管手势是用户发出的，但由手势识别器把这个手势转化成一个消息，这跟用户点击按钮，再由按钮把这个点击转化成一个消息是一模一样的。</p>
+<h1 id="4-属性观察者property-observer"><a href="#4-属性观察者property-observer" class="headerlink" title="4 属性观察者property observer"></a>4 属性观察者property observer</h1><p>property observer有主动和被动两种形式。</p>
+<h2 id="4-1-主动是指当“我”发生变化时，会触发一段代码的执行。"><a href="#4-1-主动是指当“我”发生变化时，会触发一段代码的执行。" class="headerlink" title="4.1 主动是指当“我”发生变化时，会触发一段代码的执行。"></a>4.1 主动是指当“我”发生变化时，会触发一段代码的执行。</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">var x:Int = <span class="number">0</span></span><br><span class="line">var y:Int = <span class="number">0</span></span><br><span class="line">var z:Int?&#123;</span><br><span class="line">    willSet&#123; 	<span class="comment">// 在z被赋值前调用</span></span><br><span class="line">        x += <span class="number">1</span></span><br><span class="line">        print(<span class="string">"x=\(x), y=\(y), z=\(z)"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    didSet&#123;	<span class="comment">// 在z被赋值后调用</span></span><br><span class="line">        y -= <span class="number">1</span></span><br><span class="line">        print(<span class="string">"x=\(x), y=\(y), z=\(z)"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">z=<span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>这段代码的输出结果是：<br>x=1, y=0, z=nil            // willSet的输出<br>x=1, y=-1, z=Optional(0)    // didSet的输出</p>
+<font color="red">有没有关键字能在willSet或didSet里表示“我”的值呢？</font>
+
+<p>对于上面的例子如果要在z的willSet里取自己的值，如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var z:Int?&#123;</span><br><span class="line">    willSet&#123;</span><br><span class="line">    x = z		<span class="comment">// 如果前面z的名字变了，此处就得跟着变，如果有关键字比如self，就不存在这样的问题了</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-2-被动是指当“我”被取值时，“我”的值是根据“别人”的值计算出来的。"><a href="#4-2-被动是指当“我”被取值时，“我”的值是根据“别人”的值计算出来的。" class="headerlink" title="4.2 被动是指当“我”被取值时，“我”的值是根据“别人”的值计算出来的。"></a>4.2 被动是指当“我”被取值时，“我”的值是根据“别人”的值计算出来的。</h2><p>这种形式的变量很像是一个内联函数，字面上看是一个变量，每次取值都是一次调用：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a:Int=<span class="number">0</span></span><br><span class="line">var b:Int&#123;</span><br><span class="line">    <span class="keyword">return</span> a+<span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a=<span class="number">10</span></span><br><span class="line">print(<span class="string">"b=\(b)"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这段代码的输出结果是：<br>b=11                    // b的取值是根据a算出来的</p>
+<blockquote>
+<p>本章P150，点后面跟变量名是什么意思？例如：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">let nf = NumberFormatter()</span><br><span class="line">nf.numberStyle = .decimal   <span class="comment">// .decimal是什么意思呢？</span></span><br></pre></td></tr></table></figure></p>
+<p>在<a href="/2017/08/11/2017/0812SwiftProgrammingBNRG14/">《Swfit Programming BNRG》笔记十四</a>中有介绍，这是枚举类型内部定义的case。</p>
+</blockquote>
+<h1 id="5-协议和代理"><a href="#5-协议和代理" class="headerlink" title="5. 协议和代理"></a>5. 协议和代理</h1><h2 id="5-1-协议的定义"><a href="#5-1-协议的定义" class="headerlink" title="5.1 协议的定义"></a>5.1 协议的定义</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protocol 协议名:父协议名&#123;</span><br><span class="line">    接口函数</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="5-2-协议的使用"><a href="#5-2-协议的使用" class="headerlink" title="5.2 协议的使用"></a>5.2 协议的使用</h2><p>协议不能直接实例化，而需要让某个类实现某个协议：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> 类名 : 父类, 协议名&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="5-3-代理协议"><a href="#5-3-代理协议" class="headerlink" title="5.3 代理协议"></a>5.3 代理协议</h2><p>不是所有的协议都是代理协议，代理协议的作用是把原本应该在A实现的代码委托给B来实现。比如TextField有一堆自己的逻辑，文字改变、退格、回车。对于这些事件的处理原本是TextField自己的事儿，如果要改变这些行为就必须派生TextField并重写这些逻辑，这就会产生很多零碎的类。而且并非所有与TextField相关的逻辑都应该放该类里处理，属于TextFiled逻辑的应该放入其subclass，属于业务逻辑的，就应该放到Controller里完成。<br>通过指定某Controller为TextField的代理，当这些事件发生时，TextField会直接调用该Controller的方法，这样就能把这些逻辑放在Controller里实现了。这些方法的集合就叫做协议，Controller实现该协议就叫做TextField代理。它解决的问题是把这些业务逻辑汇集到代理一并实现。</p>
+<h2 id="5-4-如果代理实现了多个TextField实例的某一个方法，如何在这个方法里区分当前是为谁服务的呢？"><a href="#5-4-如果代理实现了多个TextField实例的某一个方法，如何在这个方法里区分当前是为谁服务的呢？" class="headerlink" title="5.4 如果代理实现了多个TextField实例的某一个方法，如何在这个方法里区分当前是为谁服务的呢？"></a>5.4 如果代理实现了多个TextField实例的某一个方法，如何在这个方法里区分当前是为谁服务的呢？</h2><p>以P152的<code>UITextTextFieldDelegate</code>为例：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">protocol <span class="built_in">UITextFieldDelegate</span>: <span class="built_in">NSObjectProtocol</span> &#123;</span><br><span class="line">    optional func textFieldShouldBeginEditing(_ textField: <span class="built_in">UITextField</span>) -&gt; Bool optional func textFieldDidBeginEditing(_ textField: <span class="built_in">UITextField</span>)</span><br><span class="line">    optional func textFieldShouldEndEditing(_ textField: <span class="built_in">UITextField</span>) -&gt; Bool optional func textFieldDidEndEditing(_ textField: <span class="built_in">UITextField</span>)</span><br><span class="line">    optional func textField(_ textField: <span class="built_in">UITextField</span>, shouldChangeCharactersIn range: <span class="built_in">NSRange</span>,replacementString string: String) -&gt; Bool optional func textFieldShouldClear(_ textField: <span class="built_in">UITextField</span>) -&gt; Bool</span><br><span class="line">    optional func textFieldShouldReturn(_ textField: <span class="built_in">UITextField</span>) -&gt; Bool </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这些代理方法的第一个参数就是产生事件的控件，根据该参数就能判断了。</p>
+<h2 id="5-5-建立代理关联关系"><a href="#5-5-建立代理关联关系" class="headerlink" title="5.5 建立代理关联关系"></a>5.5 建立代理关联关系</h2><p>从TextField ctrl拖动到ViewController，就会让ViewController成为TextField的代理。<br>这个拖动操作会让TextField的delegate属性指向ViewController，具体产生的代码在<a href="/2017/07/26/2017/0726iOSProgrammingBNRG06/">第六章</a>介绍。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/23/2017/0723iOSProgrammingBNRG03/" rel="next" title="《iOS Programming BNRG》笔记三">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记三
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/25/2017/0725iOSProgrammingBNRG05/" rel="prev" title="《iOS Programming BNRG》笔记五">
+                《iOS Programming BNRG》笔记五 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/07/24/2017/0724iOSProgrammingBNRG04/" data-title="《iOS Programming BNRG》笔记四" data-url="http://palanceli.github.io/2017/07/24/2017/0724iOSProgrammingBNRG04/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-布局TextField-UI，并关联outlets对象"><span class="nav-number">1.</span> <span class="nav-text">1 布局TextField UI，并关联outlets对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-为什么给TextField填了足够大的字号，但运行时还是很小？"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 为什么给TextField填了足够大的字号，但运行时还是很小？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-响应Editbox的变化事件"><span class="nav-number">2.</span> <span class="nav-text">2 响应Editbox的变化事件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-如果View有多种事件，如何指定具体关联哪一种？"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 如果View有多种事件，如何指定具体关联哪一种？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-在TextField失去输入焦点后，收回键盘"><span class="nav-number">3.</span> <span class="nav-text">3 在TextField失去输入焦点后，收回键盘</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-TextField失去焦点会触发什么消息？"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 TextField失去焦点会触发什么消息？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-怎么实现收回键盘？"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 怎么实现收回键盘？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-怎么给View定义和关联一个手势处理函数"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 怎么给View定义和关联一个手势处理函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-属性观察者property-observer"><span class="nav-number">4.</span> <span class="nav-text">4 属性观察者property observer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-主动是指当“我”发生变化时，会触发一段代码的执行。"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 主动是指当“我”发生变化时，会触发一段代码的执行。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-被动是指当“我”被取值时，“我”的值是根据“别人”的值计算出来的。"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 被动是指当“我”被取值时，“我”的值是根据“别人”的值计算出来的。</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-协议和代理"><span class="nav-number">5.</span> <span class="nav-text">5. 协议和代理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-协议的定义"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 协议的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-协议的使用"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 协议的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-代理协议"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 代理协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-如果代理实现了多个TextField实例的某一个方法，如何在这个方法里区分当前是为谁服务的呢？"><span class="nav-number">5.4.</span> <span class="nav-text">5.4 如果代理实现了多个TextField实例的某一个方法，如何在这个方法里区分当前是为谁服务的呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-5-建立代理关联关系"><span class="nav-number">5.5.</span> <span class="nav-text">5.5 建立代理关联关系</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

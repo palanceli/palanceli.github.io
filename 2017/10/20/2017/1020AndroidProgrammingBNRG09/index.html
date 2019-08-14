@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章引入了ConstraintLayout布局，同时介绍了AndroidStudio的Design编辑器，在上一章的基础上变化不大，这里就不贴图了。 本章要点：  在AndroidStudio的Design编辑器中调整界面设置 px/dp/sp/pt,mm,in基本概念 Style, themes基本概念">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记九">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章引入了ConstraintLayout布局，同时介绍了AndroidStudio的Design编辑器，在上一章的基础上变化不大，这里就不贴图了。 本章要点：  在AndroidStudio的Design编辑器中调整界面设置 px/dp/sp/pt,mm,in基本概念 Style, themes基本概念">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/img05.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.114Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记九">
+<meta name="twitter:description" content="本章引入了ConstraintLayout布局，同时介绍了AndroidStudio的Design编辑器，在上一章的基础上变化不大，这里就不贴图了。 本章要点：  在AndroidStudio的Design编辑器中调整界面设置 px/dp/sp/pt,mm,in基本概念 Style, themes基本概念">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记九 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记九</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-20T20:00:00+08:00">
+                2017-10-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/20/2017/1020AndroidProgrammingBNRG09/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/20/2017/1020AndroidProgrammingBNRG09/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章引入了ConstraintLayout布局，同时介绍了AndroidStudio的Design编辑器，在上一章的基础上变化不大，这里就不贴图了。</p>
+<p>本章要点：</p>
+<ul>
+<li>在AndroidStudio的Design编辑器中调整界面设置</li>
+<li>px/dp/sp/pt,mm,in基本概念</li>
+<li>Style, themes基本概念<a id="more"></a>
+</li>
+</ul>
+<h1 id="把LinearLayout转成ConstraintLayout"><a href="#把LinearLayout转成ConstraintLayout" class="headerlink" title="把LinearLayout转成ConstraintLayout"></a>把LinearLayout转成ConstraintLayout</h1><p>上一节引入的list_item_crime.xml是一个LinearLayout的布局，在<a href="/2016/09/10/2017/0909AndroidProgrammingBNRG01/#ConstraintLayout布局">本书第一章笔记</a>中介绍过ConstraintLayout将成为未来Android主流布局，因此可能常常会有把老的布局形式转成ConstratintLayout的需要。具体步骤如下：</p>
+<p>打开list_item_crime.xml，选择Design编辑器，Component Tree &gt; LiearnLayout &gt; 右键 &gt; Convert LinearLayout to ConstraintLayout：<br><img src="/2017/10/20/2017/1020AndroidProgrammingBNRG09/img01.png" alt><br>AndroidStudio询问转换策略，点击OK<br><img src="/2017/10/20/2017/1020AndroidProgrammingBNRG09/img02.png" alt></p>
+<blockquote>
+<p>Google的UI设计比苹果的要差好多，在mac系统中，很少能看到这种大段文字的提示。</p>
+</blockquote>
+<h1 id="Widget的三种尺寸设置"><a href="#Widget的三种尺寸设置" class="headerlink" title="Widget的三种尺寸设置"></a>Widget的三种尺寸设置</h1><p>如下图，AndroidStudio用三种标志来表示Widget的三种尺寸设置：<br><img src="/2017/10/20/2017/1020AndroidProgrammingBNRG09/img03.png" alt></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>设置类型</th>
+<th>值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fixed</td>
+<td>Xdp</td>
+<td>以dp为单位的固定值</td>
+</tr>
+<tr>
+<td>Wrap Content</td>
+<td>wrap_content</td>
+<td>根据视图的内在需要分配尺寸。如对于TextView就是足够显示内容</td>
+</tr>
+<tr>
+<td>any size</td>
+<td>0dp</td>
+<td>允许视图拉伸以适应指定的约束</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>any size说的不是很清楚，举个例子：比如TextView，设置了距离左右邻居的宽度。如果是Wrap Content，其最终宽度由文本内容决定；如果是any size，不管文本内容是什么，其最终宽度则由距离左右邻居的宽度决定。</p>
+<p>在本例中，点击Component Tree中的具体widget，在最右侧Properties中点击标志，可以循环设定不同的值。<br><img src="/2017/10/20/2017/1020AndroidProgrammingBNRG09/img04.png" alt></p>
+<h1 id="添加ImageView元素"><a href="#添加ImageView元素" class="headerlink" title="添加ImageView元素"></a>添加ImageView元素</h1><p>Palette &gt; Images &gt; ImageView，将ImageView拖到Component Tree中，在弹出的界面中选择要植入的图片，本节是ic_solved：<br><img src="/2017/10/20/2017/1020AndroidProgrammingBNRG09/img05.png" alt></p>
+<h1 id="在Design界面中添加约束"><a href="#在Design界面中添加约束" class="headerlink" title="在Design界面中添加约束"></a>在Design界面中添加约束</h1><p>我想说的是，尽量在Text编辑器中手动编辑吧，Design对于约束的控制实在太难用了。本节需要把ImageView对齐到它所在的ConstraintLayout的上、下、右边缘。期待的操作是从ImageView的Anchor拖到父容器的Anchor，但是</p>
+<ol>
+<li>当拖动到父容器的边缘时，并没有对应的Anchor来接应，fuck无门。</li>
+<li>设定上了也没有一个相应的提示，感觉像奸尸。尽管书里说会有一个tip提示，实际并没有发生。</li>
+<li>检验一个widget都有哪些约束的箭头标志也没找到。<br>AndroidStudio的UI编辑器比Xcode差了几条街。<br>所以在Design中添加约束可以仅作为一个辅助手段，当不知道关键字怎么写时，可以用它帮个忙。真正设置还是在Text编辑器中完成。此处的约束代码如下：</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">ImageView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/imageView"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">...</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintRight_toRightOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">"parent"</span>/&gt;</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>具体用法在<a href="/2016/09/10/2017/0909AndroidProgrammingBNRG01/#ConstraintLayout布局">本书第一章笔记</a>已经介绍过，不再赘述。</p>
+<h1 id="动态显示widget"><a href="#动态显示widget" class="headerlink" title="动态显示widget"></a>动态显示widget</h1><p>本节是要根据某个item是否处于solved状态决定是否显示手铐图标。没有什么新内容：</p>
+<ol>
+<li>在CrimeHolder中提领到crime_solved （ImageView视图）</li>
+<li>在CrimeHolder::bind(…)函数中根据“货物”的值决定要不要显示crime_solved</li>
+<li>具体显示代码为：</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">mSolvedImageView.setVisibility(crime.isSolved()? View.VISIBLE:View.GONE);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h1 id="px-dp-dip-sp-pt-mm-in"><a href="#px-dp-dip-sp-pt-mm-in" class="headerlink" title="px/dp(dip)/sp/pt,mm,in"></a>px/dp(dip)/sp/pt,mm,in</h1><style>
+table th:nth-of-type(1){
+    width: 40px;
+}
+</style>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>px</td>
+<td>pixel的缩写。无论屏幕的密度是多少，一个px对应屏幕上的一个物理像素点。由于px不会适配屏幕的密度，因此不建议使用px。</td>
+</tr>
+<tr>
+<td>dp<br>或dip</td>
+<td>density-independent pixel的缩写，故又称dip。通常使用dp定义margin, padding或其它尺寸相关的像素值。通常无论屏幕密度如何，1dp=1/160英寸。</td>
+</tr>
+<tr>
+<td>sp</td>
+<td>scale-independent pixel的缩写。sp是考虑了用户字体尺寸习惯的dp，通常用于设置文本尺寸。</td>
+</tr>
+<tr>
+<td>pt,<br>mm,<br>in</td>
+<td>和dp类似的缩放单元，只是计算单位是按照points(1/72英寸)或millimeters毫米或inches英寸。不建议使用，因为不是所有设备都支持这些单位的换算。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>本书常用的计量单位是dp和sp，Android会自动把这些单位翻译成物理相关的像素。</p>
+<h1 id="Margin-vs-Padding"><a href="#Margin-vs-Padding" class="headerlink" title="Margin vs Padding"></a>Margin vs Padding</h1><p>Margin属性是用于布局的参数，它决定两个widget之间的间距；Padding则是widget内部属性，用来决定widget比它的内容大出来多少。比如一个按钮因为要比其内部文字大出一圈，需要使用Padding；因为要遵守和邻居间距而大出一圈，则需要使用Margin。</p>
+<h1 id="Styles-themes和theme-attributes"><a href="#Styles-themes和theme-attributes" class="headerlink" title="Styles, themes和theme attributes"></a>Styles, themes和theme attributes</h1><p>Style是描述widget外观和行为的xml资源文件，例如下面的style描述了一个大字体的外观：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span>=<span class="string">"BigTextStyle"</span>&gt;</span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:textSize"</span>&gt;</span>20sp<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:padding"</span>&gt;</span>3dp<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>你可以定义自己的style。</p>
+<p>theme则是style的集合，它的属性指向其它的style。Android提供了平台themes供app使用。比如在本节的fragment_crime.xml中描述TextView：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag"><span class="attr">...</span></span></span><br><span class="line"><span class="tag"><span class="attr">style</span>=<span class="string">"?android:listSeparatorTextViewStyle"</span></span></span><br><span class="line"><span class="tag"><span class="attr">...</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>这是带有一个分割线的TextView，每个Android theme都包含listSeparatorTextViewStyle，他们描述了不同的分割线外观。</p>
+<p>一个app的theme定义在<code>AndrodiManifest.xml</code>文件中：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span></span></span><br><span class="line"><span class="tag">        <span class="attr">...</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:theme</span>=<span class="string">"@style/AppTheme"</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>该theme的属性值定义在<code>res/values/styles.xml</code>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/19/2017/1019AndroidProgrammingBNRG08/" rel="next" title="《Android Programming BNRG》笔记八">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记八
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/21/2017/1021AndroidProgrammingBNRG10/" rel="prev" title="《Android Programming BNRG》笔记十">
+                《Android Programming BNRG》笔记十 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/20/2017/1020AndroidProgrammingBNRG09/" data-title="《Android Programming BNRG》笔记九" data-url="http://palanceli.github.io/2017/10/20/2017/1020AndroidProgrammingBNRG09/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#把LinearLayout转成ConstraintLayout"><span class="nav-number">1.</span> <span class="nav-text">把LinearLayout转成ConstraintLayout</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Widget的三种尺寸设置"><span class="nav-number">2.</span> <span class="nav-text">Widget的三种尺寸设置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加ImageView元素"><span class="nav-number">3.</span> <span class="nav-text">添加ImageView元素</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在Design界面中添加约束"><span class="nav-number">4.</span> <span class="nav-text">在Design界面中添加约束</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#动态显示widget"><span class="nav-number">5.</span> <span class="nav-text">动态显示widget</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#px-dp-dip-sp-pt-mm-in"><span class="nav-number">6.</span> <span class="nav-text">px/dp(dip)/sp/pt,mm,in</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Margin-vs-Padding"><span class="nav-number">7.</span> <span class="nav-text">Margin vs Padding</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Styles-themes和theme-attributes"><span class="nav-number">8.</span> <span class="nav-text">Styles, themes和theme attributes</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

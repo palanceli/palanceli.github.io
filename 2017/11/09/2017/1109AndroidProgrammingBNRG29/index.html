@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章引入了各种广播，当后台下载缩略图的线程下到新的数据，会发送有序广播，GalleryFragment在前台时会注册动态receiver，推倒后台则注销，该动态receiver设置广播的resultCode为Activity.RESULT_CANCEL。应用程序还有一个低级别的standalone receiver，发现resultCode不等于Activity.RESULT_OK时直接退出。通过">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记二十九">
+<meta property="og:url" content="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章引入了各种广播，当后台下载缩略图的线程下到新的数据，会发送有序广播，GalleryFragment在前台时会注册动态receiver，推倒后台则注销，该动态receiver设置广播的resultCode为Activity.RESULT_CANCEL。应用程序还有一个低级别的standalone receiver，发现resultCode不等于Activity.RESULT_OK时直接退出。通过">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/img05.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.159Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记二十九">
+<meta name="twitter:description" content="本章引入了各种广播，当后台下载缩略图的线程下到新的数据，会发送有序广播，GalleryFragment在前台时会注册动态receiver，推倒后台则注销，该动态receiver设置广播的resultCode为Activity.RESULT_CANCEL。应用程序还有一个低级别的standalone receiver，发现resultCode不等于Activity.RESULT_OK时直接退出。通过">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记二十九 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记二十九</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-09T20:00:00+08:00">
+                2017-11-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/09/2017/1109AndroidProgrammingBNRG29/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/09/2017/1109AndroidProgrammingBNRG29/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章引入了各种广播，当后台下载缩略图的线程下到新的数据，会发送有序广播，GalleryFragment在前台时会注册动态receiver，推倒后台则注销，该动态receiver设置广播的resultCode为<code>Activity.RESULT_CANCEL</code>。应用程序还有一个低级别的standalone receiver，发现resultCode不等于<code>Activity.RESULT_OK</code>时直接退出。通过这样的配合，使得应用程序仅在后台时，广播才有效。<br>本章要点：</p>
+<ul>
+<li>创建、注册standalone receiver</li>
+<li>创建、注册dynamic reciever</li>
+<li>使用receiver</li>
+<li>限定broadcast的传播范围</li>
+<li>有序广播<a id="more"></a>
+</li>
+</ul>
+<h1 id="Broadcast-Intents"><a href="#Broadcast-Intents" class="headerlink" title="Broadcast Intents"></a>Broadcast Intents</h1><p>Broadcast intents和普通的intents类似，不同点在于它可以同时被多个组件接收。<br><img src="/2017/11/09/2017/1109AndroidProgrammingBNRG29/img01.png" alt></p>
+<p>本节引入Boradcast是因为：尽管Alarm可以在进程被杀掉依然存活，但当遭遇系统重启它就只能中断了，因为没有进程启动Alarm。解决的办法就是让app接收系统的<code>BOOT_COMPLETED</code>广播。当系统启动完成后，一定会发出一个<code>BOOT_COMPLETED</code>广播。app要做的就是注册并创建standalone broadcast receiver，并实现处理逻辑。</p>
+<p><code>standalone broadcast receiver</code>需要在manifest声明，这样即使app没有被启动，依然能接收到它声明的broadcast。与之相对的是<code>dynamic receiver</code>，它不需要在manifest声明，而是在代码中完成注册，仅在app处于活动状态时，它才能收到broadcast。</p>
+<h2 id="创建注册standalone-receiver"><a href="#创建注册standalone-receiver" class="headerlink" title="创建注册standalone receiver"></a>创建注册standalone receiver</h2><p>创建broadcast receiver很简单，就是实现其<code>onReceive(...)</code>方法，当一个intent被<code>StartupReceiver(...)</code>调用，其对应的broadcast receiver的<code>onReceive(...)</code>方法将被回调。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// StartupReceiver.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StartupReceiver</span> <span class="keyword">extends</span> <span class="title">BroadcastReceiver</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"StartupReceiver"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceive</span><span class="params">(Context context, Intent intent)</span></span>&#123;</span><br><span class="line">        Log.i(TAG, <span class="string">"Received broadcast intent: "</span> + intent.getAction());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>和Service和Activity一样，broadcast receiver必须事先向系统注册，这样当广播发生时，系统才知道调用其回调接口。在<code>AndroidManifest.xml</code>中完成注册：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.RECEIVE_BOOT_COMPLETED"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="tag">&lt;<span class="name">receiver</span> <span class="attr">android:name</span>=<span class="string">".StartupReceiver"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.BOOT_COMPLETED"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>①添加<code>receiver</code>标签，以及<code>intent-filter</code>属性，这样<code>StartupReceiver</code>就可以监听<code>BOOT_COMPLETED</code>事件。②这需要相应的权限，因此添加<code>uses-permission</code>标签，声明<code>RECEIVE_BOOT_COMPLETED</code>权限。</p>
+<p>OK了，当收到filter中指定的broadcast，该receiver将被唤醒，并调用其<code>onReceive(...)</code>函数，然后receiver将被销毁。</p>
+<p>使用<code>Android Device Montiro</code>跟踪这一过程：Android Studio &gt; Tools &gt; Android &gt; Android Device Monitor：<br><img src="/2017/11/09/2017/1109AndroidProgrammingBNRG29/img02.png" alt><br>稍后会发现该app会退出。</p>
+<h2 id="使用receiver"><a href="#使用receiver" class="headerlink" title="使用receiver"></a>使用receiver</h2><p>在使用receiver的时候需要注意：</p>
+<ul>
+<li>不要在<code>onReceive(...)</code>中使用异步API，例如注册任何listeners，因为在<code>onReceive(...)</code>执行完成后不久，该receiver将被销毁，甚至它所在的app都会退出。</li>
+<li>不要在<code>onReceive(...)</code>中执行长程操作（如网络操作或者大量的I/O），因为该函数是在主线程中执行，长程操作会导致主线程阻塞而引发ANR。</li>
+</ul>
+<p>可以将receiver当做逻辑最初的起点，在该函数中启动另一个Activity或者Service等等。</p>
+<p>本节在SharedPreference中记录了是否开启alarm，在receiver中判断该记录，如果为true则启动alarm service：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QueryPreferences</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PREF_IS_ALARM_ON = <span class="string">"isAlarmOn"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isAlarmOn</span><span class="params">(Context context)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> PreferenceManager.getDefaultSharedPreferences(context)</span><br><span class="line">                .getBoolean(PREF_IS_ALARM_ON, <span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setAlarmOn</span><span class="params">(Context context, <span class="keyword">boolean</span> isOn)</span></span>&#123; <span class="comment">// ③</span></span><br><span class="line">        PreferenceManager.getDefaultSharedPreferences(context)</span><br><span class="line">                .edit()</span><br><span class="line">                .putBoolean(PREF_IS_ALARM_ON, isOn)</span><br><span class="line">                .apply();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PollService.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PollService</span> <span class="keyword">extends</span> <span class="title">IntentService</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setServiceAlarm</span><span class="params">(Context context, <span class="keyword">boolean</span> isOn)</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        QueryPreferences.setAlarmOn(context, isOn);<span class="comment">// ②</span></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PhotoGalleryFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PhotoGalleryFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span></span>&#123;</span><br><span class="line">        <span class="keyword">switch</span>(item.getItemId())&#123;</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">case</span> R.id.menu_item_toggle_polling:</span><br><span class="line">                <span class="keyword">boolean</span> shouldStartAlarm = !PollService.isServiceAlarmOn(getActivity());</span><br><span class="line">                PollService.setServiceAlarm(getActivity(), </span><br><span class="line">                                        shouldStartAlarm);<span class="comment">// ①</span></span><br><span class="line">                getActivity().invalidateOptionsMenu();</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// StartupReceiver.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StartupReceiver</span> <span class="keyword">extends</span> <span class="title">BroadcastReceiver</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceive</span><span class="params">(Context context, Intent intent)</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">boolean</span> isOn = QueryPreferences.isAlarmOn(context); <span class="comment">// ④</span></span><br><span class="line">        PollService.setServiceAlarm(context, isOn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>①当用户点击<code>Start polling</code>菜单时，设置ServiceAlarm为开启状态。<br>②③该状态被写入SharedPreference。<br>④当系统启动后，StartupReceiver收到启动广播，读取SharedPreference，如果ServiceAlarm的启动标记为true，则启动该服务。</p>
+<h2 id="创建dynamic-receiver"><a href="#创建dynamic-receiver" class="headerlink" title="创建dynamic receiver"></a>创建dynamic receiver</h2><p>dynamic receiver的关键点在于注册/反注册以及实现<code>onReceive(...)</code>，本节引入了一个抽象类<code>VisibleFragment</code>，并在其<code>onStart()</code>和<code>onStop()</code>回调中分别完成注册和反注册：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">VisibleFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"VisibleFragment"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        IntentFilter filter = <span class="keyword">new</span> IntentFilter(PollService.ACTION_SHOW_NOTIFICATION);</span><br><span class="line">        getActivity().registerReceiver(mOnShowNotification, filter);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        getActivity().unregisterReceiver(mOnShowNotification);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> BroadcastReceiver mOnShowNotification = <span class="keyword">new</span> BroadcastReceiver() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceive</span><span class="params">(Context context, Intent intent)</span> </span>&#123;</span><br><span class="line">            Toast.makeText(getActivity(), <span class="string">"Got a broadcast: "</span> + intent.getAction(),</span><br><span class="line">                    Toast.LENGTH_LONG).show();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在注册dynamic reciever的时候需要传入一个BoradcastReceiver和一个IntentFilter实例。定义内部类并实例化mOnShowNotification，IntentFilter则与XML文件中<intent-filter>等效，相应的可以调用<code>addCategory(String)</code>、<code>addAction(String)</code>或<code>addDataPath(String)</code>来配置。</intent-filter></p>
+<p>以上的代码不涉及业务逻辑，具体到本节解决的问题是：</p>
+<font color="red">我咋觉得解决的问题和实际方案是反的？他希望仅在应用没有打开的时候得到notification，而到目前为止，必须要求应用在打开的时候才能收到notification！</font>
+
+<p>它在<code>PollService.java</code>中当收到新图片时将发送dynamic broadcast：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PollService.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PollService</span> <span class="keyword">extends</span> <span class="title">IntentService</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String ACTION_SHOW_NOTIFICATION = <span class="string">"com.bnrg.photogallery.SHOW_NOTIFICATION"</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onHandleIntent</span><span class="params">(Intent intent)</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">if</span>(resultId.equals(lastResultId))&#123;</span><br><span class="line">            Log.i(TAG, <span class="string">"Got an old result: "</span> + resultId);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            Log.i(TAG, <span class="string">"Got a new result: "</span> + resultId);</span><br><span class="line">            doNotifiy();</span><br><span class="line">            sendBroadcast(<span class="keyword">new</span> Intent(ACTION_SHOW_NOTIFICATION));</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再让PhotoGalleryFragment继承自VisibleFragment即可：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PhotoGalleryFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PhotoGalleryFragment</span> <span class="keyword">extends</span> <span class="title">VisibleFragment</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="限定broadcast的传播范围"><a href="#限定broadcast的传播范围" class="headerlink" title="限定broadcast的传播范围"></a>限定broadcast的传播范围</h2><p>本节希望应用程序发出的广播仅能被自己接收到，提出了两个方案：</p>
+<h3 id="1-为receiver添加exported属性"><a href="#1-为receiver添加exported属性" class="headerlink" title="1.为receiver添加exported属性"></a>1.为receiver添加exported属性</h3><p>在AndroidManifest.xml的receiver标签中添加<code>android:exported=&quot;false&quot;</code>属性，以声明该receiver仅用于内部应用。<font color="red">我的疑问是：难道不应该在broadcast源声明仅内部receiver才能接收么？在端处声明我仅能接收内部broadcast阻挡不住应用外的receiver截胡吧？</font></p>
+<h3 id="2-使用自定义permission"><a href="#2-使用自定义permission" class="headerlink" title="2.使用自定义permission"></a>2.使用自定义permission</h3><p>在AndroidManifest.xml中加入<code>permission</code>标签创建自定义权限，接下来使用<code>uses-permission</code>来声明使用该权限，和声明使用系统预定义的权限类似，只是该权限是自定义的：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">permission</span> <span class="attr">android:name</span>=<span class="string">"com.bnrg.photogallery.PRIVATE"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:protectionLevel</span>=<span class="string">"signature"</span>/&gt;</span><span class="comment">&lt;!-- 创建自定义权限 --&gt;</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.RECEIVE_BOOT_COMPLETED"</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 使用自定义权限 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"com.bnrg.photogallery.PRIVATE"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">        ...</span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>最后在发送广播的时候，指定接收范围：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PollService.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PollService</span> <span class="keyword">extends</span> <span class="title">IntentService</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String ACTION_SHOW_NOTIFICATION = <span class="string">"com.bnrg.photogallery.SHOW_NOTIFICATION"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PERM_PRIVATE = <span class="string">"com.bnrg.photogallery.PRIVATE"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onHandleIntent</span><span class="params">(Intent intent)</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        sendBroadcast(<span class="keyword">new</span> Intent(ACTION_SHOW_NOTIFICATION), PERM_PRIVATE);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样，只有声明了该权限的应用才能接收到该广播。<font color="red">如果别的应用知道了我的私有权限，是不是也能盗用监听到我的私有广播呢？能屏蔽吗？</font></p>
+<p>最最后，为了防止我的receiver还能接收到其它应用发送同样的广播，引诱我执行，可以在注册receiver的时候也缀上私有权限：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">VisibleFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        IntentFilter filter = <span class="keyword">new</span> IntentFilter(PollService.ACTION_SHOW_NOTIFICATION);</span><br><span class="line">        getActivity().registerReceiver(mOnShowNotification, filter,</span><br><span class="line">                PollService.PERM_PRIVATE, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>还是没有太理解，所谓的私有权限只是一个字符串，我理解和广播的名称并没有本质区别吧？如果被泄露了，不一样会被引诱执行吗？这个问题是由protection levels解决的。</p>
+<h3 id="3-protection-levels"><a href="#3-protection-levels" class="headerlink" title="3.protection levels"></a>3.protection levels</h3><p>在创建自定义权限时，还有一段<code>android:protectionLevel=&quot;signature&quot;</code>属性，signature表示如果其他应用需要使用该权限，他必须使用和本应用一样的签名。其它的开发者不可能拿到你的签名，因此使用signature是限定应用内权限的有效方式。发出broadcast时，没有相同签名的其它应用的receiver收不到；接收broadcast时，如果发送者没有和我相同的签名，也无法欺骗让我接收。</p>
+<p>protection levels的所有取值和含义如下：</p>
+<style>
+table th:nth-of-type(1){
+    width: 80px;
+}
+table th:nth-of-type(2){
+    width: 200px;
+}
+</style>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>取值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>normal</td>
+<td>默认值。任何应用都可以申请，安装应用时，不会直接提示用户，点击全部才会展示。</td>
+</tr>
+<tr>
+<td>dangerous</td>
+<td>任何应用都可以申请，在安装应用时，会直接提示给用户。</td>
+</tr>
+<tr>
+<td>signature</td>
+<td>只有和该apk用相同的私钥签名的应用才可以申请该权限。</td>
+</tr>
+<tr>
+<td>signatureOrSystem</td>
+<td>有两种应用可以申请该权限：①和该apk用相同的私钥签名的应用；②在/system/app目录下的应用</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="有序广播"><a href="#有序广播" class="headerlink" title="有序广播"></a>有序广播</h2><p>本节要解决的问题是：让前面动态注册的receiver能优先接收到<code>PollService.ACTION_SHOW_NOTIFICATION</code>广播，并且不再让广播继续传播。之前介绍的无序广播模型是单向无序的：<br><img src="/2017/11/09/2017/1109AndroidProgrammingBNRG29/img03.png" alt><br>本节引入了有序广播<br><img src="/2017/11/09/2017/1109AndroidProgrammingBNRG29/img04.png" alt><br>无序广播像是散弹枪，打出去多少人中枪，谁先谁后是不知道的；有序广播则像是击鼓传花，大家排排坐，确保收到广播的顺序，有序广播的接收者还可以再被传递的花中附上自己的返回值。本节正是利用这一特性实现了：当app在前台时不处理广播，仅在app处于后台时才处理广播，弹出通知。</p>
+<h3 id="设置返回值"><a href="#设置返回值" class="headerlink" title="设置返回值"></a>设置返回值</h3><p>在接收端和无序广播的实现是类似的，只是可以通过调用<code>setResultCode(int code)</code>来设置自己的返回值。<br>还可以通过<code>setResultData(String)</code>、<code>setResultExtras(Bundle)</code>或<code>setResult(int, String, Bundle)</code>返回更多种类型的数据，一旦设置了这些返回值，后续所有的receiver都能收到。结合有序性，可以令高级别的receiver在符合一定条件时设置返回值，低级别的receiver在收到广播后根据返回值决定要不要继续处理，这样就能实现广播的过滤，相当于通过高级别的receiver终止了广播的继续处理。</p>
+<h3 id="发送有序广播"><a href="#发送有序广播" class="headerlink" title="发送有序广播"></a>发送有序广播</h3><p>调用<code>sendOrderedBroadcast(...)</code>发送有序广播，该函数的参数说明如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sendOrderedBroadcast</span> <span class="params">(Intent intent,   // 待广播的Intent</span></span></span><br><span class="line"><span class="function"><span class="params">        String receiverPermission,  // receiver必须具备的权限</span></span></span><br><span class="line"><span class="function"><span class="params">        BroadcastReceiver resultReceiver,  // 最后一个接收广播的receiver</span></span></span><br><span class="line"><span class="function"><span class="params">        Handler scheduler, // 自定义的handler，用来执行resultReceiver的回调，如果为<span class="keyword">null</span>则在主线程执行</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int</span> initialCode,    // resultCode的初始值，通常为<span class="keyword">null</span>，通常为Activity.RESULT_OK</span></span></span><br><span class="line"><span class="function"><span class="params">        String initialData, // resultData的初始值，通常为<span class="keyword">null</span></span></span></span><br><span class="line"><span class="function"><span class="params">        Bundle initialExtras)</span><span class="comment">// resultExtras的初始值，通常为null</span></span></span><br></pre></td></tr></table></figure></p>
+<p>和“击鼓传花”类似，有序广播的有序性是通过接收者的座次来实现，receiver有一个android:priority属性，介于(SYSTEM_LOW_PRIORITY, SYSTEM_HIGH_PRIORITY)之间（即-1000 ~ 1000，详情参见<a href="https://developer.android.com/guide/topics/manifest/intent-filter-element.html" target="_blank" rel="noopener">intent-filter</a>）。本节引入了两个receiver，一个是standalone，在<code>AndroidManifest.xml</code>中定义如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">receiver</span> <span class="attr">android:name</span>=<span class="string">".NotificationReceiver"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:exported</span>=<span class="string">"false"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span> <span class="attr">android:priority</span>=<span class="string">"-999"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"com.bnrg.photogallery.SHOW_NOTIFICATION"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>另一个是dynamic receiver，没有显式定义优先级，默认为0。因此在本节中，该dynamic receiver先收到有序广播，之后才是NotificationReceiver。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本节的逻辑有点深，读这本书的目的是学习Android系统机制，但在本节中，机制结合逻辑设计共同完成了特定效果，所以最后还是有必要把逻辑梳理一下。<br><img src="/2017/11/09/2017/1109AndroidProgrammingBNRG29/img05.png" alt><br>本节的代码和书上不太一样，为了适配AndroidO，我把弹出通知的一坨代码封装成<code>doNotify(...)</code>函数，我的代码可以去<a href="https://github.com/palanceli/TempAndroid/tree/master/PhotoGallery" target="_blank" rel="noopener">PhotoGallery</a>下载。<br>广播发出后，如果PhotoGalleryFragment处于前台，必定调用过<code>onStart()</code>函数，注册了动态receiver，它会先收到广播，并且设置resultCode为RESULT_CANCELED，轮到NotificationReceiver接收广播时就不再处理了。此时广播的流向路径是A-B。<br>如果PhotoGalleryFragment处于后台，必定调用过<code>onStop()</code>函数，注销了动态receiver，广播流向直接走C，NotificationReceiver收到广播fA线resultCode为RESULT_OK，则发出通知。</p>
+<font color="red">但是我发现如果PhotoGalleryFragment处于后台，当发出第一次有序广播后，就不再继续发送了，理论上来说只要定时器满足应该不断发送才对，我还没搞明白为什么。这个问题以后待查。</font>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/08/2017/1108AndroidProgrammingBNRG28/" rel="next" title="《Android Programming BNRG》笔记二十八">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记二十八
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/10/2017/1110AndroidProgrammingBNRG30/" rel="prev" title="《Android Programming BNRG》笔记三十">
+                《Android Programming BNRG》笔记三十 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/11/09/2017/1109AndroidProgrammingBNRG29/" data-title="《Android Programming BNRG》笔记二十九" data-url="http://palanceli.github.io/2017/11/09/2017/1109AndroidProgrammingBNRG29/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Broadcast-Intents"><span class="nav-number">1.</span> <span class="nav-text">Broadcast Intents</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建注册standalone-receiver"><span class="nav-number">1.1.</span> <span class="nav-text">创建注册standalone receiver</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用receiver"><span class="nav-number">1.2.</span> <span class="nav-text">使用receiver</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建dynamic-receiver"><span class="nav-number">1.3.</span> <span class="nav-text">创建dynamic receiver</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限定broadcast的传播范围"><span class="nav-number">1.4.</span> <span class="nav-text">限定broadcast的传播范围</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-为receiver添加exported属性"><span class="nav-number">1.4.1.</span> <span class="nav-text">1.为receiver添加exported属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用自定义permission"><span class="nav-number">1.4.2.</span> <span class="nav-text">2.使用自定义permission</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-protection-levels"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.protection levels</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有序广播"><span class="nav-number">1.5.</span> <span class="nav-text">有序广播</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置返回值"><span class="nav-number">1.5.1.</span> <span class="nav-text">设置返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送有序广播"><span class="nav-number">1.5.2.</span> <span class="nav-text">发送有序广播</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

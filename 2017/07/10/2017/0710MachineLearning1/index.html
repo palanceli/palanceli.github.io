@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Andrew NG Machine Learning,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="学习视频《斯坦福大学公开课 ：机器学习课程》之前需要补充一些预备知识，主要是概率论相关的。">
+<meta name="keywords" content="Andrew NG Machine Learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《机器学习》预备知识">
+<meta property="og:url" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="学习视频《斯坦福大学公开课 ：机器学习课程》之前需要补充一些预备知识，主要是概率论相关的。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img01.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img18.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img12.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img02.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img04.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img06.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img07.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img08.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img09.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img10.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img11.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img13.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img14.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img15.jpg">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img16.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img17.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img19.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img20.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img21.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img22.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img23.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img24.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img25.gif">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img26.gif">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.918Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《机器学习》预备知识">
+<meta name="twitter:description" content="学习视频《斯坦福大学公开课 ：机器学习课程》之前需要补充一些预备知识，主要是概率论相关的。">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/img01.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/">
+
+
+
+
+
+  <title>《机器学习》预备知识 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《机器学习》预备知识</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-10T23:00:00+08:00">
+                2017-07-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/10/2017/0710MachineLearning1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/10/2017/0710MachineLearning1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>学习视频<a href="http://open.163.com/special/opencourse/machinelearning.html" target="_blank" rel="noopener">《斯坦福大学公开课 ：机器学习课程》</a>之前需要补充一些预备知识，主要是概率论相关的。<a id="more"></a></p>
+<h1 id="希腊字符表"><a href="#希腊字符表" class="headerlink" title="希腊字符表"></a>希腊字符表</h1><style>
+table th:nth-of-type(1){
+    width: 5px;
+}
+table th:nth-of-type(2){
+    width: 5px;
+}
+table th:nth-of-type(3){
+    width: 10px;
+}
+table th:nth-of-type(4){
+    width: 1px;
+}
+table th:nth-of-type(5){
+    width: 5px;
+}
+table th:nth-of-type(6){
+    width: 5px;
+}
+table th:nth-of-type(7){
+    width: 10px;
+}
+table th:nth-of-type(8){
+    width: 1px;
+}
+table th:nth-of-type(9){
+    width: 5px;
+}
+table th:nth-of-type(10){
+    width: 5px;
+}
+table th:nth-of-type(11){
+    width: 10px;
+}
+</style>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>大写</th>
+<th>小写</th>
+<th>名称</th>
+<th></th>
+<th>大写</th>
+<th>小写</th>
+<th>名称</th>
+<th></th>
+<th>大写</th>
+<th>小写</th>
+<th>名称</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Α</td>
+<td>α</td>
+<td>alpha</td>
+<td></td>
+<td>Ι</td>
+<td>ι ℩</td>
+<td>iota</td>
+<td></td>
+<td>Ρ</td>
+<td>ρ</td>
+<td>rho</td>
+</tr>
+<tr>
+<td>Β</td>
+<td>β</td>
+<td>beta</td>
+<td></td>
+<td>Κ</td>
+<td>κ</td>
+<td>kappa</td>
+<td></td>
+<td>Σ</td>
+<td>σ ς</td>
+<td>sigma</td>
+</tr>
+<tr>
+<td>Γ</td>
+<td>γ</td>
+<td>gamma</td>
+<td></td>
+<td>Λ</td>
+<td>λ</td>
+<td>lambda</td>
+<td></td>
+<td>Τ</td>
+<td>τ</td>
+<td>tau</td>
+</tr>
+<tr>
+<td>Δ</td>
+<td>δ</td>
+<td>delta</td>
+<td></td>
+<td>Μ</td>
+<td>μ</td>
+<td>mu</td>
+<td></td>
+<td>Υ</td>
+<td>υ</td>
+<td>upsilon</td>
+</tr>
+<tr>
+<td>Ε</td>
+<td>ε</td>
+<td>epsilon</td>
+<td></td>
+<td>Ν</td>
+<td>ν</td>
+<td>nu</td>
+<td></td>
+<td>Φ</td>
+<td>φ</td>
+<td>phi</td>
+</tr>
+<tr>
+<td>Ζ</td>
+<td>ζ</td>
+<td>zeta</td>
+<td></td>
+<td>Ξ</td>
+<td>ξ</td>
+<td>xi</td>
+<td></td>
+<td>Χ</td>
+<td>χ</td>
+<td>chi</td>
+</tr>
+<tr>
+<td>Η</td>
+<td>η</td>
+<td>eta</td>
+<td></td>
+<td>Ο</td>
+<td>ο</td>
+<td>omicron</td>
+<td></td>
+<td>Ψ</td>
+<td>ψ</td>
+<td>psi</td>
+</tr>
+<tr>
+<td>Θ</td>
+<td>θ</td>
+<td>theta</td>
+<td></td>
+<td>Π</td>
+<td>π</td>
+<td>pi</td>
+<td></td>
+<td>Ω</td>
+<td>ω</td>
+<td>omega</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="概率质量函数"><a href="#概率质量函数" class="headerlink" title="概率质量函数"></a>概率质量函数</h1><p>是离散随机变量在各特定取值上的概率。Probability Mass Function，简称PMF。</p>
+<h1 id="概率密度函数"><a href="#概率密度函数" class="headerlink" title="概率密度函数"></a>概率密度函数</h1><p>连续型随机变量的<strong>概率密度函数</strong>简称<strong>密度函数</strong>，它是描述该随机变量的输出值在某个确定的取值点附近的可能性函数。Probability Density Function，简称PDF。</p>
+<p>PDF是对连续随机变量定义的，本身不是概率，只有对连续随机变量的取值进行积分后才是概率。其数学表示如下：【注1】<br><img src="/2017/07/10/2017/0710MachineLearning1/img01.gif" alt="概率密度函数"><br>X是一个连续型随机变量，fX(x)是它的概率密度函数，FX(x)是它的累计分布函数，F(x)=P(X＜x)能清晰地表达出FX(x)的含义。对于在[a, b]上均匀连续分布的x而言，问它在某个点上的概率是没有意义的，我们能讨论的只能是它在某个区间上的概率，此概率等于区间的长度乘以密度。</p>
+<h1 id="梯度"><a href="#梯度" class="headerlink" title="梯度"></a>梯度</h1><p>梯度是一个曲面沿着给定方向的倾斜程度。一个标量函数φ的梯度记作：▽φ或gradφ，其中▽表示矢量微分算子。在三维情况下，梯度在直角坐标系中表示为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img18.gif" alt="概率密度函数"></p>
+<h1 id="贝叶斯公式"><a href="#贝叶斯公式" class="headerlink" title="贝叶斯公式"></a>贝叶斯公式</h1><p>贝叶斯公式描述两个条件概率之间的关系：<code>P(A∩B) = P(A)*P(B|A) = P(B)*P(A|B)</code>，故<br><img src="/2017/07/10/2017/0710MachineLearning1/img12.gif" alt="贝叶斯公式"></p>
+<h1 id="均匀分布"><a href="#均匀分布" class="headerlink" title="均匀分布"></a>均匀分布</h1><p>x在[a, b]上均匀分布，其概率密度函数为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img02.gif" alt="在某区间均匀分布的概率密度函数"><br>即，当x∉[a, b]函数值等于0；当x∈[a, b]函数值等于1/(b-a)。<br><img src="/2017/07/10/2017/0710MachineLearning1/img03.png" alt="在某区间均匀分布的概率密度函数图"></p>
+<h1 id="正态分布"><a href="#正态分布" class="headerlink" title="正态分布"></a>正态分布</h1><p>正态分布（Normal distribution）又名高斯分布（Gaussion distribution）。若随机变量X服从一个位置参数为μ，尺度参数为δ的概率分布，且其概率密度函数为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img04.gif" alt="正态分布概率密度函数"><br>则该随机变量就成为正太随机分布，记作：<code>X ~ N(μ, δ²)</code>，μ决定了其位置，δ决定了分布幅度。<br>μ=0 δ=1的正态分布成为标准正态分布。<br><img src="/2017/07/10/2017/0710MachineLearning1/img05.png" alt="正态分布概率密度函数图"></p>
+<h1 id="伯努利分布"><a href="#伯努利分布" class="headerlink" title="伯努利分布"></a>伯努利分布</h1><p>伯努利分布是一种离散分布，有两种可能的结果：1表示成功，出现概率为p；0表示失败，出现概率为1-p。<br>Pr[x=1] = p;<br>Pr[x=0] = 1-p<br><img src="/2017/07/10/2017/0710MachineLearning1/img06.gif" alt="伯努利分布概率密度函数"></p>
+<h1 id="二项分布"><a href="#二项分布" class="headerlink" title="二项分布"></a>二项分布</h1><p>二项分布是n重伯努利试验成功次数的离散概率分布。</p>
+<ul>
+<li>如果实验E是个n重伯努利实验，每次成功的概率为p，X代表成功次数，则X的概率分布就是二项分布，记作<code>X ~ B(n, p)</code>，其概率质量函数为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img07.gif" alt="二项分布概率密度函数"><br>显然：<br><img src="/2017/07/10/2017/0710MachineLearning1/img08.gif" alt="二项分布概率密度函数"></li>
+<li>伯努利分布是二项分布在n=1时的特例。</li>
+<li>二项分布名称的由来，是由于其概率质量函数中使用了二项式系数Cnk，该系数是二项式定理中的系数，二项式定力是由牛顿提出：<br><img src="/2017/07/10/2017/0710MachineLearning1/img09.gif" alt="二项式定理"></li>
+<li>二项分布的典型例子是扔硬币，重复扔n次硬币，其中有k次正面朝上的概率即为一个二项分布概率。</li>
+</ul>
+<h1 id="多项分布"><a href="#多项分布" class="headerlink" title="多项分布"></a>多项分布</h1><p>多项分布是二项分布的推广，还是做n次试验，每次试验结果可以有m个，且m个结果发生的概率互斥且和为1，则发生其中一个结果X次的概率就是多项式分布。</p>
+<ul>
+<li>扔骰子就是典型的多项式分布，重复扔n次，有k次都是点6的概率就是：<br><img src="/2017/07/10/2017/0710MachineLearning1/img10.gif" alt="多项分布概率"></li>
+<li>多项分布的概率质量函数为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img11.gif" alt="多项分布概率"></li>
+</ul>
+<h1 id="Beta分布"><a href="#Beta分布" class="headerlink" title="Beta分布"></a>Beta分布</h1><p>需要先明确几个概念</p>
+<h2 id="先验概率"><a href="#先验概率" class="headerlink" title="先验概率"></a>先验概率</h2><p>先验概率（prior distribution）是事情尚未发生前对该事件发生概率的估计。利用历史资料计算的先验概率成为<strong>客观先验概率</strong>，凭人们的主观经验来判断而得到的先验概率成为<strong>主观先验概率</strong>。</p>
+<h2 id="后验概率"><a href="#后验概率" class="headerlink" title="后验概率"></a>后验概率</h2><p>后验概率（posterior distribution）是指通过调查或其他方法获取新的附加信息，利用贝叶斯公式对先验概率进行修正而得到的概率。</p>
+<h2 id="似然函数"><a href="#似然函数" class="headerlink" title="似然函数"></a>似然函数</h2><p>似然函数是一种关于统计模型参数的函数，给定输出x时，关于参数θ的似然函数L(θ|x)=P(X=x|θ)。“似然”和“概率”是同义词，但在统计学中，二者用法截然不同：概率用于在已知一些参数的情况下，预测接下来观测所得到的结果，而似然性则用于在已知某些观测所得到的结果时，对有关事物的性质参数进行估计。在已知某个参数B时，事件A发生的概率写作P(A|B)=P(A,B)/ P(B)，利用贝叶斯公式P(B|A)=P(A|B)*P(B)/P(A)。反过来可以构造似然性的方法：已知有事件A发生，运用似然函数L(B|A)估计估计参数B的可能性，L(b|A)=αP(A|B=b)，一个似然函数乘以一个正常数之后仍然是似然函数。</p>
+<p>还以投硬币为例，在已知一系列投掷结果时，关于硬币投掷时正面朝上的可能性，可建立如下模型：假设硬币投出是正面朝上的概率为pH，则背面朝上的概率为1-pH，似然函数<br>L(pH|HH)=p(HH|pH=0.5) = 0.25，它表示观测到两次投掷都是正面朝上时，pH的似然性是0.25。<br>如果考虑pH=0.6，则<br>L(pH|HH)=p(HH|pH=0.6) = 0.36，这说明pH=0.6时，结果观测到连续两次正面朝上的概率比假设pH=0.5时更大，说明pH去0.6要比0.5更有说服力，更为“合理”。<strong>似然函数的重要性不是他的具体值，而是当参数变化时函数变大还是变小。</strong>这正是似然函数乘以一个正常数之后仍然是似然函数的原因。</p>
+<p>对于投硬币来说，观测两次正面都朝上的似然函数为<br>L(θ|HH)=P(HH|pH=θ)=θ²，0≤pH≤1，它的曲线为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img13.png" alt="多项分布概率"><br>投掷三次，前两次正面朝上，第三次背面朝上的似然函数为<br>L(θ|HHT)=P(HHT|pH=θ)=θ²(1-θ)，，0≤pH≤1，它的曲线图为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img14.png" alt="多项分布概率"></p>
+<h2 id="逆概率问题"><a href="#逆概率问题" class="headerlink" title="逆概率问题"></a>逆概率问题</h2><p>还以投硬币的实验来说明，假设不知道硬币是不是两面“公平”的，也就是说不了解这枚硬币的物理偏向性，这时候得到正面的概率pH就不一定是50%。那么逆概率问题便是企图从某个实验样本来猜测pH的数值。应用贝叶斯公式：<br><code>后验概率 = 观测数据决定的调整因子 * 先验概率</code>　　　<strong>公式（1）</strong><br>于是利用先验知识与观察数据一起，可以决定假设的最终概率，以允许对某种不确定性逐步调整后验概率并作出最终的概率预测。</p>
+<p>因为是要对未知的不确定性作出预测，那么，在如何理解这种“不确定性”上产生了一些哲学意义上的分歧。分歧之一就是：这种不确定性是固有的客观存在吗？<br>逆概率问题，就是从样本数据来猜测概率模型的参数，比如说抛硬币实验，每次实验可以用随机变量X表示，X服从二项分布或伯努利分布。如何“猜测”抛硬币时正面出现的概率p？<strong>频率学派认为模型参数p是固定的客观存在的，贝叶斯学派则把模型的参数p也当作一个不确定的随机变量Y</strong>，因而，贝叶斯学派的Y不像频率学派的p那样是一个固定值，而是符合某种分布的随机变量（序列）。所以，对贝叶斯学派而言，硬币实验中有两类随机变量：硬币“正反”的一类随机变量X，和表征硬币偏向性的另一类随机变量Y。随机变量序列与分布相对应，因为Y是建立在随机序列X的模型参数之上的随机序列，因此，其分布被称为“分布之分布”。<br>频率学派认为p有一个固定数值，也就自然而然地认为决定这个数值的比较好的方法就是多次试验，不停地抛硬币，记录其中正面出现的频率，实验次数足够大的时候，就能越来越逼近p的真实数值，比如说，抛了1000次，正面601次，得到频率p（1000）=0.601，大概可以预测p=0.6。<br>贝叶斯学派并不假定p有一个“客观”数值，而是认为p也对应一个随机变量Y，可以取0到1之间的任何值，但可能服从某种分布（均匀、正态、或其它），实验次数的增多可以对此分布的情况了解更多。这样一来，使用贝叶斯公式，便可以逐次修正Y对应的分布：<br>后验概率分布 = 观测数据决定的调整因子×先验概率分布<br>数学化的表达如下：<br><code>P(Y|数据) = {P(数据| Y) / P(数据)} * P(Y) = 似然函数* P(Y)</code>　　　<strong>公式（2）</strong><br>P(数据)可以暂不考虑，以后会放到概率的归一化因子中。<br>其中P(Y)是先验分布，P(Y|数据) 是考虑得到了更多数据条件下的后验分布，P(数据| Y)是（正比于）似然函数。</p>
+<p>以简单的“抛硬币”实验为例，首先研究一下似然函数。对硬币“正反”随机性X对应的二项离散变量，事件要么发生（p），要么不发生（1-p）。如果发生m次，不发生n次，似然函数的形式为：<br>p^m * (1-p)^n<br>如果我们能找到一种分布形式来表示先验分布，乘以似然函数后，得到的后验分布仍然能够保持同样的形式的话，便不仅具有代数公式的协调之美，也会给实际上的计算带来许多方便之处。<br>Beta分布就具有这种性质。具有该性质的分布叫做“共轭先验”，beta分布是二项分布的共轭先验：<br><img src="/2017/07/10/2017/0710MachineLearning1/img15.jpg" alt="Beta分布概率密度函数"><br>Beta分布用f(x;a,b)表示，其中的B(a,b)是通常的由gamma函数定义的beta函数，在这儿意义不大，只是作为一个归一化的常数而引进，以保证概率求和（或积分）得到1。</p>
+<p>还以扔硬币为例，扔10次有3次正面朝上，7次背面朝上，可以由此记录得到一个beta的先验分布：f(H; 3, 7)。接下来再扔8次，前7次正面朝上，1次背面朝上，后验概率仍然是一个beta分布，只是参数发生了变化：f(H; 10, 8)。【注2】<br><img src="/2017/07/10/2017/0710MachineLearning1/img16.png" alt="Beta分布概率密度函数"></p>
+<p>Gamma函数 在实数域可以表示为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img17.png" alt="Beta分布概率密度函数"><br>Gamma函数 在整数域可以表示为：<code>Γ(n)=(n−1)!</code><br>Gamma函数有以下性质：<code>Γ(x+1)=xΓ(x)</code></p>
+<h1 id="拉格朗日乘法"><a href="#拉格朗日乘法" class="headerlink" title="拉格朗日乘法"></a>拉格朗日乘法</h1><p>拉格朗日乘法是用来解决<strong>条件极值</strong>问题的。极值问题分两类：一是无条件极值：求函数在给定区间上的极值，对自变量没有其他要求。比如求y=x²在x∈[-1, 1]的极小值。二是条件极值：对自变量有一些附加的约束条件限制下的极值。举个例子说明拉格朗日乘法的应用，例如给定椭球<br><img src="/2017/07/10/2017/0710MachineLearning1/img19.gif" alt="椭球">求这个椭球的内接长方体的最大体积，该问题其实就是在满足椭球方程的条件下，求<br><code>f(x, y, z) = 8xyz</code>的最大值。</p>
+<p>它的一般化描述为：求函数<code>z=f(x, y)</code>在满足<code>φ(x, y)=0</code>下的条件极值，可以转化为求函数<code>F(x, y, λ) = f(x, y) + λφ(x, y)</code>的无条件极值。如果(x0, y0, λ0)势函数F(x, y, λ)的驻点，则(x0, y0)就是条件极值的嫌疑点。</p>
+<p>回到上面椭球内接长方体的极值问题，通过拉格朗日乘法将问题转化为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img20.gif" alt="求解"><br>对F(x, y, z, λ)求偏导：<br><img src="/2017/07/10/2017/0710MachineLearning1/img21.gif" alt="求偏导1"><br><img src="/2017/07/10/2017/0710MachineLearning1/img22.gif" alt="求偏导2"><br><img src="/2017/07/10/2017/0710MachineLearning1/img23.gif" alt="求偏导3"><br><img src="/2017/07/10/2017/0710MachineLearning1/img24.gif" alt="求偏导4"><br>解方程组得到：<img src="/2017/07/10/2017/0710MachineLearning1/img25.gif" alt="方程组解集"><br>带入求得最大体积为：<br><img src="/2017/07/10/2017/0710MachineLearning1/img26.gif" alt="最大体积"></p>
+<p><br><br><br><br><br></p>
+<blockquote>
+<p>注1：<a href="http://latex.codecogs.com/eqneditor/editor.php" target="_blank" rel="noopener">这个数学公式生成网站</a>使用起来很方便。<br>注2：在macOS下可以执行<code>brew install scipy</code>安装scipy模块，绘制beta分布的代码如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> beta</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">beta</span><span class="params">()</span>:</span></span><br><span class="line">    x = np.linspace(<span class="number">0</span>, <span class="number">1</span>, <span class="number">100</span>)</span><br><span class="line"></span><br><span class="line">    plt.plot(x, beta.pdf(x, <span class="number">3</span>, <span class="number">7</span>), lw=<span class="number">1</span>, alpha=<span class="number">0.6</span>, label=<span class="string">'prior distribution f(x, 3, 7)'</span>)</span><br><span class="line">    plt.plot(x, beta.pdf(x, <span class="number">10</span>, <span class="number">8</span>), lw=<span class="number">1</span>, alpha=<span class="number">0.6</span>, label=<span class="string">'posterior distribution f(x, 10, 8)'</span>)</span><br><span class="line"></span><br><span class="line">    plt.legend(frameon=<span class="literal">False</span>)</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Andrew-NG-Machine-Learning/" rel="tag"># Andrew NG Machine Learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/27/2017/0627岗什卡01/" rel="next" title="攀登岗什卡">
+                <i class="fa fa-chevron-left"></i> 攀登岗什卡
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/18/2017/0718IMChanged/" rel="prev" title="接收输入法被切换的广播">
+                接收输入法被切换的广播 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/07/10/2017/0710MachineLearning1/" data-title="《机器学习》预备知识" data-url="http://palanceli.github.io/2017/07/10/2017/0710MachineLearning1/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#希腊字符表"><span class="nav-number">1.</span> <span class="nav-text">希腊字符表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概率质量函数"><span class="nav-number">2.</span> <span class="nav-text">概率质量函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概率密度函数"><span class="nav-number">3.</span> <span class="nav-text">概率密度函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#梯度"><span class="nav-number">4.</span> <span class="nav-text">梯度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#贝叶斯公式"><span class="nav-number">5.</span> <span class="nav-text">贝叶斯公式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#均匀分布"><span class="nav-number">6.</span> <span class="nav-text">均匀分布</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正态分布"><span class="nav-number">7.</span> <span class="nav-text">正态分布</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#伯努利分布"><span class="nav-number">8.</span> <span class="nav-text">伯努利分布</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二项分布"><span class="nav-number">9.</span> <span class="nav-text">二项分布</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多项分布"><span class="nav-number">10.</span> <span class="nav-text">多项分布</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Beta分布"><span class="nav-number">11.</span> <span class="nav-text">Beta分布</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#先验概率"><span class="nav-number">11.1.</span> <span class="nav-text">先验概率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后验概率"><span class="nav-number">11.2.</span> <span class="nav-text">后验概率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#似然函数"><span class="nav-number">11.3.</span> <span class="nav-text">似然函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逆概率问题"><span class="nav-number">11.4.</span> <span class="nav-text">逆概率问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#拉格朗日乘法"><span class="nav-number">12.</span> <span class="nav-text">拉格朗日乘法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

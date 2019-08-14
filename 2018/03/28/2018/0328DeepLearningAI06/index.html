@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《改善深层神经网络：超参数调试、正则化以及优化》第二周《优化算法》。本节主要从模型的训练方法上给出一些可优化的点，包括可以将数据分而治之的Mini-Batch、防止梯度下降方向变化率过大的指数加权平均以及RMSprop和Adam优化算法。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（五）">
+<meta property="og:url" content="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《改善深层神经网络：超参数调试、正则化以及优化》第二周《优化算法》。本节主要从模型的训练方法上给出一些可优化的点，包括可以将数据分而治之的Mini-Batch、防止梯度下降方向变化率过大的指数加权平均以及RMSprop和Adam优化算法。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/img04.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.217Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（五）">
+<meta name="twitter:description" content="《改善深层神经网络：超参数调试、正则化以及优化》第二周《优化算法》。本节主要从模型的训练方法上给出一些可优化的点，包括可以将数据分而治之的Mini-Batch、防止梯度下降方向变化率过大的指数加权平均以及RMSprop和Adam优化算法。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（五） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（五）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T10:00:00+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/2018/0328DeepLearningAI06/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/28/2018/0328DeepLearningAI06/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《改善深层神经网络：超参数调试、正则化以及优化》第二周《优化算法》。<br>本节主要从模型的训练方法上给出一些可优化的点，包括可以将数据分而治之的Mini-Batch、防止梯度下降方向变化率过大的指数加权平均以及RMSprop和Adam优化算法。</p>
+<a id="more"></a>
+<h1 id="2-1-Mini-Batch梯度下降法"><a href="#2-1-Mini-Batch梯度下降法" class="headerlink" title="2.1 Mini-Batch梯度下降法"></a>2.1 Mini-Batch梯度下降法</h1><p>当样本量巨大时，有必要将海量样本拆分成更小的子集。因为海量样本的向量化会收到内存限制，拆分让分布式并行成为可能。<br>例如，当有5,000,000样本时，可令1000个样本为一组，拆分成5000个子集：</p>
+<script type="math/tex; mode=display">X = [\underbrace{x^{(1)} \; x^{(2)} \;  ... \; x^{(1000)}} _{x^{\{1\}}\;\in\mathbb{R}^{n_x\;×1000}} \; | \; \underbrace{x^{(1001)} \; x^{(1002)} \; ... } _{x^{\{2\}}\;\in\mathbb{R}^{n_x\;×1000}} \; | \;...\;| \; \underbrace{ \; ...\; x^{(m)}} _{x^{\{5000\}}\;\;\in\mathbb{R}^{n_x\;×1000}} \; ]</script><script type="math/tex; mode=display">Y = [\underbrace{y^{(1)} \; y^{(2)} \;  ... \; y^{(1000)}} _{y^{\{1\}}\;\in\mathbb{R}^{n_x\;×1000}} \; | \; \underbrace{y^{(1001)} \; y^{(1002)} \; ... } _{y^{\{2\}}\;\in\mathbb{R}^{n_x\;×1000}} \; | \;...\;| \; \underbrace{ \; ...\; y^{(m)}} _{y^{\{5000\}}\;\;\in\mathbb{R}^{n_x\;×1000}} \; ]</script><p>使用符号$x^\;y^$来表示第t个样本子集。</p>
+<blockquote>
+<p>目前接触过三种上角标：<br>$x^{(i)}表示第i个样本\z^{[l]}表示第l层节点\x^表示第t个样本子集$</p>
+</blockquote>
+<p>于是Mini-Batch梯度下降法可以写作：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">model</span><span class="params">(self, X, Y, layers_dims, optimizer, learning_rate = <span class="number">0.0007</span>, mini_batch_size = <span class="number">64</span>, beta = <span class="number">0.9</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        beta1 = <span class="number">0.9</span>, beta2 = <span class="number">0.999</span>,  epsilon = <span class="number">1e-8</span>, num_epochs = <span class="number">10000</span>, print_cost = True)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># 构造各层W、b的默认值</span></span><br><span class="line">    parameters = self.initialize_parameters(layers_dims)</span><br><span class="line">    <span class="comment"># 循环代次</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num_epochs):</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment"># 洗牌、分mini-batch子集</span></span><br><span class="line">        minibatches = self.random_mini_batches(X, Y, mini_batch_size, seed)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> minibatch <span class="keyword">in</span> minibatches:   <span class="comment"># 遍历每个子集</span></span><br><span class="line">            <span class="comment"># 获取子集的样本数据</span></span><br><span class="line">            (minibatch_X, minibatch_Y) = minibatch</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 执行前向算法</span></span><br><span class="line">            a3, caches = self.forward_propagation(minibatch_X, parameters)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 计算成本</span></span><br><span class="line">            cost = self.compute_cost(a3, minibatch_Y)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 执行后向算法</span></span><br><span class="line">            grads = self.backward_propagation(minibatch_X, minibatch_Y, caches)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 更新参数</span></span><br><span class="line">            self.update_parameters_with_gd(parameters, grads, learning_rate)</span><br><span class="line">        ...</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-2-理解Mini-Batch梯度下降法"><a href="#2-2-理解Mini-Batch梯度下降法" class="headerlink" title="2.2 理解Mini-Batch梯度下降法"></a>2.2 理解Mini-Batch梯度下降法</h1><p>之前没有分割小批量的梯度下降叫Batch梯度下降法，和Mini-Batch梯度下降法相比，二者的成本函数曲线不同：<br><img src="/2018/03/28/2018/0328DeepLearningAI06/img01.png" alt><br>结合上一节代码很容易理解这一点，因为每轮Mini-Batch执行完成后，更新生成的参数W、b被应用到下一轮Mini-Batch，两轮其实是基于不同数据生成的神经子网。如果每个Mini-Batch子集的数据是独立同分布的，生成的参数在各个子集上的趋势应该是一致的，但是终究会有偏差，这就导致了不可能平滑。注意，在代码中，每一代训练完成后，会重新洗牌打乱样本次序，重新生成新的Mini-Batch子集。</p>
+<p>观察Mini-Batch每个子集的尺寸，当在极端情况下<br>Size=m，Mini-Batch退化为batch梯度下降，它会沿着等高线切线方向直奔最小值，但是当样本量极大时，机器会承担不了海量样本向量化的内存开销，这导致计算性能下降。<br>Size=1，Mini-Batch退化为m个单样本的梯度下降，又称随机梯度下降（Stochastic gradient descent）。它导致梯度下降的方向更加曲折，虽然总体会像最低点演进，但中间会走很多冤枉路，这会增加训练的轮数，降低学习性能。<br>因此应当在1和m之间取一个合理的值，既能有效利用机器的计算资源，又不让梯度下降的路径过于曲折。如下图所示蓝色是size=m的梯度下降路径，紫色是size=1的梯度下降路径，绿色的size介于二者之间：<br><img src="/2018/03/28/2018/0328DeepLearningAI06/img02.png" alt><br>一般情况下Mini-Batch的size取值在64， 128， 256， 512中选取。  </p>
+<blockquote>
+<p>本节讨论的是size的取值范围及影响，并没有涉及对Mini-Batch的理解。  </p>
+</blockquote>
+<h1 id="2-3-指数加权平均"><a href="#2-3-指数加权平均" class="headerlink" title="2.3 指数加权平均"></a>2.3 指数加权平均</h1><p>本节引入的方法貌似和前文没有什么关系，其实在后面会用到。它的核心思想是：当数据前后之间有连续性的关联关系时，令每条数据在基于前序若干数据的加权值基础上再加一个变量。本节举的例子是给定一年的气温样本，预测某一天的温度，令样本值为：$θ<em>1 \,θ_1 \,θ_1 \,…\,θ</em>{365}$ ，建立预测模型：<br>$v<em>0=0$<br>$v_1=β·v_0+(1-β)·θ_1$<br>$v_2=β·v_1+(1-β)·θ_2$<br>…<br>$v_t=β·v</em>{t-1}+(1-β)·θ_t$<br>该模型可以近似的理解为：它取了$\frac{1}{1-β}$个前序样本的加权平均值。<br>当β=0.9，即10个前序样本的加权平均；<br>当β=0.98，即50个前序样本的加权平均；<br>当β=0.5，即2个前序样本的加权平均；<br>这只是一个近似的理解，并没有给出数学证明。</p>
+<h1 id="2-4-理解指数加权平均"><a href="#2-4-理解指数加权平均" class="headerlink" title="2.4 理解指数加权平均"></a>2.4 理解指数加权平均</h1><p>当β=0.9：<br>$v<em>{100}=0.1θ</em>{100} + 0.9v<em>{99}\<br>= 0.1θ</em>{100} + 0.9(0.1θ<em>{99} + 0.9v</em>{98})\<br>= 0.1θ<em>{100} + 0.1×0.9θ</em>{99} + 0.9^2(0.1θ<em>{98} + 0.9v</em>{97})\<br>= 0.1θ<em>{100} + 0.1×0.9θ</em>{99} + 0.1×0.9^2θ<em>{98} + 0.9^3(0.1θ</em>{97} + 0.9 v_{97})\<br>=…$<br>我理解这个加权平均核心是因为系数0.1，它表达的含义是取最近$\frac{1}{1-β}$个样本，每个样本的权重是(1-β)，且随着样本越远，按照β的指数级递减，这应该是“指数加权平均”的含义。  </p>
+<p>文中指出$0.9^{10}≈0.35≈\frac{1}{e}$，我没明白他的用意是什么。我的直观理解应该是想说过了这个值$\frac{1}{e}$以后，其权重可忽略不计了，但是为什么呢？  </p>
+<blockquote>
+<p>e是自然对数的底数，$e=\mathop{lim}\limits_{n→∞}{1+\frac{1}{n}}^n≈2.71828$，在科学计算中通常不使用以10为底的对数。使用以e为底，能让许多算式得到简化，用它最“自然”，因此称为自然对数。btw:$\frac{1}{e}≈0.367879$  </p>
+</blockquote>
+<p>实现指数加权平均的算法：<br>$v<em>θ=0 \<br>Repeat {\<br>　get　next　θ_t\<br>　v</em>θ:=β·v_θ+(1-β)·θ_t\<br>}$</p>
+<h1 id="2-5-指数加权平均的偏差修正"><a href="#2-5-指数加权平均的偏差修正" class="headerlink" title="2.5 指数加权平均的偏差修正"></a>2.5 指数加权平均的偏差修正</h1><p>上一节的实现算法有一个缺陷：在算法初期，由于初值被置为0，且没有更多的前序数据拿进来做加权平均，这会导致初值偏小。等到$\frac{1}{1-β}$个前序样本都加入进来才回归正常。本节引入一个修正系数来解决这个问题：<br>$v<em>t=\frac{β·v</em>{t-1} \;+\; (1-β)·θ_t}{1-β^t}$<br>在初期t很小，$β^t→1$，分母放大了结果；t越大，$β^t→0$，分母的作用就越小。通过这种方式修正了初期数据。</p>
+<h1 id="2-6-动量梯度下降法"><a href="#2-6-动量梯度下降法" class="headerlink" title="2.6 动量梯度下降法"></a>2.6 动量梯度下降法</h1><p>本节是对指数加权平均的应用，大致思想是：w:=w-α·dw，dw决定了下一步的方向，减缓每一步dw的变化率，有利于抵消折返的角度，提升学习的效率。如下图：<br><img src="/2018/03/28/2018/0328DeepLearningAI06/img03.png" alt><br>直观理解是，如果能把原本蓝线走过的梯度下降，修正为红线，即减缓每次迭代的方向变化率，学习率将得到提升。在算法上，将原先<strong>w:=w-α·dw; b:=w-α·db</strong>修正为：<br>$v<em>{dw} = β·v</em>{dw} + (1-β)·dw\<br>v<em>{db} = β·v</em>{db} + (1-β)·db\<br>w:=w - α·v<em>{dw}\<br>b:=b - α·v</em>{db}$<br>算法的核心思想就是采用指数加权平均来作用于原先的dw和db，从而使得变化率的连续性更强，防止梯度下降中的折返消耗。<br>如果β=0，则动量梯度下降法退化为普通梯度下降；β越大，每轮梯度下降的方向变化越平滑。但是β过大也会导致“船大不好调头”，从而让学习率下降。通常β的取值范围在(0.8, 0,999)，默认情况下通常取0.9。</p>
+<h1 id="2-7-RMSprop"><a href="#2-7-RMSprop" class="headerlink" title="2.7 RMSprop"></a>2.7 RMSprop</h1><p>接下来两节介绍的优化方法，在思想上和动量梯度下降法是一致的，都是希望减小方向的变化率。直接上算法：<br>$S<em>{dw} = β_2·S</em>{dw} + (1 - β<em>2)·(dw)^2\<br>S</em>{db} = β<em>2·S</em>{db} + (1 - β<em>2)·(db)^2\<br>w:=w - α·\frac{dw}{\sqrt{S</em>{dw} \;+\; ε}}\<br>b:=b - α·\frac{db}{\sqrt{S_{db} \;+\; ε}}$  </p>
+<blockquote>
+<p>但本节并没有讲该算法的出处和思想起源，为什么取平方呢？这和加权平均差异有点大。不过也没关系，知道意图并知道这么做是有效的就好了~  </p>
+</blockquote>
+<h1 id="2-8-Adam优化算法"><a href="#2-8-Adam优化算法" class="headerlink" title="2.8 Adam优化算法"></a>2.8 Adam优化算法</h1><p>和前两节是一样的思路，并且把前两节的优化方法结合在一起了。直接上代码：<br>$v<em>{dw}=0, \; S</em>{dw}=0, \; v<em>{db}=0, \; S</em>{db}=0\<br>on \, iteration \, t:\<br>使用mini-batch方法计算dw, db\<br>v<em>{dw}=β_1·v</em>{dw} + (1-β<em>1)·dw 　　　v</em>{db}=β<em>1·v</em>{db} + (1-β<em>1)·db\<br>S</em>{dw}=β<em>2·S</em>{dw} + (1-β<em>2)·(dw)^2　S</em>{db}=β<em>2·S</em>{db} + (1-β<em>2)·(db)^2\<br>v</em>{dw}=\frac{v<em>{dw}}{1-β_1^t}　　　v</em>{db}=\frac{v<em>{db}}{1-β_1^t}\<br>S</em>{dw}=\frac{S<em>{dw}}{1-β_2^t}　　　S</em>{db}=\frac{S<em>{db}}{1-β_2^t}\<br>w:=w-α·\frac{v</em>{dw}}{\sqrt{S<em>{dw}} \;+\; ε}　　　b:=b-α·\frac{v</em>{db}}{\sqrt{S_{db}} \;+\; ε}$<br>通常超参数选择：$ε:10^{-8} \; \; \; β_1:0.9 \; \; \; β_2:0.999$，<br>α则根据业务调整。</p>
+<h1 id="2-9-学习率衰减"><a href="#2-9-学习率衰减" class="headerlink" title="2.9 学习率衰减"></a>2.9 学习率衰减</h1><p>学习率衰减的思想是：随着梯度下降的进行，距离成本最低点越来越近，应该逐步衰减每一轮的学习步长，以避免大幅在最低点附近震荡消耗。此时缩减步长有助于逼近极值点。从图上很容易理解这一点：<br><img src="/2018/03/28/2018/0328DeepLearningAI06/img04.png" alt><br>蓝线在到达了极值点附近还是以同样的步长来回震动，这导致后期的震荡对于学习不再有效；而绿线的步长越来越小，有助于逼近极值点。理解了思想，算法就很容易看懂了。<br>方法一：$α:=\frac{1}{1+decay\_rate×epoch\_num}$，其中decay_rate为衰减率，epoch_num为迭代的代次。<br>方法二：$α:=0.95^{epoch\_num}·α$<br>方法三：$α:=\frac{k}{\sqrt{epoch\_num}}·α \;或\; α:=\frac{k}{\sqrt{t}}·α$<br>最土的办法是手动调节，总之就是让后期的α能逐步衰减。</p>
+<h1 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h1><p>本节作业演示各种优化方案的效果，题目是为双月牙散点图做个分类器。代码没有太多需要注意的，都是局部的技术性优化，就不在这里贴了。</p>
+<blockquote>
+<p>本节作业可参见<a href="https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py" target="_blank" rel="noopener">https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py</a><code>class Coding2_2</code>。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/27/2018/0327pandas/" rel="next" title="pandas使用">
+                <i class="fa fa-chevron-left"></i> pandas使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/29/2018/0329DeepLearningAI07/" rel="prev" title="DeepLearning.ai笔记（六）">
+                DeepLearning.ai笔记（六） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/03/28/2018/0328DeepLearningAI06/" data-title="DeepLearning.ai笔记（五）" data-url="http://palanceli.github.io/2018/03/28/2018/0328DeepLearningAI06/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-Mini-Batch梯度下降法"><span class="nav-number">1.</span> <span class="nav-text">2.1 Mini-Batch梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-理解Mini-Batch梯度下降法"><span class="nav-number">2.</span> <span class="nav-text">2.2 理解Mini-Batch梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-3-指数加权平均"><span class="nav-number">3.</span> <span class="nav-text">2.3 指数加权平均</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-理解指数加权平均"><span class="nav-number">4.</span> <span class="nav-text">2.4 理解指数加权平均</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-5-指数加权平均的偏差修正"><span class="nav-number">5.</span> <span class="nav-text">2.5 指数加权平均的偏差修正</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-6-动量梯度下降法"><span class="nav-number">6.</span> <span class="nav-text">2.6 动量梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-7-RMSprop"><span class="nav-number">7.</span> <span class="nav-text">2.7 RMSprop</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-8-Adam优化算法"><span class="nav-number">8.</span> <span class="nav-text">2.8 Adam优化算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-9-学习率衰减"><span class="nav-number">9.</span> <span class="nav-text">2.9 学习率衰减</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作业"><span class="nav-number">10.</span> <span class="nav-text">作业</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

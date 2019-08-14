@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《神经网络和深度学习》，第二周《神经网络基础》。网上关于神经网络和深度学习的笔记、作业很多，也很有价值。这版笔记这是针对我自己学习过程中的感悟、重点做个记录，便于自己快速查阅。本文的标题号和课程号保持一致，以方便查阅。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（一）">
+<meta property="og:url" content="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《神经网络和深度学习》，第二周《神经网络基础》。网上关于神经网络和深度学习的笔记、作业很多，也很有价值。这版笔记这是针对我自己学习过程中的感悟、重点做个记录，便于自己快速查阅。本文的标题号和课程号保持一致，以方便查阅。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/sigmoid.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/GradientDescent.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.192Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（一）">
+<meta name="twitter:description" content="《神经网络和深度学习》，第二周《神经网络基础》。网上关于神经网络和深度学习的笔记、作业很多，也很有价值。这版笔记这是针对我自己学习过程中的感悟、重点做个记录，便于自己快速查阅。本文的标题号和课程号保持一致，以方便查阅。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/sigmoid.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（一） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-11T10:00:00+08:00">
+                2018-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/11/2018/0311DeepLearningAI02/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/11/2018/0311DeepLearningAI02/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《神经网络和深度学习》，第二周《神经网络基础》。<br>网上关于<a href="http://mooc.study.163.com/course/2001281002#/info" target="_blank" rel="noopener">神经网络和深度学习</a>的笔记、作业很多，也很有价值。这版笔记这是针对我自己学习过程中的感悟、重点做个记录，便于自己快速查阅。本文的标题号和课程号保持一致，以方便查阅。<br><a id="more"></a></p>
+<h1 id="2-1-样本的表示"><a href="#2-1-样本的表示" class="headerlink" title="2.1 样本的表示"></a>2.1 样本的表示</h1><p>题目的目标是判断图片中是否有猫，假设一张图是64×64像素，3通道，即R、G、B分别对应一个64×64的矩阵：</p>
+<p>R = $\left\lgroup \matrix{R<em>{1\,1} &amp; R</em>{1\,2} &amp; … &amp; R<em>{1\,64} \cr R</em>{2\,1} &amp; R<em>{2\,2} &amp; … &amp; R</em>{2\,64} \cr … &amp; … &amp; … \cr R<em>{64\,1} &amp; R</em>{64\,2} &amp; … &amp; R<em>{64\,64} } \right \rgroup$ $\;$<br>G = $\left\lgroup \matrix{G</em>{1\,1} &amp; G<em>{1\,2} &amp; … &amp; G</em>{1\,64} \cr G<em>{2\,1} &amp; G</em>{2\,2} &amp; … &amp; G<em>{2\,64} \cr … &amp; … &amp; … \cr G</em>{64\,1} &amp; G<em>{64\,2} &amp; … &amp; G</em>{64\,64} } \right \rgroup$ $\;$<br>B = $\left\lgroup \matrix{B<em>{1\,1} &amp; B</em>{1\,2} &amp; … &amp; B<em>{1\,64} \cr B</em>{2\,1} &amp; B<em>{2\,2} &amp; … &amp; B</em>{2\,64} \cr … &amp; … &amp; … \cr B<em>{64\,1} &amp; B</em>{64\,2} &amp; … &amp; B_{64\,64} } \right \rgroup$ </p>
+<p>需要将该样本转换成一个一维数组，以方便后面的运算。因此将该样本转换成：</p>
+<p>x = $\left\lgroup \matrix{R<em>{1\,1} \cr R</em>{1\,2} \cr … \cr R<em>{2\,1} \cr R</em>{2\,2} \cr … \cr G<em>{1\,1} \cr G</em>{1\,2} \cr … \cr B<em>{1\,1} \cr B</em>{1\,2} \cr … } \right \rgroup$ 它包含64×64×3=12288个元素，写作：$n_{x}$=12288，这是样本的维数。</p>
+<p>假设共有m个样本，样本空间可以写作：</p>
+<p>$X=\begin{bmatrix}\mid&amp;\mid&amp;&amp;\mid\x^{(1)}&amp;x^{(2)}&amp;\cdots&amp;x^{(m)}\ \mid&amp;\mid&amp;&amp;\mid\end{bmatrix} , Y=[y^{(1)} y^{(2)} … y^{(m)}] \;$ </p>
+<p>其中: $x^{(i)}\in \mathbb{R}^{n<em>{x}}，y^{(i)}\in {0, 1}; \<br>X\in\mathbb{R}^{n</em>{x}×m}，X.shape=(n_{x}, m);  \<br>Y\in \mathbb{R}， Y.shape=(1, m)$</p>
+<h1 id="2-2-逻辑回归问题"><a href="#2-2-逻辑回归问题" class="headerlink" title="2.2 逻辑回归问题"></a>2.2 逻辑回归问题</h1><p>对一张图片判猫的问题是一个逻辑回归问题。<br>即：给定x，求解ŷ=P(y=1|x)，即y=1的概率。</p>
+<p>对于图片$x\in(n<em>{x}, 1)$，令$ŷ=σ(w^{T}x+b)$， 其中$w\in\mathbb{R}^{n</em>{x}}, b\in\mathbb{R}$</p>
+<p>该函数将图片中的像素点映射为介于(0, 1)之间的一个数字，该数字就表示其中是否包含猫的概率，函数的图像如下：<br><img src="/2018/03/11/2018/0311DeepLearningAI02/sigmoid.png" alt><br>其中$z=w^{T}x+b ，\; \; \; σ(z)=\frac{1}{1+e^{-z}}$</p>
+<p>当$z→+\infty, \; σ(z)≈\frac{1}{1+0}=1$</p>
+<p>当$z←-\infty, \; σ(z)≈\frac{1}{1+\infty}=0$</p>
+<p>于是本节题目就是要找到合适的w和b使得对于所有样本x，计算出的ŷ都能逼近y。</p>
+<h1 id="2-3-逻辑回归的损失函数和成本函数"><a href="#2-3-逻辑回归的损失函数和成本函数" class="headerlink" title="2.3 逻辑回归的损失函数和成本函数"></a>2.3 逻辑回归的损失函数和成本函数</h1><p>对于给定样本$ŷ=σ(w^{T}x+b)$，其中$σ(z)=\frac{1}{1+e^{-z}}$，<br>定义损失函数：$L(ŷ, y)=\frac{1}{2}(ŷ-y)^{2}$  只需要找到令成本函数值最小的w和b即可。<br>但由于该函数是个非凸函数，找它的全局最优解比较困难，通常采用变通的方式。<br>令损失函数：$L(ŷ, y)=-[y\logŷ + (1-y)\log(1-ŷ)]$</p>
+<p>当y=1，$L(ŷ, y)=-\logŷ$，希望L(ŷ, y)非常小，就要求$\logŷ$足够大，这要求ŷ足够大，但ŷ是σ函数，最大也就无限接近1；<br>当y=0，$L(ŷ, y)=-\log(1-ŷ)$， 希望L(ŷ, y)非常小，就要求$\log(1-ŷ)$足够大，这要求ŷ足够小，但ŷ是σ函数，最大也就无限接近0；<br>从上面的趋势分析上来看，“ŷ无限接近y”和“L(ŷ, y)足够小”的趋势是一致的。</p>
+<blockquote>
+<p>我的问题是：应该让损失函数L(ŷ, y)趋近于0，而不是无限小到负数吧？因为从直观意义上来看损失函数表示ŷ和y之间的差距，太大和太小都不对呀？</p>
+</blockquote>
+<p>损失函数是作为单样本而言的，对于整个样本空间，则要考察成本函数：<br>$J(w, b) = -\frac{1}{m}\sum_{i=1}^{m} [y^{(i)}\logŷ^{(i)} + (1-y^{(i)})\log(1-ŷ^{(i)})]$</p>
+<h1 id="2-4-梯度下降法"><a href="#2-4-梯度下降法" class="headerlink" title="2.4 梯度下降法"></a>2.4 梯度下降法</h1><p>对于一维凸函数<br><img src="/2018/03/11/2018/0311DeepLearningAI02/GradientDescent.png" alt><br>$Repeat{ \ 　w := w - \alpha\frac{dJ_{(w)}}{dw} \ }$</p>
+<p>先随机找一个点，计算函数在此处的导数，再不断重复运算$w := w - \alpha\frac{dJ_{(w)}}{dw}$直到函数与前一个点的差值小于某个阈值。α叫做学习率，是每次迭代的步长。通过这种方法找到函数的最小值，这就是梯度下降法。</p>
+<p>对于成本函数，它有多个变量，与一维函数不同之处在于原来的求导运算要改成求偏导，原理和一维函数是一样的。对于J(w, b)：</p>
+<p>$Repeat{ \ 　w := w - \alpha\frac{dJ(w, b)}{dw} \ 　b := b - \alpha\frac{dJ(w, b)}{db} \ }$</p>
+<blockquote>
+<p>对于一维函数，为啥不让α对应一个几何意义？我直观理解认为α本应是弦长，但不幸的是$\frac{dJ(w)}{dw}$是斜率而不是cos！因此所谓的步长α只是一个数值，其乘数$\frac{dJ(w)}{dw}$也只表明一个大致的方向。</p>
+</blockquote>
+<h1 id="2-8-导数计算之计算图"><a href="#2-8-导数计算之计算图" class="headerlink" title="2.8 导数计算之计算图"></a>2.8 导数计算之计算图</h1><blockquote>
+<p>本节首次提到了“正向传播”和“反向传播”，正向传播就是将各变量组织成复合函数，反向传播就是对复合函数逐级求导。这么简单的过程为什么称为“正向传播算法”和“反向传播算法”呢？</p>
+</blockquote>
+<h1 id="2-9-逻辑回归中的梯度下降法"><a href="#2-9-逻辑回归中的梯度下降法" class="headerlink" title="2.9 逻辑回归中的梯度下降法"></a>2.9 逻辑回归中的梯度下降法</h1><p>给定:<br>$z = w^{T}x+b$  　　　　　　　　　　… ①<br>$ŷ = a = σ(z)=\frac{1}{1+e^{-z}}$ 　　　　　　… ②<br>$L(a, y) = -[y\log(a) + (1-y)\log(1-a)]$ 　… ③  </p>
+<p>接下逐级组织复合函数：<br><img src="/2018/03/11/2018/0311DeepLearningAI02/img01.png" alt><br>再利用计算图求导④：<br>$da = \frac{dL(a, y)}{da} = -\frac{y}{a} + \frac{(1-y)}{(1-a)}$<br>求导⑤：<br>$dz = \frac{dL}{dz} = \frac{dL}{da} \frac{da}{dz}$<br> 　　$= (-\frac{y}{a} + \frac{(1-y)}{(1-a)}) (-1)(1+e^{-z})^{-2}(-1)e^{-z}$ 　　【将④代入$\frac{dL}{da}$，并对②求导】<br> 　　$= (-\frac{y}{a} + \frac{(1-y)}{(1-a)}) \frac{1}{1+e^{-z}} \frac{e^{-z}}{1+e^{-z}}$<br> 　　$=(-\frac{y}{a} + \frac{(1-y)}{(1-a)})a(1-a)$ 　　　　　【将②代入】<br> 　　$=-y(1-a) + a(1-y) \ =a - y$</p>
+<p>求导⑥：<br>$dw<em>{1} = \frac{dL}{dw</em>{1}} = \frac{dL}{dz} \frac{dz}{dw<em>{1}} = dz x</em>{1} = x<em>{1} dz$<br>$dw</em>{2} = x_{2} dz$<br>$db = dz$</p>
+<p>将⑥代入梯度下降法得到：<br>$Repeat{ \<br>　w<em>{1} := w</em>{1} - α · dw<em>{1} \<br>　w</em>{2} := w<em>{2} - α · dw</em>{2} \<br>　b := b - α · db \<br>}$</p>
+<h1 id="2-10-有m个样本的梯度下降法"><a href="#2-10-有m个样本的梯度下降法" class="headerlink" title="2.10 有m个样本的梯度下降法"></a>2.10 有m个样本的梯度下降法</h1><p>结合上一节结论，当有m个样本时，成本函数：$J(w, b) = \frac{1}{m} \sum<em>{i=1}^{m}L(a^{(i)}, y^{(i)})$<br>其中：$a^{(i)} = ŷ^{(i)} = σ(z^{(i)}) = σ(w^Tx^{(i)} + b)$<br>于是：$\frac{dJ(w,b)}{dw} = \frac{1}{m}\sum</em>{i=1}^{m}\frac{d}{dw}L(a^{(i)}, y{(i)})$  </p>
+<p>应用梯度下降的伪代码表为：<br>$J=0; dw<em>{1}=0; dw</em>{2}=0; db=0; \ For i=1..m   　　 【循环I】 \ 　z^{(i)}=w^{T}x^{(i)}+b  \ 　a^{(i)} = σ(z^{(i)}) \ 　J += -[y^{(i)}\log a^{(i)} + (1-y^{(i)})\log(1-a^{(i)})] \ 　dz^{(i)} = a^{(i)} - y^{(i)} 　　【将⑤代入】　 \ 　dw<em>{1} += {x</em>{1}}^{(i)}dz^{(i)}  　 【将⑥代入】 【循环II】 \ 　dw<em>{2} += {x</em>{2}}^{(i)}dz^{(i)} \ 　db += dz^{(i)} \ J=J/m; \; dw<em>{1}=dw</em>{1}/m; \; dw<em>{2}=dw</em>{2}/m; \; db=db/m; \ w<em>{1} := w</em>{1} - α·dw<em>{1} \ w</em>{2} := w<em>{2} - α·dw</em>{2} \ b := b - α·db$</p>
+<p>这只应用了一轮梯度下降，其中包含两个循环：【循环I】是遍历所有样本，【循环II】是遍历每个样本里的所有特征。</p>
+<h1 id="2-11向量化"><a href="#2-11向量化" class="headerlink" title="2.11向量化"></a>2.11向量化</h1><p>理论已经讲完了，剩下的工作就是如何通过向量化消除前一小节中的两个循环，让代码跑得更有效率。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">a = np.random.rand(<span class="number">100000</span>)</span><br><span class="line">b = np.random.rand(<span class="number">100000</span>)</span><br><span class="line"></span><br><span class="line">c = np.dot(a, b)    <span class="comment"># ①</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100000</span>):  <span class="comment"># ②</span></span><br><span class="line">    c += a[i]*b[i]</span><br></pre></td></tr></table></figure></p>
+<p>代码①和②在结果上是等价的，前者就是向量化的写法，更简洁且更有效率。</p>
+<p>对于$z=w^{T}x+b$，其中$w=\left\lgroup \matrix{w<em>{1} \cr w</em>{2} \cr … \cr w<em>{n</em>{x}} }\right \rgroup$，$x=\left\lgroup \matrix{x<em>{1} \cr x</em>{2} \cr … \cr x<em>{n</em>{x}} }\right \rgroup$， $w\in\mathbb{R}^n<em>{x}, \;x\in\mathbb{R}^n</em>{x}$</p>
+<p>求解z非向量化的写法：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">z=<span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(nx):</span><br><span class="line">    z += w[i] * x[i]</span><br><span class="line">z += b</span><br></pre></td></tr></table></figure></p>
+<p>向量化的写法只需要：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">z = np.dot(w, x) + b</span><br></pre></td></tr></table></figure></p>
+<p>CPU和GPU都有并行化的指令，又叫SIMD（单指令流多数据流 single instruments multiple data），在python中有使用SIMD的内置函数，如<code>np.function</code>，GPU更擅长执行SIMD。</p>
+<h1 id="2-12-更多向量化的例子"><a href="#2-12-更多向量化的例子" class="headerlink" title="2.12 更多向量化的例子"></a>2.12 更多向量化的例子</h1><p>尽量使用np的向量画函数来取代for循环，例如：</p>
+<p>$v=\left\lgroup \matrix{v<em>{1} \cr v</em>{2} \cr … \cr v<em>{n} }\right \rgroup$，求$u=\left\lgroup \matrix{e^{v</em>{1}} \cr e^{v<em>{2}} \cr … \cr e^{v</em>{n}} }\right \rgroup$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">u = np.zeros((n, <span class="number">1</span>))</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(n):    <span class="comment"># 非向量化的写法</span></span><br><span class="line">    u[i] = math.exp(v[i])</span><br><span class="line">    </span><br><span class="line">u = np.exp(v)      <span class="comment"># 向量化的写法</span></span><br></pre></td></tr></table></figure>
+<p>接下来利用向量化将2.10伪码中的for循环消除掉：</p>
+<p>$J=0; \ dw<em>{1}=0; dw</em>{2}=0; 　【替换为dw = np.zeros((n<em>x, 1))】 \ db=0; \ For i=1..m \ 　z^{(i)}=w^{T}x^{(i)}+b  　【替换为Z=W.T * X + b = np.dot(W.T, X) + b】 \ 　a^{(i)} = σ(z^{(i)})   　 　 　【替换为A = sigmoid(Z)】 \ 　J += -[y^{(i)}\log a^{(i)} + (1-y^{(i)})\log(1-a^{(i)})] \ 　dz^{(i)} = a^{(i)} - y^{(i)} 　【替换为dZ = A - Y】 \ 　dw</em>{1} += {x<em>{1}}^{(i)}dz^{(i)}  　 【替换为dW = (1/m) <em> X </em> dZ】 \ 　dw</em>{2} += {x<em>{2}}^{(i)}dz^{(i)} \ 　db += dz^{(i)}  　   　 　　 　【替换为db = (1/m) * np.sum(dZ)】 \ J=J/m; \ dw</em>{1}=dw<em>{1}/m; \; dw</em>{2}=dw<em>{2}/m;    　 【替换为dW /= m】 \ db=db/m; \ w</em>{1} := w<em>{1} - α·dw</em>{1} \ w<em>{2} := w</em>{2} - α·dw_{2} \ b := b - α·db$</p>
+<h1 id="2-13-有m个样本的向量化逻辑回归"><a href="#2-13-有m个样本的向量化逻辑回归" class="headerlink" title="2.13 有m个样本的向量化逻辑回归"></a>2.13 有m个样本的向量化逻辑回归</h1><p>对于有m个样本：<br>$z^{(1)} = w^{T}x^{(1)} + b$，$z^{(2)} = w^{T}x^{(2)} + b$，$z^{(m)} = w^{T}x^{(m)} + b$<br>$a^{(1)}=σ(z^{(1)})$，$a^{(2)}=σ(z^{(2)})$，$a^{(m)}=σ(z^{(m)})$<br>可令$X=\begin{bmatrix}\mid&amp;\mid&amp;&amp;\mid\x^{(1)}&amp;x^{(2)}&amp;\cdots&amp;x^{(m)}\ \mid&amp;\mid&amp;&amp;\mid\end{bmatrix} \; \in \mathbb{R}^{n_{x}×m}$<br>则$Z = [Z^{(1)} , Z^{(2)} , … , Z^{(m)}] = W^{T}·X + [b, b, …, b] $<br>使用向量化的代码写作：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Z = np.dot(W.T, X) + b</span><br></pre></td></tr></table></figure></p>
+<p>实数b被自动扩展为矩阵，这在python中被称作广播。<br>$A = [a^{(1)}, a^{(2)}, …, a^{(m)}] = σ(Z)$</p>
+<h1 id="2-14-向量化逻辑回归成本函数的梯度下降法"><a href="#2-14-向量化逻辑回归成本函数的梯度下降法" class="headerlink" title="2.14 向量化逻辑回归成本函数的梯度下降法"></a>2.14 向量化逻辑回归成本函数的梯度下降法</h1><p>继续向量化2.12中的伪码：</p>
+<p>$A = [a^{(1)}, a^{(2)}, …, a^{(m)}] \; \; \; \ Y = [y^{(1)}, y^{(2)}, …, y^{(m)}] \ Z = W^{T}X + b = np.dot(W.T, X) + b \ A = σ(Z) \ dZ = A - Y \ dW = \frac{1}{m}XdZ^{T} \ db = \frac{1}{m} np.sum(dZ) \ W := W - α·dW \ b := b - α·db$</p>
+<p>以上是一次梯度下降的迭代，若要进行n轮迭代，还是需要一个n的循环，这个最外层循环是无法避免的。</p>
+<h1 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h1><p>作业题目以及相关的数据在网上可以找得到，由于数据量太大，就不上传了。</p>
+<h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>给定209个训练样本和50个测试样本，每个样本包含一张图片并标注了该图中是否包含猫，使用梯度下降法训练一个模型，用来识别给定的图片中是否包含猫。训练样本和测试样本文件格式一样，都包含三个dataset：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/list_classes, shape:(2, )</span><br><span class="line">    value:[b&apos;non-cat&apos; b&apos;cat&apos;]　　　# 标注词典，表示没猫和有猫的文字表述</span><br><span class="line"> </span><br><span class="line">/train_set_x, shape:(209, 64, 64, 3)   # 共209张图片，每张图片是64 * 64 * 3</span><br><span class="line">    value:[[[[ 17  31  56]        # 图片数据</span><br><span class="line">    [ 22  33  59]</span><br><span class="line">    [ 25  35  62]</span><br><span class="line">    ...,</span><br><span class="line">    [  1  28  57]</span><br><span class="line">    [  1  26  56]</span><br><span class="line">    [  1  22  51]]</span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">/train_set_y, shape:(209,)        # 共209个标注</span><br><span class="line">    value:[0 0 1 ... 0 0 0]</span><br></pre></td></tr></table></figure></p>
+<h2 id="主干逻辑"><a href="#主干逻辑" class="headerlink" title="主干逻辑"></a>主干逻辑</h2><p>主干代码如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回训练样本和测试样本的数据、标注，classes是标注对应的含义</span></span><br><span class="line">train_set_x_orig, train_set_y, test_set_x_orig, test_set_y, classes = self.load_dataset()</span><br><span class="line"></span><br><span class="line">m_train = train_set_x_orig.shape[<span class="number">0</span>]     <span class="comment"># 训练样本的个数：209</span></span><br><span class="line">m_test = test_set_x_orig.shape[<span class="number">0</span>]       <span class="comment"># 测试样本的个数：50</span></span><br><span class="line">num_px = train_set_x_orig.shape[<span class="number">1</span>]      <span class="comment"># 图片的宽、高像素数：64</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将训练和测试样本扁平化，对于每一张图，将 (64, 64, 3) 的图片转成(64*64*3, 1)</span></span><br><span class="line"><span class="comment"># 对于整个训练样本，将(209, 64, 64, 3)转成(209, -1).T，注意有个转置，转置后每一列是一个样本，</span></span><br><span class="line"><span class="comment"># 某列的每一行是图片的一个特征。训练集共209行（个样本），12288个特征。参见笔记2.1。</span></span><br><span class="line">train_set_x_flatten = train_set_x_orig.reshape(train_set_x_orig.shape[<span class="number">0</span>],<span class="number">-1</span>).T</span><br><span class="line">test_set_x_flatten = test_set_x_orig.reshape(test_set_x_orig.shape[<span class="number">0</span>],<span class="number">-1</span>).T</span><br><span class="line"></span><br><span class="line"><span class="comment"># 标准化数据，让每个元素∈[0, 1]</span></span><br><span class="line">train_set_x = train_set_x_flatten / <span class="number">255.</span></span><br><span class="line">test_set_x = test_set_x_flatten / <span class="number">255.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练出模型 🏁</span></span><br><span class="line">d = self.model(train_set_x, train_set_y, test_set_x, test_set_y, num_iterations = <span class="number">2000</span>, learning_rate = <span class="number">0.005</span>, print_cost = <span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证模型</span></span><br><span class="line">fname = os.path.join(self.imagesDir, <span class="string">'my_image2.jpg'</span>)</span><br><span class="line">image = np.array(ndimage.imread(fname, flatten=<span class="literal">False</span>))</span><br><span class="line">my_image = scipy.misc.imresize(image, size=(num_px, num_px)).reshape((<span class="number">1</span>, num_px*num_px*<span class="number">3</span>)).T</span><br><span class="line">my_predicted_image = self.predict(d[<span class="string">'w'</span>], d[<span class="string">'b'</span>], my_image)</span><br><span class="line">logging.info(my_predicted_image)</span><br></pre></td></tr></table></figure></p>
+<h2 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h2><p>主干逻辑非常简单，无需过多解释，深入模型训练部分：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">model</span><span class="params">(self, X_train, Y_train, X_test, Y_test, num_iterations = <span class="number">2000</span>, learning_rate = <span class="number">0.5</span>, print_cost = False)</span>:</span></span><br><span class="line">    w, b = self.initialize_with_zeros(X_train.shape[<span class="number">0</span>]) <span class="comment"># w元素个数等于特征数，b是一个实数，将他们初始化为0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 学习率为learning_rate，经过num_iterations轮迭代，获得模型参数 🏁</span></span><br><span class="line">    parameters, grads, costs = self.optimize(w, b, X_train, Y_train, num_iterations, learning_rate, print_cost=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    w = parameters[<span class="string">"w"</span>]</span><br><span class="line">    b = parameters[<span class="string">"b"</span>]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 验证模型在训练集和测试集上的准确率</span></span><br><span class="line">    Y_prediction_test = self.predict(w, b, X_test)</span><br><span class="line">    Y_prediction_train = self.predict(w, b, X_train)</span><br><span class="line">    print(<span class="string">"train accuracy: &#123;&#125; %"</span>.format(<span class="number">100</span> - np.mean(np.abs(Y_prediction_train - Y_train)) * <span class="number">100</span>))</span><br><span class="line">    print(<span class="string">"test accuracy: &#123;&#125; %"</span>.format(<span class="number">100</span> - np.mean(np.abs(Y_prediction_test - Y_test)) * <span class="number">100</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 这是构成模型的全部元素，对未来有用的就是w和b</span></span><br><span class="line">    d = &#123;<span class="string">"costs"</span>: costs,</span><br><span class="line">         <span class="string">"Y_prediction_test"</span>: Y_prediction_test, </span><br><span class="line">         <span class="string">"Y_prediction_train"</span> : Y_prediction_train, </span><br><span class="line">         <span class="string">"w"</span> : w, </span><br><span class="line">         <span class="string">"b"</span> : b,</span><br><span class="line">         <span class="string">"learning_rate"</span> : learning_rate,</span><br><span class="line">         <span class="string">"num_iterations"</span>: num_iterations&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> d</span><br></pre></td></tr></table></figure></p>
+<h3 id="多轮迭代"><a href="#多轮迭代" class="headerlink" title="多轮迭代"></a>多轮迭代</h3><p>所谓“模型”核心就是经过若干轮梯度下降法的迭代，得到令成本函数最小的w和b，训练的核心逻辑在函数<code>optimize(...)</code>中：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">optimize</span><span class="params">(self, w, b, X, Y, num_iterations, learning_rate, print_cost = False)</span>:</span></span><br><span class="line">    costs = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num_iterations):</span><br><span class="line">        grads, cost = self.propagate(w, b, X, Y) <span class="comment"># 一次梯度下降🏁</span></span><br><span class="line"></span><br><span class="line">        dw = grads[<span class="string">"dw"</span>]</span><br><span class="line">        db = grads[<span class="string">"db"</span>]</span><br><span class="line"></span><br><span class="line">        w = w - learning_rate * dw</span><br><span class="line">        b = b - learning_rate * db</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Record the costs</span></span><br><span class="line">        <span class="keyword">if</span> i % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">            costs.append(cost)</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    params = &#123;<span class="string">"w"</span>: w, <span class="string">"b"</span>: b&#125;</span><br><span class="line"></span><br><span class="line">    grads = &#123;<span class="string">"dw"</span>: dw, <span class="string">"db"</span>: db&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> params, grads, costs</span><br></pre></td></tr></table></figure></p>
+<h3 id="梯度下降"><a href="#梯度下降" class="headerlink" title="梯度下降"></a>梯度下降</h3><p><code>propagate(...)</code>中是梯度下降的核心逻辑，对应笔记的2.14：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">propagate</span><span class="params">(self, w, b, X, Y)</span>:</span></span><br><span class="line">    m = X.shape[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    A = self.sigmoid(np.dot(w.T,X) + b)            <span class="comment"># compute activation</span></span><br><span class="line">    cost = -(np.sum(np.dot(Y,np.log(A).T)+np.dot((<span class="number">1</span>-Y),np.log(<span class="number">1</span>-A).T)))/m      <span class="comment"># compute cost</span></span><br><span class="line"></span><br><span class="line">    dw = (np.dot(X,(A-Y).T))/m</span><br><span class="line">    db = (np.sum(A-Y))/m</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">    cost = np.squeeze(cost)</span><br><span class="line"></span><br><span class="line">    grads = &#123;<span class="string">"dw"</span>: dw, <span class="string">"db"</span>: db&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> grads, cost</span><br></pre></td></tr></table></figure></p>
+<p>过程还是非常清晰的，模型训练完成后，将训练样本和测试样本代入模型，可以得到训练样本的精度是99%，测试样本的精度是70%：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">train accuracy: 99.04306220095694 %</span><br><span class="line">test accuracy: 70.0 %</span><br></pre></td></tr></table></figure></p>
+<p>随便找张图，带入<code>predict(...)</code>函数，即可验证有效性。</p>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>确实和传统的编程思路完全不同：传统的编程思路中对/错是个确定的值，正如if/else或true/false，非此即彼的。当结果和预期发生不一致，那叫bug，顺着代码往里查，一定能查到不一致的原因。</p>
+<p>而深度学习似乎更靠近真实世界，因为真实世界中很多判断不是非黑即白，而是概率的，我认为这是世界的本质。但这给问题的解决带来麻烦——当结果和预期不一致时，你没有可顺藤摸瓜的逻辑点来表明到底哪里出了问题。最多只能确认“梯度下降”的算法是不是正确，模型产生的是一批神经元，针对具体的一张图片，无法人肉判断某个神经元的权重是否正确。</p>
+<p>作业里images/中的图片，模型都能判断正确，但我从网上随便找几张猫图扔给模型，结果是错误的。我不知道该如何改进才能让新图识别正确。直观的想法可能是喂给模型更多的训练样本，可是如何做出一个量化的预测呢？需要喂多少？能达到什么样的水平？不同的人类大脑对于新事物的学习效率也是不一样的，对于同一批样本，有没有可能改进模型，令其效果得到提升呢？怎么改进？</p>
+<p>我相信这些问题在未来的课程中会有解答，继续学习吧！</p>
+<hr>
+<p>本文代码参见<a href="https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py" target="_blank" rel="noopener">https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py</a>的<code>class Coding1_1</code>部分。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/09/2018/0309DeepLearningAI01/" rel="next" title="DeepLearning开悟">
+                <i class="fa fa-chevron-left"></i> DeepLearning开悟
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/12/2018/0312DeepLearningAI03/" rel="prev" title="DeepLearning.ai笔记（二）">
+                DeepLearning.ai笔记（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/03/11/2018/0311DeepLearningAI02/" data-title="DeepLearning.ai笔记（一）" data-url="http://palanceli.github.io/2018/03/11/2018/0311DeepLearningAI02/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-样本的表示"><span class="nav-number">1.</span> <span class="nav-text">2.1 样本的表示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-逻辑回归问题"><span class="nav-number">2.</span> <span class="nav-text">2.2 逻辑回归问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-3-逻辑回归的损失函数和成本函数"><span class="nav-number">3.</span> <span class="nav-text">2.3 逻辑回归的损失函数和成本函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-梯度下降法"><span class="nav-number">4.</span> <span class="nav-text">2.4 梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-8-导数计算之计算图"><span class="nav-number">5.</span> <span class="nav-text">2.8 导数计算之计算图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-9-逻辑回归中的梯度下降法"><span class="nav-number">6.</span> <span class="nav-text">2.9 逻辑回归中的梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-10-有m个样本的梯度下降法"><span class="nav-number">7.</span> <span class="nav-text">2.10 有m个样本的梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-11向量化"><span class="nav-number">8.</span> <span class="nav-text">2.11向量化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-12-更多向量化的例子"><span class="nav-number">9.</span> <span class="nav-text">2.12 更多向量化的例子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-13-有m个样本的向量化逻辑回归"><span class="nav-number">10.</span> <span class="nav-text">2.13 有m个样本的向量化逻辑回归</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-14-向量化逻辑回归成本函数的梯度下降法"><span class="nav-number">11.</span> <span class="nav-text">2.14 向量化逻辑回归成本函数的梯度下降法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作业"><span class="nav-number">12.</span> <span class="nav-text">作业</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#题目"><span class="nav-number">12.1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主干逻辑"><span class="nav-number">12.2.</span> <span class="nav-text">主干逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练模型"><span class="nav-number">12.3.</span> <span class="nav-text">训练模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多轮迭代"><span class="nav-number">12.3.1.</span> <span class="nav-text">多轮迭代</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#梯度下降"><span class="nav-number">12.3.2.</span> <span class="nav-text">梯度下降</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#思考"><span class="nav-number">13.</span> <span class="nav-text">思考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《卷积神经网络》第二周《深度卷及网络：实例探究》。本周课程前半部分对卷积神经网络作了进一步延伸介绍，领略了LeNet-5、AlexNet、VGG-16等经典网络和残差网络、Inception网络。这些介绍略显枯燥，因为每个网络体系都更加复杂，你很难从网络体系架构图上理解他为什么这么做。课程并没有讲解思想起源，而是建议大家阅读论文。好消息是，如果只是应用，不需要读懂论文，可以去寻找开源的实现，不仅是">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（十）">
+<meta property="og:url" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《卷积神经网络》第二周《深度卷及网络：实例探究》。本周课程前半部分对卷积神经网络作了进一步延伸介绍，领略了LeNet-5、AlexNet、VGG-16等经典网络和残差网络、Inception网络。这些介绍略显枯燥，因为每个网络体系都更加复杂，你很难从网络体系架构图上理解他为什么这么做。课程并没有讲解思想起源，而是建议大家阅读论文。好消息是，如果只是应用，不需要读懂论文，可以去寻找开源的实现，不仅是">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img16.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img11.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img12.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img13.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img14.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img15.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img17.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img18.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img19.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img20.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.254Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（十）">
+<meta name="twitter:description" content="《卷积神经网络》第二周《深度卷及网络：实例探究》。本周课程前半部分对卷积神经网络作了进一步延伸介绍，领略了LeNet-5、AlexNet、VGG-16等经典网络和残差网络、Inception网络。这些介绍略显枯燥，因为每个网络体系都更加复杂，你很难从网络体系架构图上理解他为什么这么做。课程并没有讲解思想起源，而是建议大家阅读论文。好消息是，如果只是应用，不需要读懂论文，可以去寻找开源的实现，不仅是">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/img16.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（十） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（十）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T10:00:00+08:00">
+                2018-04-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/18/2018/0418DeepLearningAI12/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/18/2018/0418DeepLearningAI12/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《卷积神经网络》第二周《深度卷及网络：实例探究》。<br>本周课程前半部分对卷积神经网络作了进一步延伸介绍，领略了LeNet-5、AlexNet、VGG-16等经典网络和残差网络、Inception网络。这些介绍略显枯燥，因为每个网络体系都更加复杂，你很难从网络体系架构图上理解他为什么这么做。课程并没有讲解思想起源，而是建议大家阅读论文。好消息是，如果只是应用，不需要读懂论文，可以去寻找开源的实现，不仅是算法，连同前人已经训练好的模型都可以一并拿来，通过迁移学习的方法嫁接到自己的应用中。这是本周课程的后半部分讲解的内容。</p>
+<a id="more"></a>
+<h1 id="2-1-为什么要进行实例探究？"><a href="#2-1-为什么要进行实例探究？" class="headerlink" title="2.1 为什么要进行实例探究？"></a>2.1 为什么要进行实例探究？</h1><h1 id="2-2-经典网络"><a href="#2-2-经典网络" class="headerlink" title="2.2 经典网络"></a>2.2 经典网络</h1><p>本节介绍了卷积神经网络中几个典型的框架。<br>LeNet-5的作者是法国人LeCun，哥们虽然是CNN鼻祖，但学术上并非石破天惊一鸣惊人，他在1980年底提出“人工神经网络”的时候，甚至很不受学术界待见。靠着死磕精神坚持到21世纪，他的理论才逐步变的热门。他的个人网站是<a href="http://yann.lecun.com/" target="_blank" rel="noopener">http://yann.lecun.com/</a>在这里可以找到LeNet-5的<a href="http://yann.lecun.com/exdb/publis/index.html#lecun-98" target="_blank" rel="noopener">论文</a>。在今年（2018年）的GMIC大会上，LeCun做了开场的主题演讲：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img16.png" alt></p>
+<p>LeNet-5的结构如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img01.png" alt><br>本例适用于数字的识别，<br>第1层输入32×32×1的图片，过滤器5×5，于是<br>$n^{[0]}=32, p^{[0]}=0, s^{[0]}=1 ，f^0=5 \<br>结合公式得到第二层维度为：⌊(n+2p−f)/s+1⌋=⌊(32+0−5)/1+1⌋=28$<br>在论文提出的年代，<strong>平均池化</strong>更常用，因此这里都采用<strong>平均池化</strong>的策略，而在今天大多使用<strong>最大化池化</strong>了。<br>池化层不改变原矩阵的通道数，继续使用$⌊(n+2p−f)/s+1⌋$，得到池化后的矩阵为14×14。<br>第二个卷积层采用5×5过滤器，使用$⌊(n+2p−f)/s+1⌋$得到结果矩阵为10×10。<br>再应用f=2,s=2矩阵池化，得到矩阵结果为5×5。将该矩阵扁平化为400个节点，经过2个全连接层输出为10个节点的输出层，对应10个数字。  </p>
+<p>第二个经典架构是AlexNet，论文详见2012年发表在NIP的<a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf" target="_blank" rel="noopener">《Imagenet classification with deep convolutional neural networks》</a>，作者Alex Krizhevsky。<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img02.png" alt><br>它的层次比LeNet-5多很多，参数也达到6000万（LeNet-5只有6000多个）。这里的池化就已经采用最大化策略了。</p>
+<p>第三个架构是VGG-16，这是牛津大学 visual geometry group（VGG）Karen Simonyan 和Andrew Zisserman 于14年撰写的论文，在<a href="https://github.com/SnailTyan/deep-learning-papers-translation" target="_blank" rel="noopener">Deep Learning Papers Translation</a>有以上论文的中英文对照。<br>网络结构如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img03.png" alt><br>层次越来越深，VGG-16中的数字16就是指网络共有16个卷积层和池化层，共有1.38亿个参数！</p>
+<font color="red">以上三个经典网络结构都不算太复杂，一张图就能描述清楚。但是这些结构是怎么搭建起来的呢？层次数、过滤器的尺寸、规模等这些超参数是怎么制定出来的呢？为什么16层有效而19层几乎就没什么提升了？每一层分别起到的效果又是什么？如果说方法的有效性全靠尝试，那这和挖矿几乎没啥差别了，课程始终也没有对此做出解释。当我们面临一个新问题，需要重新搭建网络的时候，应遵循什么样的原则？这些是我内心的疑团。不过本门课程能把这么一个宽广深厚的学科巨细靡遗地呈现出来，告诉我们该怎么操作，已经非常难得了。</font>
+
+<h1 id="2-3-残差网络"><a href="#2-3-残差网络" class="headerlink" title="2.3 残差网络"></a>2.3 残差网络</h1><p>什么是残差块？<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img04.png" alt><br>传统的神经网络是按照底部的黑字执行正向传播。而残差网络则是将$a^{[l+2]}=g(z^{[l+2]})$<br>改为$a^{[l+2]}=g(z^{[l+2]} +a^{[l]})$，即将激活节点直接跳远接入两层后的激活函数，称加上的这个$a^{[l]}$  为一个残差块。<br>图形可以表示为被上边蓝框框住的流程图。<br>使用残差块能训练更深的神经网络，残差网络就是将这些残差块堆积在一起，形成的深度神经网络。<br>残差网络的论文原文在<a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">这里</a>，也可以在<a href="https://github.com/SnailTyan/deep-learning-papers-translation" target="_blank" rel="noopener">Deep Learning Papers Translation</a>中找到中英文对照。</p>
+<p>本节后半段介绍一个现象，对于普通的神经网络，尽管理论上希望随着网络层次的加深，训练集的误差能越来越少，而实际上则是到达一定层次之后，误差会回升，正如左下方的曲线。而引入残差网络之后，训练集误差表现更符合预期，一路向下。<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img05.png" alt></p>
+<h1 id="2-4-残差网络为什么有效？"><a href="#2-4-残差网络为什么有效？" class="headerlink" title="2.4 残差网络为什么有效？"></a>2.4 残差网络为什么有效？</h1><p>本节分析了在极端情况下，可能导致$a^{[l+2]} =a^{[l]}$<br>我能理解它表达的含义是尽量让上一层的激活节点延续到下一层，从而使得节点的影响不被复杂的层次消磨掉。既然这样为什么要引入那么复杂的层次呢？老师的说法是希望算法在每一层学习的过程中提升性能，但是我的老问题又来了：<font color="red">为什么这种嫁接方式刚好能保留二者的优点呢？既通过多层次的学习提升了性能，又不会因为层次过多而减弱原始数据的影响。两个优点全占了，为什么不是两个缺点全占了呢？</font><br><img src="/2018/04/18/2018/0418DeepLearningAI12/img06.png" alt><br>好困惑……  </p>
+<h1 id="2-5-网络中的网络以及1×1卷积"><a href="#2-5-网络中的网络以及1×1卷积" class="headerlink" title="2.5 网络中的网络以及1×1卷积"></a>2.5 网络中的网络以及1×1卷积</h1><p>在单通道矩阵中，1×1卷积似乎看不出有什么用，仅仅是将每个元素乘以同样的倍数。但在多通道矩阵中，这么做相当于为每一个点在所有通道上组成的向量执行了一次全连接操作。<br>此处我有疑问：根据卷积的定义，是在每个通道上完成被操作矩阵和过滤器之间的运算，而不会跨通道执行乘法，所以应该形成32个平行线，而非32×32的网络吧？因此<strong>所谓的全连接并不是被操作矩阵和某一个过滤器组成的，而是被操作矩阵和n_c个过滤器的第i个通道的所有节点之间形成的</strong>。<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img07.png" alt><br>以上表达了在多通道中1×1卷积远比在单通道中有更深刻的含义，那么这个深刻含义究竟能起到什么作用呢？在下图的应用中，老师讲到1×1卷积可以压缩、保持或扩大矩阵的信道数。<br>我的思考：如果是压缩或保持，池化也能做到，是不是可以把1×1卷积和池化都理解为压缩数据的手段？<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img08.png" alt></p>
+<h1 id="2-6-谷歌Inception网络简介"><a href="#2-6-谷歌Inception网络简介" class="headerlink" title="2.6 谷歌Inception网络简介"></a>2.6 谷歌Inception网络简介</h1><p>Inception的核心思想是：原先由人来设计的过滤器、层数，这些超参数，现在都作为参数，交给机器来学习。例如下图中从左侧输入到右侧输出经历的过滤器和池化参数均成为了参数，让他们的运算结果拼接在一起，为了让不同的结果拼接在一起，需要确保每次运算所得结果的维度相同。<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img09.png" alt><br>本节并没有深入讨论怎么搭建这样的网络，只是展开了一个细节：在28×28×192矩阵上做多个过滤器的卷积运算时，运算量是巨大的。以上图中紫块的运算为例，结果矩阵中每一个通道上的一个节点都是5×5×192次乘法运算，于是一个通道就有5×5×192×28×28次运算，所有通道加起来就是5×5×192×28×28×32=1.2亿次：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img10.png" alt><br>在Inception网络中先对输入矩阵做了1×1卷积，实现压缩通道，然后再执行卷积运算：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img11.png" alt><br>于是两个部分共执行28×28×192×1×1×16 + 28×28×16×28×28×32 = 1240万次<br>通过这种方式将运算成本降低一个量级。</p>
+<h1 id="2-7-Inception-网络"><a href="#2-7-Inception-网络" class="headerlink" title="2.7 Inception 网络"></a>2.7 Inception 网络</h1><p>这张图展现了通过普遍引入上一节的1×1卷积减小Inception的运算规模：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img12.png" alt><br>但从这张图上并不能看出他是怎么把过滤器这些超参数变成参数的。<br>即使在完整的Inception网络结构图中，也看不出参数化的痕迹，而是堆积了很多个类似的子网：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img13.png" alt></p>
+<h1 id="2-8-使用开源的实现方案"><a href="#2-8-使用开源的实现方案" class="headerlink" title="2.8 使用开源的实现方案"></a>2.8 使用开源的实现方案</h1><h1 id="2-9-迁移学习"><a href="#2-9-迁移学习" class="headerlink" title="2.9 迁移学习"></a>2.9 迁移学习</h1><p>前面章节中介绍过迁移学习的基本概念，计算机视觉研究社区有很多现成的数据集，以及基于这些数据集训练出来的现成的模型，可以在这些模型的基础上继续正对自己的业务逻辑训练自己的模型，这样可以节省数周甚至数月的时间。这类数据集包括<a href="http://www.image-net.org/index" target="_blank" rel="noopener">ImageNet</a>、<a href="http://cocodataset.org/#home" target="_blank" rel="noopener">MS COCO</a>、<a href="http://host.robots.ox.ac.uk/pascal/VOC/" target="_blank" rel="noopener">Pascal VOC</a>等，前人在这些数据集上动用大量计算资源训练、调优，应该形成积累效应，每一步都能让模型更优化。<br>本节之给出了一个操作的原则，在前面章节也都讲到过：</p>
+<ul>
+<li>如果训练集很少，则建议将现有模型的除softmax以外的层次全部保留并冻结，删除softmax层并重新训练该层。很多开源框架支持冻结操作。</li>
+<li>如果有一定的训练集，则可以保留和冻结一部分隐藏层，删除靠后的隐藏层和softmax层，重新训练。<br>如果训练集非常大，则可以把现有的模型作为初始参数，完全重新训练。<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img14.png" alt></li>
+</ul>
+<h1 id="2-10-数据扩充"><a href="#2-10-数据扩充" class="headerlink" title="2.10 数据扩充"></a>2.10 数据扩充</h1><p>前面章节也介绍过当数据量不够的时候，数据扩充的手段：</p>
+<ul>
+<li>几何变换，包括：对称复制、随机修剪、旋转、扭曲</li>
+<li>色彩变换，包括：例如(R, G, B)分别做(+20, -20, +20)的运算、PCA颜色增强</li>
+</ul>
+<h1 id="2-11-计算机视觉现状"><a href="#2-11-计算机视觉现状" class="headerlink" title="2.11 计算机视觉现状"></a>2.11 计算机视觉现状</h1><p>这一节的技术性就更不强了，主要从语音、图片识别、物体检测等几个门类陈述了当前行业的现状：相对于要解决的问题，语音这个行业积累的数据已经足够多了，图片识别其次、物体检测最少。主要原因在于标注成本：一个语音输入法天然就是一个标注工具，可以利用用户自己选择候选完成标注，这几乎没有什么成本，而且拥有海量的标注用户。而物体检测则需要堆专人来干标注的活。<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img15.png" alt></p>
+<p>对于有大量数据的行业，比如语音，更多依靠机器完成工作，很少嵌入人工组件；而对于数据量不足的行业，就需要有大量的人工工作，比如设计网络、超参，嵌入公共组件，注入人工知识等。当然还可以利用迁移学习。</p>
+<p>本周的课程略显水，主要扩展了眼界，领略了当下经典的神经网络，深入理解还需要自己去看论文。希望作业的部分包含迁移学习的具体练习。</p>
+<h1 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h1><h2 id="Keras-Tutorial-Happy-House"><a href="#Keras-Tutorial-Happy-House" class="headerlink" title="Keras Tutorial Happy House"></a>Keras Tutorial Happy House</h2><p>这一节介绍Keras的基本用法，Keras是一套适合用于快速建模的高级工具。高度的抽象使得Keras特别适合用一些标准模块快速拼出一个神经网络框架，适合前期快速验证一个网络结构。Kearas不擅长做更复杂的定制。具体用法可参见<a href="http://keras-cn.readthedocs.io/en/latest/" target="_blank" rel="noopener">Keras开发文档</a></p>
+<p>本节例子训练集是600张64×64×3的图片，开发集是150张64×64×3的图片。最核心的代码是<code>HappyModel(...)</code>，该函数构建了卷积神经网络：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">HappyModel</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    X_input = Input(input_shape) <span class="comment"># 在本例中=(64, 64, 3)</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 参数第1个3表示在矩阵前后行均加3行0，第2个3表示在前后列均加3列0</span></span><br><span class="line">    X = ZeroPadding2D((<span class="number">3</span>, <span class="number">3</span>))(X_input)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 32个7×7的卷积核，步长为1×1，我没找到name参数的含义</span></span><br><span class="line">    X = Conv2D(<span class="number">32</span>, (<span class="number">7</span>, <span class="number">7</span>), strides = (<span class="number">1</span>, <span class="number">1</span>), name = <span class="string">'conv0'</span>)(X)</span><br><span class="line">    <span class="comment"># 正则化，参见《笔记六》3.4正则化网络的激活函数</span></span><br><span class="line">    X = BatchNormalization(axis = <span class="number">3</span>, name = <span class="string">'bn0'</span>)(X)</span><br><span class="line">    <span class="comment"># 定义激活函数为RELU</span></span><br><span class="line">    X = Activation(<span class="string">'relu'</span>)(X) </span><br><span class="line"></span><br><span class="line">    <span class="comment"># MAXPOOL，Pooling的尺寸为2，步长为2</span></span><br><span class="line">    X = MaxPooling2D((<span class="number">2</span>, <span class="number">2</span>), name=<span class="string">'max_pool'</span>)(X)</span><br><span class="line"></span><br><span class="line">    X = Flatten()(X)</span><br><span class="line">    X = Dense(<span class="number">1</span>, activation=<span class="string">'sigmoid'</span>, name=<span class="string">'fc'</span>)(X)</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">    model = Model(inputs = X_input, outputs = X, name=<span class="string">'HappyModel'</span>)</span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> model</span><br></pre></td></tr></table></figure></p>
+<p>Pooling可参见<a href="/2018/04/04/2018/0404DeepLearningAI11/#padding">笔记九-Padding</a><br>BatchNormalization可参见<a href="/2018/03/29/2018/0329DeepLearningAI07/#正则化网络的激活函数">笔记六-正则化网络的激活函数</a><br>MaxPooling可参见<a href="/2018/04/04/2018/0404DeepLearningAI11/#池化层">笔记九-池化层</a><br>生成的神经网络如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img17.png" alt></p>
+<p>本节末尾可以通过代码生成算法结构图：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plot_model(happyModel, to_file=<span class="string">'HappyModel.png'</span>)</span><br><span class="line">SVG(model_to_dot(happyModel).create(prog=<span class="string">'dot'</span>, format=<span class="string">'svg'</span>))</span><br></pre></td></tr></table></figure></p>
+<p>这段代码使用了graphviz，需要先安装Graphviz:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install graphviz</span><br></pre></td></tr></table></figure></p>
+<p>生成的结构图为：<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img18.png" alt></p>
+<blockquote>
+<p>本节作业可参见<a href="https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py" target="_blank" rel="noopener">https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py</a><code>Coding4_2_KerasTutorial</code>。</p>
+</blockquote>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://keras-cn.readthedocs.io/en/latest/#30skeras" target="_blank" rel="noopener">快速开始：30s上手Keras</a><br><a href="http://keras-cn.readthedocs.io/en/latest/getting_started/sequential_model/" target="_blank" rel="noopener">序贯模型</a></p>
+<h2 id="Residual-Networks"><a href="#Residual-Networks" class="headerlink" title="Residual Networks"></a>Residual Networks</h2><p>残差网络中的残差块有两种形式。<br>恒等块如下<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img19.png" alt><br>卷积块如下<br><img src="/2018/04/18/2018/0418DeepLearningAI12/img20.png" alt><br>差异在于在shortcut路径上是否执行了卷积运算。如果<code>x(shortcut)</code>和<code>经过三个组件运算后的x</code>具有相同的维度，二者可以直接相加，就采用恒等块。否则由于纬度不同不能直接相加，需要采用卷积块运算后再相加。</p>
+<p>代码没太多要说的，我觉得写神经网络主要是画好结构图，并培养从网络结构到代码范式的直观记忆。</p>
+<p>本节提供了一个在GPU上训练好的残差网络模型<code>ResNet50.h5</code>，<font color="red">应该掌握下怎么保存模型文件，怎么读取并继续训练。</font></p>
+<blockquote>
+<p>本节作业可参见<a href="https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py" target="_blank" rel="noopener">https://github.com/palanceli/MachineLearningSample/blob/master/DeepLearningAIHomeWorks/mywork.py</a><code>Coding4_2_ResidualNetworks</code>。</p>
+</blockquote>
+<p>本节需要记住：</p>
+<ul>
+<li>非常深的“普通”网络会因为梯度消失而难以训练，因此在实践中不起作用。</li>
+<li>跳过连接有助于解决梯度消失问题，使ResNet模块可以轻松学习识别功能。</li>
+<li>有两种主要类型的块：恒等块和卷积块。</li>
+<li>通过将这些块堆叠在一起来可以构建非常深的残差网络。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/04/2018/0404DeepLearningAI11/" rel="next" title="DeepLearning.ai笔记（九）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（九）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/18/2018/0418DeepLearningAI13/" rel="prev" title="DeepLearning.ai笔记（十一）">
+                DeepLearning.ai笔记（十一） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/04/18/2018/0418DeepLearningAI12/" data-title="DeepLearning.ai笔记（十）" data-url="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI12/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-为什么要进行实例探究？"><span class="nav-number">1.</span> <span class="nav-text">2.1 为什么要进行实例探究？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-经典网络"><span class="nav-number">2.</span> <span class="nav-text">2.2 经典网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-3-残差网络"><span class="nav-number">3.</span> <span class="nav-text">2.3 残差网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-残差网络为什么有效？"><span class="nav-number">4.</span> <span class="nav-text">2.4 残差网络为什么有效？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-5-网络中的网络以及1×1卷积"><span class="nav-number">5.</span> <span class="nav-text">2.5 网络中的网络以及1×1卷积</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-6-谷歌Inception网络简介"><span class="nav-number">6.</span> <span class="nav-text">2.6 谷歌Inception网络简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-7-Inception-网络"><span class="nav-number">7.</span> <span class="nav-text">2.7 Inception 网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-8-使用开源的实现方案"><span class="nav-number">8.</span> <span class="nav-text">2.8 使用开源的实现方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-9-迁移学习"><span class="nav-number">9.</span> <span class="nav-text">2.9 迁移学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-10-数据扩充"><span class="nav-number">10.</span> <span class="nav-text">2.10 数据扩充</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-11-计算机视觉现状"><span class="nav-number">11.</span> <span class="nav-text">2.11 计算机视觉现状</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作业"><span class="nav-number">12.</span> <span class="nav-text">作业</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Keras-Tutorial-Happy-House"><span class="nav-number">12.1.</span> <span class="nav-text">Keras Tutorial Happy House</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">12.1.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Residual-Networks"><span class="nav-number">12.2.</span> <span class="nav-text">Residual Networks</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

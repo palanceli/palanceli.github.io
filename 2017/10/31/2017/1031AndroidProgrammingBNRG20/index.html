@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章引入了Data Binding，让Java代码和XML文件之间可以更直接地相互调用。本章要点：  Data Binding MVVM vs MVC assets 资源">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记二十">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章引入了Data Binding，让Java代码和XML文件之间可以更直接地相互调用。本章要点：  Data Binding MVVM vs MVC assets 资源">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/img03.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.133Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记二十">
+<meta name="twitter:description" content="本章引入了Data Binding，让Java代码和XML文件之间可以更直接地相互调用。本章要点：  Data Binding MVVM vs MVC assets 资源">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/img04.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记二十 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记二十</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-31T20:00:00+08:00">
+                2017-10-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/31/2017/1031AndroidProgrammingBNRG20/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/31/2017/1031AndroidProgrammingBNRG20/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章引入了Data Binding，让Java代码和XML文件之间可以更直接地相互调用。<br>本章要点：</p>
+<ul>
+<li>Data Binding</li>
+<li>MVVM vs MVC</li>
+<li>assets 资源<a id="more"></a>
+</li>
+</ul>
+<h1 id="Data-Binding"><a href="#Data-Binding" class="headerlink" title="Data Binding"></a>Data Binding</h1><h2 id="什么是Data-Binding"><a href="#什么是Data-Binding" class="headerlink" title="什么是Data Binding"></a>什么是Data Binding</h2><p>Data Binding是让Java代码和XML布局文件相互打通的技术，它包括：</p>
+<ol>
+<li>在Java代码中直接把ID当做变量访问元素的能力。本节之前，也可以在Java代码中提领XML文件中的元素，通过<code>findViewById(...)</code>来查找和获取子控件，使用了Data Binding之后，AndroidStudio会为XML文件生成Java类，这样就可以直接把XML文件中的ID直接当做Java对象来访问了。</li>
+<li>在XML文件中嵌入Java代码完善布局的能力。很有点JSP的味道了，本节之前介绍的内容足以完成所有的界面展现、交互工作，为什么还要提供这种能力呢？XML布局文件规定的是显示模板，Java代码提供的是数据和展现代码，展现代码必须遵守模板规定的方式工作——比如界面上有几个widget，分别对应数据的什么字段——模板和代码紧紧地耦合在一起。<br>打个比方：一个手机生产厂商委托A生产包装盒，B生产手机及配件。本节之前的方式是由B负责出厂包装，如果A生产的包装盒内部布局发生变化，就可能会影响B在包装流水线中的分工协作。引入了Data Binding机制之后，相当于把出厂包装的活交给了A，A和B之间只要商定好手机和配件尺寸规格即可——这是两家公司必须了解的细节，至于公司A怎么设计包装盒，B就不管了，他只负责把生产好的手机和配件交给A，如果A改动了包装布局，它自然知道该怎么调整出厂包装。这样的分工安排更合理。</li>
+</ol>
+<h2 id="让Java代码访问XML布局元素"><a href="#让Java代码访问XML布局元素" class="headerlink" title="让Java代码访问XML布局元素"></a>让Java代码访问XML布局元素</h2><h3 id="1-配置app-build-gradle"><a href="#1-配置app-build-gradle" class="headerlink" title="1.配置app/build.gradle"></a>1.配置app/build.gradle</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    ...</span><br><span class="line">    defaultConfig &#123; ... &#125;</span><br><span class="line">    buildTypes &#123; ... &#125;</span><br><span class="line">    dataBinding&#123;</span><br><span class="line">        enabled = <span class="keyword">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>开启了dataBinding，IDE会自动生成data binding class，并集成到项目当中供你使用。</p>
+<h3 id="2-用layout包裹目标布局"><a href="#2-用layout包裹目标布局" class="headerlink" title="2.用layout包裹目标布局"></a>2.用layout包裹目标布局</h3><p>// fragment_beat_box.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">layout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">android.support.v7.widget.RecyclerView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/recycler_view"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">layout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>按照之前的做法，这个布局文件只放RecyclerView，现在需要在外面裹一层<code>layout</code>标签，这层标签会令data binding tool自动生成binding class，默认类名根据该布局的文件名生成，所不同的是布局文件名是xxx_yyy.xml而类名是XxxYyy。在本节为<code>fragment_beat_box.xml</code>生成的data binding class为<code>FragmentBeatBoxBinding</code>。</p>
+<p>按照以前的做法，一个Activity需要在<code>onCreate(...)</code>函数中inflate布局文件，再根据id提取widget：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    setContentView(R.layout.activity_crime_pager); <span class="comment">// 加载布局文件</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 根据id提领子视图</span></span><br><span class="line">    mViewPager = (ViewPager)findViewById(R.id.crime_view_pager); </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用了data binding，则需要从布局文件中inflate出data binding instance：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container,</span></span></span><br><span class="line"><span class="function"><span class="params">                         Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">    <span class="comment">// 从布局文件提领data binding实例</span></span><br><span class="line">    FragmentBeatBoxBinding binding = DataBindingUtil.inflate(inflater,</span><br><span class="line">            R.layout.fragment_beat_box, container, <span class="keyword">false</span>);</span><br><span class="line">    <span class="comment">// 根据data binding实例直接访问布局中的子视图recyclerView</span></span><br><span class="line">    binding.recyclerView.setLayoutManager(<span class="keyword">new</span> GridLayoutManager(getActivity(), <span class="number">3</span>));</span><br><span class="line">    <span class="keyword">return</span> binding.getRoot();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该实例的<code>getRoot()</code>方法返回布局中祖先节点，此外还可以通过id直接访问布局中的子视图，如上例中的<code>binding.recyclerView</code>。</p>
+<p>有时候AndroidStudio会报告找不到<code>FragmentBeatBoxBinding</code>这个符号，可以手动添加<code>import com.bnrg.beatbox.databinding.FragmentBeatBoxBinding;</code>。</p>
+<h2 id="在XML文件中访问Java对象"><a href="#在XML文件中访问Java对象" class="headerlink" title="在XML文件中访问Java对象"></a>在XML文件中访问Java对象</h2><h3 id="1-在XML文件中声明数据类型，并使用"><a href="#1-在XML文件中声明数据类型，并使用" class="headerlink" title="1.在XML文件中声明数据类型，并使用"></a>1.在XML文件中声明数据类型，并使用</h3><p>// list_item_sound.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">layout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:tools</span>=<span class="string">"http://schemas.android.com/tools"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">data</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">variable</span> <span class="attr">name</span>=<span class="string">"viewModel"</span> <span class="attr">type</span>=<span class="string">"com.bnrg.beatbox.SoundViewModel"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">data</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"120dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">"@&#123;viewModel.title&#125;"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tools:text</span>=<span class="string">"Sound name"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">layout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>在<code>data</code>部分声明了数据类型，和变量<code>viewModel</code>，Data Binding Tools会为每一个变量生成<code>getter/setter</code>方法在，Widget中可以使用变量的函数和数据成员，如上例中的<code>@{viewModel.title}</code>。这里有一些简写的约定，例如<code>viewModel.title</code>是<code>viewModel.getTitle()</code>的简写。<br>下一步肯定就需要把数据传入xml。</p>
+<h3 id="2-将数据传入XML文件"><a href="#2-将数据传入XML文件" class="headerlink" title="2.将数据传入XML文件"></a>2.将数据传入XML文件</h3><p>回顾<a href="http://localhost:4000/2017/10/19/2017/1019AndroidProgrammingBNRG08/#RecyclerView的设计思想" target="_blank" rel="noopener">笔记八·RecyclerView的设计思想</a>，Adapter作为调度中心负责“集装箱”的生产和装配，<code>onCreateViewHolder()</code>负责生产，<code>onBindViewHolder()</code>负责装配：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BeatBoxFragment.java</span></span><br><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">SoundHolder</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ListItemSoundBinding mBinding;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">SoundHolder</span><span class="params">(ListItemSoundBinding binding)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(binding.getRoot());</span><br><span class="line">        mBinding = binding; </span><br><span class="line">        mBinding.setViewModel(<span class="keyword">new</span> SoundViewModel(mBeatBox));    <span class="comment">// ②</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span><span class="params">(Sound sound)</span></span>&#123;</span><br><span class="line">        mBinding.getViewModel().setSound(sound);    <span class="comment">// ④</span></span><br><span class="line">        mBinding.executePendingBindings();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">SoundAdapter</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">Adapter</span>&lt;<span class="title">SoundHolder</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Sound&gt; mSounds;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SoundAdapter</span><span class="params">(List&lt;Sound&gt; sounds)</span></span>&#123;mSounds = sounds;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span>   </span><br><span class="line">    <span class="function"><span class="keyword">public</span> SoundHolder <span class="title">onCreateViewHolder</span><span class="params">(ViewGroup parent, <span class="keyword">int</span> viewType)</span></span>&#123;</span><br><span class="line">        LayoutInflater inflater = LayoutInflater.from(getActivity());</span><br><span class="line">        ListItemSoundBinding binding = DataBindingUtil.inflate(inflater,</span><br><span class="line">                R.layout.list_item_sound, parent, <span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> SoundHolder(binding);    <span class="comment">// ①</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span>   </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBindViewHolder</span><span class="params">(SoundHolder holder, <span class="keyword">int</span> position)</span></span>&#123;</span><br><span class="line">        Sound sound = mSounds.get(position);</span><br><span class="line">        holder.bind(sound); <span class="comment">// ③</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getItemCount</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> mSounds.size();&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>①生产集装箱时，通过Data Binding将Binding对象传入“集装箱”ViewHolder<br>②在“集装箱”ViewHolder的构造函数中通过<code>mBinding.setViewModel(...)</code>将Java对象传入XML<br>③④当需要重新装配“集装箱”时，通过<code>mBinding.getViewModel()</code>获得XML中的数据，重新为之设置Sound</p>
+<p>在<code>SoundHolder::bind(...)</code>的末位有一行<code>mBinding.executePendingBindings();</code>调用，它的作用是当RecyclerView刷新的时候，确保layout立刻刷新自己，不要延迟。</p>
+<font color="red">我发现SoundHolder的构造函数是private，Singleton才会这么写，这会让外部无法创建它的实例，为什么SoundAdapter::onCreateViewHolder(...)可以做到呢？</font>
+
+<p>再来看看“集装箱”里存放的数据，每个集装箱里存放的核心数据就是Sound对象：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SoundViewModel</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SoundViewModel</span> <span class="keyword">extends</span> <span class="title">BaseObservable</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Sound mSound;</span><br><span class="line">    <span class="keyword">private</span> BeatBox mBeatBox;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SoundViewModel</span><span class="params">(BeatBox beatBox)</span></span>&#123;</span><br><span class="line">        mBeatBox = beatBox;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bindable</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTitle</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mSound.getName();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Sound <span class="title">getSound</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mSound;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSound</span><span class="params">(Sound sound)</span></span>&#123;</span><br><span class="line">        mSound = sound;</span><br><span class="line">        notifyChange();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>setSound(...)</code>有一行<code>notifyChange();</code>这是因为当“集装箱”SoundHolder发生重新装配<code>bind(...)</code>时，layout并不知道这件事，这会导致界面错乱。为了解决这个问题，需要有一种机制当某个集装箱发生重新装配时，应通知layout刷新，<code>notifyChange();</code>正是起到这样的作用。它通知Binding class所有标注为<code>@Bindable</code>的字段都需要更新，在上面的代码中就是<code>getTitle()</code>。</p>
+<h1 id="MVVM（Model-View-ViewModel）"><a href="#MVVM（Model-View-ViewModel）" class="headerlink" title="MVVM（Model-View-ViewModel）"></a>MVVM（Model-View-ViewModel）</h1><p>回顾一下本节中BeatBoxFragment，它本来应当承担Controller的角色，应当负责取出Model对象的字段，设置到View的某个子控件上去。但在本节里因为引入了Data Binding，都无需这么做了，它只是简单地把数据对象扔给XML。这似乎改变了原本的MVC格局，弱化了C的职责。但这也引入了一个原本不存在的SoundViewModel。</p>
+<p>我们再回到手机生产商的类比上来：原先有专门负责包装的Controller公司，他从包装生产商View拿到包装盒，从手机/配件生产商Model拿到硬件，把他们包装成盒，完成塑封。现在改由包装生产商View直接从手机/配件生产商Model拿到硬件完成包装。但是如果Model直接把一堆手机、配件混在一起，View还需要再分拣，于是两人协商，Model的交付物是一个简易包装，它把一套手机及配件封入简易包装再交给View，这个简易包装就是ViewModel。</p>
+<p>在本节的例子中，list_item_sound.xml只使用了一个Sound成员，所以看起来SoundViewModel似乎多余。但是如果list_item_sound.xml使用了多个数据类型的多个字段，SoundViewModel就必要了：<br>1、负责收纳“一套”数据，也就是在list_item_sound.xml上现实的数据；<br>2、负责向list_item_sound.xml提供需要的数据接口，SoundViewModel::getTitle()正是这类接口。<br>本节绘制MVVM的模型如下：<br><img src="/2017/10/31/2017/1031AndroidProgrammingBNRG20/img04.png" alt></p>
+<h1 id="添加Assets资源"><a href="#添加Assets资源" class="headerlink" title="添加Assets资源"></a>添加Assets资源</h1><p>Assets资源会被原封不动地打入apk包，和一般的资源相比，不会有系统工具帮助统一管理assets资源——不会根据设备分辨率、语言、横竖屏不同而匹配不同资源，不能在代码中通过布局文件或其他资源文件提取到assets资源。<br>这么多不便为什么还要使用Assets资源呢？因为Assets就像随包带的文件系统，你可以自定义它的目录结构。比如在本例中有20多个音频资源，如果当做一般资源导入，代码需要通过资源ID来操作每一个音频数据，而导入成Assets后，只需要通过代码遍历目录，逐个获取文件即可，以后如果要添加或删除音频，只需要加入或删除文件即可，代码完全不用修改。添加assets资源的步骤如下：</p>
+<p>在app右键 &gt; New &gt; Folder &gt; Assets Folder：<br><img src="/2017/10/31/2017/1031AndroidProgrammingBNRG20/img01.png" alt><br>在弹出窗口中点击Finish：<br><img src="/2017/10/31/2017/1031AndroidProgrammingBNRG20/img02.png" alt><br>再在assets右键 &gt; New &gt; Directory，创建新目录sample_sounds。将音频文件直接拷贝到目录BeatBox/app/src/main/assets/sample_sounds/，它们将自动展现到AndroidStudio项目内：<br><img src="/2017/10/31/2017/1031AndroidProgrammingBNRG20/img03.png" alt></p>
+<p>通过如下代码获取资源：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">AssetManager assets = context.getAssets();</span><br><span class="line"><span class="comment">// 获取assets/sample_sounds/下所有文件名</span></span><br><span class="line">String[] soundNames = assets.list(<span class="string">"sample_sounds"</span>);</span><br><span class="line"><span class="comment">// 获得首个文件的数据</span></span><br><span class="line">InputStream soundData = assets.open(soundNames[<span class="number">0</span>]);</span><br><span class="line"><span class="comment">// 获得第二个文件的数据</span></span><br><span class="line">AssetFileDescriptor assetFd = assets.openFd(soundNames[<span class="number">1</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>访问Assets资源必须通过<code>AssetManager</code>，使用<code>File</code>操作Assets是不灵的。<br>其中context可以是任意Activity，通过<code>assets.list(&quot;sample_sounds&quot;)</code>函数列出assets/sample_sounds目录下所有资源名称。<br>打开文件访问数据时，使用<code>open(...)</code>获得<code>InputStream</code>实例；使用<code>openFd(...)</code>获得<code>AssetFileDescriptor</code>实例。</p>
+<font color="red">在创建project的时候有一个“是否支持kotlin"选项，这是什么意思？</font>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/30/2017/1030AndroidProgrammingBNRG19/" rel="next" title="《Android Programming BNRG》笔记十九">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记十九
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/01/2017/1101AndroidProgrammingBNRG21/" rel="prev" title="《Android Programming BNRG》笔记二十一">
+                《Android Programming BNRG》笔记二十一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/31/2017/1031AndroidProgrammingBNRG20/" data-title="《Android Programming BNRG》笔记二十" data-url="http://palanceli.github.io/2017/10/31/2017/1031AndroidProgrammingBNRG20/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Data-Binding"><span class="nav-number">1.</span> <span class="nav-text">Data Binding</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是Data-Binding"><span class="nav-number">1.1.</span> <span class="nav-text">什么是Data Binding</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#让Java代码访问XML布局元素"><span class="nav-number">1.2.</span> <span class="nav-text">让Java代码访问XML布局元素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-配置app-build-gradle"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.配置app/build.gradle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-用layout包裹目标布局"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.用layout包裹目标布局</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在XML文件中访问Java对象"><span class="nav-number">1.3.</span> <span class="nav-text">在XML文件中访问Java对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-在XML文件中声明数据类型，并使用"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.在XML文件中声明数据类型，并使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-将数据传入XML文件"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.将数据传入XML文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MVVM（Model-View-ViewModel）"><span class="nav-number">2.</span> <span class="nav-text">MVVM（Model-View-ViewModel）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加Assets资源"><span class="nav-number">3.</span> <span class="nav-text">添加Assets资源</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

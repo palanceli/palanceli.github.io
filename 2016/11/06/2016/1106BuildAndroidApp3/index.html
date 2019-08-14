@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android开发环境,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="当工程当中包含C/C++代码，就需要使用NDK编译生成so文件，以供java调用，本文记录编译过程。">
+<meta name="keywords" content="Android开发环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android应用程序的编译（三）——NDK编译">
+<meta property="og:url" content="http://palanceli.github.io/2016/11/06/2016/1106BuildAndroidApp3/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="当工程当中包含C/C++代码，就需要使用NDK编译生成so文件，以供java调用，本文记录编译过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/11/06/2016/1106BuildAndroidApp3/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.777Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android应用程序的编译（三）——NDK编译">
+<meta name="twitter:description" content="当工程当中包含C/C++代码，就需要使用NDK编译生成so文件，以供java调用，本文记录编译过程。">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/11/06/2016/1106BuildAndroidApp3/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/11/06/2016/1106BuildAndroidApp3/">
+
+
+
+
+
+  <title>Android应用程序的编译（三）——NDK编译 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/11/06/2016/1106BuildAndroidApp3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android应用程序的编译（三）——NDK编译</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-06T21:28:07+08:00">
+                2016-11-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/11/06/2016/1106BuildAndroidApp3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/06/2016/1106BuildAndroidApp3/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>当工程当中包含C/C++代码，就需要使用NDK编译生成so文件，以供java调用，本文记录编译过程。<br><a id="more"></a></p>
+<h1 id="带有JNI的Android工程"><a href="#带有JNI的Android工程" class="headerlink" title="带有JNI的Android工程"></a>带有JNI的Android工程</h1><p>同<a href="http://palanceli.com/2016/11/06/2016/1106BuildAndroidApp2/#生成标准Android工程" target="_blank" rel="noopener">Android应用程序的编译（二）——SDK编译</a>，使用<code>android create project</code>命令生成一个默认的HellAndroid，在其中手动添加一个jni目录，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">HelloAndroid</span><br><span class="line">├──bin</span><br><span class="line">│  └──</span><br><span class="line">├──libs</span><br><span class="line">│  └──</span><br><span class="line">├──res</span><br><span class="line">│  └──...</span><br><span class="line">│  ├──layout</span><br><span class="line">│  │  └──main.xml</span><br><span class="line">│  └──values</span><br><span class="line">│     └──strings.xml</span><br><span class="line">├──jni                  # 手动添加此目录</span><br><span class="line">│  ├──palance_li_hellojni_HelloJni.h</span><br><span class="line">│  ├──palance_li_hellojni_HelloJni.c</span><br><span class="line">│  ├──Android.mk</span><br><span class="line">│  └──Application.mk</span><br><span class="line">├──src/palance/li/hello</span><br><span class="line">│  └──MainActivity.java</span><br><span class="line">├──ant.properties</span><br><span class="line">├──local.properties</span><br><span class="line">├──project.properties</span><br><span class="line">├──proguard-project.txt</span><br><span class="line">├──AndroidManifest.xml</span><br><span class="line">└──build.xml</span><br></pre></td></tr></table></figure></p>
+<h1 id="通过javah创建-h文件"><a href="#通过javah创建-h文件" class="headerlink" title="通过javah创建.h文件"></a>通过javah创建.h文件</h1><p><code>javah</code>会根据<code>javac</code>编译出的class文件生成必要的.h头文件，并在其中生成函数声明的代码。首先，在<code>src/palance/li/hello/MainActivity.java</code>中添加native函数的声明和调用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> palance.li.hello;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.app.Activity;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.widget.TextView;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">native</span> String <span class="title">stringFromJNI</span><span class="params">()</span></span>;  <span class="comment">// 声明native函数</span></span><br><span class="line">  <span class="keyword">static</span> &#123;</span><br><span class="line">    System.loadLibrary(<span class="string">"libhellojni"</span>);  <span class="comment">// 加载so</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">/** Called when the activity is first created. */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.main);</span><br><span class="line">        TextView tv = (TextView)findViewById(R.id.tv); <span class="comment">// 通过id获得对象</span></span><br><span class="line">        tv.setText(stringFromJNI());  <span class="comment">// 调用native函数，设置对象文本</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此外还要在<code>layout/main.xml</code>中为TextView添加id：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">LinearLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:orientation</span>=<span class="string">"vertical"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"fill_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"fill_parent"</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 为TextView添加id --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/tv"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"fill_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:text</span>=<span class="string">"Hello World, MainActivity"</span></span></span><br><span class="line"><span class="tag">    /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>编译java源文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ javac -encoding utf-8 \</span><br><span class="line">    -<span class="built_in">source</span> 1.6 -target 1.6 \</span><br><span class="line">    -bootclasspath ~/Library/Android/sdk/platforms/android-25/android.jar \</span><br><span class="line">    -d bin/classes \</span><br><span class="line">    src/palance/li/hello/HelloAndroid.java gen/palance/li/hello/R.java</span><br></pre></td></tr></table></figure></p>
+<p>调用javah为class文件生成.h头文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ javah -classpath bin/classes \</span><br><span class="line">    -bootclasspath /Users/palance/Library/Android/sdk/platforms/android-25/android.jar  \</span><br><span class="line">    -d jni \</span><br><span class="line">    palance.li.hello.MainActivity</span><br></pre></td></tr></table></figure></p>
+<p><code>-classpath</code> 指定javah用来查询类的路径，即需要为之生成.h文件的class文件所在路径<br><code>-bootclasspath</code> 覆盖引导类的位置<br><code>-d</code> 生成头文件的目录<br>最后一个参数是类名。<br>我在调用javah的时候曾经遇到各种问题，比如：<code>错误: 无法访问android.app.Activity</code>、<code>找不到android.app.Activity的类文件</code>之类的，网上给出的办法多是换个当前路径。当明白javah的工作机制以后，这些问题就不难解决了：首先要在java源文件中添加native函数的声明和调用，然后要编译成class文件，之后才能让javah根据这些class文件自动生成代码。</p>
+<h1 id="创建-c文件"><a href="#创建-c文件" class="headerlink" title="创建.c文件"></a>创建.c文件</h1><p>jni/palance_li_hello_MainActivity.c：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"palance_li_hello_MainActivity.h"</span></span></span><br><span class="line"><span class="function">JNIEXPORT jstring JNICALL <span class="title">Java_palance_li_hello_MainActivity_stringFromJNI</span><span class="params">(JNIEnv* env, jobject _this)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (*env)-&gt;NewStringUTF(env, <span class="string">"This is from JNI!"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="创建jni-Android-mk文件"><a href="#创建jni-Android-mk文件" class="headerlink" title="创建jni/Android.mk文件"></a>创建jni/Android.mk文件</h1><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">LOCAL_PATH:=<span class="variable">$(<span class="built_in">call</span> my-<span class="built_in">dir</span>)</span></span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(CLEAR_VARS)</span></span><br><span class="line"></span><br><span class="line">LOCAL_MODULE := libhellojni</span><br><span class="line">LOCAL_SRC_FILES := \</span><br><span class="line">    palance_li_hello_MainActivity.c</span><br><span class="line"></span><br><span class="line">LOCAL_C_INCLUDES += \</span><br><span class="line">    <span class="variable">$(JNI_H_INCLUDE)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> <span class="variable">$(BUILD_SHARED_LIBRARY)</span></span><br></pre></td></tr></table></figure>
+<h1 id="通过ndk-build生成so文件"><a href="#通过ndk-build生成so文件" class="headerlink" title="通过ndk-build生成so文件"></a>通过ndk-build生成so文件</h1><p>执行如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> HelloAndroid</span><br><span class="line">$ ndk-build</span><br></pre></td></tr></table></figure></p>
+<p><code>ndk-build</code>来自<code>$ ~/Library/Android/sdk/ndk-bundle/ndk-build</code>。它会生成目录<code>/libs</code>，并在其下生成一堆子目录：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">HelloAndroid</span><br><span class="line">├──...</span><br><span class="line">└──libs</span><br><span class="line">   ├──arm64-v8a</span><br><span class="line">   │  └──libhellojni.so</span><br><span class="line">   ├──armeabi</span><br><span class="line">   │  └──libhellojni.so</span><br><span class="line">   ├──armeabi-v7a</span><br><span class="line">   │  └──libhellojni.so</span><br><span class="line">   ├──mips</span><br><span class="line">   │  └──libhellojni.so</span><br><span class="line">   ├──mips64</span><br><span class="line">   │  └──libhellojni.so</span><br><span class="line">   ├──x86</span><br><span class="line">   │  └──libhellojni.so</span><br><span class="line">   └──x86_64</span><br><span class="line">      └──libhellojni.so</span><br></pre></td></tr></table></figure></p>
+<p>可以放一个配置文件<code>jni/Application.mk</code>来制定需要的平台类型：<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">APP_ABI := armeabi-v7a x86_64</span><br></pre></td></tr></table></figure></p>
+<p>再次执行<code>ndk-build</code>命令，就会在<code>/libs</code>下只生成<code>armeabi-v7a</code>和<code>x86_64</code>两个平台的so文件了。</p>
+<h1 id="生成apk"><a href="#生成apk" class="headerlink" title="生成apk"></a>生成apk</h1><p>接下来的打包过程和<a href="http://palanceli.com/2016/11/06/2016/1106BuildAndroidApp2/#使用SDK编译" target="_blank" rel="noopener">使用SDK编译</a>就一模一样了，唯一的差别在于在第4步之后插入一步，把so文件添加到apk里，完整的过程如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> HelloAndroid</span><br><span class="line"></span><br><span class="line"><span class="comment"># 1. 将工程的资源编译到R.java文件</span></span><br><span class="line">$ aapt package -m -f \</span><br><span class="line">    -J gen \</span><br><span class="line">    -M AndroidManifest.xml \</span><br><span class="line">    -S res \</span><br><span class="line">    -I ~/Library/Android/sdk/platforms/android-25/android.jar</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 编译java源文件</span></span><br><span class="line">$ javac -encoding utf-8 \</span><br><span class="line">    -<span class="built_in">source</span> 1.6 -target 1.6 \</span><br><span class="line">    -bootclasspath ~/Library/Android/sdk/platforms/android-25/android.jar \</span><br><span class="line">    -d bin/classes \</span><br><span class="line">    src/palance/li/hello/HelloAndroid.java gen/palance/li/hello/R.java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 将编译好的文件打包成dex格式</span></span><br><span class="line">$ dx --dex --output=bin/classes.dex bin/classes</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 创建未签名的apk文件，并将dex和so文件添加到该apk中</span></span><br><span class="line">$ aapt package -f -M AndroidManifest.xml \</span><br><span class="line">    -S res </span><br><span class="line">    -A assets </span><br><span class="line">    -I ~/Library/Android/sdk/platforms/android-25/android.jar </span><br><span class="line">    -F bin/HelloAndroid_unsigned.apk</span><br><span class="line">$ <span class="built_in">cd</span> bin</span><br><span class="line">$ aapt add HelloAndroid_unsigned.apk classes.dex</span><br><span class="line">$ mv libs lib</span><br><span class="line">$ aapt add HelloAndroid_unsigned.apk lib/x86_64/libhellojni.so</span><br><span class="line">$ mv lib libs</span><br><span class="line"></span><br><span class="line"><span class="comment"># 5. 对apk文件签名</span></span><br><span class="line">$ jarsigner -verbose \</span><br><span class="line">    -keystore ~/.android/debug.keystore \</span><br><span class="line">    -keypass android \</span><br><span class="line">    -storepass android \</span><br><span class="line">    -signedjar bin/HelloAndroid_signed.apk<span class="string">" \</span></span><br><span class="line"><span class="string">    bin/HelloAndroid_unsigned.apk"</span> \</span><br><span class="line">    androiddebugkey</span><br><span class="line"></span><br><span class="line"><span class="comment"># 6. 对签名后的apk做对其优化</span></span><br><span class="line">$ zipalign -f 4 bin/HelloAndroid_signed.apk bin/HelloAndroid.apk</span><br></pre></td></tr></table></figure></p>
+<p>其中需要特别注意的是在第4步，添加so文件一定要带着路径，而且必须是<code>lib/&lt;平台&gt;/&lt;so文件名&gt;</code>，而不是android默认生成的libs。我被这个坑搞了一个多小时，发现apk确实把so打进去了，可就是到模拟器里安装不上。正常情况下安装apk文件的时候，so文件应该被拷贝到<code>/data/app/&lt;包名&gt;/lib/&lt;平台名&gt;</code>下的，结合本例就是<code>/data/app/palance.li.hello/lib/x86_64</code>。在命令行中，添加so到apk之前我先把libs目录改名为lib，添加完成后再改回来。</p>
+<p>如果出现了加载so失败，可以先查看so文件是否被正确安装：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ adb shell ls /data/app/palance.li.hello-1/lib/x86_64</span><br></pre></td></tr></table></figure></p>
+<p>如果还有问题，可以使用logcat查看具体的输出：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ adb shell logcat *:d</span><br></pre></td></tr></table></figure></p>
+<p>终于算折腾出结果了：<br><img src="/2016/11/06/2016/1106BuildAndroidApp3/img01.png" alt="带native的Android应用"></p>
+<p>我把本文的代码放到<a href="https://github.com/palanceli/blog/tree/master/source/_posts/2016/1106BuildAndroidApp3/HelloAndroid" target="_blank" rel="noopener">HelloAndroid</a>，并在其下写了一个脚本<a href="https://github.com/palanceli/blog/blob/master/source/_posts/2016/1106BuildAndroidApp3/HelloAndroid/build.sh" target="_blank" rel="noopener">build.sh</a>。由于带native的Android应用在编译的时候需要穿插自动和手动——先修改java代码、编译之后才能生成jni的头文件，所以<code>build.sh</code>算是个半自动脚本。首次执行，生成R.java、编译java源文件、生成dex文件；然后需要手动执行ndk-build，生成so；然后在执行一次build.sh完成打包：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> HelloAndroid</span><br><span class="line">$ sh build.sh</span><br><span class="line">$ ndk-build</span><br><span class="line">$ sh build.sh</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android开发环境/" rel="tag"># Android开发环境</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/06/2016/1106BuildAndroidApp2/" rel="next" title="Android应用程序的编译（二）——SDK编译">
+                <i class="fa fa-chevron-left"></i> Android应用程序的编译（二）——SDK编译
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/09/2016/1109Next404/" rel="prev" title="Hexo + Github对vendors访问404导致页面空白">
+                Hexo + Github对vendors访问404导致页面空白 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/11/06/2016/1106BuildAndroidApp3/" data-title="Android应用程序的编译（三）——NDK编译" data-url="http://palanceli.github.io/2016/11/06/2016/1106BuildAndroidApp3/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#带有JNI的Android工程"><span class="nav-number">1.</span> <span class="nav-text">带有JNI的Android工程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过javah创建-h文件"><span class="nav-number">2.</span> <span class="nav-text">通过javah创建.h文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建-c文件"><span class="nav-number">3.</span> <span class="nav-text">创建.c文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建jni-Android-mk文件"><span class="nav-number">4.</span> <span class="nav-text">创建jni/Android.mk文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过ndk-build生成so文件"><span class="nav-number">5.</span> <span class="nav-text">通过ndk-build生成so文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#生成apk"><span class="nav-number">6.</span> <span class="nav-text">生成apk</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

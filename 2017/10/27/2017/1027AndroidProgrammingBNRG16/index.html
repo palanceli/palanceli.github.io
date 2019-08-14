@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章使用摄像头为Details界面添加照片。本章要点：  摄像头的使用 Bitmap类的使用 users-feature声明">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记十六">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/27/2017/1027AndroidProgrammingBNRG16/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章使用摄像头为Details界面添加照片。本章要点：  摄像头的使用 Bitmap类的使用 users-feature声明">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.128Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记十六">
+<meta name="twitter:description" content="本章使用摄像头为Details界面添加照片。本章要点：  摄像头的使用 Bitmap类的使用 users-feature声明">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/27/2017/1027AndroidProgrammingBNRG16/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记十六 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/27/2017/1027AndroidProgrammingBNRG16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记十六</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-27T20:00:00+08:00">
+                2017-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/27/2017/1027AndroidProgrammingBNRG16/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/27/2017/1027AndroidProgrammingBNRG16/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章使用摄像头为Details界面添加照片。<br>本章要点：</p>
+<ul>
+<li>摄像头的使用</li>
+<li>Bitmap类的使用</li>
+<li>users-feature声明<a id="more"></a>
+</li>
+</ul>
+<h1 id="文件和目录相关的Context-API返回信息"><a href="#文件和目录相关的Context-API返回信息" class="headerlink" title="文件和目录相关的Context API返回信息"></a>文件和目录相关的Context API返回信息</h1><p>Android应用的内部存储路径为：/data/data/&lt; package name &gt;<br><strong>files相关</strong></p>
+<ul>
+<li><code>File getFilesDir()</code> 返回/data/data/&lt; package name &gt;/files/的File对象</li>
+<li><code>FileInputStream openFileInput(String name)</code> 打开files/目录下的指定文件以读出数据。</li>
+<li><code>FileOutputStream openFileOutput(String name)</code>打开files/目录下的指定文件以写入数据。</li>
+<li><code>String[] fileList()</code> 获取应用程序私有目录下所有文件名</li>
+</ul>
+<p><strong>custome dir</strong></p>
+<ul>
+<li><code>File getDir(String name, int mode)</code> 返回应/data/data/&lt; package name &gt;/下指定的文件夹的File对象</li>
+</ul>
+<p><strong>cache</strong></p>
+<ul>
+<li><code>File getCacheDir()</code> 获取/data/data/&lt; package name &gt;/cache/的File对象，注意要保持该目录整洁。</li>
+</ul>
+<h1 id="使用FileProvider"><a href="#使用FileProvider" class="headerlink" title="使用FileProvider"></a>使用FileProvider</h1><p>在app之间共享文件，需要通过<code>ContentProvider</code>将文件暴露出来。这在<a href="http://palanceli.com/2016/10/26/2017/1026AndroidProgrammingBNRG15/#请求通讯录并接收返回数据" target="_blank" rel="noopener">《笔记15·请求通讯录并接收返回数据》</a>使用过。使用<code>ContentProvider</code>将文件的URI暴露出去，其它app就可以通过该URI下载或写入文件，通过这种方式确保文件所有者对于数据的可控性。</p>
+<p>如果只是希望从其他app接收文件，使用<code>ContentProvider</code>略重，可以使用<code>FileProvider</code>。本节以拍照为例，让相机把拍摄的照片写入本app，操作步骤如下：</p>
+<h2 id="1-xml配置要暴露的文件"><a href="#1-xml配置要暴露的文件" class="headerlink" title="1.xml配置要暴露的文件"></a>1.xml配置要暴露的文件</h2><p>res右键 &gt; New &gt; Android resource file 在弹出窗口选择Resource type 为XML，创建文件res/xml/files.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">paths</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">files-path</span> <span class="attr">name</span>=<span class="string">"crime_photos"</span> <span class="attr">path</span>=<span class="string">"."</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">paths</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>这个配置的含义是：将私有存储的根目录映射为crime_photos</p>
+<h2 id="2-AndroidManifest-xml"><a href="#2-AndroidManifest-xml" class="headerlink" title="2.AndroidManifest.xml"></a>2.AndroidManifest.xml</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">"com.bnrg.bnrg07"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">            ...</span><br><span class="line">        <span class="tag">&lt;<span class="name">provider</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:authorities</span>=<span class="string">"com.bnrg.bnrg07."</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:name</span>=<span class="string">"android.support.v4.content.FileProvider"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:exported</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:grantUriPermissions</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:name</span>=<span class="string">"android.support.FILE_PROVIDER_PATHS"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">android:resource</span>=<span class="string">"@xml/files"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">provider</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>其中authority是一个路径，表示文件存储的位置。<br>exported=”false”表示禁止任何没有经过你授权的人使用你的provider<br>grantUriPermissions=”true”表示当发送其他应用程序权限时，可以添加授权给该权限的URI<br>最后需要加上配置暴露文件的xml信息。</p>
+<h2 id="3-启动相机应用"><a href="#3-启动相机应用" class="headerlink" title="3.启动相机应用"></a>3.启动相机应用</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeFragment.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstance)</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime); <span class="comment">// ③</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container, Bundle savedInstance)</span></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    mPhotoButton = (ImageButton)v.findViewById(R.id.crime_camera);</span><br><span class="line">    <span class="comment">// ① 启动拍照app的隐式Intent</span></span><br><span class="line">    <span class="keyword">final</span> Intent captureImage = <span class="keyword">new</span> Intent(MediaStore.ACTION_IMAGE_CAPTURE);</span><br><span class="line">    <span class="comment">// 检查是否有拍照的应用</span></span><br><span class="line">    <span class="keyword">boolean</span> canTakePhoto = (mPhotoFile != <span class="keyword">null</span> &amp;&amp; </span><br><span class="line">                captureImage.resolveActivity(packageManager) != <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">    mPhotoButton.setEnabled(canTakePhoto);</span><br><span class="line">    mPhotoButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">            <span class="comment">// ② 将本地文件翻译成Uri</span></span><br><span class="line">            Uri uri = FileProvider.getUriForFile(getActivity(),</span><br><span class="line">                    <span class="string">"com.bnrg.bnrg07.criminalintent.fileprovider"</span>, </span><br><span class="line">                    mPhotoFile);</span><br><span class="line"></span><br><span class="line">            captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);</span><br><span class="line">            <span class="comment">// 得到每一个可以拍照的Activity</span></span><br><span class="line">            List&lt;ResolveInfo&gt; cameraActivities = </span><br><span class="line">                                getActivity().getPackageManager().</span><br><span class="line">                                queryIntentActivities(captureImage, </span><br><span class="line">                                PackageManager.MATCH_DEFAULT_ONLY);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 为每一个Activity授权，可以写入Uri</span></span><br><span class="line">            <span class="keyword">for</span>(ResolveInfo activity: cameraActivities)&#123;</span><br><span class="line">                getActivity().grantUriPermission(</span><br><span class="line">                        activity.activityInfo.packageName,</span><br><span class="line">                        uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);</span><br><span class="line">            &#125;</span><br><span class="line">            startActivityForResult(captureImage, REQUEST_PHOTO);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中①，<code>MediaStore.ACTION_IMAGE_CAPTURE</code>将启动拍照app，但是默认并不拍摄全分辨率的照片，而只是一个低分辨率的缩略图，并且将它塞到Intent里通过<code>onActivityResult(...)</code>返回；要想得到全分辨率的照片，你需要向隐式Intent的<code>MediaStore.EXTRA_OUTPUT</code>写入Uri，这样拍照app将全分辨率的照片写入该Uri。</p>
+<p>其中②，<code>FileProvider.getUriForFile(...)</code>将本地文件翻译成Uri，拍照app将照片文件写入该Uri，<code>mPhotoFile</code>的实际值是<code>/data/data/&lt;包名&gt;/files/IMG_xxxx.jpg</code>。</p>
+<p>其中③，文件名的生成策略如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Crime.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Crime</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPhotoFilename</span><span class="params">()</span></span>&#123;   <span class="comment">// 文件名</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"IMG_"</span> + getId().toString() + <span class="string">".jpg"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// CrimeLab.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeLab</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> File <span class="title">getPhotoFile</span><span class="params">(Crime crime)</span></span>&#123;  <span class="comment">// 路径名 + 文件名</span></span><br><span class="line">        File filesDir = mContext.getFilesDir();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> File(filesDir, crime.getPhotoFilename());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-将拍到的照片显示出来"><a href="#4-将拍到的照片显示出来" class="headerlink" title="4.将拍到的照片显示出来"></a>4.将拍到的照片显示出来</h2><p>更新照片的时机有两个：1、当Fragment初始化之后；2、重新拍摄照片之后。<br>对于1需要注意，在Fragment初始化之后，是不知道自己尺寸的，它最先获得自己的尺寸是在<code>onCreate(...)</code> &gt; <code>onStart(...)</code> &gt; <code>onResume(...)</code>之后。因此如果计算Bitmap应该的大小，要么是在<code>onResume(...)</code>里做；要么是在<code>onCreateView(...)</code>里做，但是只能粗略估算，本节是采用了后者。这个时候虽然不知道Fragment的具体尺寸，但能知道屏幕尺寸，本节就是根据屏幕尺寸确定照片的缩放比例。</p>
+<font color="red">此处待确认</font>
+
+<h1 id="加载Bitmap"><a href="#加载Bitmap" class="headerlink" title="加载Bitmap"></a>加载Bitmap</h1><p>Bitmap仅对图像文件做了简单的封装，如果加载一个压缩的图像文件，载入到Bitmap对象后，将被完全解压。也就是说对于一个5M的压缩图片，加载到Bitmap的内存中可能会膨胀好几倍！</p>
+<p>本节根据设备的尺寸对图像做了缩放，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PictureUtils.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PictureUtils</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">getScaledBitmap</span><span class="params">(String path, <span class="keyword">int</span> destWidth, <span class="keyword">int</span> destHeight)</span></span>&#123;</span><br><span class="line">        BitmapFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line">        options.inJustDecodeBounds = <span class="keyword">true</span>;</span><br><span class="line">        BitmapFactory.decodeFile(path, options);</span><br><span class="line">        <span class="keyword">float</span> srcWidth = options.outWidth;  <span class="comment">// 获得源图尺寸</span></span><br><span class="line">        <span class="keyword">float</span> srcHeight = options.outHeight;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> inSampleSize = <span class="number">1</span>;               <span class="comment">// 计算缩放系数</span></span><br><span class="line">        <span class="keyword">if</span>(srcHeight &gt; destHeight || srcWidth &gt; destWidth)&#123;</span><br><span class="line">            <span class="keyword">float</span> heightScale = srcHeight / destHeight;</span><br><span class="line">            <span class="keyword">float</span> widthScale = srcWidth / destWidth;</span><br><span class="line">            inSampleSize = Math.round(heightScale &gt; widthScale? heightScale: widthScale);</span><br><span class="line">        &#125;</span><br><span class="line">        options = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line">        options.inSampleSize = inSampleSize;</span><br><span class="line">        <span class="comment">// 对源图缩放，获得新图</span></span><br><span class="line">        <span class="keyword">return</span> BitmapFactory.decodeFile(path, options);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="users-feature声明"><a href="#users-feature声明" class="headerlink" title="users-feature声明"></a>users-feature声明</h1><p>当app需要使用依赖设备特性的功能，如本节需要使用相机，最好把这个信息告诉Android系统，当Google Play分发应用时，它会根据这些信息决定是否在特定设备上分发。具体操作是在Manifest.xml中添加如下内容：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">"com.bnrg.bnrg07"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-feature</span> <span class="attr">android:name</span>=<span class="string">"android.hardware.camera"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:required</span>=<span class="string">"false"</span>/&gt;</span></span><br><span class="line">    ...</span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>其中<code>android:required=&quot;false&quot;</code>表示即使没有摄像头，app也能正常运行，只是某些功能会受限。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/26/2017/1026AndroidProgrammingBNRG15/" rel="next" title="《Android Programming BNRG》笔记十五">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记十五
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/28/2017/1028AndroidProgrammingBNRG17/" rel="prev" title="《Android Programming BNRG》笔记十七">
+                《Android Programming BNRG》笔记十七 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/27/2017/1027AndroidProgrammingBNRG16/" data-title="《Android Programming BNRG》笔记十六" data-url="http://palanceli.github.io/2017/10/27/2017/1027AndroidProgrammingBNRG16/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#文件和目录相关的Context-API返回信息"><span class="nav-number">1.</span> <span class="nav-text">文件和目录相关的Context API返回信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用FileProvider"><span class="nav-number">2.</span> <span class="nav-text">使用FileProvider</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-xml配置要暴露的文件"><span class="nav-number">2.1.</span> <span class="nav-text">1.xml配置要暴露的文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-AndroidManifest-xml"><span class="nav-number">2.2.</span> <span class="nav-text">2.AndroidManifest.xml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-启动相机应用"><span class="nav-number">2.3.</span> <span class="nav-text">3.启动相机应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-将拍到的照片显示出来"><span class="nav-number">2.4.</span> <span class="nav-text">4.将拍到的照片显示出来</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#加载Bitmap"><span class="nav-number">3.</span> <span class="nav-text">加载Bitmap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#users-feature声明"><span class="nav-number">4.</span> <span class="nav-text">users-feature声明</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

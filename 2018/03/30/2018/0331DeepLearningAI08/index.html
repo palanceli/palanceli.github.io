@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《结构化机器学习项目》第一周《机器学习（ML)策略（1）》。本课没有编程作业，老师在开篇提到本课提供更快速、高效地优化机器学习系统的思路，很多大学机器学习的课程是不包含这些内容的。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（七）">
+<meta property="og:url" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《结构化机器学习项目》第一周《机器学习（ML)策略（1）》。本课没有编程作业，老师在开篇提到本课提供更快速、高效地优化机器学习系统的思路，很多大学机器学习的课程是不包含这些内容的。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img10.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.225Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（七）">
+<meta name="twitter:description" content="《结构化机器学习项目》第一周《机器学习（ML)策略（1）》。本课没有编程作业，老师在开篇提到本课提供更快速、高效地优化机器学习系统的思路，很多大学机器学习的课程是不包含这些内容的。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（七） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（七）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-30T10:00:00+08:00">
+                2018-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/30/2018/0331DeepLearningAI08/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/30/2018/0331DeepLearningAI08/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《结构化机器学习项目》第一周《机器学习（ML)策略（1）》。<br>本课没有编程作业，老师在开篇提到本课提供更快速、高效地优化机器学习系统的思路，很多大学机器学习的课程是不包含这些内容的。</p>
+<a id="more"></a>
+<h1 id="1-2-正交化"><a href="#1-2-正交化" class="headerlink" title="1.2 正交化"></a>1.2 正交化</h1><p>显示器的控制开关通常由若干个：控制显示区宽度、高度、梯度、角度和亮度等。每个开关或旋钮控制一个指标，调解其中一个不会改变另一个，这就是正交化，机器学习也是如此，我们希望当训练的结果不如人意的时候，能诊断出一些正交的问题，并针对每一个问题找到确定的方法，来单独调节。<br>我曾经面试过一人，跟我描述说机器学习更像是玄学，完全不可预期它能运算出什么结果。我觉得正是因为在调优阶段没有做到正交化所致。如果一个旋钮在控制高度的同时，也在控制角度和亮度，操作这样一台机器恐怕必须要靠烧香乞求它产生一个靠谱的结果了。  </p>
+<p>通常进行机器学习的操作链条如下：<br>① 系统在训练集上表现良好 →<br>② 系统在开发机上表现良好 →<br>③ 系统在测试机上表现良好 →<br>④ 系统在实际应用中表现良好<br>当在每一环节出现问题时，希望找到正交化的解决方案来优化，方案的方向如下：<br>① 训练更大的网络或切换更好的优化算法，如Adam等<br>② 正则化或增大训练集<br>③ 可能是对开发集过拟合了，需要更大的开发集<br>④ 要么开发集分布设置不正确，要么成本函数测量的指标不对，改变开发集或成本函数  </p>
+<p>正交化的作用就是确定在链条中哪个阶段出了问题，并确定可以调节哪些不同的参数来解决该问题。</p>
+<h1 id="1-3-单一数字评估指标"><a href="#1-3-单一数字评估指标" class="headerlink" title="1.3 单一数字评估指标"></a>1.3 单一数字评估指标</h1><p>本节的观念是：让系统的评价指标统一到一个单一的数值上来。例如我们常常陷入<strong>查准率</strong>和<strong>查全率</strong>的两难境地上来，两个都想要，可是二者就是此消彼长的关系。在机器学习的学术界常采用二者的调和平均值=$\frac{2}{\frac{1}{P}+\frac{1}{R}}$来将指标单一化。<br>再如，当训练了6个识猫模型，把它们应用到从不同区域采样上来的数据后，表现各不相同：<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img01.png" alt><br>指标不单一，很难从这个二维表格中评价哪个模型表现最好。因此建议将四个区域的表现取平均值，从而使指标单一化到该均值上来：<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img02.png" alt></p>
+<h1 id="1-4-满足和优化指标"><a href="#1-4-满足和优化指标" class="headerlink" title="1.4 满足和优化指标"></a>1.4 满足和优化指标</h1><p>本节还是在讲单一数字评估指标的方式有时候，指标过多且不一个维度，不好捏在一起或者捏在一起显得很不自然，但仍然要这么做。随便定一个目标也胜过没有目标，当指标过多时，单一化会不可避免地掺入一些主观的价值判断，这是确定产品方向或设定任务目标是必须的。<br>例如，分类器的性能表现除了精度，还要考虑运行时间：<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img03.png" alt><br>可以设定公式：<code>性能指标=精度-0.5×运行时间</code>，作为单一化的评价指标。于是本例中<br>A=90-0.5×80=50<br>B=92-0.5×95=44.5<br>C=95-0.5×1500=-655<br>故A是最优解。  </p>
+<p>还有一种思路是，将精度指定为<code>优化指标</code>，将运行时间指定为<code>满足指标</code>，模型的训练目标是在达到满足指标（≤100ms）的基础上，尽量提升优化指标。于是上面的例子中B就是最优解。这同样要求优化指标是单一化的。</p>
+<h1 id="1-5-训练-开发-测试集的划分"><a href="#1-5-训练-开发-测试集的划分" class="headerlink" title="1.5 训练/开发/测试集的划分"></a>1.5 训练/开发/测试集的划分</h1><p>开发集又称保留交叉验证集。<br>机器学习的工作流程是：尝试很多思路，用训练及训练不同的模型，然后使用开发集评估这些不同的思路，然后选择一个；然后再不断迭代模型，改善其在开发集上的性能，直到最后得到一个满意的成本，最后再用测试集去验证评估。<br>本节第一个例子是为来自多个区域的样本训练“识猫”模型：<br>①选取开发集+单实数评估指标<br>②迭代不同的想法跑实验，根据①评估不同的分类器，选出最好的那个<br>③不断调优，迭代生成模型<br>④在测试集上验证  </p>
+<p>我的理解：训练集就是练习册，开发集就是真题模拟考，测试集就是大考，最终的应用就是就业了。不是每次都用大考来验证模型是担心过拟合，因为模型最终的目的是应用，对测试集过拟合可能会导致“高分低能”，所以不能轻易祭出测试集。用真题模拟考来把关，就要求真题模考和大考的集合必须是同分布的，如果这两个数据集不同分布，就好比学了三年文科，大考时却被扔到理科考场，不傻逼才怪！  </p>
+<p>还回到“识猫”的案例，绝对不能随机抽取区域作为开发、测试集：<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img04.png" alt><br>而应该将这些来自不同区域的数据重新洗牌，随机抽取出开发集和测试集。  </p>
+<p>本节末尾给出的指导意见是：在选择开发集和测试集时，要让它们能够反映未来将应用于实际的数据，并要求开发集和测试集必须同分布。这里没有讲训练集，有时候出于现实的限制，可能很难做到训练集与开发/测试集同分布，这种情况会在后面的章节讲到。</p>
+<h1 id="1-6-开发集和测试集的大小"><a href="#1-6-开发集和测试集的大小" class="headerlink" title="1.6 开发集和测试集的大小"></a>1.6 开发集和测试集的大小</h1><p>以往当数据规模较小时（比如100、1,000、10,000……这样的量级），训练集占70%，测试集占30%或训练集60%，开发集20%，测试集20%是合理的。<br>而现代机器学习的数据规模常常在百万量级，采用1%作为开发集，1%作为测试集就足够了，更多的数据用于训练。  </p>
+<p>我理解，对于开发集和测试集，只要与未来的应用场景是同分布的，其有效性更多取决于量级而非占总数据的比重，万级别对于评测通常都足够了。  </p>
+<h1 id="1-7-什么时候该改变开发-测试集和指标"><a href="#1-7-什么时候该改变开发-测试集和指标" class="headerlink" title="1.7 什么时候该改变开发/测试集和指标"></a>1.7 什么时候该改变开发/测试集和指标</h1><p>针对这个标题其实很好回答：那就是设错目标的时候。课件举了两个例子：  </p>
+<p>一个是对总目标的分量考虑不周全，只考虑了判猫的精度，没考虑到如果把色情图片误判为猫推送给用户，比判错一个猫后果严重得多。这在很多产品的应用场景中很常见，比如输入法的纠错候选做对10个带来的加分体验，可能都不及将一个正确候选纠成错误的带来的负分多。在判猫的案例中，原本的成本指标是：<br>$\frac{1}{m}\sum<em>{i=1}^{m}I{y</em>{pred}^{(i)}≠y^{(i)}}$<br>需要引入一个权重$w^{(i)} = \begin{cases}1 与色情图片无关的误判\10　把色情图片识别为猫\end{cases}$<br>新的成本指标修正为$\frac{1}{\sum{w^{(i)}}}\sum<em>{i=1}^{m}w^{(i)}·I{y</em>{pred}^{(i)}≠y^{(i)}}$  </p>
+<p>另一个例子是对应用场景的数据评估不准确，导致训练、开发和测试集不能反映实际的应用情况。  </p>
+<p>听起来这两个例子都比较弱，我猜测之所以独立一节，应该是因为工程师或者研究员拿到数据后往往会一头扎到训练的工作中去了，交作业时才发现文不对题，这种情况可能比较典型。传统的开发很少会出现这种情况，因为开发周期没那么长，而且经常开发一半就能有可体验的中间版本供演示了，如果出现和需求不一致，不论是工程师还是产品很容易在早期发现。而机器学习因为其过程的抽象性，且周期动辄以周、月计，一旦目标设定出现偏差，往往发现比较晚，损失会比传统的工程方法大得多。</p>
+<h1 id="1-8-为什么是人的表现"><a href="#1-8-为什么是人的表现" class="headerlink" title="1.8 为什么是人的表现"></a>1.8 为什么是人的表现</h1><p>机器学习的表现通常呈现如下的态势：起初发展很快，可以追上甚至超越人，之后便进入瓶颈，而且任凭时间推移继续优化算法，尽管模型越来越大，数据越来越多，但性能再也无法超越某个理论上限，这条线就称为贝叶斯最优误差。<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img05.png" alt><br>贝叶斯误差线不会达到100%，因为比如语音识别，背景噪声很大时，理论上也达不到完美识别；比如图像识别，如果图片特别模糊，也会导致无法识别。  </p>
+<p>而机器学习在超越人类之后，往往进展也就慢了下来，原因有二：  </p>
+<ol>
+<li>在有些领域，人类的能力已经接近贝叶斯误差，比如看图听声，也就是说机器学习超越人来后也就达到了理论极限。</li>
+<li>只要表现比人类更差，就总能找到一些工具帮助提升。比如喂入更多数据，标注更多数据，或人工误差分析查找原因，如分析偏差/方差以针对性解决。而一旦表现超越了人类，这些方法也就失效了。  </li>
+</ol>
+<font color="red">我对第2点前半段有质疑：超越人类的能力后可以继续喂入数据，这和是否是否超越人类无关。关于后半段的更详细解释在下一节有介绍。</font>
+
+<h1 id="1-9-可避免偏差"><a href="#1-9-可避免偏差" class="headerlink" title="1.9 可避免偏差"></a>1.9 可避免偏差</h1><p>在评估模型的可改进空间时，应结合贝叶斯误差来看待训练集误差和开发集误差。下图中相同的训练集误差和开发集误差，在不同贝叶斯误差的背景下，优化方法会不同。<br>此处把人类误差水平等效于贝叶斯误差，把贝叶斯误差和训练误差之间的距离称为<strong>可避免误差</strong>。训练误差和开发误差之间的距离则说明在方差问题上还有多大的改善空间。<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img06.png" alt><br>前者的可避免误差较大，应该优先解决训练偏差的问题，如扩大网络规模或优化算法。后者可能因为噪声的原因，人类水平的误差就很高，可避免误差很小，因此应该优先解决开发集方差过高的问题，应采用正则化或增大训练集以缓解对训练集的过拟合。</p>
+<h1 id="1-10理解人的表现"><a href="#1-10理解人的表现" class="headerlink" title="1.10理解人的表现"></a>1.10理解人的表现</h1><p>首先应该根据系统的目标定义自己的贝叶斯误差。比如学术研究，要做出超越所有人类的诊断系统，应该将资深医生团队作为贝叶斯误差；如果要实现产品化，做出优于普通医生的可用系统，则应将一般医生的水平作为贝叶斯误差。<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img07.png" alt><br>该目标会直接决定模型的优化方向。第一组应当优先解决可避免偏差较大的问题，第二组则应优先解决训练集方差较大的问题，第三组是最难权衡的，这也是越接近人类越难以提升的一个表现，从绝对值得对比关系来看，还是应当先解决可避免偏差，但是在相差不大的情况下，偏差自身的误差浮动也许已经大于可避免偏差本身了。<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img08.png" alt></p>
+<h1 id="1-11-超过人的表现"><a href="#1-11-超过人的表现" class="headerlink" title="1.11 超过人的表现"></a>1.11 超过人的表现</h1><p>本节粗略地解释了当机器学习超越人的表现之后，为什么继续提升比较困难。<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img09.png" alt><br>第一组的可避免偏差0.1%，方差0.2%，很明显应先解决方差的问题。而第二组训练集误差已超越人类，你无法判断是不是出现了过拟合，即使没有过拟合，接下来贝叶斯偏差线在哪里，已经没有判断依据了，因此先解决可避免偏差还是方差也就失去了判断依据。优化失去方向，这是进一步提升的难点。  </p>
+<p>不过在很多方面，机器学习已经超越了人类，如：在线广告、相关产品推荐、物流预测、贷款风控等。人类擅长更直观的自然感知，如识图、听声。不过即使在这些领域，机器学习也正在超越人类。</p>
+<h1 id="1-12-改善你的模型表现"><a href="#1-12-改善你的模型表现" class="headerlink" title="1.12 改善你的模型表现"></a>1.12 改善你的模型表现</h1><p>本节是对以上内容的总结，完成监督学习的两个基本要点：</p>
+<ol>
+<li>让模型很好地拟合训练集达到低偏差</li>
+<li>让模型很好地拟合开发集达到低方差</li>
+</ol>
+<p>在正交化的思想下分别达成两个目标。在量化效果时拉出三条线：<br><img src="/2018/03/30/2018/0331DeepLearningAI08/img10.png" alt><br>如果可避免偏差过大则应使用规模更大的模型或更换更优化的算法，比如加入momentum或RMSprop或Adam或寻找更好的神经网络架构或优化更好的超参数。<br>如果方差较大，则应为训练集收集更多的数据或使用正则化包括L2正则化、Dropout正则化，也可以尝试使用不同的神经网络架构、超参数搜索等。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/29/2018/0329DeepLearningAI07/" rel="next" title="DeepLearning.ai笔记（六）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（六）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/02/2018/0403DeepLearningAI10/" rel="prev" title="DeepLearning.ai笔记（八）">
+                DeepLearning.ai笔记（八） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/03/30/2018/0331DeepLearningAI08/" data-title="DeepLearning.ai笔记（七）" data-url="http://palanceli.github.io/2018/03/30/2018/0331DeepLearningAI08/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-2-正交化"><span class="nav-number">1.</span> <span class="nav-text">1.2 正交化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-单一数字评估指标"><span class="nav-number">2.</span> <span class="nav-text">1.3 单一数字评估指标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-4-满足和优化指标"><span class="nav-number">3.</span> <span class="nav-text">1.4 满足和优化指标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-5-训练-开发-测试集的划分"><span class="nav-number">4.</span> <span class="nav-text">1.5 训练/开发/测试集的划分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-6-开发集和测试集的大小"><span class="nav-number">5.</span> <span class="nav-text">1.6 开发集和测试集的大小</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-7-什么时候该改变开发-测试集和指标"><span class="nav-number">6.</span> <span class="nav-text">1.7 什么时候该改变开发/测试集和指标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-8-为什么是人的表现"><span class="nav-number">7.</span> <span class="nav-text">1.8 为什么是人的表现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-9-可避免偏差"><span class="nav-number">8.</span> <span class="nav-text">1.9 可避免偏差</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-10理解人的表现"><span class="nav-number">9.</span> <span class="nav-text">1.10理解人的表现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-11-超过人的表现"><span class="nav-number">10.</span> <span class="nav-text">1.11 超过人的表现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-12-改善你的模型表现"><span class="nav-number">11.</span> <span class="nav-text">1.12 改善你的模型表现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

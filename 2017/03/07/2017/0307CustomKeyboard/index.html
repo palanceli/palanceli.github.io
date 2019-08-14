@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="（本文来自《Custom Keyboard》）自定义键盘为那些希望体验更新颖的输入法或者需要用到iOS不支持的语言的用户，提供了替代系统键盘的备选。自定义键盘的核心功能很简单：响应按键、手势或其它输入事件，并提供转换后的文本字串，并将该字串插入到当前的光标位置。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS下的自定义键盘（译）">
+<meta property="og:url" content="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="（本文来自《Custom Keyboard》）自定义键盘为那些希望体验更新颖的输入法或者需要用到iOS不支持的语言的用户，提供了替代系统键盘的备选。自定义键盘的核心功能很简单：响应按键、手势或其它输入事件，并提供转换后的文本字串，并将该字串插入到当前的光标位置。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/img1.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/img2.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/img3.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.808Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS下的自定义键盘（译）">
+<meta name="twitter:description" content="（本文来自《Custom Keyboard》）自定义键盘为那些希望体验更新颖的输入法或者需要用到iOS不支持的语言的用户，提供了替代系统键盘的备选。自定义键盘的核心功能很简单：响应按键、手势或其它输入事件，并提供转换后的文本字串，并将该字串插入到当前的光标位置。">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/img1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/">
+
+
+
+
+
+  <title>iOS下的自定义键盘（译） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS下的自定义键盘（译）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-07T20:53:00+08:00">
+                2017-03-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/07/2017/0307CustomKeyboard/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/07/2017/0307CustomKeyboard/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>（本文来自<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ExtensibilityPG/CustomKeyboard.html" target="_blank" rel="noopener">《Custom Keyboard》</a>）<br>自定义键盘为那些希望体验更新颖的输入法或者需要用到iOS不支持的语言的用户，提供了替代系统键盘的备选。自定义键盘的核心功能很简单：响应按键、手势或其它输入事件，并提供转换后的文本字串，并将该字串插入到当前的光标位置。<br><a id="more"></a></p>
+<blockquote>
+<p><strong> 开始阅读前 </strong><br>请先确认你需要开发的的确是系统范围的自定义键盘。如果只是希望在你的app内部提供可自定义的键盘，可以到<a href="https://developer.apple.com/library/content/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/InputViews/InputViews.html#//apple_ref/doc/uid/TP40009542-CH12" target="_blank" rel="noopener">《Custom Views for Data Input 》</a>和<a href="https://developer.apple.com/library/content/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/Introduction/Introduction.html#//apple_ref/doc/uid/TP40009542" target="_blank" rel="noopener">《Text Programming Guide for iOS》</a>了解<code>自定义输入视图</code>和<code>输入辅助视图</code>的相关内容，iOS SDK为此提供了更好的备选方案。</p>
+</blockquote>
+<p>当用户选择了自定义键盘，该键盘即成为每个app的键盘。因此，你创建的键盘必须包含一些基本的功能。其中最重要的是，必须允许用户切换到其它键盘。</p>
+<h1 id="理解用户对键盘的预期"><a href="#理解用户对键盘的预期" class="headerlink" title="理解用户对键盘的预期"></a>理解用户对键盘的预期</h1><p>要理解用户对于自定义键盘的预期，可以系统键盘为标杆——它反应灵敏且高效。它不会用垃圾信息或请求打断用户输入。如果你提供了需要用户交互的功能，应该把它们放到键盘的app里，而不是键盘上。</p>
+<h2 id="iOS用户预期的键盘功能"><a href="#iOS用户预期的键盘功能" class="headerlink" title="iOS用户预期的键盘功能"></a>iOS用户预期的键盘功能</h2><p>每个自定义键盘都必须提供的iOS用户所预期的键盘功能是：切换到其它键盘的方法。在系统键盘中，有一个小地球的按键用来完成此功能。iOS 8也提供了专门的API用于切换到下一个键盘，可以参见<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ExtensibilityPG/CustomKeyboard.html#//apple_ref/doc/uid/TP40014214-CH16-SW4" target="_blank" rel="noopener">《提供一种切换到其它键盘的方法》</a>。</p>
+<p>系统键盘会根据当前文本输入对象的<a href="https://developer.apple.com/reference/uikit/uikeyboardtype" target="_blank" rel="noopener">UIKeyboardType</a>属性，展现与之匹配的键盘布局。如果当前的输入对象需要输入邮箱，系统键盘的句号建就会变化：长按会冒出一些顶级域名的后缀作为候选。你在设计自己的键盘布局时也应当考虑到当前的输入对象属性。</p>
+<p>iOS用户还期望自动大写：在一个标准的文本输入区域，对于大小写敏感的语言来说，应当让句首的字母自动大写。</p>
+<p>这类功能列出如下：</p>
+<ul>
+<li>对输入对象的属性考虑适当的键盘布局</li>
+<li>自动纠错和建议</li>
+<li>自动大写</li>
+<li>两个空格后自动添加句号</li>
+<li>Caps lock键的支持</li>
+<li>键帽上的美观</li>
+<li>对于象形文字的多层转换</li>
+</ul>
+<p>你可以自行决定是否实现这些功能；系统并没有为这些功能提供专用的API，在自己的输入法中提供这些功能可以让你的产品更有竞争力。</p>
+<h2 id="系统键盘中的哪些功能不适用于自定义键盘"><a href="#系统键盘中的哪些功能不适用于自定义键盘" class="headerlink" title="系统键盘中的哪些功能不适用于自定义键盘"></a>系统键盘中的哪些功能不适用于自定义键盘</h2><p>自定义键盘不能访问在系统设置中的通用键盘设置数据（设置 &gt; 通用 &gt; 键盘），比如自动大写、使Caps Lock可用。自定义键盘也不能访问字典还原信息（设置 &gt; 通用 &gt; 还原 &gt; 还原键盘词典）。要满足你用户的灵活性要求，你应该创建一个标准的设置bundle，这个话题在<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/UserDefaults/Introduction/Introduction.html#//apple_ref/doc/uid/10000059i" target="_blank" rel="noopener">《偏好和设置编程指南》</a>的<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/UserDefaults/Preferences/Preferences.html#//apple_ref/doc/uid/10000059i-CH6" target="_blank" rel="noopener">《实现iOS设置Bundle》</a>中有讨论。这样你的自定义键盘的设置就会出现在系统设置的键盘区域。</p>
+<p>还有一些文本输入对象，自定义键盘是不能在其上进行输入的。首先就是任何安全相关的文本输入对象。这类文本输入对象设置了其<a href="https://developer.apple.com/reference/uikit/uitextinputtraits/1624427-securetextentry" target="_blank" rel="noopener">secureTextEntry</a>属性为<code>YES</code>，在其上的输入内容将呈现为圆点。</p>
+<p>当用户在密码框里输入时，系统会临时用系统键盘来替代自定义键盘。当用户在非密码框里输入时，自定义键盘又会恢复回来。</p>
+<p>自定义键盘也无权在拨号输入的位置出现，例如通讯录的电话号码输入区域。对于这类输入对象，键盘是由运营商指定的一个数字/字母的小集合组成，并且具备如下属性：<br><a href="https://developer.apple.com/reference/uikit/uikeyboardtype/1624426-phonepad" target="_blank" rel="noopener">UIKeyboardTypePhonePad</a><br><a href="https://developer.apple.com/reference/uikit/uikeyboardtype/1624465-namephonepad" target="_blank" rel="noopener">UIKeyboardTypeNamePhonePad</a></p>
+<p>当用户点击拨号输入对象时，系统将临时用系统键盘替换掉你的自定义键盘。当用户再点击其它标准输入对象时，自定义键盘又会恢复回来。</p>
+<p>app的开发者可以选择在app内部不使用自定义键盘。例如银行类app，或者必须遵守美国HIPAA隐私规则的app，可以这么干。这类app实现来自<code>UIApplicationDelegate</code>协议的<a href="https://developer.apple.com/reference/uikit/uiapplicationdelegate/1623122-application" target="_blank" rel="noopener">application:shouldAllowExtensionPointIdentifier:</a>方法，并返回NO，以达到使用系统键盘的效果。</p>
+<p>由于自定义键盘只能绘制其<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller" target="_blank" rel="noopener">UIInputViewController</a>对象内的主视图，在它上面不能选择文字。选择文字是使用键盘的应用程序控制的。如果app提供了编辑菜单（如剪切、拷贝和粘贴），键盘是无权访问它的。自定义键盘不能提供在光标位置的自动inline纠错能力。</p>
+<p>在iOS8.0下，如所有扩展app一样，自定义键盘不能访问麦克风，因此不能实现语音输入。</p>
+<p>最后，显示插图不能超过键盘的主视图上边缘，系统键盘可以，但自定义键盘不行。如下图，可以发现自定义键盘和系统输入法的差别：<img src="/2017/03/07/2017/0307CustomKeyboard/img1.png" alt="按键插图不能超越上边缘"></p>
+<h1 id="自定义键盘API"><a href="#自定义键盘API" class="headerlink" title="自定义键盘API"></a>自定义键盘API</h1><p>本节将给出开发自定义键盘的快速入门。如下图，它展示了键盘运行过程中一些重要的对象，以及它们在开发流程中的的位置：<br><img src="/2017/03/07/2017/0307CustomKeyboard/img2.png" alt="自定义键盘的基本结构"></p>
+<p>自定义键盘模板（在iOS“Application Extension”目标模板组）包含一个<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller" target="_blank" rel="noopener">UIInputViewController</a>的子类，它是你开发的键盘的主视图控制器。该模板包含键盘所必需的“下一个键盘”按钮的实现，它调用了<code>UIInputViewController</code>类的<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller/1618191-advancetonextinputmode" target="_blank" rel="noopener">advanceToNextInputMode</a>方法。如上图所示，可以在输入视图控制器的主视图（在其<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller/1618192-inputview" target="_blank" rel="noopener">inputView</a>属性）中添加子视图、控制器以及手势识别器等。对于其它类型的扩展应用，在目标上并不存在窗体，因此也就没有根视图控制器了。</p>
+<p>在模板的<code>Info.plist</code>文件中有预先配置好的键盘所需要的最基本的值。参见其中的<code>NSExtensionAttributes</code>字典关键字，配置一个键盘的关键字在<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ExtensibilityPG/CustomKeyboard.html#//apple_ref/doc/uid/TP40014214-CH16-SW18" target="_blank" rel="noopener">《配置自定义键盘的Info.plist文件》</a>中有介绍。</p>
+<p>默认，键盘不能访问网络，不能和它的app共享容器。如果要具备这种能力，必须要将<code>Info.plist</code>文件中<code>RequestsOpenAccess</code>的值置为<code>YES</code>。这需要扩展键盘的沙盒，在<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ExtensibilityPG/CustomKeyboard.html#//apple_ref/doc/uid/TP40014214-CH16-SW3" target="_blank" rel="noopener">《设计用户信任》</a>中有介绍相关内容。</p>
+<p>一个输入视图控制器遵从各种与文本输入对象内容交互的协议：</p>
+<ul>
+<li><p>响应触摸消息时如果要插入或删除文本，可以使用<a href="https://developer.apple.com/reference/uikit/uikeyinput" target="_blank" rel="noopener">UIKeyInput</a>协议的<a href="https://developer.apple.com/reference/uikit/uikeyinput/1614543-inserttext" target="_blank" rel="noopener">insertText:</a>和<a href="https://developer.apple.com/reference/uikit/uikeyinput/1614572-deletebackward" target="_blank" rel="noopener">deleteBackward</a>方法。可以在视图控制器的<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller/1618193-textdocumentproxy" target="_blank" rel="noopener">textDocumentProxy</a>属性中调用这些方法，该属性代表当前文本输入对象，它遵从<a href="https://developer.apple.com/reference/uikit/uitextdocumentproxy" target="_blank" rel="noopener">UITextDocumentProxy</a>协议。如下：</p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="keyword">self</span>.textDocumentProxy insertText:<span class="string">@"hello "</span>]; <span class="comment">// Inserts the string "hello " at the insertion point</span></span><br><span class="line">[<span class="keyword">self</span>.textDocumentProxy deleteBackward];       <span class="comment">// Deletes the character to the left of the insertion point</span></span><br><span class="line">[<span class="keyword">self</span>.textDocumentProxy insertText:<span class="string">@"\n"</span>];     <span class="comment">// In a text view, inserts a newline character at the insertion point</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在调用<a href="https://developer.apple.com/reference/uikit/uikeyinput/1614572-deletebackward" target="_blank" rel="noopener">deleteBackward</a>之前要先决定删除的字符数。可以通过<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller/1618193-textdocumentproxy" target="_blank" rel="noopener">textDocumentProxy</a>的<a href="https://developer.apple.com/reference/uikit/uitextdocumentproxy/1618190-documentcontextbeforeinput" target="_blank" rel="noopener">documentContextBeforeInput</a>属性，来获得光标附近的文本上下文信息。如下：</p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSString</span> *precedingContext = <span class="keyword">self</span>.textDocumentProxy.documentContextBeforeInput;</span><br></pre></td></tr></table></figure>
+<p>  然后就可以删除你指定的文字区域了，比如单个字符还是空格后的所有字符。如果要按照语义执行删除，比如一个单词、句子、还是一个段落，可以使用<a href="https://developer.apple.com/reference/corefoundation/cfstringtokenizer-rf8" target="_blank" rel="noopener">《 CFStringTokenizer Reference》</a>中描述的函数，注意每个语种的语义规则是不同的。</p>
+</li>
+<li><p>为了控制光标所在位置的操作，比如支持向前删除文字，需要调用<code>UITextDocumentProxy</code>协议中的<a href="https://developer.apple.com/reference/uikit/uitextdocumentproxy/1618194-adjusttextposition" target="_blank" rel="noopener">adjustTextPositionByCharacterOffset:</a>方法。比如向前删除一个字符，代码如下：</p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>) deleteForward &#123;</span><br><span class="line">    [<span class="keyword">self</span>.textDocumentProxy adjustTextPositionByCharacterOffset: <span class="number">1</span>];</span><br><span class="line">    [<span class="keyword">self</span>.textDocumentProxy deleteBackward];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过实现<a href="https://developer.apple.com/reference/uikit/uitextinputdelegate" target="_blank" rel="noopener">UITextInputDelegate</a>协议中的方法，可以响应当前输入文本对象的一些变化，比如内容变化以及用户触发的光标位置的变化。</p>
+</li>
+</ul>
+<p>为了展现与当前文本输入对象适配的键盘布局，需要参照该对象的<a href="https://developer.apple.com/reference/uikit/uikeyboardtype" target="_blank" rel="noopener">UIKeyboardType</a>属性，根据每种你的键盘所能支持的属性，变化布局内容。</p>
+<p>在自定义键盘中，有两种方式来支持多语言：</p>
+<ul>
+<li>为每个语言创建一个键盘，每个键盘都作为向容器app添加的独立的Target</li>
+<li>创建一个多语言键盘，动态切换当前语言。可以使用<code>UIInputViewController</code>类的<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller/1618200-primarylanguage" target="_blank" rel="noopener">primaryLanguage</a>属性来动态切换语言。</li>
+</ul>
+<p>根据你要支持的语言数量以及你想提供的用户体验，你可以从上面选择最合适的方案。</p>
+<p>每种自定义键盘（需要<code>RequestsOpenAccess</code>）都可以通过<a href="https://developer.apple.com/reference/uikit/uilexicon" target="_blank" rel="noopener">UILexicon</a>类访问自动纠错的词典。通过使用该类，并结合你自己的词典设计，可以在用户输入过程中为他提供输入建议和自动纠错。<code>UILexicon</code>对象包含来自如下源的单词：</p>
+<ul>
+<li>来自用户通讯录的人名和姓</li>
+<li>在 设置 &gt; 通用 &gt; 键盘 &gt; 快捷方式（文本替换） 列表</li>
+<li>通用词典</li>
+</ul>
+<p>你可以使用自动布局来调整你的自定义键盘主视图的高度。默认情况下，自定义键盘会根据屏幕尺寸以及设备方向，和系统键盘的尺寸保持一致。自定义键盘的宽度通常与屏幕当前宽度一致。修改自定义键盘主视图的高度约束即可修改其高度。</p>
+<p>下面的代码展示如何定义和添加约束：</p>
+<figure class="highlight obj-c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CGFloat</span> _expandedHeight = <span class="number">500</span>;</span><br><span class="line"><span class="built_in">NSLayoutConstraint</span> *_heightConstraint = </span><br><span class="line">    [<span class="built_in">NSLayoutConstraint</span> constraintWithItem: <span class="keyword">self</span>.view </span><br><span class="line">                                 attribute: <span class="built_in">NSLayoutAttributeHeight</span> </span><br><span class="line">                                 relatedBy: <span class="built_in">NSLayoutRelationEqual</span> </span><br><span class="line">                                    toItem: <span class="literal">nil</span> </span><br><span class="line">                                 attribute: <span class="built_in">NSLayoutAttributeNotAnAttribute</span> </span><br><span class="line">                                multiplier: <span class="number">0.0</span> </span><br><span class="line">                                  constant: _expandedHeight];</span><br><span class="line">[<span class="keyword">self</span>.view addConstraint: _heightConstraint];</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong> 注意 </strong><br>在 iOS8.8下，你可以在主视图画到屏幕之后的任何时间里调整键盘高度。</p>
+</blockquote>
+<h1 id="自定义键盘的开发关键"><a href="#自定义键盘的开发关键" class="headerlink" title="自定义键盘的开发关键"></a>自定义键盘的开发关键</h1><p>自定义键盘开发有两个关键点：</p>
+<ul>
+<li><strong>信任。</strong> 自定义键盘能访问用户输入的内容 ，因此在键盘和用户间建立信任非常关键。</li>
+<li><strong>“下一个键盘”键。</strong> 通过键盘界面必须能让用户能切换到下一个键盘。</li>
+</ul>
+<h2 id="为用户信任所做的设计"><a href="#为用户信任所做的设计" class="headerlink" title="为用户信任所做的设计"></a>为用户信任所做的设计</h2><p>作为自定义键盘的开发者，你首先应当考虑的是如何建立和维护用户信任。你要理解隐私策略的最佳实践并知道如何实现它才能很好地践行。</p>
+<blockquote>
+<p>注意<br>本节为你创建自定义键盘提供相关的开发手册，该手册要求尊重用户隐私。了解iOS编程要求，请阅读<code>应用商店审核手册</code>，<code>iOS人机交互手册</code>，<code>iOS开发许可协议</code>，请参见苹果的<a href="https://developer.apple.com/support/appstore/app-review/" target="_blank" rel="noopener">《应用审核支持》</a>，<a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/ExpectedAppBehaviors/ExpectedAppBehaviors.html#//apple_ref/doc/uid/TP40007072-CH3-SW6" target="_blank" rel="noopener">《支持用户隐私》</a>，<a href="https://developer.apple.com/library/content/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40007072" target="_blank" rel="noopener">《iOS应用编程指南》</a>。</p>
+</blockquote>
+<p>对于键盘，如下三个方面对于建立和维护用户信任至关重要：<br><strong> 按键数据的安全。 </strong>用户希望他们的敲键会落在文档以及输入区域内，而不是上传到服务器或者用于其他不明目的。<br><strong> 最小化合理利用其它用户数据。 </strong>如果你的键盘还需要使用其他用户数据，例如定位服务或者通讯录，你有义务解释这给用户带来的好处是什么。<br><strong> 准确。 </strong> 把输入事件转换成文本要求精准，这本身虽然不是一个隐私话题，但他会影响到信任：每次文字转换需要体现出你的代码的精准。</p>
+<p>在信任的开发设计过程中，首先考虑的是是否要获取open access权限。尽管开启了open access权限能给自定义键盘开发带来极大便利，但这也增加了你作为开发者的责任。下面是标准的open access的能力和隐私考虑：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Open Access</th>
+<th>能力和限制</th>
+<th>隐私考虑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Off(default)</td>
+<td>·键盘可以执行所有基本键盘的职责<br>·可以访问通用词典以支持自动纠错和输入建议<br>·访问设置里的快捷短语<br>·不与containing应用共享容器<br>·不访问键盘容器以外的文件系统<br>·不访问键盘容器以外的文件系统<br>·不能直接或间接访问iCloud或游戏中心或应用内购买</td>
+<td>用户了解按键仅仅被发送到当前使用键盘的应用里</td>
+</tr>
+<tr>
+<td>On</td>
+<td>·具备非联网自定义键盘的所有能力<br>·在用户许可情况下可以访问位置服务和通讯录<br>·键盘和containing app可以访问共享容器<br>·键盘可以为服务器侧处理过程发送按键或其他输入事件<br>·containing app自动纠错字典提供编辑界面<br>·通过containing app键盘可以使用iCloud来保证自动纠错词典和设置的更新<br>·通过containing app，键盘可以参与到游戏中心和应用内购买<br>·如果键盘支持移动设备管理(MDM)，它可与被管理的应用共同工作</td>
+<td>·用户了解键盘开发者会利用按键数据<br>·你必须遵守<code>有联网能力的键盘开发手册</code>和<code>iOS开发许可协议</code>，可参见<a href="https://developer.apple.com/support/appstore/app-review/" target="_blank" rel="noopener">《应用审核支持》</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>如果你的自定义键盘不需要open access权限，系统确保敲键信息不会被发送给你的键盘以及别的地方。如果只想提供一般的键盘功能，请不要给键盘配备联网能力。由于有沙盒限制，不联网的键盘一定是满足苹果的数据隐私手册并能获得用户信任的。</p>
+<p>开启open access权限（如上所述，可以在Info.plist文件中配置），能给你的开发带来更多可能性，同时也带来更多的责任。</p>
+<blockquote>
+<p>注意<br>向应用商店提交一个open-access的键盘必须遵守苹果<a href="https://developer.apple.com/support/appstore/app-review/" target="_blank" rel="noopener">《应用审核支持》</a>中的相关条款。</p>
+</blockquote>
+<p>每一个与open access相关的功能都需要你履行相应的责任，应当最大限度地尊重用户数据，不得用于与用户输入无关的其他任何目的。下表列出了open access带来的好处以及开发者需承担的责任：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>用户利益示例</th>
+<th>开发者责任</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>与containing app共享容器</td>
+<td>为键盘的自动纠错词典管理UI界面</td>
+<td>要考虑到自动纠错数据属于用户隐私。不要把他发到你的服务器，用作与输入无关的用途。</td>
+</tr>
+<tr>
+<td>把按键数据发到你的服务器</td>
+<td>通过开发者的计算资源可以提供更好的按键处理结果和输入预测</td>
+<td>只有为用户提供更好的输入体验之用时，才能保存按键和语音数据</td>
+</tr>
+<tr>
+<td>基于云的自动纠错词典</td>
+<td>把人名、地名、热点新闻加入到自动纠错词典中</td>
+<td>不要把用户身份与输入数据关联起来，不得将用户信息用作与输入体验无关的其他目的</td>
+</tr>
+<tr>
+<td>通讯录</td>
+<td>把人名、地名、电话号码添加到自动纠错词典中</td>
+<td>不得讲通讯录用作与输入体验无关的其他目的</td>
+</tr>
+<tr>
+<td>位置服务</td>
+<td>将附近的地名添加到自动纠错词典中</td>
+<td>不要在后台使用位置服务，不得将位置信息发送到你的服务器并用于与输入体验无关的其他目的</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>一个具有open-access权限的键盘和其containing app能将按键数据发送到服务器端，通过这些数据可以为用户提供更好的输入体验。如果你使用了这些能力，当不需要这些数据的时候，请及时在服务器端删除。参见上面的表格来履行你使用open-access权限中的义务。</p>
+<h2 id="提供切换到其他键盘的方法"><a href="#提供切换到其他键盘的方法" class="headerlink" title="提供切换到其他键盘的方法"></a>提供切换到其他键盘的方法</h2><p>系统键盘的小地球按键用于切换到其他键盘，如下所示：<br><img src="/2017/03/07/2017/0307CustomKeyboard/img3.png" alt="系统键盘的小地球键"><br>你的自定义键盘必须提供类似的机制能切换到其他键盘。</p>
+<blockquote>
+<p>注意<br>要通过应用审核，必须在你的键盘上提供明显允许用户切换键盘的UI标识。</p>
+</blockquote>
+<p>调用<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller" target="_blank" rel="noopener">UIInputViewController</a>类的<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller/1618191-advancetonextinputmode" target="_blank" rel="noopener">advanceToNextInputMode</a>方法可以切换到其他键盘。系统会选择下一个键盘，没有能获得键盘列表的API，也没有切换到指定键盘的API。</p>
+<p>Xcode自定义键盘模板中就已经在<code>下一个键盘</code>按钮上具备了<a href="https://developer.apple.com/reference/uikit/uiinputviewcontroller/1618191-advancetonextinputmode" target="_blank" rel="noopener">advanceToNextInputMode</a>的功能。为了提供最好的用户体验，应当把你的<code>下一个键盘</code>按键放在靠近系统键盘的小地球键的位置。</p>
+<h1 id="开始自定义键盘的开发"><a href="#开始自定义键盘的开发" class="headerlink" title="开始自定义键盘的开发"></a>开始自定义键盘的开发</h1><p>本节中你将学习到如何创建自定义键盘，根据你的目标配置并在iOS模拟器或物理机上把它运行起来。你还将学习到一些替代系统键盘应谨记的UI要点。</p>
+<h2 id="使用Xcode自定义键盘模板"><a href="#使用Xcode自定义键盘模板" class="headerlink" title="使用Xcode自定义键盘模板"></a>使用Xcode自定义键盘模板</h2><p>创建键盘及其containing app与其他扩展应用略有不同。本节将带你领略基本键盘的开发和运行。</p>
+<p><strong>在一个容器app中创建键盘，步骤如下：</strong></p>
+<ol>
+<li>在Xcode中选择<code>File &gt; New &gt; Project &gt; iOS &gt; Application</code>选择<code>Single View Application</code>模板。</li>
+<li>点击<code>Next</code>。</li>
+<li>填写<code>Project Name</code>（如CKIme），点击<code>Next</code>。</li>
+<li>选择要保存的位置，点击<code>Create</code>。这样，你就有了一个空app，该app只能完成一个简单的操作，接下来它将承载键盘。在你提交到应用商店之前，你需要完成一些有用的功能。请到<a href="https://developer.apple.com/support/appstore/app-review/" target="_blank" rel="noopener">应用审核支持</a>参考<code>应用商店审核指南</code>。</li>
+<li>选择<code>File &gt; New &gt; Target &gt; iOS &gt; Application Extension</code>选择<code>Custom Keyboard Extension</code>，点击<code>Next</code>。</li>
+<li>填写<code>Product Name</code>（如CKbd），点击<code>Finish</code>。</li>
+<li>确认<code>Project</code>和<code>Embed in Application</code>中都显示的是容器app的名字（CKIme），点击<code>Finish</code>。如果弹出<code>Activate “CKbd” scheme</code>提示让激活键盘工程，点击<code>Activate</code>。</li>
+</ol>
+<p>接下来你可以根据需要决定是否要自定义键盘的group name，它会出现在设置中的已购买键盘列表中。</p>
+<p><strong>自定义键盘group name，步骤如下：</strong></p>
+<ol>
+<li>在Xcode工程导航视图中，选择容器app的<code>Info.plist</code>文件，</li>
+<li>在右侧plist编辑器中，鼠标hover到<code>Bundle name</code>上，点“+”按钮创建一行空属性。</li>
+<li>在Key中填写<code>Bundle display name</code>，回车</li>
+<li>双击该行的Value，填写你要自定义的键盘group name。</li>
+<li>选择<code>File &gt; Save</code>保存设置。</li>
+</ol>
+<p>下表汇总了在容器app和键盘app的<code>Info.plist</code>文件中你可以配置的UI字符串：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>iOSUI字符串</th>
+<th>Info.plist关键字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>· 在系统设置的已购键盘列表中的键盘group name</td>
+<td>在容器app的Info.plist文件中的Bundle display name</td>
+</tr>
+<tr>
+<td>· 系统设置中的键盘名称<br>· 键盘换列表中的键盘名称</td>
+<td>在键盘app的Info.plist文件中的Bundle display name</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>现在你可以在iOS模拟器或真机上运行该键盘，看看它目前都具备什么行为和能力吧。</p>
+<p><strong> 运行自定义键盘并将Xcode调试器attach到它上面 </strong></p>
+<ol>
+<li>在Xcode，你的view controller实现中设置一个断点（比如可以断在<a href="https://developer.apple.com/reference/uikit/uiviewcontroller/1621495-viewdidload" target="_blank" rel="noopener">viewDidLoad</a>上）。</li>
+<li>在Xcode工具栏确保当前活动的项目为键盘项目，并对应iOS模拟器或设备。</li>
+<li>选择菜单<code>Project &gt; Run</code>，或点击<code>Build and then run the current scheme</code>按钮（即播放按钮）。Xcode会提示选择host app。选择一个带有输入框的，比如通讯录或Safari。</li>
+<li>点击<code>Run</code>。<br>Xcode将运行起你指定的host app。如果这是你第一次使用键盘扩展应用，需要现在设置中添加并启用键盘：<ol>
+<li><code>Settings &gt; General &gt; Keyboard &gt; Keyboards</code></li>
+<li>点击<code>Add New Keyboard...</code></li>
+<li>在<code>OTHER IPHONE KEYBOARDS</code>中点击你刚刚创建的键盘</li>
+</ol>
+</li>
+<li>在iOS模拟器或真机上，调出你的自定义键盘。<br>点击任意可输入区域，将显示出系统键盘。按住小地球，选择你的自定义键盘。<br>此时你将看到自定义键盘，但是调试器尚未attach上来。一个从模板构建而来的极简键盘仅有一个<code>Next Keyboard</code>按钮，点击后切换回前一个键盘。</li>
+<li>取消你的键盘（以便在第8步中你可以再次调出键盘以命中<code>viewDidLoad</code>断点）</li>
+<li>在Xcode中，选择<code>Debug &gt; Attach to Process &gt; By Process Identifier(PID) or Name</code><br>在弹出对话框中，输入你的键盘扩展应用的名字（包含空格）.默认就是该扩展应用在工程导航窗口里的group name。</li>
+<li>点击<code>Attach</code>。<br>Xcode将显示出等待attach的调试器。</li>
+<li>在任意能输入文字的app中调出键盘。<br>当你的键盘主视图开始加载时，Xcode调试器将attache到你的键盘，并命中断点。</li>
+</ol>
+<h2 id="为自定义键盘配置Info-plist文件"><a href="#为自定义键盘配置Info-plist文件" class="headerlink" title="为自定义键盘配置Info.plist文件"></a>为自定义键盘配置Info.plist文件</h2><p>自定义键盘的Info.plist文件允许静态定义键盘的现式特征，包括主要语言，以及是否需要open access权限。</p>
+<p>打开Xcode并切换到自定义键盘的target。在工程导航栏选择Info.plist文件，按文本格式呈现如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">key</span>&gt;</span>NSExtension<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>NSExtensionAttributes<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key</span>&gt;</span>IsASCIICapable<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">false</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key</span>&gt;</span>PrefersRightToLeft<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">false</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key</span>&gt;</span>PrimaryLanguage<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">string</span>&gt;</span>en-US<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key</span>&gt;</span>RequestsOpenAccess<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">false</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>NSExtensionPointIdentifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.apple.keyboard-service<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>NSExtensionPrincipalClass<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>KeyboardViewController<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>每个关键字在<a href="https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/AppExtensionKeys.html#//apple_ref/doc/uid/TP40014212" target="_blank" rel="noopener">App Extension Keys</a>中都有解释。可以使用字典<code>NSExtensionAttributes</code>中的关键字来描述你的自定义键盘的特征和需求，如下：</p>
+<p><code>IsASCIICapable</code> - 默认为NO的布尔值。用户键盘是否可以向文档中插入ASCII字串。如果要为<code>UIKeyboardTypeASCIICapable</code>属性的输入对象展现单独类型的键盘，需要将该值置为YES。</p>
+<p><code>PrefersRightToLeft</code> - 默认为NO的布尔值。是否为从右到左的语种设计的的自定义键盘。</p>
+<p><code>PrimaryLanguage</code> - 默认为<code>en-US</code>的字串。以&lt;语种&gt;-&lt;区域&gt;的形式描述键盘的主语言。可以到<a href="http://www.opensource.apple.com/source/CF/CF-476.14/CFLocaleIdentifier.c" target="_blank" rel="noopener">http://www.opensource.apple.com/source/CF/CF-476.14/CFLocaleIdentifier.c</a>找到对应的语种和区域。</p>
+<p><code>RequestsOpenAccess</code> - 默认为NO的布尔值。是否需要比基础键盘更大的沙盒范围。把该值置为YES将需要<code>完全访问</code>权限，你的键盘将获得如下能力，每个能力都伴随有相应的权限：</p>
+<ul>
+<li>访问定位服务，通讯录数据库，相机，每个都需要用户允许</li>
+<li>与键盘的容器app共享容器数据，以便完成比如在容器app中管理用户词库的界面的功能</li>
+<li>通过网络发送按键、输入事件之类的数据供云端处理</li>
+<li>使用<a href="https://developer.apple.com/reference/uikit/uipasteboard" target="_blank" rel="noopener">UIPasteboard</a>类</li>
+<li>播放音频，包括使用<a href="https://developer.apple.com/reference/uikit/uidevice/1620050-playinputclick" target="_blank" rel="noopener">playInputClick</a>方法播放按键音</li>
+<li>访问iCloud，可以用来根据用户身份同步比如键盘设置、自定义自动纠错词典</li>
+<li>通过容器app访问游戏中心和应用内购买</li>
+<li>如果你的键盘支持移动设备管理（MDM），可以与被管理的app无缝合作</li>
+</ul>
+<p>当考虑是否将这些关键字设置为YES之前，一定要先阅读<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ExtensibilityPG/CustomKeyboard.html#//apple_ref/doc/uid/TP40014214-CH16-SW3" target="_blank" rel="noopener">《用户信任设计》</a>，这里描述了如何尊重和保护用户数据。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/06/2017/0306InputMethodKit/" rel="next" title="macOS下的Input Method Kit（译）">
+                <i class="fa fa-chevron-left"></i> macOS下的Input Method Kit（译）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/11/2017/0311iOSCKImeSample/" rel="prev" title="iOS下开发Custom Keyboard">
+                iOS下开发Custom Keyboard <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/03/07/2017/0307CustomKeyboard/" data-title="iOS下的自定义键盘（译）" data-url="http://palanceli.github.io/2017/03/07/2017/0307CustomKeyboard/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#理解用户对键盘的预期"><span class="nav-number">1.</span> <span class="nav-text">理解用户对键盘的预期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS用户预期的键盘功能"><span class="nav-number">1.1.</span> <span class="nav-text">iOS用户预期的键盘功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统键盘中的哪些功能不适用于自定义键盘"><span class="nav-number">1.2.</span> <span class="nav-text">系统键盘中的哪些功能不适用于自定义键盘</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自定义键盘API"><span class="nav-number">2.</span> <span class="nav-text">自定义键盘API</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自定义键盘的开发关键"><span class="nav-number">3.</span> <span class="nav-text">自定义键盘的开发关键</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为用户信任所做的设计"><span class="nav-number">3.1.</span> <span class="nav-text">为用户信任所做的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提供切换到其他键盘的方法"><span class="nav-number">3.2.</span> <span class="nav-text">提供切换到其他键盘的方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开始自定义键盘的开发"><span class="nav-number">4.</span> <span class="nav-text">开始自定义键盘的开发</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Xcode自定义键盘模板"><span class="nav-number">4.1.</span> <span class="nav-text">使用Xcode自定义键盘模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为自定义键盘配置Info-plist文件"><span class="nav-number">4.2.</span> <span class="nav-text">为自定义键盘配置Info.plist文件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

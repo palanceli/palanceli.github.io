@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文基于《在Android下创建输入法（译）》演示创建Android系统下的输入法。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="创建Android下的输入法(一)——创建步骤">
+<meta property="og:url" content="http://palanceli.github.io/2017/03/27/2017/0327AndroidIMESample1/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本文基于《在Android下创建输入法（译）》演示创建Android系统下的输入法。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.814Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="创建Android下的输入法(一)——创建步骤">
+<meta name="twitter:description" content="本文基于《在Android下创建输入法（译）》演示创建Android系统下的输入法。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/03/27/2017/0327AndroidIMESample1/">
+
+
+
+
+
+  <title>创建Android下的输入法(一)——创建步骤 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/03/27/2017/0327AndroidIMESample1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">创建Android下的输入法(一)——创建步骤</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-27T23:00:00+08:00">
+                2017-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/27/2017/0327AndroidIMESample1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/27/2017/0327AndroidIMESample1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文基于<a href="http://palanceli.com/2017/02/07/2017/0207CreatingAnInputMethod/" target="_blank" rel="noopener">《在Android下创建输入法（译）》</a>演示创建Android系统下的输入法。<a id="more"></a></p>
+<h1 id="创建工程"><a href="#创建工程" class="headerlink" title="创建工程"></a>创建工程</h1><p>打开AndroidStudio，选择<code>Start a new Android Studio project</code>，填写<br><code>Application name</code>：<strong>AndroidIMESample</strong><br><code>Company Domain</code>：<strong>ime.palanceli.com</strong><br>点击 Next &gt; Next &gt; 选择<code>Add No Activity</code> &gt; Finish。</p>
+<h1 id="在manifest中添加服务"><a href="#在manifest中添加服务" class="headerlink" title="在manifest中添加服务"></a>在manifest中添加服务</h1><p>在app上右键 &gt; New &gt; Service &gt; Service，填写<br><code>ClassName</code>：<strong>AndroidIMESampleService</strong><br>点击 Finish。<br>编辑<code>AndroidManifest.xml</code>，修改自动生成的<code>service</code>部分：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">"com.palanceli.ime.androidimesample"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:allowBackup</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:icon</span>=<span class="string">"@mipmap/ic_launcher"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:label</span>=<span class="string">"@string/app_name"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:supportsRtl</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:theme</span>=<span class="string">"@style/AppTheme"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">service</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:name</span>=<span class="string">".AndroidIMESampleService"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:label</span>=<span class="string">"AndroidIMESample"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:permission</span>=<span class="string">"android.permission.BIND_INPUT_METHOD"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:enabled</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:exported</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.view.InputMethod"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">"android.view.im"</span> </span></span><br><span class="line"><span class="tag">                <span class="attr">android:resource</span>=<span class="string">"@xml/method"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>其中<code>service</code>的<code>android:label</code>属性定义了输入法的名称，在系统输入法列表中看到的名称就是从此处获取到的。在<code>service</code>的<code>meta-data</code>中引用了元数据<code>@xml/method</code>，接下来添加它。</p>
+<h1 id="添加元数据"><a href="#添加元数据" class="headerlink" title="添加元数据"></a>添加元数据</h1><p>在工程res中创建xml目录，然后在res右键 &gt; New &gt; Android resource file 填写<br><code>File name</code>：<strong>method</strong><br>点击OK。修改其内容如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input-method</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">subtype</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:label</span>=<span class="string">"English (US)"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:imeSubtypeLocale</span>=<span class="string">"en_US"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:imeSubtypeMode</span>=<span class="string">"keyboard"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">input-method</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>关于subtype的属性，可以参见<a href="https://developer.android.com/reference/android/view/inputmethod/InputMethodSubtype.html?hl=zh-cn" target="_blank" rel="noopener">InputMethodSubtype</a>：</p>
+<p><code>label</code>是该subtype的名字<br><code>imeSubtypeLocale</code>是该subtype支持的语言类型<br><code>imeSubtypeMode</code>是它所支持的模式，可以是keyboard或者voice，当输入法被调起是，系统会把用户选择的mode值传给输入法。</p>
+<h1 id="定义键盘布局"><a href="#定义键盘布局" class="headerlink" title="定义键盘布局"></a>定义键盘布局</h1><p>在res上右键 &gt; New &gt; XML &gt; Layout XML File，填写<br><code>Layout File name</code>：<strong>keyboard</strong><br>点击Finish。修改其内容为：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">android.inputmethodservice.KeyboardView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/keyboard"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_alignParentBottom</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:keyPreviewLayout</span> =<span class="string">"@layout/preview"</span></span></span><br><span class="line"><span class="tag">    /&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>继续在res/layout/中添加Layout XML File，填写<br><code>Layout File name</code>：<strong>preview</strong>，其内容为：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">TextView</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:gravity</span>=<span class="string">"center"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:background</span>=<span class="string">"#ffff00"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:textStyle</span>=<span class="string">"bold"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:textSize</span>=<span class="string">"30sp"</span></span></span><br><span class="line"><span class="tag">    &gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">TextView</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>在res/xml/中添加<code>qwerty.xml</code>文件，内容如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Keyboard</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:keyWidth</span>=<span class="string">"10%p"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:horizontalGap</span>=<span class="string">"0px"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:verticalGap</span>=<span class="string">"0px"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:keyHeight</span>=<span class="string">"60dp"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Row</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"113"</span> <span class="attr">android:keyLabel</span>=<span class="string">"q"</span> <span class="attr">android:keyEdgeFlags</span>=<span class="string">"left"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"119"</span> <span class="attr">android:keyLabel</span>=<span class="string">"w"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"101"</span> <span class="attr">android:keyLabel</span>=<span class="string">"e"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"114"</span> <span class="attr">android:keyLabel</span>=<span class="string">"r"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"116"</span> <span class="attr">android:keyLabel</span>=<span class="string">"t"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"121"</span> <span class="attr">android:keyLabel</span>=<span class="string">"y"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"117"</span> <span class="attr">android:keyLabel</span>=<span class="string">"u"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"105"</span> <span class="attr">android:keyLabel</span>=<span class="string">"i"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"111"</span> <span class="attr">android:keyLabel</span>=<span class="string">"o"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"112"</span> <span class="attr">android:keyLabel</span>=<span class="string">"p"</span> <span class="attr">android:keyEdgeFlags</span>=<span class="string">"right"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Row</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Row</span> <span class="attr">android:layout_centerHorizontal</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"97"</span> <span class="attr">android:keyLabel</span>=<span class="string">"a"</span> <span class="attr">android:horizontalGap</span>=<span class="string">"5%p"</span> <span class="attr">android:keyEdgeFlags</span>=<span class="string">"left"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"115"</span> <span class="attr">android:keyLabel</span>=<span class="string">"s"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"100"</span> <span class="attr">android:keyLabel</span>=<span class="string">"d"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"102"</span> <span class="attr">android:keyLabel</span>=<span class="string">"f"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"103"</span> <span class="attr">android:keyLabel</span>=<span class="string">"g"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"104"</span> <span class="attr">android:keyLabel</span>=<span class="string">"h"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"106"</span> <span class="attr">android:keyLabel</span>=<span class="string">"j"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"107"</span> <span class="attr">android:keyLabel</span>=<span class="string">"k"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"108"</span> <span class="attr">android:keyLabel</span>=<span class="string">"l"</span> <span class="attr">android:keyEdgeFlags</span>=<span class="string">"right"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Row</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Row</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"39"</span> <span class="attr">android:keyLabel</span>=<span class="string">"'"</span> <span class="attr">android:keyEdgeFlags</span>=<span class="string">"left"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"122"</span> <span class="attr">android:keyLabel</span>=<span class="string">"z"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"120"</span> <span class="attr">android:keyLabel</span>=<span class="string">"x"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"99"</span> <span class="attr">android:keyLabel</span>=<span class="string">"c"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"118"</span> <span class="attr">android:keyLabel</span>=<span class="string">"v"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"98"</span> <span class="attr">android:keyLabel</span>=<span class="string">"b"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"110"</span> <span class="attr">android:keyLabel</span>=<span class="string">"n"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"109"</span> <span class="attr">android:keyLabel</span>=<span class="string">"m"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"44"</span> <span class="attr">android:keyLabel</span>=<span class="string">","</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"46"</span> <span class="attr">android:keyLabel</span>=<span class="string">"."</span> <span class="attr">android:keyEdgeFlags</span>=<span class="string">"right"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Row</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Row</span> <span class="attr">android:rowEdgeFlags</span>=<span class="string">"bottom"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"63"</span> <span class="attr">android:keyLabel</span>=<span class="string">"\?"</span> <span class="attr">android:keyWidth</span>=<span class="string">"10%p"</span>  <span class="attr">android:keyEdgeFlags</span>=<span class="string">"left"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"47"</span> <span class="attr">android:keyLabel</span>=<span class="string">"/"</span> <span class="attr">android:keyWidth</span>=<span class="string">"10%p"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"32"</span> <span class="attr">android:keyLabel</span>=<span class="string">" "</span> <span class="attr">android:keyWidth</span>=<span class="string">"40%p"</span> <span class="attr">android:isRepeatable</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"-5"</span> <span class="attr">android:keyLabel</span>=<span class="string">"DEL"</span> <span class="attr">android:keyWidth</span>=<span class="string">"20%p"</span> <span class="attr">android:isRepeatable</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">Key</span> <span class="attr">android:codes</span>=<span class="string">"-4"</span> <span class="attr">android:keyLabel</span>=<span class="string">"DONE"</span> <span class="attr">android:keyWidth</span>=<span class="string">"20%p"</span> <span class="attr">android:keyEdgeFlags</span>=<span class="string">"right"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Row</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Keyboard</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>在<code>AndroidIMESampleService::onCreateInputView()</code>函数中将根据<code>res/layout/keyboard.xml</code>来创建键盘视图，再根据<code>res/xml/qwerty.xml</code>将键盘布局创建在该视图上。<br>在<a href="https://developer.android.com/reference/android/inputmethodservice/Keyboard.html" target="_blank" rel="noopener">android.inputmethodservice.Keyboard</a>中有对键盘xml格式的详细说明</p>
+<h1 id="显示输入窗口"><a href="#显示输入窗口" class="headerlink" title="显示输入窗口"></a>显示输入窗口</h1><p>编辑文件app/java/com.palanceli.ime.androidimesample/AndroidIMESampleService.java：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.palanceli.ime.androidimesample;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.inputmethodservice.InputMethodService;</span><br><span class="line"><span class="keyword">import</span> android.inputmethodservice.Keyboard;</span><br><span class="line"><span class="keyword">import</span> android.inputmethodservice.KeyboardView;</span><br><span class="line"><span class="keyword">import</span> android.media.AudioManager;</span><br><span class="line"><span class="keyword">import</span> android.view.KeyEvent;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> android.view.inputmethod.InputConnection;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AndroidIMESampleService</span> <span class="keyword">extends</span> <span class="title">InputMethodService</span></span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">KeyboardView</span>.<span class="title">OnKeyboardActionListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> KeyboardView mKeyboardView; <span class="comment">// 对应keyboard.xml中定义的KeyboardView</span></span><br><span class="line">    <span class="keyword">private</span> Keyboard mKeyboard;         <span class="comment">// 对应qwerty.xml中定义的Keyboard</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateInputView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// res/layout/keyboard.xml</span></span><br><span class="line">        mKeyboardView = (KeyboardView)getLayoutInflater().inflate(R.layout.keyboard, <span class="keyword">null</span>);</span><br><span class="line">        mKeyboard = <span class="keyword">new</span> Keyboard(<span class="keyword">this</span>, R.xml.qwerty);  <span class="comment">// res/xml/qwerty.xml</span></span><br><span class="line">        mKeyboardView.setKeyboard(mKeyboard);</span><br><span class="line">        <span class="comment">// 将自己设为mKeyboardView的listener,以便接收和处理键盘消息</span></span><br><span class="line">        mKeyboardView.setOnKeyboardActionListener(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">return</span> mKeyboardView;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onKey</span><span class="params">(<span class="keyword">int</span> primaryCode, <span class="keyword">int</span>[] keyCodes)</span> </span>&#123;</span><br><span class="line">        InputConnection ic = getCurrentInputConnection();</span><br><span class="line">        <span class="keyword">switch</span>(primaryCode)&#123;</span><br><span class="line">            <span class="keyword">case</span> Keyboard.KEYCODE_DELETE :</span><br><span class="line">                ic.deleteSurroundingText(<span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Keyboard.KEYCODE_DONE:</span><br><span class="line">                ic.sendKeyEvent(<span class="keyword">new</span> KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">char</span> code = (<span class="keyword">char</span>)primaryCode;</span><br><span class="line">                ic.commitText(String.valueOf(code), <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPress</span><span class="params">(<span class="keyword">int</span> primaryCode)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRelease</span><span class="params">(<span class="keyword">int</span> primaryCode)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onText</span><span class="params">(CharSequence text)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">swipeDown</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">swipeLeft</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">swipeRight</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">swipeUp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在函数<code>AndroidIMESample::onCreateInputView()</code>中，它将自己设为键盘视图的listener，因此<code>AndroidIMESample</code>必须实现<a href="https://developer.android.com/reference/android/inputmethodservice/KeyboardView.OnKeyboardActionListener.html" target="_blank" rel="noopener">KeyboardView.OnKeyboardActionListener</a>定义的几个接口方法：</p>
+<ul>
+<li><code>onKey(int primaryCode, int[] keyCodes)</code> 向listener发送key press事件</li>
+<li><code>onPress(int primaryCode)</code> 响应用户按下按键的动作</li>
+<li><code>onRelease(int primaryCode)</code> 响应用户松开按键的动作</li>
+<li><code>onText(CharSequence text)</code>   向listener发送一个字符序列</li>
+<li><code>swipeDown()</code>    响应用户从上到下快速扫过的动作</li>
+<li><code>swipeLeft()</code> 响应用户从右到左快速扫过的动作</li>
+<li><code>swipeRight()</code> 响应用户从左到右快速扫过的动作</li>
+<li><code>swipeUp()</code> 响应用户从下到上快速扫过的动作</li>
+</ul>
+<h1 id="构建apk并安装"><a href="#构建apk并安装" class="headerlink" title="构建apk并安装"></a>构建apk并安装</h1><p>点击Android Studio 菜单 Build &gt; Build APK，构建完成后会弹出结果，在Finder中可以查看此APK。<br>在模拟器中安装该输入法：打开模拟器，将APK直接拖入模拟器完成安装。<br>在模拟器中点击：设置 &gt; 语言和输入法 &gt; 当前输入法 &gt; 选择键盘，即可看到AndroidIMESample，将之开启。<br>再重新进入：设置 &gt; 语言和输入法 &gt; 当前输入法，即可选择AndroidIMESample。<br>随便进入一个可编辑区域，即可看到弹出的键盘。</p>
+<p>本文的源码可参见<a href="https://github.com/palanceli/AndroidIMESample/tree/v1.0" target="_blank" rel="noopener">AndroidIMESample v1.0</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/23/2017/0323macOSIMKSample2/" rel="next" title="macOS下基于IMK的输入法（二）——处理流程">
+                <i class="fa fa-chevron-left"></i> macOS下基于IMK的输入法（二）——处理流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/27/2017/0327macOSIMKSample3/" rel="prev" title="macOS下基于IMK的输入法（三）——绘制候选窗口">
+                macOS下基于IMK的输入法（三）——绘制候选窗口 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/03/27/2017/0327AndroidIMESample1/" data-title="创建Android下的输入法(一)——创建步骤" data-url="http://palanceli.github.io/2017/03/27/2017/0327AndroidIMESample1/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建工程"><span class="nav-number">1.</span> <span class="nav-text">创建工程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在manifest中添加服务"><span class="nav-number">2.</span> <span class="nav-text">在manifest中添加服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加元数据"><span class="nav-number">3.</span> <span class="nav-text">添加元数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#定义键盘布局"><span class="nav-number">4.</span> <span class="nav-text">定义键盘布局</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#显示输入窗口"><span class="nav-number">5.</span> <span class="nav-text">显示输入窗口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构建apk并安装"><span class="nav-number">6.</span> <span class="nav-text">构建apk并安装</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

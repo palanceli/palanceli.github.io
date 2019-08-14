@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章实现该界面的创建和按钮的消息响应，点击TRUE或FALSE按钮，弹出Toast提示。本章要点：  ConstraintLayout布局 为控件创建变量并关联响应函数 匿名内部类 Toast控制">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记一">
+<meta property="og:url" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章实现该界面的创建和按钮的消息响应，点击TRUE或FALSE按钮，弹出Toast提示。本章要点：  ConstraintLayout布局 为控件创建变量并关联响应函数 匿名内部类 Toast控制">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/img05.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.050Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记一">
+<meta name="twitter:description" content="本章实现该界面的创建和按钮的消息响应，点击TRUE或FALSE按钮，弹出Toast提示。本章要点：  ConstraintLayout布局 为控件创建变量并关联响应函数 匿名内部类 Toast控制">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记一 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记一</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-10T20:00:00+08:00">
+                2017-09-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/10/2017/0909AndroidProgrammingBNRG01/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/10/2017/0909AndroidProgrammingBNRG01/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/2017/09/10/2017/0909AndroidProgrammingBNRG01/img01.png" alt="base ui"><br>本章实现该界面的创建和按钮的消息响应，点击TRUE或FALSE按钮，弹出Toast提示。<br>本章要点：</p>
+<ul>
+<li>ConstraintLayout布局</li>
+<li>为控件创建变量并关联响应函数</li>
+<li>匿名内部类</li>
+<li>Toast控制<a id="more"></a>
+</li>
+</ul>
+<h1 id="ConstraintLayout布局"><a href="#ConstraintLayout布局" class="headerlink" title="ConstraintLayout布局"></a>ConstraintLayout布局</h1><p>本章从一个非常简单的界面开始，主界面由三个元素组成：第一行居中的“Hello World” TextView，第二行并排放置的“TRUE”和“FALSE”两个按钮，点击按钮后弹出Toast，分别提示“Correct!”和“InCorrect!”。如下图：<br><img src="/2017/09/10/2017/0909AndroidProgrammingBNRG01/img05.png" alt="base ui"><br>首先要做的是布局，书中介绍的根布局还是RelativeLayout，我使用的Android Studio版本是2.3.3，它默认生成的根布局改成了ConstraintLayout。</p>
+<p>ConstraintLayout是Google I/O 2016推出，将成为主流布局样式，完全替代其他布局。优点是减少布局层级，优化渲染性能。它和iOS的布局方式很像了。</p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>基本格式为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">layout_constraint[本源位置]_[目标位置]=&quot;[目标ID]&quot;</span><br></pre></td></tr></table></figure></p>
+<p>例如：<code>app:layout_constraintTop_toBottomOf=&quot;@+id/textView&quot;</code>表示将自己的顶部对齐到textView的底部。</p>
+<h2 id="引导线"><a href="#引导线" class="headerlink" title="引导线"></a>引导线</h2><p>可以通过引入引导线，类似一条辅助线，让其他元素与该引导线对齐来完成布局。例如：距离左边缘10dp拉一条竖直的引导线，让textView与该引导线对齐：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">    <span class="tag">&lt;<span class="name">android.support.constraint.Guideline</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/guideLine"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:orientation</span>=<span class="string">"vertical"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintGuide_begin</span>=<span class="string">"10dp"</span>/&gt;</span> <span class="comment">&lt;!-- 添加引导线 --&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/textView"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">"Hello World."</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">"parent"</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintStart_toStartOf</span>=<span class="string">"@+id/guideLine"</span> /&gt;</span> <span class="comment">&lt;!-- 对齐引导线 --&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>运行，得到界面如下：<br><img src="/2017/09/10/2017/0909AndroidProgrammingBNRG01/img02.png" alt></p>
+<h2 id="比例"><a href="#比例" class="headerlink" title="比例"></a>比例</h2><p>还可以按照比例关系，摆放控件的位置。例如让textView在竖直方向上，放在父窗口的1/4处：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/textView"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:text</span>=<span class="string">"Hello World."</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintStart_toStartOf</span>=<span class="string">"@+id/guideLine"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">app:layout_constraintVertical_bias</span>=<span class="string">"0.25"</span>/&gt;</span> <span class="comment">&lt;!-- 增加比例约束 --&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>注意还是要指定textView的上下边缘对齐到父窗口的上下边缘，只是多了一条比例约束。运行，得到界面如下：<br><img src="/2017/09/10/2017/0909AndroidProgrammingBNRG01/img03.png" alt></p>
+<h2 id="链条样式（Chain-Style）"><a href="#链条样式（Chain-Style）" class="headerlink" title="链条样式（Chain Style）"></a>链条样式（Chain Style）</h2><p>如果在一条线上有多个元素需要平均排布，过去可以嵌套一个LinearLayout，现在既然要全面使用ConstraintLayout，可以使用它的链条样式。<br>给链上的第一个元素设置属性<code>layout_constraintHorizontal_chainStyle</code> 或<code>layout_constraintVertical_chainStyle</code>，其后的元素通过添加上/下或左/右边缘约束加入这条链。对于空出的空间如何分配，取决于链条样式的具体值，各值的含义如下：<br><img src="/2017/09/10/2017/0909AndroidProgrammingBNRG01/img04.png" alt><br>本章中的布局，原书是通过LinearLayout来实现的，我改成ConstraintLayout后如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">android.support.constraint.ConstraintLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:app</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:tools</span>=<span class="string">"http://schemas.android.com/tools"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">tools:context</span>=<span class="string">"com.palanceli.ime.bnrg01.QuizActivity"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/textView"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">"Hello World."</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintStart_toStartOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintEnd_toEndOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintVertical_bias</span>=<span class="string">"0.25"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">&lt;!-- 设置链头，并与其后的Button手拉手 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/true_button"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span> = <span class="string">"@string/true_button"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintTop_toBottomOf</span>=<span class="string">"@id/textView"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintHorizontal_chainStyle</span>=<span class="string">"packed"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintLeft_toLeftOf</span>=<span class="string">"parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintRight_toLeftOf</span>=<span class="string">"@+id/false_button"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/false_button"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span> = <span class="string">"@string/false_button"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintTop_toBottomOf</span>=<span class="string">"@id/textView"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintLeft_toRightOf</span>=<span class="string">"@id/true_button"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintRight_toRightOf</span>=<span class="string">"parent"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">android.support.constraint.ConstraintLayout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>运行后界面如下：<br><img src="/2017/09/10/2017/0909AndroidProgrammingBNRG01/img05.png" alt></p>
+<h2 id="Layout根元素的要求"><a href="#Layout根元素的要求" class="headerlink" title="Layout根元素的要求"></a>Layout根元素的要求</h2><p>和LinearLayout一样，作为布局xml文件中的布局根元素，ConstraintLayout必须指定Android资源xml的namespace为<code>http://schemas.android.com/</code>。</p>
+<h2 id="id还是-id？"><a href="#id还是-id？" class="headerlink" title="@id还是@+id？"></a>@id还是@+id？</h2><p>上面的xml文件中有时候是<code>@+id/true_button</code>，有时候是<code>@id/true_button</code>，它们之间什么区别呢？</p>
+<p>Android中的组件需要用一个int类型的值来表示，这个值就是id属性值。id属性只能接受资源类型的值，因此必须以@开头的值。</p>
+<p>如果在@后面使用“+”，表示在访问该id后需要为之在R.java文件中生成相应的int类型变量。变量名就是“/”后面的值，例如，<code>@+id/true_button</code>会在R.java文件中生成<code>int true_button = value</code>，其中value是一个十六进制的数。如果在R.java中已经存在同名的变量，就不再重新生成。</p>
+<p>如果R.java中已存在<code>true_button</code>变量，则再访问该变量的时候可以不带<code>+</code>，使用<code>@id/true_button</code>即可。</p>
+<p>上文中，在<code>true_button</code>中对齐<code>false_button</code>的时候，由于<code>false_button</code>变量还未生成，所以必须带加号。之后在定义<code>false_button</code>的时候，该变量已经存在了，所以可以把加号去掉。</p>
+<h1 id="setContentView-…-函数都做了什么？"><a href="#setContentView-…-函数都做了什么？" class="headerlink" title="setContentView(…)函数都做了什么？"></a>setContentView(…)函数都做了什么？</h1><p>在<code>QuizActivity.java</code>中的<code>onCreate(...)</code>函数中，除了调用父类的同名函数外，还调用了<code>setContentView(...)</code>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_quiz);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该函数的作用是根据xml实例化每一个控件，按照布局摆放这些控件，并显示到屏幕上。实例化过程是通过<code>LayoutInflater</code>类来实现的。</p>
+<p>在编译Android应用的时候，aapt（Android Asset Packaging Tool）会把所有资源编译成一个压缩文件，打到apk包里，以便在运行时被<code>setContentView(...)</code>访问。</p>
+<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><p>在xml中可以看到元素的宽高值被设为<code>match_parent</code>或<code>wrap_content</code>，他们的含义分别是：<br><code>match_parent</code>：与父窗口等大<br><code>wrap_content</code>：与内容等大</p>
+<p>尽管ConstraintLayout是xml的根布局元素，但它仍然有父窗口——app的最顶层view，因此ConstraintLayout的宽高均为<code>match_parent</code>。</p>
+<h1 id="如何关联xml中的控件到java变量？"><a href="#如何关联xml中的控件到java变量？" class="headerlink" title="如何关联xml中的控件到java变量？"></a>如何关联xml中的控件到java变量？</h1><p>通过Activity的成员函数<code>public View findViewById(int id)</code>可以访问xml中的控件，因此根据id可以很方便地提领到按钮：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Button mTrueButton;</span><br><span class="line">    <span class="keyword">private</span> Button mFalseButton;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_quiz);</span><br><span class="line">        mTrueButton = (Button)findViewById(R.id.true_button);</span><br><span class="line">        mFalseButton = (Button)findViewById(R.id.false_button);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="如何响应按钮消息？"><a href="#如何响应按钮消息？" class="headerlink" title="如何响应按钮消息？"></a>如何响应按钮消息？</h1><p>给按钮变量设置Listener对象，在该对象中可以实现响应处理。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Button mTrueButton;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_quiz);</span><br><span class="line">        mTrueButton = (Button)findViewById(R.id.true_button);</span><br><span class="line">        ...</span><br><span class="line">        mTrueButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">                <span class="comment">// true_button按钮的响应代码</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>mTrueButton.setOnClickListener(…)的参数是一个匿名内部类的实例。</p>
+<p>这和iOS的处理方式就有很大差异，iOS通过委托代理，把处理函数放到按钮所在的View或ViewController中实现，而Android则是在按钮内部来实现（尽管不是在按钮类中实现，通过设置Listener，终究是要关联到这个按钮类上的）。这就不可避免地要生成很多零碎的按钮类，也会让上下层的业务逻辑和机制混在一起。Java有自己的方式来解决这个问题，那就是匿名内部类。</p>
+<h1 id="内部匿名类（anonymous-inner-class）"><a href="#内部匿名类（anonymous-inner-class）" class="headerlink" title="内部匿名类（anonymous inner class）"></a>内部匿名类（anonymous inner class）</h1><p>这里内部匿名类的使用，最大的好处就是把与mTrueButton关联的业务层逻辑代码放到了业务层（即QuizActivity），而不是mTrueButton的机制层。体现了依赖倒置原则。</p>
+<h1 id="Toast"><a href="#Toast" class="headerlink" title="Toast"></a>Toast</h1><p>Toast是一个提示气泡，可以在指定的时间消失。</p>
+<h2 id="怎么显示Toast"><a href="#怎么显示Toast" class="headerlink" title="怎么显示Toast"></a>怎么显示Toast</h2><ol>
+<li>调用<code>Toast</code>的静态函数<code>Toast Toast::makeText(Constext context, int resId, int duration)</code>来生成气泡。<br>其中参数<code>context</code>是<code>Activity</code>实例，<code>resId</code>是气泡中的文字，<code>duration</code>是显示多久后消失。</li>
+<li>调用<code>Toast::show()</code>显示气泡：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Button mTrueButton;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_quiz);</span><br><span class="line">        mTrueButton = (Button)findViewById(R.id.true_button);</span><br><span class="line">        ...</span><br><span class="line">        mTrueButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener()&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span></span>&#123;</span><br><span class="line">                Toast.makeText(QuizActivity.<span class="keyword">this</span>, R.string.correct_toast, Toast.LENGTH_SHORT).show();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>需要注意：<code>makeText</code>的第一个参数不能直接使用<code>this</code>，因为此时在一个内部匿名类里，这个<code>this</code>表示该匿名类，需要指定<code>QuizActivity.this</code>表明是Activity的this指针。</p>
+<font color="red">不过这个语法怎么理解呢？"QuizActivity."表示class的属性，它为什么有this呢？</font>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/09/2017/0909AndrewNGMachineLearning04/" rel="next" title="Andrew NG Machine Learning视频学习笔记四">
+                <i class="fa fa-chevron-left"></i> Andrew NG Machine Learning视频学习笔记四
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/29/2017/0929numpy/" rel="prev" title="numpy使用">
+                numpy使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/09/10/2017/0909AndroidProgrammingBNRG01/" data-title="《Android Programming BNRG》笔记一" data-url="http://palanceli.github.io/2017/09/10/2017/0909AndroidProgrammingBNRG01/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ConstraintLayout布局"><span class="nav-number">1.</span> <span class="nav-text">ConstraintLayout布局</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本使用"><span class="nav-number">1.1.</span> <span class="nav-text">基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引导线"><span class="nav-number">1.2.</span> <span class="nav-text">引导线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#比例"><span class="nav-number">1.3.</span> <span class="nav-text">比例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#链条样式（Chain-Style）"><span class="nav-number">1.4.</span> <span class="nav-text">链条样式（Chain Style）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Layout根元素的要求"><span class="nav-number">1.5.</span> <span class="nav-text">Layout根元素的要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#id还是-id？"><span class="nav-number">1.6.</span> <span class="nav-text">@id还是@+id？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#setContentView-…-函数都做了什么？"><span class="nav-number">2.</span> <span class="nav-text">setContentView(…)函数都做了什么？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其它"><span class="nav-number">3.</span> <span class="nav-text">其它</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何关联xml中的控件到java变量？"><span class="nav-number">4.</span> <span class="nav-text">如何关联xml中的控件到java变量？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何响应按钮消息？"><span class="nav-number">5.</span> <span class="nav-text">如何响应按钮消息？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内部匿名类（anonymous-inner-class）"><span class="nav-number">6.</span> <span class="nav-text">内部匿名类（anonymous inner class）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Toast"><span class="nav-number">7.</span> <span class="nav-text">Toast</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么显示Toast"><span class="nav-number">7.1.</span> <span class="nav-text">怎么显示Toast</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

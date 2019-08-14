@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《序列模型》第一周《循环序列模型》。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（十三）">
+<meta property="og:url" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《序列模型》第一周《循环序列模型》。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img11.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img12.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img13.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img14.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img15.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img16.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img17.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img18.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img19.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img20.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img21.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img22.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.293Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（十三）">
+<meta name="twitter:description" content="《序列模型》第一周《循环序列模型》。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（十三） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（十三）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T13:00:00+08:00">
+                2018-04-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/18/2018/0418DeepLearningAI15/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/18/2018/0418DeepLearningAI15/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《序列模型》第一周《循环序列模型》。  </p>
+<a id="more"></a>
+<h1 id="1-1-为什么选择序列模型？"><a href="#1-1-为什么选择序列模型？" class="headerlink" title="1.1 为什么选择序列模型？"></a>1.1 为什么选择序列模型？</h1><p>本节简述了序列模型适用的范围：从一个序列到另一个序列的转换，比如语音识别、翻译；仅输入端或输出端是一个序列，比如从一段评价文字中判断评价的等级<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img01.png" alt></p>
+<h1 id="1-2-数学符号"><a href="#1-2-数学符号" class="headerlink" title="1.2 数学符号"></a>1.2 数学符号</h1><p>以查找一段文本中的人名为例，在运算之前，将输入按照单词划分成单元，每个单元记作$x^{<t>}$<br>标注是在输入的基础上完成的，将人名单元标注为1，否则标注为0，每个标注单元记作$y^{<t>}$<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img02.png" alt><br>计算机在存储$x^{<t>}$ 时也不再保存具体的单词，而是先建立词典——对每个单词编号，再以one−hot的方式记录$x^{<t>}$在词典中的编号：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img03.png" alt></t></t></t></t></p>
+<h1 id="1-3-循环神经网络模型"><a href="#1-3-循环神经网络模型" class="headerlink" title="1.3 循环神经网络模型"></a>1.3 循环神经网络模型</h1><p>还以给一个句子标注人名为例，如果使用常规的神经网络，结构如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img04.png" alt><br>它有两个问题：</p>
+<ol>
+<li>神经网络的输入层节点个数是固定的，而每个句子的长度却是变化的，显然固定的NN网络无法适用于变化的句子。</li>
+<li>词和位置特征绑死在一起了，从一个位置学到的特征无法复用到另一个位置上，这和常规NN解决图像遇到的问题是类似的，图像识别卷积解决了该问题。</li>
+</ol>
+<p>因此引入循环神经网络，模型如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img05.png" alt><br>先看纵向，每一列是一个神经网络，输入一个单词，输出是否为人名；再看横向，又是一个神经网络，考虑了单词的先后顺序。纵向NN训练出一套参数，横向NN训练出另一套参数，这些参数不依赖纵向NN的个数，即不依赖一个句子的单词个数。<br>我不太确定对于模型解决第二个问题的理解是否正确：它通过一套参数训练单词在不同位置上的特征，而不像常规NN在不同位置对应不同的w参数。从而解决了复用的问题。但我总觉得有点不对劲，循环神经网络的模型看起来一样有和序列绑死的问题呀，也就是说Waa会记忆序列信息。</p>
+<p>正向传播算法如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img06.png" alt><br>可以做一个简化，将Waa和Wax横向排列称为Wa，将$a^{<t−1>}$ 和$x^{<t>}$ 纵向排列称为$[a^{<t−1>},  x^{<t>}]$<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img07.png" alt></t></t−1></t></t−1></p>
+<h1 id="1-4-通过时间的反向传播"><a href="#1-4-通过时间的反向传播" class="headerlink" title="1.4 通过时间的反向传播"></a>1.4 通过时间的反向传播</h1><p>反向传播算法是基于正向传播和损失函数的，先来看损失函数。每一个节点的损失函数和常规NN定义是一样的，其中$y^{<t>}$  是标注值，用0/1表示该词是否为人名，$ŷ^{<t>}$是计算所得该词是否为人名的概率。总的损失函数是将这些分量相加：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img08.png" alt><br>有了损失函数就可以逆向计算各个环节的偏导数，最终的目的是为了求Wa、ba、Wy、by的偏导，从而再执行梯度下降更新得到下一轮迭代的值。</t></t></p>
+<h1 id="1-5-不同类型的循环神经网络"><a href="#1-5-不同类型的循环神经网络" class="headerlink" title="1.5 不同类型的循环神经网络"></a>1.5 不同类型的循环神经网络</h1><p>本周课程开始提到过，大部分循环神经网络要解决的问题都不是输入输出个数相等且一一对应的，比如翻译、语义分析等，本节主要介绍循环神经网络的几个变型。<br>首先是多对一——多个输入，一个输出。根据一段评论的文字，分析它对应的评分就属于类应用。他的RNN结构如下，仅在最后一个单元有输出：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img09.png" alt><br>下面是一个一对多的RNN，输入可能只有一个元素，或者没有，输出是一段乐谱。和常规RNN稍有不同在于它每个单元的输出都作为下一个单元的输入：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img10.png" alt><br>下面是多对多的RNN模型，翻译是这类的典型应用，他的输入和输出的节点个数没有关系。输入部分作为编码器是一个RNN网络，输出部分作为解码器是另一个RNN网络：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img11.png" alt></p>
+<h1 id="1-6-语言模型和序列生成"><a href="#1-6-语言模型和序列生成" class="headerlink" title="1.6 语言模型和序列生成"></a>1.6 语言模型和序列生成</h1><p>语音识别系统通常要配合语言模型才能输出比较靠谱的候选，前者根据输入语音生成与之匹配的单词序列，后者为每一个序列计算概率从而选择最可能的句子。RNN就可以用来生成语言模型。语言模型的输出就是一个单词序列出现的概率：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img12.png" alt><br>为语言模型生成RNN的步骤如下：<br>1、将语料库中每一个句子的每个单词转成one-hot矩阵，并加入结尾标记，对于字典中没有的单词，给他一个特殊标记<unk>：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img13.png" alt><br>2、对语料库中每个样本训练如下网络：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img14.png" alt><br>该网络每个单元的输入是当前第i个单词，输出则是在前面输入序列的情况下，各个单词出现的概率。比如y^1 表示没有任何输入时，P(a)、P(anron)、……、P(\<unk\>)、P(\<eos\>)的概率，这是一个向量；y^2表示当输入Cats时，P(a)、P(anron)、……、P(\<unk\>)、P(\<eos\>)的概率，即P(a|Cats)、P(anron|Cats)、……、P(\<unk\>|Cats)、P(\<eos\>|Cats)的概率。以此类推。</eos\></unk\></eos\></unk\></eos\></unk\></unk></p>
+<p>定义每个单元的损失函数，将它们加和即为总算是函数。</p>
+<h1 id="1-7-对新序列采样"><a href="#1-7-对新序列采样" class="headerlink" title="1.7 对新序列采样"></a>1.7 对新序列采样</h1><p>本节介绍如何看一个训练完成的RNN都学到了什么，本节的方法似乎只能用来做写作机器人，除此之外我想不到还能用来做什么，不清楚这个采样还有哪些用途。</p>
+<p>方法很简单，就是在什么也不输入的情况下看，在RNN第一单元的输出中随机选择一个单词，作为下一单元的输入，再在下一单元的输出中随机选择一个单词，持续操作直至结束。</p>
+<p>网络结构很简单，当然每个单元的输出可以是单词，也可以是字母，这取决于在训练的时候的输入输出粒度。本节貌似只讲了以单词为字典的RNN的优点：天然保证了不会输出一个无意义的单词；更容易捕捉单词与单词之间的上下文关系；计算成本比较低。<strong>我的直观感受，以字母为字典的RNN似乎在自然语言处理中不是个好的做法，毕竟语言是基于单词而不是字母的。</strong><br><img src="/2018/04/18/2018/0418DeepLearningAI15/img15.png" alt></p>
+<h1 id="1-8-带有神经网络的梯度消失"><a href="#1-8-带有神经网络的梯度消失" class="headerlink" title="1.8 带有神经网络的梯度消失"></a>1.8 带有神经网络的梯度消失</h1><p>本节介绍了常规RNN的一个缺陷——梯度消失，以自然语言处理为例，当网络层次较深时它，网络很难学到距离比较远的两个节点之间的关系，比如一个长句主语是单数或复数，会影响到谓语was或were的形式，当网络较深时，很难学到这种关系。<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img16.png" alt><br>本节仅介绍了梯度消失的情况，具体怎么解决需要继续往下学习。</p>
+<h1 id="1-9-GRU（Gated-Recurrent-Unit）门控单元"><a href="#1-9-GRU（Gated-Recurrent-Unit）门控单元" class="headerlink" title="1.9 GRU（Gated Recurrent Unit）门控单元"></a>1.9 GRU（Gated Recurrent Unit）门控单元</h1><p>本节是我学过的最难理解的一节课。先简单地描述下我的理解：为了解决深层网络会丢失相隔较远单元之间的相关性，本节引入了记忆单元，相当于给每一个单元的输出再增加一个向量，用来记忆它到远端单元的相关性，这个记忆单元本身也是需要学习的，而且它的表示形式非常复杂，这导致了该方法不好理解。<br>本节有两篇相关的论文：<a href="https://arxiv.org/abs/1409.1259" target="_blank" rel="noopener">《On the properties of neural machine translation: Encoder-decoder approaches》</a> 和<a href="https://arxiv.org/abs/1412.3555" target="_blank" rel="noopener">《Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling》</a>。</p>
+<p>接下来我尝试着理解一下这个算法。先看右下角，GRU为每个RNN单元引入一个记忆细胞$c^{<t>}$ 和记忆门$Γ_u$<br>记忆细胞$c^{<t>}$ 用来记录当前单元和前一个单元的相关度，记忆门$Γ_u$ 用来调整相关度的权重。$Γ_u$ 越接近0，表明本层记忆细胞越倾向于直接沿用上一个单元的记忆细胞；越接近1，表明越倾向于使用上一层记忆细胞和本层输入的调和值$\tilde{c}^{<t>}$<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img17.png" alt><br>到这里就已经够复杂了，但这还只是GRU的简化版本，常规版本还要在调和值$\tilde{c}^{<t>}$ 的运算中再加入一个相关系数$Γ_r$<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img18.png" alt><br>惊叹于这么复杂的公式，数学家们是怎么知道为这些矩阵添加什么参数，七搞八搞就搞出一个可以拟合现实的算式！</t></t></t></t></p>
+<h1 id="1-10-长短期记忆（LSTM）"><a href="#1-10-长短期记忆（LSTM）" class="headerlink" title="1.10 长短期记忆（LSTM）"></a>1.10 长短期记忆（LSTM）</h1><p>长短期记忆的论文是<a href="http://www.bioinf.jku.at/publications/older/2604.pdf" target="_blank" rel="noopener">《Long short-term memory》</a> 它是在GRU的基础上演化出来的。理解了GRU之后，向LSTM的演化就不是很难理解了。GRU通过一个门$Γ_u$ 来控制使用前一个记忆单元还是使用调和值，这两个选择是此消彼长的；而LSTM的思路是用两个门分别控制二者的权重，它认为记忆和忘却不是此消彼长的关系，因此它使用记忆门$Γ_u$ 和忘却门$Γ_f$ 分别控制$\tilde{c}^{<t>}$ 和$c^{<t−1>}$ 的权重，最后再用一个输出门$Γ_o$ 控制总权重。<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img19.png" alt><br>逻辑还是挺清晰的，而且从公式上更简洁地反映了这个逻辑，课件配的图示反而有些复杂，这里就不看了。</t−1></t></p>
+<p>GRU和LSTM的思想都是为不同的单元之间牵了一根线，并且通过学习来决定线的长短，这让我想起前面课程里讲的残差网络，我感觉二者有着同样的目的。</p>
+<h1 id="1-11-双向序列神经网络BRNN"><a href="#1-11-双向序列神经网络BRNN" class="headerlink" title="1.11 双向序列神经网络BRNN"></a>1.11 双向序列神经网络BRNN</h1><p>常规RNN有一个缺陷，就是每一个单元的输出仅依赖前一个单元。本节举的例子：<br>He said, “Teddy bears are on sale!”<br>He said, “Teddy Roosevelt was a great President!”<br>这两句话中Teddy是不是一个人名，仅从前面的单词无法判断，还需要看后面的单词是什么。这种情况就需要双向序列神经网络BRNN来解决了。</p>
+<p>BRNN的结构图如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img20.png" alt><br>在每个单元不仅放置了正向激活节点，也放置一个反向激活节点。在执行正向传播算法时，需要沿着正方向计算到末节点，再反方向计算到初节点，得出两个方向的a，再执行反向传播。</p>
+<p>还记得正向的a是由前一个a和x计算出来的：<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img21.png" alt><br>反向的a也需要由前一个a和x计算出来，这就意味着无论是在训练还是在预测时，都要求所有节点都就绪了才能开始运算。因此这种算法无法满足边说边出词的语音输入，必须等一句话说完了才能开始运算。</p>
+<h1 id="1-12-深层循环神经网络"><a href="#1-12-深层循环神经网络" class="headerlink" title="1.12 深层循环神经网络"></a>1.12 深层循环神经网络</h1><p>下面是一个常见的深层RNN结构图，在每个单元分别是一个多层的神经网络，这些层次的横向和纵向连成一张计算网。如果应用在NLP上，其运算负荷可想而知，通常这样的网络在网状的部分最多也就三层，在根深的层次上就不再横向连接了。<br><img src="/2018/04/18/2018/0418DeepLearningAI15/img22.png" alt><br>在每个单元以及横向关系上，他们可以是GRU、LSTM或者BRNN。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/18/2018/0418DeepLearningAI14/" rel="next" title="DeepLearning.ai笔记（十二）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（十二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/18/2018/0418DeepLearningAI16/" rel="prev" title="DeepLearning.ai笔记（十四）">
+                DeepLearning.ai笔记（十四） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/04/18/2018/0418DeepLearningAI15/" data-title="DeepLearning.ai笔记（十三）" data-url="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI15/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-1-为什么选择序列模型？"><span class="nav-number">1.</span> <span class="nav-text">1.1 为什么选择序列模型？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-2-数学符号"><span class="nav-number">2.</span> <span class="nav-text">1.2 数学符号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-3-循环神经网络模型"><span class="nav-number">3.</span> <span class="nav-text">1.3 循环神经网络模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-4-通过时间的反向传播"><span class="nav-number">4.</span> <span class="nav-text">1.4 通过时间的反向传播</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-5-不同类型的循环神经网络"><span class="nav-number">5.</span> <span class="nav-text">1.5 不同类型的循环神经网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-6-语言模型和序列生成"><span class="nav-number">6.</span> <span class="nav-text">1.6 语言模型和序列生成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-7-对新序列采样"><span class="nav-number">7.</span> <span class="nav-text">1.7 对新序列采样</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-8-带有神经网络的梯度消失"><span class="nav-number">8.</span> <span class="nav-text">1.8 带有神经网络的梯度消失</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-9-GRU（Gated-Recurrent-Unit）门控单元"><span class="nav-number">9.</span> <span class="nav-text">1.9 GRU（Gated Recurrent Unit）门控单元</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-10-长短期记忆（LSTM）"><span class="nav-number">10.</span> <span class="nav-text">1.10 长短期记忆（LSTM）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-11-双向序列神经网络BRNN"><span class="nav-number">11.</span> <span class="nav-text">1.11 双向序列神经网络BRNN</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-12-深层循环神经网络"><span class="nav-number">12.</span> <span class="nav-text">1.12 深层循环神经网络</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Emacs,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近经常在不同操作系统下写C、Python和JAVA代码，需要持续不断地学习新的编辑器、IDE的使用，为了让学习成本尽快收敛住，还是决定捡起多年没用过的Emacs，把编辑、调试各种操作通透了，以后就再也不用学习新的编辑器了。 如果仅在Windows下做C++，精通VisualStudio就足够了。如果要跨平台或者跨语言，我认为最好还是能精通Vim或者Emacs。这俩货的学习曲线虽然陡峭，却是唯一在">
+<meta name="keywords" content="Emacs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Emacs">
+<meta property="og:url" content="http://palanceli.github.io/2016/09/19/2016/0919Emacs/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="最近经常在不同操作系统下写C、Python和JAVA代码，需要持续不断地学习新的编辑器、IDE的使用，为了让学习成本尽快收敛住，还是决定捡起多年没用过的Emacs，把编辑、调试各种操作通透了，以后就再也不用学习新的编辑器了。 如果仅在Windows下做C++，精通VisualStudio就足够了。如果要跨平台或者跨语言，我认为最好还是能精通Vim或者Emacs。这俩货的学习曲线虽然陡峭，却是唯一在">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.746Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Emacs">
+<meta name="twitter:description" content="最近经常在不同操作系统下写C、Python和JAVA代码，需要持续不断地学习新的编辑器、IDE的使用，为了让学习成本尽快收敛住，还是决定捡起多年没用过的Emacs，把编辑、调试各种操作通透了，以后就再也不用学习新的编辑器了。 如果仅在Windows下做C++，精通VisualStudio就足够了。如果要跨平台或者跨语言，我认为最好还是能精通Vim或者Emacs。这俩货的学习曲线虽然陡峭，却是唯一在">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/09/19/2016/0919Emacs/">
+
+
+
+
+
+  <title>使用Emacs | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/09/19/2016/0919Emacs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Emacs</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-19T23:03:27+08:00">
+                2016-09-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/环境、配置/" itemprop="url" rel="index">
+                    <span itemprop="name">环境、配置</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/09/19/2016/0919Emacs/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/19/2016/0919Emacs/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近经常在不同操作系统下写C、Python和JAVA代码，需要持续不断地学习新的编辑器、IDE的使用，为了让学习成本尽快收敛住，还是决定捡起多年没用过的Emacs，把编辑、调试各种操作通透了，以后就再也不用学习新的编辑器了。</p>
+<p>如果仅在Windows下做C++，精通VisualStudio就足够了。如果要跨平台或者跨语言，我认为最好还是能精通Vim或者Emacs。这俩货的学习曲线虽然陡峭，却是唯一在所有平台下通用的编程工具。一旦使顺手了，就不用在不同平台下适应不同的习惯；不用隔段时间就要学习新的编辑器；也不会因为隔段时间不用，让原先已经学会的工具由于版本更新又变得陌生了。<a id="more"></a></p>
+<p>我也认为学习这两样工具之前需要慎重考虑，有了十足的必要性再开动。因为学习成本真的不低，隔段时间不用又会忘掉，所以最忌讳学个三五成扔掉了，过一年半载的又觉得需要，再从头学。这种学法是最浪费精力，浪费时间的。也是我过去的学法:(</p>
+<p>学习周期长没关系，每次学一点也无所谓。有效地沉淀和记录下来，日常用起来，总能在可预期的时间里把它啃下来。本文不是什么全面的总结，只是把我自己需要的配置、操作、注意点记录下来，确保有效积累。前面小节中记录下的点滴如果涉及到配置的，都会在最后一节的<code>.emacs文件配置</code>中体现出来。</p>
+<h1 id="安装Emacs"><a href="#安装Emacs" class="headerlink" title="安装Emacs"></a>安装Emacs</h1><p>在mac OS下安装Emacs非常简单，去<a href="https://emacsformacosx.com/" target="_blank" rel="noopener">emacs for mac osx</a>下载安装最新版本即可。这个版本默认就带了cedet、semantic、speedbar等工具，不用额外下载，只需要完成配置即可。</p>
+<h1 id="设置主题"><a href="#设置主题" class="headerlink" title="设置主题"></a>设置主题</h1><p>简单点，就用自带主题吧：<br>Options - Customize Emacs - Custom Theme - tsdh-dark<br>点击<code>Save Theme Settings</code>保存主题。</p>
+<h1 id="设置默认字体"><a href="#设置默认字体" class="headerlink" title="设置默认字体"></a>设置默认字体</h1><p>Options - Set Default Font<br>选择字体<code>Curier New</code>，字号16。注意，该操作只能在本次会话中生效，如果想把它作为Emacs的默认设置，需要修改~/.emacs文件。</p>
+<p>敲入命令：<br><code>M-x describe-font 回车 回车</code>，<br>Emacs会列出当前使用的字体字号的文本描述：<br><code>name (opened by): -*-Courier New-normal-normal-normal-*-16-*-*-*-m-0-iso10646-1</code><br>在~/.emacs中加入：<br><code>(set-default-font&quot;-*-Courier New-normal-normal-normal-*-16-*-*-*-m-0-iso10646-1&quot;)</code></p>
+<h1 id="标题栏显示文件完整路径"><a href="#标题栏显示文件完整路径" class="headerlink" title="标题栏显示文件完整路径"></a>标题栏显示文件完整路径</h1><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">;;Emacs title bar to reflect file name</span></span><br><span class="line">(<span class="name">defun</span> frame-title-string ()</span><br><span class="line"><span class="string">"Return the file name of current buffer, using ~ if under home directory"</span></span><br><span class="line">(<span class="name">let</span> </span><br><span class="line">((<span class="name">fname</span> (<span class="name">or</span> </span><br><span class="line">(<span class="name">buffer-file-name</span> (<span class="name">current-buffer</span>))</span><br><span class="line">(<span class="name">buffer-name</span>))))</span><br><span class="line"><span class="comment">;;let body</span></span><br><span class="line">(<span class="name">when</span> (<span class="name">string-match</span> (<span class="name">getenv</span> <span class="string">"HOME"</span>) fname)</span><br><span class="line">(<span class="name">setq</span> fname (<span class="name">replace-match</span> <span class="string">"~"</span> <span class="literal">t</span> <span class="literal">t</span> fname)) )</span><br><span class="line">fname))</span><br><span class="line"></span><br><span class="line"><span class="comment">;;; Title = 'system-name File: foo.bar'</span></span><br><span class="line">(<span class="name">setq</span> frame-title-format '(<span class="symbol">:eval</span> (frame-title-string)))</span><br></pre></td></tr></table></figure>
+<h1 id="备份文件"><a href="#备份文件" class="headerlink" title="备份文件"></a>备份文件</h1><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">;; 禁止生成配置文件</span></span><br><span class="line">(<span class="name">setq</span> make-backup-files <span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">;; 配置文件都生成到~/.backups下</span></span><br><span class="line">(<span class="name">setq</span> backup-directory-alist (<span class="name">quote</span> ((<span class="string">"."</span> . <span class="string">"~/.backups"</span>))))</span><br></pre></td></tr></table></figure>
+<p>若要恢复文件，可执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">M-x recover-file &lt;RET&gt; 文件名 &lt;RET&gt;</span><br><span class="line">yes &lt;RET&gt;</span><br><span class="line">C-x C-s</span><br></pre></td></tr></table></figure></p>
+<h1 id="elpy"><a href="#elpy" class="headerlink" title="elpy"></a>elpy</h1><p><a href="https://elpy.readthedocs.io/en/latest/introduction.html" target="_blank" rel="noopener">elpy</a>——Emacs Lisp Python Environment，这个必须得装，安装过程也很简单：</p>
+<ol>
+<li><p>在.emacs文件中添加如下内容后重启emacs</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">require</span> 'package)</span><br><span class="line">(<span class="name">add-to-list</span> 'package-archives</span><br><span class="line">             '(<span class="string">"elpy"</span> . <span class="string">"http://jorgenschaefer.github.io/packages/"</span>))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行<code>M-x package-install RET elpy RET</code></p>
+</li>
+<li>在.emacs文件中添加如下内容，以使emacs默认支持elpy：<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">package-initialize</span>)</span><br><span class="line">(<span class="name">elpy-enable</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="cscope"><a href="#cscope" class="headerlink" title="cscope"></a>cscope</h1><p>cscope是用来帮助阅读源码的，Emacs for mac osx默认自带cscope的支持。在使用之前，cscope也需要对代码进行索引。在emacs中可以这样做：<br>C-c s a 设定初始化的目录，一般是你代码的根目录<br>C-s s I 对目录中的相关文件建立列表并进行索引<br>C-c s s 寻找符号<br>C-c s g 寻找全局的定义<br>C-c s c 看看指定函数被哪些函数所调用<br>C-c s C 看看指定函数调用了哪些函数<br>C-c s e 寻找正则表达式<br>C-c s f 寻找文件<br>C-c s i 看看指定的文件被哪些文件include</p>
+<h1 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>macOS下默认没有gdb，需要另行下载安装：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ brew tap homebrew/dupes</span><br><span class="line">$ brew install gdb</span><br></pre></td></tr></table></figure></p>
+<p>安装完成后，需要在~/.emacs中添加：<br><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">setenv</span> <span class="string">"PATH"</span> <span class="string">"/usr/local/bin:$PATH"</span> <span class="literal">t</span>)</span><br><span class="line"> (<span class="name">add-to-list</span> 'exec-path <span class="string">"/usr/local/bin"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>如果没有这两行，emacs是找不到gdb的。</p>
+<h2 id="签名"><a href="#签名" class="headerlink" title="签名"></a>签名</h2><p>macOS下使用gdb必须签名，否则不能调试。具体步骤是：</p>
+<ul>
+<li>打开钥匙串访问，点击菜单钥匙串访问 - 证书助理 - 创建证书</li>
+<li>名称：gdb-cert；身份类型：自签名根证书；证书类型：代码签名；勾选“让我覆盖这些默认值”</li>
+<li>指定尽量长的有效期</li>
+<li>一路回车直到“指定用于该证书的位置”，钥匙串：系统</li>
+<li>一路完成后，在该证书上右键 - 显示简介，代码签名：始终信任</li>
+</ul>
+<p>接下来打开终端，输入命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">codesign -s gdb-cert /usr/<span class="built_in">local</span>/bin/gdb</span><br></pre></td></tr></table></figure></p>
+<p>打开任务管理器，杀掉进程taskgated。接下来就可以正常使用gdb调试程序了。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>编译单个文件，不用写makefile脚本，直接执行g++就好了：<br><code>M-x compile RET</code>把紧接着出现的命令改成：<code>g++ main.cpp -g -o main.out</code><br>选择菜单Tools - Debugger，启动调试。<br>命令：<br><code>M-x gdb-many-windows RET</code><br>打开多个窗口。</p>
+<h1 id="markdown支持"><a href="#markdown支持" class="headerlink" title="markdown支持"></a>markdown支持</h1><p>下载<a href="http://jblevins.org/projects/markdown-mode/markdown-mode.el" target="_blank" rel="noopener">markdown-mode.el</a>，放到~/.emacs.d/modes/markdown-mode.el，在~/.emacs文件中添加：<br><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">add-to-list</span> 'load-path <span class="string">"~/.emacs.d/modes"</span>)  </span><br><span class="line">(<span class="name">autoload</span> 'markdown-mode <span class="string">"markdown-mode.el"</span>  </span><br><span class="line"><span class="string">"Major mode for editing Markdown files"</span> <span class="literal">t</span>)  </span><br><span class="line">(<span class="name">setq</span> auto-mode-alist  </span><br><span class="line">      (<span class="name">cons</span> '(<span class="string">".md"</span> . markdown-mode) auto-mode-alist))</span><br></pre></td></tr></table></figure></p>
+<p>这样打开.md文件，emacs讲自动使用markdown-model.el。</p>
+<h1 id="常用基本命令"><a href="#常用基本命令" class="headerlink" title="常用基本命令"></a>常用基本命令</h1><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C-x C-f</td>
+<td>打开文件</td>
+</tr>
+<tr>
+<td>C-x k</td>
+<td>关闭缓冲区</td>
+</tr>
+<tr>
+<td>M-x scroll-down-line</td>
+<td>向下滚动一行</td>
+</tr>
+<tr>
+<td>M-x scroll-up-line</td>
+<td>向上滚动一行</td>
+</tr>
+<tr>
+<td>M-]</td>
+<td>向后循环滚动buffer（自定义）</td>
+</tr>
+<tr>
+<td>M-[</td>
+<td>向前循环滚动buffer（自定义）</td>
+</tr>
+<tr>
+<td>M-x shell</td>
+<td>在buffer中开启命令行</td>
+</tr>
+<tr>
+<td>C-x r m (M-x bookmark-set)</td>
+<td>设置书签</td>
+</tr>
+<tr>
+<td>C-x r l (M-x bookmark-bmenu-list)</td>
+<td>列出书签</td>
+</tr>
+<tr>
+<td>(M-x book-delete)</td>
+<td>删除书签</td>
+</tr>
+<tr>
+<td>C-x r b (M-x bookmark-jump)</td>
+<td>跳转书签</td>
+</tr>
+<tr>
+<td>(M-x bookmark-save)</td>
+<td>将所有书签保存至~/.emacs.bmk</td>
+</tr>
+<tr>
+<td>M-x load-file ~/.emacs</td>
+<td>无需重启，直接加载配置文件并更新</td>
+</tr>
+<tr>
+<td>M-x hs-minor-mode</td>
+<td>开启折叠模式</td>
+</tr>
+<tr>
+<td>s-<up> s-<down></down></up></td>
+<td>向上、向下滚动一行</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="emacs文件配置"><a href="#emacs文件配置" class="headerlink" title=".emacs文件配置"></a>.emacs文件配置</h1><p>正文就不贴到这里了，因为经常变化，我放到了<a href="https://github.com/palanceli/blog/blob/master/source/_posts/2016/_0919Emacs/dotemacs" target="_blank" rel="noopener">这里</a>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Emacs/" rel="tag"># Emacs</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/08/2016/0908Emulator/" rel="next" title="在模拟器上运行app">
+                <i class="fa fa-chevron-left"></i> 在模拟器上运行app
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/22/2016/0922关于面试/" rel="prev" title="关于面试">
+                关于面试 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/09/19/2016/0919Emacs/" data-title="使用Emacs" data-url="http://palanceli.github.io/2016/09/19/2016/0919Emacs/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Emacs"><span class="nav-number">1.</span> <span class="nav-text">安装Emacs</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设置主题"><span class="nav-number">2.</span> <span class="nav-text">设置主题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设置默认字体"><span class="nav-number">3.</span> <span class="nav-text">设置默认字体</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标题栏显示文件完整路径"><span class="nav-number">4.</span> <span class="nav-text">标题栏显示文件完整路径</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#备份文件"><span class="nav-number">5.</span> <span class="nav-text">备份文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#elpy"><span class="nav-number">6.</span> <span class="nav-text">elpy</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cscope"><span class="nav-number">7.</span> <span class="nav-text">cscope</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gdb"><span class="nav-number">8.</span> <span class="nav-text">gdb</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">8.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#签名"><span class="nav-number">8.2.</span> <span class="nav-text">签名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">8.3.</span> <span class="nav-text">使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#markdown支持"><span class="nav-number">9.</span> <span class="nav-text">markdown支持</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常用基本命令"><span class="nav-number">10.</span> <span class="nav-text">常用基本命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#emacs文件配置"><span class="nav-number">11.</span> <span class="nav-text">.emacs文件配置</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

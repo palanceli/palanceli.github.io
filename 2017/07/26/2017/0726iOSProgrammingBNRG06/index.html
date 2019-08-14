@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="第六章还是这个界面，只不过是用代码的方式来实现，而不再通过Interface Builder。本章要点：  设置VC的View 创建约束条件 为控件关联事件">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记六">
+<meta property="og:url" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="第六章还是这个界面，只不过是用代码的方式来实现，而不再通过Interface Builder。本章要点：  设置VC的View 创建约束条件 为控件关联事件">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/img06.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.957Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记六">
+<meta name="twitter:description" content="第六章还是这个界面，只不过是用代码的方式来实现，而不再通过Interface Builder。本章要点：  设置VC的View 创建约束条件 为控件关联事件">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记六 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记六</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-26T23:00:00+08:00">
+                2017-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/26/2017/0726iOSProgrammingBNRG06/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/26/2017/0726iOSProgrammingBNRG06/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第六章还是这个界面，只不过是用代码的方式来实现，而不再通过Interface Builder。<br><img src="/2017/07/26/2017/0726iOSProgrammingBNRG06/img01.png" alt><br>本章要点：</p>
+<ul>
+<li>设置VC的View</li>
+<li>创建约束条件</li>
+<li>为控件关联事件<a id="more"></a>
+</li>
+</ul>
+<p>本章先用Interface Builder创建好了TabBarViewController、ConvertorViewController和MapViewController，以及ConvertorVC和MapVC作为TabBarVC两个Tab的关联关系。并把MapVC里的默认View删掉了。之后的工作是用代码完成的。</p>
+<h1 id="1-用代码将主MapVC的View设为MapView"><a href="#1-用代码将主MapVC的View设为MapView" class="headerlink" title="1 用代码将主MapVC的View设为MapView"></a>1 用代码将主MapVC的View设为MapView</h1><p>如第5章末尾提到的，为VC创建子视图是覆盖VC的loadView()函数：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">……</span><br><span class="line">import MapKit	<span class="comment">// 通过代码直接import，后面还有对MKMapView的使用，因此不必再手动导入framework</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> MapViewController: <span class="built_in">UIViewController</span> &#123;</span><br><span class="line"></span><br><span class="line">    var mapView: <span class="built_in">MKMapView</span>!		<span class="comment">// 定义View变量</span></span><br><span class="line">    override func loadView() &#123; </span><br><span class="line">        <span class="comment">// Create a map view </span></span><br><span class="line">        mapView = <span class="built_in">MKMapView</span>()	<span class="comment">// 创建实例，并设置为VC的主view</span></span><br><span class="line">        view = mapView </span><br><span class="line">    &#125;</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所以就是把VC的view变量指向新View的实例即可。</p>
+<h1 id="2-用代码创建约束条件"><a href="#2-用代码创建约束条件" class="headerlink" title="2. 用代码创建约束条件"></a>2. 用代码创建约束条件</h1><h2 id="2-1-autoresizing"><a href="#2-1-autoresizing" class="headerlink" title="2.1 autoresizing"></a>2.1 autoresizing</h2><p>在Auto Layout之前，苹果使用autoresizing标志位控制视图在不同设备上的布局。每一个view都有一个autoresizing标志位，但是该标志位往往会和Auto Layout的约束相冲突，解决冲突的办法就是把每个视图的autoresizing开关关掉，即把translatesAutoresizingMaskIntoConstraints属性置为false。</p>
+<h2 id="2-2-锚点的概念"><a href="#2-2-锚点的概念" class="headerlink" title="2.2 锚点的概念"></a>2.2 锚点的概念</h2><p>锚是视图的属性，用于约束和另一个视图锚点的关系。一个视图的锚点属性有<br><code>topAnchor</code>、<code>leadingAnchor</code>、<code>tailingAnchor</code>、<code>bottomAnchor</code><br>可以直观地类比为控件上下左右的四个把手：<br><img src="/2017/07/26/2017/0726iOSProgrammingBNRG06/img02.png" alt></p>
+<h2 id="2-3-锚点的使用"><a href="#2-3-锚点的使用" class="headerlink" title="2.3 锚点的使用"></a>2.3 锚点的使用</h2><p>用代码添加约束的主要手段是通过锚点，两步完成：</p>
+<ul>
+<li>指定自己的哪个锚点和参照的哪个锚点之间是什么关系，这返回的是一个约束；</li>
+<li>让该约束生效。</li>
+</ul>
+<p>如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 让subView的顶部锚点与rootView的顶部锚点对齐</span></span><br><span class="line">let topConstraint = subView.topAnchor.constraint(equalTo: rootView.topAnchor)  </span><br><span class="line"><span class="comment">// 让subView的左侧锚点与rootView的顶部锚点对齐 </span></span><br><span class="line">let leadingConstraint = subView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor)</span><br><span class="line"><span class="comment">// 让subView的右侧锚点与rootView的顶部锚点对齐</span></span><br><span class="line">let tailingConstraint = subView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor)</span><br><span class="line"></span><br><span class="line">topConstraint.isActive = <span class="literal">true</span>			<span class="comment">// 让各锚点生效</span></span><br><span class="line">leadingConstraint.isActive = <span class="literal">true</span></span><br><span class="line">tailingConstraint.isActive = <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>topConstrait是使用let声明的常量，因此是不能被修改的，为什么能设置它的isActive属性呢？<br>这是因为其isActive是一个property observer（相关详见<a href="/2017/07/24/2017/0724iOSProgrammingBNRG04/">《iOS Programming BNRG》笔记四</a>），在NSLayoutConstraint::isActive的帮助文档中提到：activating 或 deactivate一个约束会调用最近共同祖先的<code>addConstratint(_:)</code>和<code>removeConstraint(_:)</code>方法，所以isActive这个值的修改并没有变动topConstratint。</p>
+</blockquote>
+<p><br></p>
+<blockquote>
+<p>在第193页提到，通过把isActive属性置为true，约束将会沿着subView和rootView找到他们的共同容器，并调用容器的addConstraint(_:)方法，我看到isActive的定义如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* The receiver may be activated or deactivated by manipulating this property.  Only active constraints affect the calculated layout.  Attempting to activate a constraint whose items have no common ancestor will cause an exception to be thrown.  Defaults to NO for newly created constraints. */</span></span><br><span class="line">@available(iOS <span class="number">8.0</span>, *)</span><br><span class="line">open var isActive: Bool</span><br></pre></td></tr></table></figure></p>
+<font color="red">并没有为该变量设置观察者，为什么呢？</font>
+
+</blockquote>
+<h2 id="2-4-怎么让View的上边缘让出系统状态栏？"><a href="#2-4-怎么让View的上边缘让出系统状态栏？" class="headerlink" title="2.4 怎么让View的上边缘让出系统状态栏？"></a>2.4 怎么让View的上边缘让出系统状态栏？</h2><p>如果让SegmentedControl和根view的topAnchor对齐，会盖住系统状态栏：<br><img src="/2017/07/26/2017/0726iOSProgrammingBNRG06/img03.png" alt><br>系统提供了<code>topLayoutGuide</code>和<code>bottomLayoutGuide</code>两个变量记录系统状态栏的锚点，以及tab bar的锚点，通过与他们对齐可以有效避开防止叠加。这就是把<code>SegmentedControl</code>的上边缘对其到<code>topLayoutGuide</code>的下边缘：</p>
+<p><img src="/2017/07/26/2017/0726iOSProgrammingBNRG06/img04.png" alt><br>更好的体验是不要让子视图可着边，而是在左右都留出边缘。一种做法是设定固定尺寸；推荐做法是使用<code>layoutMarginsGuide</code>，每个视图会有这么一个属性，用来记录边缘大小。让子视图和根视图的左右边缘对齐：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">let leadingConstrait = subView.leadingAnchor.constraint(equalTo: rootView.layoutMarginsGuide.leadlingAnchor)</span><br><span class="line">let tailingConstrait = subView.trailingAnchor.constraint(equalTo: rootView.layoutMarginsGuide.trailingAnchor)</span><br></pre></td></tr></table></figure></p>
+<p><img src="/2017/07/26/2017/0726iOSProgrammingBNRG06/img05.png" alt></p>
+<h2 id="2-5-什么是显式约束？"><a href="#2-5-什么是显式约束？" class="headerlink" title="2.5 什么是显式约束？"></a>2.5 什么是显式约束？</h2><p>以上是以视图为中心添加约束：把约束条件当做视图的属性。显式约束是以约束为中心，直接创建约束，把关联的视图边缘当做约束的属性。创建一个约束实例，其参数的基本含义就是某个视图的某个边缘等于另一个视图的某个边缘：<br><img src="/2017/07/26/2017/0726iOSProgrammingBNRG06/img06.png" alt></p>
+<blockquote>
+<p>隐式约束创建完成后需要设置isActive属性为true，显式约束需要吗？<br>前面通过<code>subView.topAnchor.constraint(equalTo: rootView.topAnchor)</code>生成的就是一个NSLayoutConstraint，此处只不过显式地声明了NSLayoutConstratint变量，所以肯定也需要让isActive置为true。</p>
+</blockquote>
+<h1 id="3-用代码创建子View并为之关联事件"><a href="#3-用代码创建子View并为之关联事件" class="headerlink" title="3 用代码创建子View并为之关联事件"></a>3 用代码创建子View并为之关联事件</h1><h2 id="3-1-如何创建子View"><a href="#3-1-如何创建子View" class="headerlink" title="3.1 如何创建子View"></a>3.1 如何创建子View</h2><p>其实在1中已经演示了如何为VC创建根View，创建子View的方法也是一样的，直接创建实例即可。</p>
+<h2 id="3-2-如何为子View关联事件"><a href="#3-2-如何为子View关联事件" class="headerlink" title="3.2 如何为子View关联事件"></a>3.2 如何为子View关联事件</h2><p>回想通过Interface Builder关联事件的步骤是：</p>
+<ol>
+<li>在VC中写好事件响应函数；</li>
+<li>在Interface Builder中从产生事件的视图 Ctrl拖动到VC就建立关联了。</li>
+</ol>
+<p>代码和Interface Builder的步骤很类似：</p>
+<ol>
+<li><p>在VC中写好事件响应函数：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">func mapTypeChanged(_ segControl: <span class="built_in">UISegmentedControl</span>)&#123;</span><br><span class="line">    <span class="keyword">switch</span> segControl.selectedSegmentIndex &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">0</span>:</span><br><span class="line">        mapView.mapType = .standard</span><br><span class="line">    ……</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>用代码建立关联：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">segmentedControl.addTarget(<span class="keyword">self</span>, action: <span class="meta">#selector(MapViewController.mapTypeChanged(_:)), for: .valueChanged)</span></span><br></pre></td></tr></table></figure>
+<p> 它表示：由当前VC的<code>mapTypeChanged(_:)</code>函数负责响应<code>segmentedControl</code>的<code>valueChanged</code>事件，。</p>
+</li>
+</ol>
+<p>注：UIControl有几个通用事件：<br><code>UIControlEvents.touchDown</code>在控件上按下<br><code>UIControlEvents.touchUpInside</code>touchDown后在空间内部抬起<br><code>UIControlEvents.valueChanged</code>控件的值被改变了<br><code>UIControlEvents.editingChanged</code>正在编辑的内容发生变化</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/25/2017/0725iOSProgrammingBNRG05/" rel="next" title="《iOS Programming BNRG》笔记五">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记五
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/27/2017/0727iOSProgrammingBNRG07/" rel="prev" title="《iOS Programming BNRG》笔记七">
+                《iOS Programming BNRG》笔记七 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/07/26/2017/0726iOSProgrammingBNRG06/" data-title="《iOS Programming BNRG》笔记六" data-url="http://palanceli.github.io/2017/07/26/2017/0726iOSProgrammingBNRG06/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-用代码将主MapVC的View设为MapView"><span class="nav-number">1.</span> <span class="nav-text">1 用代码将主MapVC的View设为MapView</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-用代码创建约束条件"><span class="nav-number">2.</span> <span class="nav-text">2. 用代码创建约束条件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-autoresizing"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 autoresizing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-锚点的概念"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 锚点的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-锚点的使用"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 锚点的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-怎么让View的上边缘让出系统状态栏？"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 怎么让View的上边缘让出系统状态栏？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-什么是显式约束？"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 什么是显式约束？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-用代码创建子View并为之关联事件"><span class="nav-number">3.</span> <span class="nav-text">3 用代码创建子View并为之关联事件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-如何创建子View"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 如何创建子View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-如何为子View关联事件"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 如何为子View关联事件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

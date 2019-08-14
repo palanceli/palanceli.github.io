@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《序列模型》第二周《自然语言处理与词嵌入》。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（十四）">
+<meta property="og:url" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《序列模型》第二周《自然语言处理与词嵌入》。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img11.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img12.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img13.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img14.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img15.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img16.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img17.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.307Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（十四）">
+<meta name="twitter:description" content="《序列模型》第二周《自然语言处理与词嵌入》。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（十四） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（十四）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T14:00:00+08:00">
+                2018-04-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/18/2018/0418DeepLearningAI16/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/18/2018/0418DeepLearningAI16/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《序列模型》第二周《自然语言处理与词嵌入》。  </p>
+<a id="more"></a>
+<h1 id="2-1-词汇表征"><a href="#2-1-词汇表征" class="headerlink" title="2.1 词汇表征"></a>2.1 词汇表征</h1><p>之前的课程中都是采用one-hot的方式来表示一个词，在这种表示法下，假设词典共10000个单词，每个单词就是一个10000维的稀疏向量，词与词之间是正交的，因此每个词之间是孤立、没有关系的。这使得算法的泛化能力不强。课件中举的例子是：<br>I want a glass of orange <strong><em>__</em></strong>.<br>模型可能学会了将空白处填为juice，但是如果题目改为：<br>I want a glass of apple <strong>__</strong>.<br>这对于模型来说就变成了另一道完全不相关的题目了，而实际上苹果和桔子有高度的相关性，应该考虑利把两个单词向量中的稀疏部分利用起来，以体现出两个单词的相关性。<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img01.png" alt><br>按照不同的维度将每个单词重新编码，每个向量表示该单词在该维度上的得分，如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img02.png" alt><br>这就将原先稀疏向量的one-hot表示法修改成不同维度属性的向量表示，这就是词汇的词嵌入法。这种方法使得词的ID直接体现出其属性，因此也就能体现出词与词之间的关系，可以使模型有更好的泛化能力。</p>
+<p>课件中提到的数据可视化的论文是<a href="http://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf" target="_blank" rel="noopener">《visualizing data using t-sne》</a></p>
+<h1 id="2-2-使用词嵌入"><a href="#2-2-使用词嵌入" class="headerlink" title="2.2 使用词嵌入"></a>2.2 使用词嵌入</h1><p>本节介绍了使用词嵌入后RNN的效果：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img03.png" alt><br>如果训练集中有Sally Johnson is an orange farmer.<br>当预测Robert Lin is an apple farmer.时，由于apple farmer和orange farmer词性接近，模型就知道Robert Lin也是人名了。</p>
+<p>本节给出了用词嵌入做迁移学习的步骤：<br>1、先从大量文本集中学习词嵌入<br>2、把这些词嵌入模型迁移到新的只有少量标注训练集的任务中<br>3、可选操作：在新数据上继续优化词嵌入模型，通常只有在第2步的训练数据量比较大时才会这么做<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img04.png" alt><br>本节最后提到，词嵌入和前面讲到的人脸识别中的人脸编码是非常类似的。所谓嵌入和编码只是同一个过程的不同表述。两个应用场景的差异在于人脸编码的操作对象是个开放集——要对从来没见过的人脸做识别；而词嵌入则是在一个封闭的词典集合内对所有词做一个N维编码。</p>
+<h1 id="2-3-词嵌入的特征"><a href="#2-3-词嵌入的特征" class="headerlink" title="2.3 词嵌入的特征"></a>2.3 词嵌入的特征</h1><p>本节介绍了词嵌入的一点很牛逼的特性——类比推理。如下图，向量man和womwan的差非常接近于向量king和queen的差，<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img05.png" alt><br>这个特性使得在有Man对Woman的句子中，可以类比推理替换成King对Queen。这篇论文是<a href="https://www.aclweb.org/anthology/N13-1090" target="_blank" rel="noopener">《linguistic regularities in continuous space word representations》</a></p>
+<p>两个词向量相似的直观理解可以用一张二维图来表示，queen对king和woman对man只是沿着某一个方向做了平移，于是当已知man、woman和king的时候，只需要找到和king组成的夹角与woman和man最接近的点即可。不过这个解释有点极端理想，因为词嵌入的向量通常在上百维，投影到二维平面后就损失了很多信息，很难保证它们在与投影平面平行的角度还能保持上面的性质。<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img06.png" alt><br>回到算法思想上来，我们要找到的就是与king-man+woman相似度最大的词向量，sim称为相似度函数。</p>
+<p>相似度函数sim可以有多种计算方式，其中一种称为余弦相似度函数，公式如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img07.png" alt><br>之所以称为余弦相似度是因为两个向量的角度越小，值越大，越垂直，值越小。这和余弦的性质非常相似。</p>
+<h1 id="2-4-嵌入矩阵"><a href="#2-4-嵌入矩阵" class="headerlink" title="2.4 嵌入矩阵"></a>2.4 嵌入矩阵</h1><p>本节介绍了单词词嵌入向量的求解思路。令单词i的one-hot向量为$O_i$，词嵌入向量为$e_i$，如果词嵌入向量是300维，词典是10000维，那么只需要求解一个300×10000维的嵌入矩阵E使得<br>$E·O_i = e_i$<br>可以用机器学习的方法求得E，具体方法将在下一节介绍。<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img08.png" alt></p>
+<h1 id="2-5-学习词嵌入"><a href="#2-5-学习词嵌入" class="headerlink" title="2.5 学习词嵌入"></a>2.5 学习词嵌入</h1><p>训练一个语言模型是学习词嵌入的好方法。如下假设我们有一批训练语料，填空处是标注内容，神经网络的输入是句子的单词O序列，输出是填空单词。O序列经过与嵌入矩阵相乘得到e序列，再继续向下一层传递，计算输出。<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img09.png" alt><br>因此从o到e可以看做是语言模型神经网络的一层，于是学习词嵌入就成了学习语言模型的副产品。当然图中的网络只是个概念产品，因为神经网络输入节点的个数应该是固定的，所以实际操作中通常只取固定窗口的上下文。这个窗口大小就是学习词嵌入的超参数。</p>
+<p>如果训练一个模型的目的是为了得到语言模型，则上下文只能取前文，因为语言模型的主要应用场景是预测，即输入前半部分，预测后半部分。所以训练只能取前文。</p>
+<p>但是如果训练的目的是为了学习词嵌入，上下文的范围就可以更自由了，既可以取前文，也可以取后文，还可以取最近的一个实体词。即课件中蓝色大括号括住的部分：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img10.png" alt></p>
+<h1 id="2-6-Word2Vec"><a href="#2-6-Word2Vec" class="headerlink" title="2.6 Word2Vec"></a>2.6 Word2Vec</h1><p>Word2Vec的论文在<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">《efficient estimation of word representations in vector space》</a><br>算法思想和上一节讲的类似，在具体操作上做出了一些优化：<br>1、随机选一个词作为上下文词。<br>2、随机在一定词距之内选另一个词作为目标词，比如上下文词前后10个词以内。<br>3、构造监督学习算法，给定上下文词，预测目标词。<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img11.png" alt><br>在构造神经网络时，课件中貌似只有一层运算，所以在计算成本函数时e的指数是$θ_e$，θ相当于w的作用，老师说这里省略了偏移，如果想加，也可以加上：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img12.png" alt><br>显然这个算法在计算成本函数时，分母的运算量非常大，因此可以引入一些改进措施，比如先把词典分两堆，先预测输出词属于哪一堆，通过这种递归二分的做法可以减少运算量：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img13.png" alt><br>最后在上下文词的采样上需要注意：不能使用均衡随机来取上下文词，因为很多虚词the is a of等，大部目标词都会在一定词距内和他们有关系，这就导致学出的嵌入词向量没有区分度了。应该避开这些高频词，以保持嵌入词向量的区分度。</p>
+<h1 id="2-7-负采样"><a href="#2-7-负采样" class="headerlink" title="2.7 负采样"></a>2.7 负采样</h1><p>本节介绍的方法论文是<a href="https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf" target="_blank" rel="noopener">《distributed representations of words and phrases and their compositionality》</a></p>
+<p>具体操作步骤是：<br>1、在训练集句子中随机选一个词作为上下文词Context，再随机在一定词距之内选另一个词Word，这和上一节介绍的方法一模一样，增加一个字段Target表示Context-Word是否在训练语料某个句子中选取，如果是为1。<br>2、为同一个Context在字典里随机选取k个词Word，令Target 为0。其中k是个超参数，需要特别注意的是：即使Word碰巧也出现在了当前句子中，也仍然把Target标为0。如果训练集比较小，k可以稍微大一些比如[5,20]；如果训练集比较大，k应该小一些比如[2, 5]<br>3、在网络的训练部分，我没有看明白，它是说将Context的O作为输入，乘以词嵌入矩阵E，得到词嵌入向量e，在经过softmax运算得到k+1个输出，分别对应正例和负例：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img14.png" alt><br>我的问题是：<br>1、我没有看到负例中t在网络的什么部分有所体现，他们怎么参与塑造网络呢？<br>2、采样是只采这k+1个数据还是要采m*(k+1)？</p>
+<h1 id="2-8-GloVe词向量"><a href="#2-8-GloVe词向量" class="headerlink" title="2.8 GloVe词向量"></a>2.8 GloVe词向量</h1><p>GloVe的论文详见<a href="https://nlp.stanford.edu/pubs/glove.pdf" target="_blank" rel="noopener">《GloVe: Global Vectors for Word Representation》</a><br>首先定义$X<em>{ij}$<br>表示在所有语料中，单词i出现在单词j的上下文中的次数。对于“出现在上下文”的不同解释，$X</em>{ij}$  的值是不一样的，比如：<br>i出现在j的上下文 = i出现在j前后10个单词内，此时$X<em>{ij}=X</em>{ji}$<br>i出现在j的上下文 = i出现在j前1个单词，此时$X<em>{ij}≠X</em>{ji}$<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img15.png" alt></p>
+<p>如果词典是一个m维向量，则X<em>ij 是一个m×m的矩阵，采用梯度下降法求<br>$minimize \sum</em>{i=1}^{10000}  \sum<em>{j=1}^{10000}  (θ_i^T e_j − logX</em>{ij})^2$<br>的最小值，得到θ和e即为词向量的相关值，当然这个算式表达的是求解思想，完整的算式为：<br>$minimize \sum<em>{i=1}^{10000}  \sum</em>{j=1}^{10000}  f(X<em>{ij})(θ</em>{i}^T e<em>j+b_i+b_j^′−logX</em>{ij})^2$<br>其中f(X_ij)是一个权重函数，当logX_ij=0时，为避免括号内的算式为无穷小，令f(X_ij)=0，于是整体算式为0；<br>此外，对于this, is, of, a等常用词f()函数会适当降权；对于生僻词，f()函数会适当提权。<br>最终得到的θ和e是两个对称的数值，即若θ=a时e=b，则θ=b时e=a，因此定义词嵌入的最终值为：<br>$e_w^{final}   =\frac{e_w+θ_w}{2}$  </p>
+<h1 id="2-9-情绪分类"><a href="#2-9-情绪分类" class="headerlink" title="2.9 情绪分类"></a>2.9 情绪分类</h1><p>情绪分类要解决的问题是根据一段话，判断它表达的评分是多少。采用常规的神经网络结构如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img16.png" alt><br>但是它的缺陷是对于否定或否定的否定，判断是不准确的。采用RNN结构如下：<br><img src="/2018/04/18/2018/0418DeepLearningAI16/img17.png" alt><br>它考虑了单词的前后顺序，因此对于双重否定有更准确的判断。同时词嵌入可以有效地识别同义词，即使它们没有出现在训练样本中。</p>
+<h1 id="2-10-词嵌入除偏"><a href="#2-10-词嵌入除偏" class="headerlink" title="2.10 词嵌入除偏"></a>2.10 词嵌入除偏</h1><p>本节除偏的意思是指性别、种族歧视，例如：<br>Man : Computer Programmer as Woman : Homemaker<br>Man : Doctor as Woman : Nurse<br>老师认为这是种族歧视，应该被纠正。但我觉得这是训练集本身体现出的特征，在训练集中存在就说明它是现实的客观存在，在结果中把它“纠正”过来没有任何意义。显示不会因此改变。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/18/2018/0418DeepLearningAI15/" rel="next" title="DeepLearning.ai笔记（十三）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（十三）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/02/2018/0502DeepLearningAI17/" rel="prev" title="DeepLearning.ai笔记（十五）">
+                DeepLearning.ai笔记（十五） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/04/18/2018/0418DeepLearningAI16/" data-title="DeepLearning.ai笔记（十四）" data-url="http://palanceli.github.io/2018/04/18/2018/0418DeepLearningAI16/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-词汇表征"><span class="nav-number">1.</span> <span class="nav-text">2.1 词汇表征</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-使用词嵌入"><span class="nav-number">2.</span> <span class="nav-text">2.2 使用词嵌入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-3-词嵌入的特征"><span class="nav-number">3.</span> <span class="nav-text">2.3 词嵌入的特征</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-嵌入矩阵"><span class="nav-number">4.</span> <span class="nav-text">2.4 嵌入矩阵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-5-学习词嵌入"><span class="nav-number">5.</span> <span class="nav-text">2.5 学习词嵌入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-6-Word2Vec"><span class="nav-number">6.</span> <span class="nav-text">2.6 Word2Vec</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-7-负采样"><span class="nav-number">7.</span> <span class="nav-text">2.7 负采样</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-8-GloVe词向量"><span class="nav-number">8.</span> <span class="nav-text">2.8 GloVe词向量</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-9-情绪分类"><span class="nav-number">9.</span> <span class="nav-text">2.9 情绪分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-10-词嵌入除偏"><span class="nav-number">10.</span> <span class="nav-text">2.10 词嵌入除偏</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="键盘消息处理学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="承接《键盘消息处理学习笔记（十）》当InputDispatcher被InputReader唤醒后，启动键盘事件分发流程，最终会把分发数据写入活动窗口注册进来的socket描述符，完成事件分发。这会导致应用程序的主线程Looper被唤醒，并且调用与该描述符关联的回调函数。">
+<meta name="keywords" content="键盘消息处理学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="键盘消息处理学习笔记（十一）">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/04/2016/1004KeyboardLearning11/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="承接《键盘消息处理学习笔记（十）》当InputDispatcher被InputReader唤醒后，启动键盘事件分发流程，最终会把分发数据写入活动窗口注册进来的socket描述符，完成事件分发。这会导致应用程序的主线程Looper被唤醒，并且调用与该描述符关联的回调函数。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.751Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="键盘消息处理学习笔记（十一）">
+<meta name="twitter:description" content="承接《键盘消息处理学习笔记（十）》当InputDispatcher被InputReader唤醒后，启动键盘事件分发流程，最终会把分发数据写入活动窗口注册进来的socket描述符，完成事件分发。这会导致应用程序的主线程Looper被唤醒，并且调用与该描述符关联的回调函数。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/04/2016/1004KeyboardLearning11/">
+
+
+
+
+
+  <title>键盘消息处理学习笔记（十一） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/04/2016/1004KeyboardLearning11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">键盘消息处理学习笔记（十一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-04T18:49:17+08:00">
+                2016-10-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/04/2016/1004KeyboardLearning11/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/04/2016/1004KeyboardLearning11/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>承接《键盘消息处理学习笔记（十）》当InputDispatcher被InputReader唤醒后，启动键盘事件分发流程，最终会把分发数据写入活动窗口注册进来的socket描述符，完成事件分发。这会导致应用程序的主线程Looper被唤醒，并且调用与该描述符关联的回调函数。<br><a id="more"></a><br>先回顾一下当初是如何在应用程序主线程Looper中注册InputChannel的吧，参见《键盘消息处理学习笔记（八）》的Step5：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputEventReceiver.cpp:145</span></span><br><span class="line"><span class="keyword">void</span> NativeInputEventReceiver::setFdEvents(<span class="keyword">int</span> events) &#123;</span><br><span class="line">    <span class="keyword">if</span> (mFdEvents != events) &#123;</span><br><span class="line">        mFdEvents = events;</span><br><span class="line">        <span class="keyword">int</span> fd = mInputConsumer.getChannel()-&gt;getFd();</span><br><span class="line">        <span class="keyword">if</span> (events) &#123; <span class="comment">// 为真</span></span><br><span class="line">            mMessageQueue-&gt;getLooper()-&gt;addFd(fd, <span class="number">0</span>, events, <span class="keyword">this</span>, <span class="literal">NULL</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            mMessageQueue-&gt;getLooper()-&gt;removeFd(fd);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>mInputConsumer.getChannel()-&gt;getFd()返回ViewRootImpl::mInputChannel-&gt;getFd()，即Client端的InputChannel的socket描述符。需要注意addFd(…)的第四个参数是一个回调函数，其实是一个有回调接口的对象。参见《键盘消息处理学习笔记（四）》之<a href="http://localhost:4000/2016/10/02/2016/1002KeyboardLearning4/#Looper-pollInner-…" target="_blank" rel="noopener">Looper::pollInner(…)</a>，当Looper被唤醒后，如果注册的描述符有回调接口，则调用其handleEvent(…)函数。本文就以NativeInputEventReceiver::handleEvent(…)函数为起点，来看该事件如何被应用程序窗口处理。</p>
+<h1 id="Step1-NativeInputEventReceiver-handleEvent-…"><a href="#Step1-NativeInputEventReceiver-handleEvent-…" class="headerlink" title="Step1: NativeInputEventReceiver::handleEvent(…)"></a>Step1: NativeInputEventReceiver::handleEvent(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputEventReceiver.cpp:157</span></span><br><span class="line"><span class="keyword">int</span> NativeInputEventReceiver::handleEvent(<span class="keyword">int</span> receiveFd, <span class="keyword">int</span> events, <span class="keyword">void</span>* data) &#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (events &amp; ALOOPER_EVENT_INPUT) &#123;</span><br><span class="line">        JNIEnv* env = AndroidRuntime::getJNIEnv();</span><br><span class="line">        <span class="keyword">status_t</span> status = consumeEvents(env, <span class="literal">false</span> <span class="comment">/*consumeBatches*/</span>, </span><br><span class="line">                                        <span class="number">-1</span>, <span class="literal">NULL</span>); <span class="comment">// 🏁</span></span><br><span class="line">        mMessageQueue-&gt;raiseAndClearException(env, <span class="string">"handleReceiveCallback"</span>);</span><br><span class="line">        <span class="keyword">return</span> status == OK || status == NO_MEMORY ? <span class="number">1</span> : <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step2-NativeInputEventReceiver-consumeEvents-…"><a href="#Step2-NativeInputEventReceiver-consumeEvents-…" class="headerlink" title="Step2: NativeInputEventReceiver::consumeEvents(…)"></a>Step2: NativeInputEventReceiver::consumeEvents(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputEventReceiver.cpp:217</span></span><br><span class="line"><span class="keyword">status_t</span> NativeInputEventReceiver::consumeEvents(JNIEnv* env,</span><br><span class="line">        <span class="keyword">bool</span> consumeBatches, <span class="keyword">nsecs_t</span> frameTime, <span class="keyword">bool</span>* outConsumedBatch) &#123;</span><br><span class="line">        <span class="comment">// consumeBatches   false</span></span><br><span class="line">        <span class="comment">// frameTime        -1</span></span><br><span class="line">        <span class="comment">// outConsumedBatch NULL</span></span><br><span class="line">    ... ...</span><br><span class="line">    ScopedLocalRef&lt;jobject&gt; receiverObj(env, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">bool</span> skipCallbacks = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">uint32_t</span> seq;</span><br><span class="line">        InputEvent* inputEvent;</span><br><span class="line">        <span class="comment">// 🏁Step3: 将InputDispatcher分发过来的键盘事件读取到inputEvent</span></span><br><span class="line">        <span class="keyword">status_t</span> status = mInputConsumer.consume(&amp;mInputEventFactory,</span><br><span class="line">                consumeBatches, frameTime, &amp;seq, &amp;inputEvent);</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">if</span> (!skipCallbacks) &#123; <span class="comment">// 为真</span></span><br><span class="line">            <span class="comment">// 前面读取到了合法数据，接下来在窗口消息组织合适的分发函数，完成分发</span></span><br><span class="line">            <span class="keyword">if</span> (!receiverObj.get()) &#123;</span><br><span class="line">                <span class="comment">// 此处得到的是java层InputEventReceiver的弱引用指针</span></span><br><span class="line">                <span class="comment">// 见《键盘消息处理学习笔记（八）》Step1、2，这个指针</span></span><br><span class="line">                <span class="comment">// 实际指向的是一个WindowInputEventReceiver对象</span></span><br><span class="line">                receiverObj.reset(jniGetReferent(env, mReceiverWeakGlobal));</span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            jobject inputEventObj;</span><br><span class="line">            <span class="keyword">switch</span> (inputEvent-&gt;getType()) &#123;</span><br><span class="line">            <span class="keyword">case</span> AINPUT_EVENT_TYPE_KEY:</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="comment">// 把C++层InputEvent对象转成Java层InputEvent对象</span></span><br><span class="line">                inputEventObj = android_view_KeyEvent_fromNative(env,</span><br><span class="line">                        <span class="keyword">static_cast</span>&lt;KeyEvent*&gt;(inputEvent));</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            ... ...</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (inputEventObj) &#123;</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="comment">// 🏁Step5:调用java层</span></span><br><span class="line">                <span class="comment">// WindowInputEventReceiver::dispatchInputEvent(...)函数</span></span><br><span class="line">                env-&gt;CallVoidMethod(receiverObj.get(),</span><br><span class="line">                        gInputEventReceiverClassInfo.dispatchInputEvent, seq, inputEventObj);</span><br><span class="line">                <span class="keyword">if</span> (env-&gt;ExceptionCheck()) &#123;</span><br><span class="line">                    ... ...</span><br><span class="line">                    skipCallbacks = <span class="literal">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                env-&gt;DeleteLocalRef(inputEventObj);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                ... ...</span><br><span class="line">                skipCallbacks = <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (skipCallbacks) &#123;</span><br><span class="line">            mInputConsumer.sendFinishedSignal(seq, <span class="literal">false</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step3-InputConsumer-consume-…"><a href="#Step3-InputConsumer-consume-…" class="headerlink" title="Step3: InputConsumer::consume(…)"></a>Step3: InputConsumer::consume(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/libs/input/InputTransport.cpp:399</span></span><br><span class="line"><span class="comment">// 从InputChannel读出数据，返回到outEvent</span></span><br><span class="line"><span class="keyword">status_t</span> InputConsumer::consume(InputEventFactoryInterface* factory,</span><br><span class="line">        <span class="keyword">bool</span> consumeBatches, <span class="keyword">nsecs_t</span> frameTime, <span class="keyword">uint32_t</span>* outSeq, InputEvent** outEvent) &#123;</span><br><span class="line">        <span class="comment">// consumeBatches   false</span></span><br><span class="line">        <span class="comment">// frameTime        -1</span></span><br><span class="line">    ... ...</span><br><span class="line">    *outSeq = <span class="number">0</span>;</span><br><span class="line">    *outEvent = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Fetch the next input message.</span></span><br><span class="line">    <span class="comment">// Loop until an event can be returned or no additional events are received.</span></span><br><span class="line">    <span class="keyword">while</span> (!*outEvent) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">            <span class="comment">// Receive a fresh message.</span></span><br><span class="line">            <span class="keyword">status_t</span> result = mChannel-&gt;receiveMessage(&amp;mMsg);  <span class="comment">// 🏁Step4</span></span><br><span class="line">            ... ...</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> (mMsg.header.type) &#123;</span><br><span class="line">        <span class="keyword">case</span> InputMessage::TYPE_KEY: &#123;</span><br><span class="line">            KeyEvent* keyEvent = factory-&gt;createKeyEvent();</span><br><span class="line">            <span class="keyword">if</span> (!keyEvent) <span class="keyword">return</span> NO_MEMORY;</span><br><span class="line"></span><br><span class="line">            initializeKeyEvent(keyEvent, &amp;mMsg); <span class="comment">// 用读出的数据初始化KeyEvent对象</span></span><br><span class="line">            *outSeq = mMsg.body.key.seq;</span><br><span class="line">            *outEvent = keyEvent;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它读出的mMsg跟《键盘消息处理学习笔记（十）》之Step8刚好是相应的，前面是往里写，此处是读出来。然后把独处的数据封装成KeyEvent类型，赋给*outEvent，这会终止下一轮的while循环。</p>
+<h1 id="Step4-InputChannel-receiveMessage-…"><a href="#Step4-InputChannel-receiveMessage-…" class="headerlink" title="Step4: InputChannel::receiveMessage(…)"></a>Step4: InputChannel::receiveMessage(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/native/libs/input/InputTransport.cpp:188</span></span><br><span class="line"><span class="keyword">status_t</span> InputChannel::receiveMessage(InputMessage* msg) &#123;</span><br><span class="line">    <span class="keyword">ssize_t</span> nRead;</span><br><span class="line">    <span class="keyword">do</span> &#123;    <span class="comment">// 非阻塞式接收</span></span><br><span class="line">        nRead = ::recv(mFd, msg, <span class="keyword">sizeof</span>(InputMessage), MSG_DONTWAIT); </span><br><span class="line">    &#125; <span class="keyword">while</span> (nRead == <span class="number">-1</span> &amp;&amp; errno == EINTR);</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意在::recv第四个参数中使用了MSG_DONTWAIT标志，表明该读操作是个非阻塞的，如果当前没有数据可读，该函数立即返回EWOULDBLOCK错误。在本节的上下文中，该函数之所以被执行，是因为主线程Looper被该socketIO事件通知到而唤醒，说明一定是有数据可读的，因此，这里会返回OK，即0。</p>
+<p>返回到Step3中，把读到的数据组织成KeyEvent对象，返回给输出参数。再回到Step2中，前半部分是读取键盘事件，后半部分是调用WindowInputEventReceiver::dispatcheInputEvent(…)函数处理该事件，该函数继承自InputEventReceiver：</p>
+<h1 id="Step5-InputEventReceiver-dispatchInputEvent-…"><a href="#Step5-InputEventReceiver-dispatchInputEvent-…" class="headerlink" title="Step5: InputEventReceiver::dispatchInputEvent(…)"></a>Step5: InputEventReceiver::dispatchInputEvent(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/InputEventReceiver.java:183</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dispatchInputEvent</span><span class="params">(<span class="keyword">int</span> seq, InputEvent event)</span> </span>&#123;</span><br><span class="line">        mSeqMap.put(event.getSequenceNumber(), seq);</span><br><span class="line">        onInputEvent(event);    <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>onInputEvent(…)是一个虚函数，调用WidnowInputEventReceiver的版本：</p>
+<h1 id="Step6-WindowInputEventReceiver-onInputEvent-…"><a href="#Step6-WindowInputEventReceiver-onInputEvent-…" class="headerlink" title="Step6: WindowInputEventReceiver::onInputEvent(…)"></a>Step6: WindowInputEventReceiver::onInputEvent(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:6025</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onInputEvent</span><span class="params">(InputEvent event)</span> </span>&#123;</span><br><span class="line">            enqueueInputEvent(event, <span class="keyword">this</span>, <span class="number">0</span>, <span class="keyword">true</span>);    <span class="comment">// 🏁</span></span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>enqueueInputEvent(…)即没有在WindowInputEventReceiver中，也没有在其父类InputEventReceiver中。WindowInputEventReceiver是定义在ViewRootImpl中的内部类，因此这个函数可以去ViewRootImpl中找：</p>
+<h1 id="Step7-ViewRootImpl-enqueueInputEvent-…"><a href="#Step7-ViewRootImpl-enqueueInputEvent-…" class="headerlink" title="Step7: ViewRootImpl::enqueueInputEvent(…)"></a>Step7: ViewRootImpl::enqueueInputEvent(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:5835</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">enqueueInputEvent</span><span class="params">(InputEvent event, InputEventReceiver receiver, </span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">int</span> flags, <span class="keyword">boolean</span> processImmediately)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// flags                0</span></span><br><span class="line">        <span class="comment">// processImmediately   true</span></span><br><span class="line">        adjustInputEventForCompatibility(event);</span><br><span class="line">        <span class="comment">// 将event入队</span></span><br><span class="line">        QueuedInputEvent q = obtainQueuedInputEvent(event, receiver, flags);</span><br><span class="line">        ... ...</span><br><span class="line">        mPendingInputEventCount += <span class="number">1</span>;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">if</span> (processImmediately) &#123;</span><br><span class="line">            doProcessInputEvents();     <span class="comment">// 🏁</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            scheduleProcessInputEvents();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step8-ViewRootImpl-doProcessInputEvents-…"><a href="#Step8-ViewRootImpl-doProcessInputEvents-…" class="headerlink" title="Step8: ViewRootImpl::doProcessInputEvents(…)"></a>Step8: ViewRootImpl::doProcessInputEvents(…)</h1><p>// frameworks/base/core/java/android/view/ViewRootImpl.java:5873<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doProcessInputEvents</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Deliver all pending input events in the queue.</span></span><br><span class="line">    <span class="keyword">while</span> (mPendingInputEventHead != null) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">        deliverInputEvent(q);   <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// We are done processing all input events that we can process right now</span></span><br><span class="line">    <span class="comment">// so we can clear the pending flag immediately.</span></span><br><span class="line">    <span class="keyword">if</span> (mProcessInputEventsScheduled) &#123;</span><br><span class="line">        mProcessInputEventsScheduled = <span class="literal">false</span>;</span><br><span class="line">        mHandler.removeMessages(MSG_PROCESS_INPUT_EVENTS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Step9-ViewRootImpl-deliverInputEvent-…"><a href="#Step9-ViewRootImpl-deliverInputEvent-…" class="headerlink" title="Step9: ViewRootImpl::deliverInputEvent(…)"></a>Step9: ViewRootImpl::deliverInputEvent(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:5908</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">deliverInputEvent</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</span><br><span class="line">        Trace.asyncTraceBegin(Trace.TRACE_TAG_VIEW, <span class="string">"deliverInputEvent"</span>,</span><br><span class="line">                q.mEvent.getSequenceNumber());</span><br><span class="line">        <span class="keyword">if</span> (mInputEventConsistencyVerifier != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mInputEventConsistencyVerifier.onInputEvent(q.mEvent, <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        InputStage stage;</span><br><span class="line">        <span class="keyword">if</span> (q.shouldSendToSynthesizer()) &#123; <span class="comment">// 这里应该是处理合成键盘消息的分支</span></span><br><span class="line">            stage = mSyntheticInputStage;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;    <span class="comment">// 显然不应该忽略输入法，所以stage = mFirstInputStage</span></span><br><span class="line">            stage = q.shouldSkipIme() ? mFirstPostImeInputStage : mFirstInputStage;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (stage != <span class="keyword">null</span>) &#123;</span><br><span class="line">            stage.deliver(q);   <span class="comment">// 🏁</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            finishInputEvent(q);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>来看ViewRootImpl::setView(…)时对InputStage的初始化：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:633</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set up the input pipeline.</span></span><br><span class="line">    CharSequence counterSuffix = attrs.getTitle();</span><br><span class="line">    mSyntheticInputStage = <span class="keyword">new</span> SyntheticInputStage();</span><br><span class="line">    InputStage viewPostImeStage = <span class="keyword">new</span> ViewPostImeInputStage(</span><br><span class="line">            mSyntheticInputStage);</span><br><span class="line">    InputStage nativePostImeStage = <span class="keyword">new</span> NativePostImeInputStage(</span><br><span class="line">            viewPostImeStage, <span class="string">"aq:native-post-ime:"</span> + counterSuffix);</span><br><span class="line">    InputStage earlyPostImeStage = <span class="keyword">new</span> EarlyPostImeInputStage(</span><br><span class="line">            nativePostImeStage);</span><br><span class="line">    InputStage imeStage = <span class="keyword">new</span> ImeInputStage(earlyPostImeStage,</span><br><span class="line">            <span class="string">"aq:ime:"</span> + counterSuffix);</span><br><span class="line">    InputStage viewPreImeStage = <span class="keyword">new</span> ViewPreImeInputStage(imeStage);</span><br><span class="line">    InputStage nativePreImeStage = <span class="keyword">new</span> NativePreImeInputStage(</span><br><span class="line">            viewPreImeStage, <span class="string">"aq:native-pre-ime:"</span> + counterSuffix);</span><br><span class="line"></span><br><span class="line">    mFirstInputStage = nativePreImeStage;</span><br><span class="line">    mFirstPostImeInputStage = earlyPostImeStage;</span><br><span class="line">    mPendingInputEventQueueLengthCounterName = <span class="string">"aq:pending:"</span> + counterSuffix;</span><br></pre></td></tr></table></figure></p>
+<p>可以发现他们依次以前面的一个InputStage为参数，这是因为<br><code>NativePreImeInputStage</code> -&gt; <code>ViewPreImeInputStage</code> -&gt; <code>ImeInputStage</code> -&gt;<code>EarlyPostImeInputStage</code> -&gt; <code>NativePostImeInputStage</code> -&gt; <code>ViewPostImeInputStage</code> -&gt; <code>SyntheticInputStage</code><br>他们依次构成一个输入事件的处理链，如果本阶段对时间没有处理，则传递到下一个对象处理，知道事件被处理。</p>
+<p>此处的stage应该被赋值为mFirstInputStage即NativePreInputStage。</p>
+<h1 id="Step10-InputStage-deliver-…"><a href="#Step10-InputStage-deliver-…" class="headerlink" title="Step10: InputStage::deliver(…)"></a>Step10: InputStage::deliver(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:3637</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">deliver</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> ((q.mFlags &amp; QueuedInputEvent.FLAG_FINISHED) != <span class="number">0</span>) &#123;</span><br><span class="line">                forward(q);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (shouldDropInputEvent(q)) &#123;</span><br><span class="line">                finish(q, <span class="keyword">false</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                apply(q, onProcess(q)); <span class="comment">// 🏁</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>由于时间还没完成，不会带上FLAG_FINISHED标志，正常案件消息不应该被抛弃，因此我们走apply(…)分支。第二个参数又是一个函数调用，先来看onProcess(…)</p>
+<h1 id="Step11-NativePreImeInputStage-onProcess-…"><a href="#Step11-NativePreImeInputStage-onProcess-…" class="headerlink" title="Step11: NativePreImeInputStage::onProcess(…)"></a>Step11: NativePreImeInputStage::onProcess(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:3899</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">onProcess</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (mInputQueue != <span class="keyword">null</span> &amp;&amp; q.mEvent <span class="keyword">instanceof</span> KeyEvent) &#123;</span><br><span class="line">                mInputQueue.sendInputEvent(q.mEvent, q, <span class="keyword">true</span>, <span class="keyword">this</span>); <span class="comment">// 🏁</span></span><br><span class="line">                <span class="keyword">return</span> DEFER;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> FORWARD;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step12-InputQueue-sendInputEvent-…"><a href="#Step12-InputQueue-sendInputEvent-…" class="headerlink" title="Step12: InputQueue::sendInputEvent(…)"></a>Step12: InputQueue::sendInputEvent(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/InputQueue.java:91</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendInputEvent</span><span class="params">(InputEvent e, Object token, <span class="keyword">boolean</span> predispatch,</span></span></span><br><span class="line"><span class="function"><span class="params">            FinishedInputEventCallback callback)</span> </span>&#123;</span><br><span class="line">        ActiveInputEvent event = obtainActiveInputEvent(token, callback);</span><br><span class="line">        <span class="keyword">long</span> id;</span><br><span class="line">        <span class="keyword">if</span> (e <span class="keyword">instanceof</span> KeyEvent) &#123; <span class="comment">// 我们关注的是键盘消息</span></span><br><span class="line">            id = nativeSendKeyEvent(mPtr, (KeyEvent) e, predispatch);<span class="comment">//🏁</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            id = nativeSendMotionEvent(mPtr, (MotionEvent) e);</span><br><span class="line">        &#125;</span><br><span class="line">        mActiveEventArray.put(id, event);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step13-nativeSendKeyEvent-…"><a href="#Step13-nativeSendKeyEvent-…" class="headerlink" title="Step13 : nativeSendKeyEvent(…)"></a>Step13 : nativeSendKeyEvent(…)</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/jni/android_view_InputQueue.cpp:219</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> jlong <span class="title">nativeSendKeyEvent</span><span class="params">(JNIEnv* env, jobject clazz, jlong ptr, jobject eventObj,</span></span></span><br><span class="line"><span class="function"><span class="params">        jboolean predispatch)</span> </span>&#123;</span><br><span class="line">    InputQueue* <span class="built_in">queue</span> = <span class="keyword">reinterpret_cast</span>&lt;InputQueue*&gt;(ptr);</span><br><span class="line">    KeyEvent* event = <span class="built_in">queue</span>-&gt;createKeyEvent();</span><br><span class="line">    <span class="keyword">status_t</span> status = android_view_KeyEvent_toNative(env, eventObj, event);</span><br><span class="line">    <span class="keyword">if</span> (status) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;recycleInputEvent(event);</span><br><span class="line">        jniThrowRuntimeException(env, <span class="string">"Could not read contents of KeyEvent object."</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (predispatch) &#123;</span><br><span class="line">        event-&gt;setFlags(event-&gt;getFlags() | AKEY_EVENT_FLAG_PREDISPATCH);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">queue</span>-&gt;enqueueEvent(event);     <span class="comment">// 把event放入mPendingEvents队列中</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">reinterpret_cast</span>&lt;jlong&gt;(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再回到Step10中，NativePreInputStage没有apply(…)，找父类<code>AsyncInputStage::apply(...)</code>是有的。</p>
+<h1 id="Step14-AsyncInputStage-apply-…"><a href="#Step14-AsyncInputStage-apply-…" class="headerlink" title="Step14: AsyncInputStage::apply(…)"></a>Step14: AsyncInputStage::apply(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:3841</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(QueuedInputEvent q, <span class="keyword">int</span> result)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (result == DEFER) &#123;</span><br><span class="line">                defer(q);   <span class="comment">// 🏁</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">super</span>.apply(q, result);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:3775</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">defer</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</span><br><span class="line">            q.mFlags |= QueuedInputEvent.FLAG_DEFERRED;</span><br><span class="line">            enqueue(q);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// frameworks/base/core/java/android/view/ViewRootImpl.java:3849</span></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">enqueue</span><span class="params">(QueuedInputEvent q)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (mQueueTail == <span class="keyword">null</span>) &#123;</span><br><span class="line">                mQueueHead = q;</span><br><span class="line">                mQueueTail = q;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                mQueueTail.mNext = q;</span><br><span class="line">                mQueueTail = q;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            mQueueLength += <span class="number">1</span>;</span><br><span class="line">            Trace.traceCounter(Trace.TRACE_TAG_INPUT, mTraceCounter, mQueueLength);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<font color="red">未完待续，此处似乎走进了死胡同，KeyEvent被吃掉了！</font>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/键盘消息处理学习笔记/" rel="tag"># 键盘消息处理学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/04/2016/1004KeyboardLearning10/" rel="next" title="键盘消息处理学习笔记（十）InputDispatcher分发键盘事件">
+                <i class="fa fa-chevron-left"></i> 键盘消息处理学习笔记（十）InputDispatcher分发键盘事件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/09/2016/1008Unicode/" rel="prev" title="Unicode字符集和字形">
+                Unicode字符集和字形 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/04/2016/1004KeyboardLearning11/" data-title="键盘消息处理学习笔记（十一）" data-url="http://palanceli.github.io/2016/10/04/2016/1004KeyboardLearning11/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-NativeInputEventReceiver-handleEvent-…"><span class="nav-number">1.</span> <span class="nav-text">Step1: NativeInputEventReceiver::handleEvent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-NativeInputEventReceiver-consumeEvents-…"><span class="nav-number">2.</span> <span class="nav-text">Step2: NativeInputEventReceiver::consumeEvents(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-InputConsumer-consume-…"><span class="nav-number">3.</span> <span class="nav-text">Step3: InputConsumer::consume(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-InputChannel-receiveMessage-…"><span class="nav-number">4.</span> <span class="nav-text">Step4: InputChannel::receiveMessage(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step5-InputEventReceiver-dispatchInputEvent-…"><span class="nav-number">5.</span> <span class="nav-text">Step5: InputEventReceiver::dispatchInputEvent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step6-WindowInputEventReceiver-onInputEvent-…"><span class="nav-number">6.</span> <span class="nav-text">Step6: WindowInputEventReceiver::onInputEvent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step7-ViewRootImpl-enqueueInputEvent-…"><span class="nav-number">7.</span> <span class="nav-text">Step7: ViewRootImpl::enqueueInputEvent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step8-ViewRootImpl-doProcessInputEvents-…"><span class="nav-number">8.</span> <span class="nav-text">Step8: ViewRootImpl::doProcessInputEvents(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step9-ViewRootImpl-deliverInputEvent-…"><span class="nav-number">9.</span> <span class="nav-text">Step9: ViewRootImpl::deliverInputEvent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step10-InputStage-deliver-…"><span class="nav-number">10.</span> <span class="nav-text">Step10: InputStage::deliver(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step11-NativePreImeInputStage-onProcess-…"><span class="nav-number">11.</span> <span class="nav-text">Step11: NativePreImeInputStage::onProcess(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step12-InputQueue-sendInputEvent-…"><span class="nav-number">12.</span> <span class="nav-text">Step12: InputQueue::sendInputEvent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step13-nativeSendKeyEvent-…"><span class="nav-number">13.</span> <span class="nav-text">Step13 : nativeSendKeyEvent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step14-AsyncInputStage-apply-…"><span class="nav-number">14.</span> <span class="nav-text">Step14: AsyncInputStage::apply(…)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

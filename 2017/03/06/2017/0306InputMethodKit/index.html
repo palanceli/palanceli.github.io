@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="（本文来自《Input Method Kit API Reference》）Input Method Kit用于开发输入法，并管理与客户端应用之间的通讯，管理候选窗口和输入模式等。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="macOS下的Input Method Kit（译）">
+<meta property="og:url" content="http://palanceli.github.io/2017/03/06/2017/0306InputMethodKit/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="（本文来自《Input Method Kit API Reference》）Input Method Kit用于开发输入法，并管理与客户端应用之间的通讯，管理候选窗口和输入模式等。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.807Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="macOS下的Input Method Kit（译）">
+<meta name="twitter:description" content="（本文来自《Input Method Kit API Reference》）Input Method Kit用于开发输入法，并管理与客户端应用之间的通讯，管理候选窗口和输入模式等。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/03/06/2017/0306InputMethodKit/">
+
+
+
+
+
+  <title>macOS下的Input Method Kit（译） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/03/06/2017/0306InputMethodKit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">macOS下的Input Method Kit（译）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-06T20:53:00+08:00">
+                2017-03-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/06/2017/0306InputMethodKit/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/06/2017/0306InputMethodKit/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>（本文来自<a href="https://developer.apple.com/reference/inputmethodkit" target="_blank" rel="noopener">《Input Method Kit API Reference》</a>）<br>Input Method Kit用于开发输入法，并管理与客户端应用之间的通讯，管理候选窗口和输入模式等。<a id="more"></a></p>
+<h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>OSX 在10.5版本中引入了IMK，该框架提供了输入法开发的原型接口，与老版本的mac相比，这套接口大大简化了输入法开发的工作量。该框架与文字服务管理器充分整合，使得32位和64位应用程序和输入法之间可以无缝合作。</p>
+<p>IMK通过几个类和协议来支持输入法与客户端应用间的通讯，并管理候选窗和输入模式等。输入法从转换引擎提供转换后的文字（该引擎可以用C，C++，Objective-C，Python等编写），还会提供键盘绑定、可选的事件处理、通过一个扩展的Info.plist文件提供更多输入法信息。还可以通过菜单项支持输入法的特殊命令或偏好设置。</p>
+<p>接下来看IMK涉及的类、协议和其它数据结构。</p>
+<h1 id="IMKCandidates"><a href="#IMKCandidates" class="headerlink" title="IMKCandidates"></a>IMKCandidates</h1><p>IMKCandidates类用来表示候选。在用户选择了一个候选后，会通知对应的<a href="#IMKInputController">IMKInputController</a>对象。候选是对已经输入的文字序列转换后的结果。IMKCandidates类支持在你的输入法中使用一个候选窗口来展现内容。该类的使用是可选的，不是所有输入法都需要它。</p>
+<p>当创建一个IMKCandidates对象，你需要将它归属给输入法的IMKServer对象。然后重写IMKInputController的方法<code>candidateSelectionChanged:</code>和<code>candidateSelected:</code>，并在你的代理对象中实现一个候选方法。IMKInputController子类通过实现候选方法来为IMKCandidate对象提供候选。当需要显示候选窗时，可以调用候选方法来更新候选列表并显示候选窗口。该类涉及的方法如下：</p>
+<h2 id="初始化候选窗"><a href="#初始化候选窗" class="headerlink" title="初始化候选窗"></a>初始化候选窗</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385500-init" target="_blank" rel="noopener">init!(server: IMKServer!, panelType: IMKCandidatePanelType)</a><br>&emsp; 返回初始化的IMKCandidates对象</p>
+<h2 id="管理选择按键"><a href="#管理选择按键" class="headerlink" title="管理选择按键"></a>管理选择按键</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385522-setselectionkeys" target="_blank" rel="noopener">func setSelectionKeys([Any]!)</a><br>&emsp; 为候选设置选择键</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385537-selectionkeys" target="_blank" rel="noopener">func selectionKeys()</a><br>&emsp; 返回一个NSNumber对象的数组，每个元素代表一个虚拟键盘码</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385422-setselectionkeyskeylayout" target="_blank" rel="noopener">func setSelectionKeysKeylayout(TISInputSource!)</a><br>&emsp; 设置用来映射虚拟键盘码到字符的键盘布局</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385428-selectionkeyskeylayout" target="_blank" rel="noopener">func selectionKeysKeylayout()</a><br>&emsp; 返回用来映射虚拟键盘码到字符的键盘布局</p>
+<h2 id="管理窗口展现和行为"><a href="#管理窗口展现和行为" class="headerlink" title="管理窗口展现和行为"></a>管理窗口展现和行为</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385391-show" target="_blank" rel="noopener">func show(IMKCandidatesLocationHint)</a><br>&emsp; 显示候选窗</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385498-hide" target="_blank" rel="noopener">func hide()</a><br>&emsp; 隐藏候选窗</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385504-isvisible" target="_blank" rel="noopener">func isVisible()</a><br>&emsp; 返回候选窗是否可见</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385379-setdismissesautomatically" target="_blank" rel="noopener">func setDismissesAutomatically(Bool)</a><br>&emsp; 设置候选窗是否自动取消的标志</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385463-dismissesautomatically" target="_blank" rel="noopener">func dismissesAutomatically()</a><br>&emsp; 返回候选窗是否自动取消的标志</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385516-update" target="_blank" rel="noopener">func update()</a><br>&emsp; 更新候选窗上的候选列表</p>
+<h2 id="管理窗体类型和文字属性"><a href="#管理窗体类型和文字属性" class="headerlink" title="管理窗体类型和文字属性"></a>管理窗体类型和文字属性</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385448-paneltype" target="_blank" rel="noopener">func panelType()</a><br>&emsp; 返回候选窗的风格</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385545-setpaneltype" target="_blank" rel="noopener">func setPanelType(IMKCandidatePanelType)</a><br>&emsp; 设置候选窗风格</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385465-setattributes" target="_blank" rel="noopener">func setAttributes([AnyHashable : Any]!)</a><br>&emsp; 设置候选窗属性</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385440-attributes" target="_blank" rel="noopener">func attributes()</a><br>&emsp; 返回候选窗属性</p>
+<h2 id="显示注释窗口"><a href="#显示注释窗口" class="headerlink" title="显示注释窗口"></a>显示注释窗口</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385354-showannotation" target="_blank" rel="noopener">func showAnnotation(NSAttributedString!)</a><br>&emsp; 在注释窗口上显示注释串</p>
+<h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidatepaneltype" target="_blank" rel="noopener">IMKCandidatePanelType</a><br>&emsp; IMK提供的候选窗口的类型</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidateslocationhint" target="_blank" rel="noopener">IMKCandidatesLocationHint</a><br>&emsp; 放置候选窗口的位置提示</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/imkcandidatesopacityattributename" target="_blank" rel="noopener">IMKCandidatesOpacityAttributeName</a><br>&emsp; 候选窗口的透明度级别</p>
+<h2 id="初始化器"><a href="#初始化器" class="headerlink" title="初始化器"></a>初始化器</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385467-init" target="_blank" rel="noopener">init!(server: IMKServer!, panelType: IMKCandidatePanelType, styleType: IMKStyleType)</a><br>&emsp; </p>
+<h2 id="实例方法"><a href="#实例方法" class="headerlink" title="实例方法"></a>实例方法</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385455-attachchild" target="_blank" rel="noopener">func attachChild(IMKCandidates!, toCandidate: Int, type: IMKStyleType)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385426-candidateframe" target="_blank" rel="noopener">func candidateFrame()</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385471-candidateidentifier" target="_blank" rel="noopener">func candidateIdentifier(atLineNumber: Int)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385512-candidatestringidentifier" target="_blank" rel="noopener">func candidateStringIdentifier(Any!)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385356-clearselection" target="_blank" rel="noopener">func clearSelection()</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385457-detachchild" target="_blank" rel="noopener">func detachChild(Int)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385494-hidechild" target="_blank" rel="noopener">func hideChild()</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385488-linenumberforcandidate" target="_blank" rel="noopener">func lineNumberForCandidate(withIdentifier: Int)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385543-selectcandidate" target="_blank" rel="noopener">func selectCandidate(Int)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385559-selectcandidate" target="_blank" rel="noopener">func selectCandidate(withIdentifier: Int)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385514-selectedcandidate" target="_blank" rel="noopener">func selectedCandidate()</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385402-selectedcandidatestring" target="_blank" rel="noopener">func selectedCandidateString()</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385508-setcandidatedata" target="_blank" rel="noopener">func setCandidateData([Any]!)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385459-setcandidateframetopleft" target="_blank" rel="noopener">func setCandidateFrameTopLeft(NSPoint)</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385404-show" target="_blank" rel="noopener">func show()</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385518-showchild" target="_blank" rel="noopener">func showChild()</a><br>&emsp;<br><a href="https://developer.apple.com/reference/inputmethodkit/imkcandidates/1385492-showsublist" target="_blank" rel="noopener">func showSublist([Any]!, subListDelegate: Any!)</a><br>&emsp; </p>
+<h1 id="IMKInputController"><a href="#IMKInputController" class="headerlink" title="IMKInputController"></a>IMKInputController</h1><p>IMKInputController为用户自定义的输入控制器提供一个基类。由<a href="#IMKServer">IMKServer为</a>每个输入会话创建输入控制器，IMKServer通常在main函数的开头创建，输入会话则由客户端应用负责创建。对于每个输入会话都会有一个对应的输入控制器即IMKInputController对象。</p>
+<p>IMKInputController对象用纸输入法侧的文本输入。它管理来自应用程序的事件和文本以及被输入法引擎转换后的文本。IMKInputController完全实现了<a href="#IMKStateSetting">IMKStateSetting</a>协议和<a href="#IMKMouseHandling">IMKMouseHandling</a>协议。通常你不需要覆写该类，而只需要为你感兴趣的方法实现代理对象。IMKInputController协议方法的版本会检查代理对象是否实现了某方法，如果存在则调用此代理版本。以下是它的成员：</p>
+<h2 id="初始化InputController"><a href="#初始化InputController" class="headerlink" title="初始化InputController"></a>初始化InputController</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385385-init" target="_blank" rel="noopener">init!(server: IMKServer!, delegate: Any!, client: Any!)</a><br>&emsp; 通过设置代理，初始化输入控制器</p>
+<h2 id="区域相关"><a href="#区域相关" class="headerlink" title="区域相关"></a>区域相关</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385453-compositionattributes" target="_blank" rel="noopener">func compositionAttributes(at: NSRange)</a><br>&emsp; 返回文本属性的字典</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385414-selectionrange" target="_blank" rel="noopener">func selectionRange()</a><br>&emsp; 返回选中文本的区域，该区域的文本会被选中且替换掉</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385486-replacementrange" target="_blank" rel="noopener">func replacementRange()</a><br>&emsp; 返回客户端文档中应当被替换掉的文本的区域</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385381-mark" target="_blank" rel="noopener">func mark(forStyle: Int, at: NSRange)</a><br>&emsp; 返回文本属性的字典，这些属性可以用来标注一段属性串的区域并发送给客户端应用</p>
+<h2 id="管理代理"><a href="#管理代理" class="headerlink" title="管理代理"></a>管理代理</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385557-setdelegate" target="_blank" rel="noopener">func setDelegate(Any!)</a><br>&emsp; 为输入法控制器对象设置代理</p>
+<h2 id="获得客户端和服务端对象"><a href="#获得客户端和服务端对象" class="headerlink" title="获得客户端和服务端对象"></a>获得客户端和服务端对象</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385418-server" target="_blank" rel="noopener">func server()</a><br>&emsp; 返回管理输入控制器的server对象</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385490-client" target="_blank" rel="noopener">func client()</a><br>&emsp; 返回与输入控制器关联的client对象</p>
+<h2 id="跟踪选择"><a href="#跟踪选择" class="headerlink" title="跟踪选择"></a>跟踪选择</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385432-annotationselected" target="_blank" rel="noopener">func annotationSelected(NSAttributedString!, forCandidate: NSAttributedString!)</a><br>&emsp; 向输入控制器发送被选中的候选串和注释串</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385365-candidateselectionchanged" target="_blank" rel="noopener">func candidateSelectionChanged(NSAttributedString!)</a><br>&emsp; 通知输入控制器当前候选窗中选中的候选项发生了变化</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385451-candidateselected" target="_blank" rel="noopener">func candidateSelected(NSAttributedString!)</a><br>&emsp; 通知输入控制器一个新的候选被选中了</p>
+<h2 id="管理写作串"><a href="#管理写作串" class="headerlink" title="管理写作串"></a>管理写作串</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385502-updatecomposition" target="_blank" rel="noopener">func updateComposition()</a><br>&emsp; 通知输入控制器写作串发生变化</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385479-cancelcomposition" target="_blank" rel="noopener">func cancelComposition()</a><br>&emsp; 取消当前写作串，并用原始串替代当前标记的文本</p>
+<h2 id="隐藏用户界面"><a href="#隐藏用户界面" class="headerlink" title="隐藏用户界面"></a>隐藏用户界面</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385430-hidepalettes" target="_blank" rel="noopener">func hidePalettes()</a><br>&emsp; 通知输入法隐藏用户界面</p>
+<h2 id="用户自定义命令"><a href="#用户自定义命令" class="headerlink" title="用户自定义命令"></a>用户自定义命令</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385553-docommand" target="_blank" rel="noopener">func doCommand(by: Selector!, command: [AnyHashable : Any]!)</a><br>&emsp; 传递由非输入法进程产生的命令</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385406-menu" target="_blank" rel="noopener">func menu()</a><br>&emsp; 返回输入法的命令菜单</p>
+<h2 id="实例方法-1"><a href="#实例方法-1" class="headerlink" title="实例方法"></a>实例方法</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385555-delegate" target="_blank" rel="noopener">func delegate()</a><br>&emsp; </p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkinputcontroller/1385375-inputcontrollerwillclose" target="_blank" rel="noopener">func inputControllerWillClose()</a><br>&emsp; </p>
+<h1 id="IMKServer"><a href="#IMKServer" class="headerlink" title="IMKServer"></a>IMKServer</h1><p>IMKServer类管理客户端与输入法的连接。应当在main函数中创建IMKServer对象，永远不要修改该类，不要从它派生子类。下面是它的成员：</p>
+<h2 id="初始化对象"><a href="#初始化对象" class="headerlink" title="初始化对象"></a>初始化对象</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/1385475-init" target="_blank" rel="noopener">init!(name: String!, bundleIdentifier: String!)</a><br>&emsp; 根据plist文件提供的信息创建并返回一个server对象</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/1385520-init" target="_blank" rel="noopener">init!(name: String!, controllerClass: AnyClass!, delegateClass: AnyClass!)</a><br>&emsp; 根据参数创建并返回一个server对象</p>
+<h2 id="获得输入法的Bundle"><a href="#获得输入法的Bundle" class="headerlink" title="获得输入法的Bundle"></a>获得输入法的Bundle</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/1385387-bundle" target="_blank" rel="noopener">func bundle()</a><br>&emsp; 返回输入法的NSBundle对象</p>
+<h2 id="常量-1"><a href="#常量-1" class="headerlink" title="常量"></a>常量</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/imkmodedictionary" target="_blank" rel="noopener">IMKModeDictionary</a><br>&emsp; 输入法模式字典关键字</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/imkcontrollerclass" target="_blank" rel="noopener">IMKControllerClass</a><br>&emsp; 输入法控制器类的关键字</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/imkdelegateclass" target="_blank" rel="noopener">IMKDelegateClass</a><br>&emsp; 输入法代理类的关键字</p>
+<h2 id="实例方法-2"><a href="#实例方法-2" class="headerlink" title="实例方法"></a>实例方法</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/1385506-lastkeyeventwasdeadkey" target="_blank" rel="noopener">func lastKeyEventWasDeadKey()</a><br>&emsp; </p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkserver/1385358-palettewillterminate" target="_blank" rel="noopener">func paletteWillTerminate()</a><br>&emsp; </p>
+<h1 id="IMKMouseHandling"><a href="#IMKMouseHandling" class="headerlink" title="IMKMouseHandling"></a>IMKMouseHandling</h1><p>这是一个协议，它定义了输入法可以实现的鼠标处理事件。一下是它的成员：</p>
+<h2 id="处理鼠标事件"><a href="#处理鼠标事件" class="headerlink" title="处理鼠标事件"></a>处理鼠标事件</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkmousehandling/1385444-mousedown" target="_blank" rel="noopener">func mouseDown(onCharacterIndex: Int, coordinate: NSPoint, withModifier: Int, continueTracking: UnsafeMutablePointer<objcbool>!, client: Any!)</objcbool></a><br>&emsp; 处理发送给输入法的鼠标按下事件</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkmousehandling/1385410-mouseup" target="_blank" rel="noopener">func mouseUp(onCharacterIndex: Int, coordinate: NSPoint, withModifier: Int, client: Any!)</a><br>&emsp; 处理发送给输入法的鼠标抬起事件</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkmousehandling/1385551-mousemoved" target="_blank" rel="noopener">func mouseMoved(onCharacterIndex: Int, coordinate: NSPoint, withModifier: Int, client: Any!)</a><br>&emsp; 处理发送给输入法的鼠标移动事件</p>
+<h1 id="IMKServerInput"><a href="#IMKServerInput" class="headerlink" title="IMKServerInput"></a>IMKServerInput</h1><p>这是一个协议，它定义了处理文本事件的方法。这不是一个正式协议，因为有三种方式来处理事件，输入法选择其中之一来实现对应方法。如下：</p>
+<ul>
+<li><p>键盘绑定。系统把每一个键盘按下事件映射到到输入法的一个方法。如果成功（找到此映射方法），系统调用<code>didCommandBySelector:client:</code>，否则（没有找到该方法）调用<code>inputText:client:</code>。针对此方式，你应当实现<code>input​Text:​client:​</code> 和<code>did​Command​By​Selector:​client:​</code>两个方法。</p>
+</li>
+<li><p>只处理文本数据。这种方式下你无需键盘绑定就能接收到所有键盘事件，然后解析相关的文本数据。键盘事件会包含Unicodes，产生它们的键盘码，修饰标记。该数据被发送给方法<code>input​Text:​key:​modifiers:​client:​</code>，你应当实现该方法。</p>
+</li>
+<li><p>处理所有事件。这种方式下输入法会接收到来自文本服务管理器的所有方法，这些方法被封装为NSEvent对象。你必须实现方法<code>handle​Event:​client:​</code>。</p>
+</li>
+</ul>
+<h2 id="支持键盘绑定"><a href="#支持键盘绑定" class="headerlink" title="支持键盘绑定"></a>支持键盘绑定</h2><p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385446-inputtext?language=objc" target="_blank" rel="noopener">- (BOOL)inputText:(NSString *)string client:(id)sender;</a><br>&emsp; 处理没有映射到响应方法的键盘按下事件</p>
+<p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385394-didcommandbyselector?language=objc" target="_blank" rel="noopener">- (BOOL)didCommandBySelector:(SEL)aSelector client:(id)sender;</a><br>&emsp; 处理由用户行为产生的命令，比如按下某个按键或点击了鼠标按键</p>
+<h2 id="解析文本数据"><a href="#解析文本数据" class="headerlink" title="解析文本数据"></a>解析文本数据</h2><p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385436-inputtext" target="_blank" rel="noopener">- (BOOL)inputText:(NSString *)string key:(NSInteger)keyCode modifiers:(NSUInteger)flags client:(id)sender;</a><br>&emsp; 接收unicode、键盘码以及键盘的修饰标记数据</p>
+<h2 id="直接从文本服务管理器接收事件"><a href="#直接从文本服务管理器接收事件" class="headerlink" title="直接从文本服务管理器接收事件"></a>直接从文本服务管理器接收事件</h2><p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385363-handle" target="_blank" rel="noopener">- (BOOL)handleEvent:(NSEvent *)event client:(id)sender;</a><br>&emsp; 处理键盘按下和鼠标事件</p>
+<h2 id="提交写作串"><a href="#提交写作串" class="headerlink" title="提交写作串"></a>提交写作串</h2><p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385539-commitcomposition" target="_blank" rel="noopener">func commitComposition(Any!)</a><br>&emsp; 通知控制器，提交组织串</p>
+<h2 id="获得输入串和候选串"><a href="#获得输入串和候选串" class="headerlink" title="获得输入串和候选串"></a>获得输入串和候选串</h2><p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385416-composedstring" target="_blank" rel="noopener">func composedString(Any!)</a><br>&emsp; 返回当前组织串</p>
+<p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385400-originalstring" target="_blank" rel="noopener">func originalString(Any!)</a><br>&emsp; 返回组织前的unicode字串</p>
+<p><a href="https://developer.apple.com/reference/objectivec/nsobject/1385360-candidates" target="_blank" rel="noopener">func candidates(Any!)</a><br>&emsp; 返回候选列表</p>
+<h2 id="常量-2"><a href="#常量-2" class="headerlink" title="常量"></a>常量</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkserverinput/info_dictionary_keys" target="_blank" rel="noopener">Info Dictionary Keys</a><br>&emsp; </p>
+<h1 id="IMKStateSetting"><a href="#IMKStateSetting" class="headerlink" title="IMKStateSetting"></a>IMKStateSetting</h1><p>这是一个协议，它定义了设置和修改输入法状态的方法。下面是它的成员</p>
+<h2 id="激活和解除激活Server"><a href="#激活和解除激活Server" class="headerlink" title="激活和解除激活Server"></a>激活和解除激活Server</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkstatesetting/1385434-activateserver" target="_blank" rel="noopener">func activateServer(Any!)</a><br>&emsp; 激活输入法server</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkstatesetting/1385424-deactivateserver" target="_blank" rel="noopener">func deactivateServer(Any!)</a><br>&emsp; 解除激活输入法server</p>
+<h2 id="显示偏好设置窗口"><a href="#显示偏好设置窗口" class="headerlink" title="显示偏好设置窗口"></a>显示偏好设置窗口</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkstatesetting/1385549-showpreferences" target="_blank" rel="noopener">func showPreferences(Any!)</a><br>&emsp; 显示偏好设置窗口</p>
+<h2 id="获得支持的事件"><a href="#获得支持的事件" class="headerlink" title="获得支持的事件"></a>获得支持的事件</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkstatesetting/1385535-recognizedevents" target="_blank" rel="noopener">func recognizedEvents(Any!)</a><br>&emsp; 返回表示事件掩码的无符号整形数</p>
+<h2 id="获得模式字典"><a href="#获得模式字典" class="headerlink" title="获得模式字典"></a>获得模式字典</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkstatesetting/1385461-modes" target="_blank" rel="noopener">func modes(Any!)</a><br>&emsp; 返回与输入法关联的模式字典</p>
+<h2 id="存取值"><a href="#存取值" class="headerlink" title="存取值"></a>存取值</h2><p><a href="https://developer.apple.com/reference/inputmethodkit/imkstatesetting/1385547-value" target="_blank" rel="noopener">func value(forTag: Int, client: Any!)</a><br>&emsp; 返回与tag匹配的值</p>
+<p><a href="https://developer.apple.com/reference/inputmethodkit/imkstatesetting/1385412-setvalue" target="_blank" rel="noopener">func setValue(Any!, forTag: Int, client: Any!)</a><br>&emsp; 将值保存到key下</p>
+<h1 id="NSObject"><a href="#NSObject" class="headerlink" title="NSObject"></a>NSObject</h1><p>这是Objective-C派生体系的根类，从该类可以继承Objective-C对象的基本能力。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/05/2017/0305macOSIMKSample1/" rel="next" title="macOS下基于IMK的输入法（一）——创建步骤">
+                <i class="fa fa-chevron-left"></i> macOS下基于IMK的输入法（一）——创建步骤
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/07/2017/0307CustomKeyboard/" rel="prev" title="iOS下的自定义键盘（译）">
+                iOS下的自定义键盘（译） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/03/06/2017/0306InputMethodKit/" data-title="macOS下的Input Method Kit（译）" data-url="http://palanceli.github.io/2017/03/06/2017/0306InputMethodKit/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概要"><span class="nav-number">1.</span> <span class="nav-text">概要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMKCandidates"><span class="nav-number">2.</span> <span class="nav-text">IMKCandidates</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化候选窗"><span class="nav-number">2.1.</span> <span class="nav-text">初始化候选窗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理选择按键"><span class="nav-number">2.2.</span> <span class="nav-text">管理选择按键</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理窗口展现和行为"><span class="nav-number">2.3.</span> <span class="nav-text">管理窗口展现和行为</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理窗体类型和文字属性"><span class="nav-number">2.4.</span> <span class="nav-text">管理窗体类型和文字属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#显示注释窗口"><span class="nav-number">2.5.</span> <span class="nav-text">显示注释窗口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常量"><span class="nav-number">2.6.</span> <span class="nav-text">常量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化器"><span class="nav-number">2.7.</span> <span class="nav-text">初始化器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例方法"><span class="nav-number">2.8.</span> <span class="nav-text">实例方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMKInputController"><span class="nav-number">3.</span> <span class="nav-text">IMKInputController</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化InputController"><span class="nav-number">3.1.</span> <span class="nav-text">初始化InputController</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#区域相关"><span class="nav-number">3.2.</span> <span class="nav-text">区域相关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理代理"><span class="nav-number">3.3.</span> <span class="nav-text">管理代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获得客户端和服务端对象"><span class="nav-number">3.4.</span> <span class="nav-text">获得客户端和服务端对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跟踪选择"><span class="nav-number">3.5.</span> <span class="nav-text">跟踪选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理写作串"><span class="nav-number">3.6.</span> <span class="nav-text">管理写作串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#隐藏用户界面"><span class="nav-number">3.7.</span> <span class="nav-text">隐藏用户界面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户自定义命令"><span class="nav-number">3.8.</span> <span class="nav-text">用户自定义命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例方法-1"><span class="nav-number">3.9.</span> <span class="nav-text">实例方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMKServer"><span class="nav-number">4.</span> <span class="nav-text">IMKServer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化对象"><span class="nav-number">4.1.</span> <span class="nav-text">初始化对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获得输入法的Bundle"><span class="nav-number">4.2.</span> <span class="nav-text">获得输入法的Bundle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常量-1"><span class="nav-number">4.3.</span> <span class="nav-text">常量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例方法-2"><span class="nav-number">4.4.</span> <span class="nav-text">实例方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMKMouseHandling"><span class="nav-number">5.</span> <span class="nav-text">IMKMouseHandling</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#处理鼠标事件"><span class="nav-number">5.1.</span> <span class="nav-text">处理鼠标事件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMKServerInput"><span class="nav-number">6.</span> <span class="nav-text">IMKServerInput</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#支持键盘绑定"><span class="nav-number">6.1.</span> <span class="nav-text">支持键盘绑定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解析文本数据"><span class="nav-number">6.2.</span> <span class="nav-text">解析文本数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#直接从文本服务管理器接收事件"><span class="nav-number">6.3.</span> <span class="nav-text">直接从文本服务管理器接收事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交写作串"><span class="nav-number">6.4.</span> <span class="nav-text">提交写作串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获得输入串和候选串"><span class="nav-number">6.5.</span> <span class="nav-text">获得输入串和候选串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常量-2"><span class="nav-number">6.6.</span> <span class="nav-text">常量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IMKStateSetting"><span class="nav-number">7.</span> <span class="nav-text">IMKStateSetting</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#激活和解除激活Server"><span class="nav-number">7.1.</span> <span class="nav-text">激活和解除激活Server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#显示偏好设置窗口"><span class="nav-number">7.2.</span> <span class="nav-text">显示偏好设置窗口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获得支持的事件"><span class="nav-number">7.3.</span> <span class="nav-text">获得支持的事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获得模式字典"><span class="nav-number">7.4.</span> <span class="nav-text">获得模式字典</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存取值"><span class="nav-number">7.5.</span> <span class="nav-text">存取值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NSObject"><span class="nav-number">8.</span> <span class="nav-text">NSObject</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

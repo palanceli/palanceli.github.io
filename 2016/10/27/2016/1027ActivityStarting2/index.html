@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Activity启动过程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="收到来自ActivityManagerService的进程间通信请求SCHEDULE_PAUSE_ACTIVITY_TRANSACTION后，Launcher通过ApplicationThread::schedulePauseActivity(...)来执行处理操作：">
+<meta name="keywords" content="Activity启动过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Activity启动过程学习笔记（二）">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="收到来自ActivityManagerService的进程间通信请求SCHEDULE_PAUSE_ACTIVITY_TRANSACTION后，Launcher通过ApplicationThread::schedulePauseActivity(...)来执行处理操作：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/img06.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.771Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Activity启动过程学习笔记（二）">
+<meta name="twitter:description" content="收到来自ActivityManagerService的进程间通信请求SCHEDULE_PAUSE_ACTIVITY_TRANSACTION后，Launcher通过ApplicationThread::schedulePauseActivity(...)来执行处理操作：">
+<meta name="twitter:image" content="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/img03.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/">
+
+
+
+
+
+  <title>Activity启动过程学习笔记（二） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Activity启动过程学习笔记（二）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-27T22:36:58+08:00">
+                2016-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/27/2016/1027ActivityStarting2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/27/2016/1027ActivityStarting2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>收到来自<code>ActivityManagerService</code>的进程间通信请求<code>SCHEDULE_PAUSE_ACTIVITY_TRANSACTION</code>后，Launcher通过<code>ApplicationThread::schedulePauseActivity(...)</code>来执行处理操作：<br><a id="more"></a></p>
+<h1 id="Step18-ApplicationThread-schedulePauseActivity-…"><a href="#Step18-ApplicationThread-schedulePauseActivity-…" class="headerlink" title="Step18 ApplicationThread::schedulePauseActivity(…)"></a>Step18 ApplicationThread::schedulePauseActivity(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ActivityThread</span> </span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationThread</span> <span class="keyword">extends</span> <span class="title">ApplicationThreadNative</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line"><span class="comment">// :588</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">schedulePauseActivity</span><span class="params">(IBinder token, <span class="keyword">boolean</span> finished,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">boolean</span> userLeaving, <span class="keyword">int</span> configChanges, <span class="keyword">boolean</span> dontReport)</span> </span>&#123;</span><br><span class="line">            sendMessage(</span><br><span class="line">                    finished ? H.PAUSE_ACTIVITY_FINISHING : H.PAUSE_ACTIVITY,</span><br><span class="line">                    token,</span><br><span class="line">                    (userLeaving ? <span class="number">1</span> : <span class="number">0</span>) | (dontReport ? <span class="number">2</span> : <span class="number">0</span>),</span><br><span class="line">                    configChanges);</span><br><span class="line">        &#125;...</span><br><span class="line">    &#125;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中参数<br><code>finished</code>为flase；<br><code>token</code>是指向ActivityManagerService中Launcher对应的ActivityRecord对象的Binder代理对象；<br><code>userLeaving</code>为true。<br>因此，sendMessage向Launcher的主线程发送PAUSE_ACTIVITY消息。</p>
+<h1 id="Step19-ActivityThread-sendMessage-…"><a href="#Step19-ActivityThread-sendMessage-…" class="headerlink" title="Step19 ActivityThread::sendMessage(…)"></a>Step19 ActivityThread::sendMessage(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:2265</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">(<span class="keyword">int</span> what, Object obj, <span class="keyword">int</span> arg1, <span class="keyword">int</span> arg2)</span> </span>&#123;</span><br><span class="line">        sendMessage(what, obj, arg1, arg2, <span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendMessage</span><span class="params">(<span class="keyword">int</span> what, Object obj, <span class="keyword">int</span> arg1, <span class="keyword">int</span> arg2, <span class="keyword">boolean</span> async)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        Message msg = Message.obtain();</span><br><span class="line">        msg.what = what;</span><br><span class="line">        msg.obj = obj;</span><br><span class="line">        msg.arg1 = arg1;</span><br><span class="line">        msg.arg2 = arg2;</span><br><span class="line">        <span class="keyword">if</span> (async) &#123;</span><br><span class="line">            msg.setAsynchronous(<span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// mH用来处理进程的主线程消息，类型为H，继承自Handle。sendMessage向主线程消息队列</span></span><br><span class="line">        <span class="comment">// 发送一个消息，该消息最终由应用程序主线程的handleMessage处理。此处发送的消息将在</span></span><br><span class="line">        <span class="comment">// Launcher中执行中止Launcher组建的操作</span></span><br><span class="line">        mH.sendMessage(msg);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step20-ActivityThread-handleMessage-…"><a href="#Step20-ActivityThread-handleMessage-…" class="headerlink" title="Step20 ActivityThread::handleMessage(…)"></a>Step20 ActivityThread::handleMessage(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:1335</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="keyword">case</span> PAUSE_ACTIVITY:</span><br><span class="line">                    ... ...</span><br><span class="line">                    handlePauseActivity((IBinder)msg.obj, <span class="keyword">false</span>, (msg.arg1&amp;<span class="number">1</span>) != <span class="number">0</span>, msg.arg2,</span><br><span class="line">                            (msg.arg1&amp;<span class="number">2</span>) != <span class="number">0</span>);</span><br><span class="line">                    ... ...</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step21-ActivityThread-handlePauseActivity-…"><a href="#Step21-ActivityThread-handlePauseActivity-…" class="headerlink" title="Step21 ActivityThread::handlePauseActivity(…)"></a>Step21 ActivityThread::handlePauseActivity(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:3305</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handlePauseActivity</span><span class="params">(IBinder token, <span class="keyword">boolean</span> finished,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> userLeaving, <span class="keyword">int</span> configChanges, <span class="keyword">boolean</span> dontReport)</span> </span>&#123;</span><br><span class="line">        ActivityClientRecord r = mActivities.get(token); <span class="comment">// 找到Launcher的ActivityRecord对象</span></span><br><span class="line">        <span class="keyword">if</span> (r != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">if</span> (userLeaving) &#123;</span><br><span class="line">                performUserLeavingActivity(r); <span class="comment">// 向Launcher发送一个用户离开事件通知</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            r.activity.mConfigChangeFlags |= configChanges;</span><br><span class="line">            <span class="comment">// 向Launcher发送一个中止事件通知</span></span><br><span class="line">            performPauseActivity(token, finished, r.isPreHoneycomb());</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 等待完成前面Launcher中止可能导致的数据写入操作完成</span></span><br><span class="line">            <span class="keyword">if</span> (r.isPreHoneycomb()) &#123;</span><br><span class="line">                QueuedWork.waitToFinish();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 🏁通知ActivityManagerService，Launcher组件已经进入Paused状态</span></span><br><span class="line">            <span class="keyword">if</span> (!dontReport) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123; <span class="comment">// getDefault()返回ActivityManagerService的代理对象</span></span><br><span class="line">                    ActivityManagerNative.getDefault().activityPaused(token);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException ex) &#123;&#125;</span><br><span class="line">            &#125;</span><br><span class="line">            mSomeActivitiesChanged = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step22-ActivityManagerProxy-activityPaused-…"><a href="#Step22-ActivityManagerProxy-activityPaused-…" class="headerlink" title="Step22 ActivityManagerProxy::activityPaused(…)"></a>Step22 ActivityManagerProxy::activityPaused(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityManagerNative.java:3134</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">activityPaused</span><span class="params">(IBinder token)</span> <span class="keyword">throws</span> RemoteException</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Parcel data = Parcel.obtain();</span><br><span class="line">        Parcel reply = Parcel.obtain();</span><br><span class="line">        data.writeInterfaceToken(IActivityManager.descriptor);</span><br><span class="line">        data.writeStrongBinder(token);</span><br><span class="line">        mRemote.transact(ACTIVITY_PAUSED_TRANSACTION, data, reply, <span class="number">0</span>);</span><br><span class="line">        reply.readException();</span><br><span class="line">        data.recycle();</span><br><span class="line">        reply.recycle();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>此处向ActivityManagerService发送类型为ACTIVITY_PAUSED_TRANSACTION的进程间通信请求。<br>以上Step18~Step22在Launcher中执行，如下图：<br><img src="/2016/10/27/2016/1027ActivityStarting2/img03.png" alt="Step18~Step22"><br><strong>接下来又转入ActivityManagerService执行。</strong></p>
+<h1 id="Step23-ActivityManagerService-activityPaused-…"><a href="#Step23-ActivityManagerService-activityPaused-…" class="headerlink" title="Step23 ActivityManagerService::activityPaused(…)"></a>Step23 ActivityManagerService::activityPaused(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/service/core/java/com/android/server/am/ActivityManagerService.java:6498</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">activityPaused</span><span class="params">(IBinder token)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">            ActivityStack stack = ActivityRecord.getStackLocked(token);</span><br><span class="line">            <span class="keyword">if</span> (stack != <span class="keyword">null</span>) &#123;</span><br><span class="line">                stack.activityPausedLocked(token, <span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step24-ActivityStack-activityPausedLocked-…"><a href="#Step24-ActivityStack-activityPausedLocked-…" class="headerlink" title="Step24 ActivityStack::activityPausedLocked(…)"></a>Step24 ActivityStack::activityPausedLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/service/core/java/com/android/server/am/ActivityStack.java:928</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">activityPausedLocked</span><span class="params">(IBinder token, <span class="keyword">boolean</span> timeout)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// 根据token找到Launcher对应的ActivityRecord对象</span></span><br><span class="line">        <span class="keyword">final</span> ActivityRecord r = isInStackLocked(token);</span><br><span class="line">        <span class="keyword">if</span> (r != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// Launcher已经在规定的时间内处理完成中止通知，因此可以删除消息了</span></span><br><span class="line">            mHandler.removeMessages(PAUSE_TIMEOUT_MSG, r); </span><br><span class="line">            <span class="keyword">if</span> (mPausingActivity == r) &#123; <span class="comment">// 前面已经将mPausingActivity指向Launcher</span></span><br><span class="line">                ... ...</span><br><span class="line">                completePauseLocked(<span class="keyword">true</span>); <span class="comment">// 🏁 启动新组件</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; ... &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step25-ActivityStack-completePauseLocked-…"><a href="#Step25-ActivityStack-completePauseLocked-…" class="headerlink" title="Step25 ActivityStack::completePauseLocked(…)"></a>Step25 ActivityStack::completePauseLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/service/core/java/com/android/server/am/ActivityStack.java:994</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">completePauseLocked</span><span class="params">(<span class="keyword">boolean</span> resumeNext)</span> </span>&#123;</span><br><span class="line">        ActivityRecord prev = mPausingActivity;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">if</span> (prev != <span class="keyword">null</span>) &#123;</span><br><span class="line">            prev.state = ActivityState.PAUSED;</span><br><span class="line">            ... ...</span><br><span class="line">            mPausingActivity = <span class="keyword">null</span>; <span class="comment">// 系统当前正在中止的Activity已经进入Paused状态</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (resumeNext) &#123;</span><br><span class="line">            <span class="keyword">final</span> ActivityStack topStack = mStackSupervisor.getFocusedStack();</span><br><span class="line">            <span class="comment">//系统不是正进入休眠或关闭状态，则启动位于组件堆栈顶端的Activity</span></span><br><span class="line">            <span class="keyword">if</span> (!mService.isSleepingOrShuttingDown()) &#123; </span><br><span class="line">                mStackSupervisor.resumeTopActivitiesLocked(topStack, prev, <span class="keyword">null</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; ... &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step26-ActivityStackSupervisor-resumeTopActivitiesLocked-…"><a href="#Step26-ActivityStackSupervisor-resumeTopActivitiesLocked-…" class="headerlink" title="Step26 ActivityStackSupervisor::resumeTopActivitiesLocked(…)"></a>Step26 ActivityStackSupervisor::resumeTopActivitiesLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityStackSupervisor.java:2727</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">resumeTopActivitiesLocked</span><span class="params">(ActivityStack targetStack, ActivityRecord target,</span></span></span><br><span class="line"><span class="function"><span class="params">            Bundle targetOptions)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> displayNdx = mActivityDisplays.size() - <span class="number">1</span>; displayNdx &gt;= <span class="number">0</span>; --displayNdx) &#123;</span><br><span class="line">            <span class="keyword">final</span> ArrayList&lt;ActivityStack&gt; stacks = mActivityDisplays.valueAt(displayNdx).mStacks;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> stackNdx = stacks.size() - <span class="number">1</span>; stackNdx &gt;= <span class="number">0</span>; --stackNdx) &#123;</span><br><span class="line">                <span class="keyword">final</span> ActivityStack stack = stacks.get(stackNdx);</span><br><span class="line">                <span class="keyword">if</span> (stack == targetStack) &#123;</span><br><span class="line">                    <span class="comment">// Already started above.</span></span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (isFrontStack(stack)) &#123;</span><br><span class="line">                    stack.resumeTopActivityLocked(<span class="keyword">null</span>); <span class="comment">// 🏁</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step27-ActivityStack-resumeTopActivityLocked-…"><a href="#Step27-ActivityStack-resumeTopActivityLocked-…" class="headerlink" title="Step27 ActivityStack::resumeTopActivityLocked(…)"></a>Step27 ActivityStack::resumeTopActivityLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityStack.java:1536</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">resumeTopActivityLocked</span><span class="params">(ActivityRecord prev)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> resumeTopActivityLocked(prev, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">resumeTopActivityLocked</span><span class="params">(ActivityRecord prev, Bundle options)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">boolean</span> result = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// Protect against recursion.</span></span><br><span class="line">            mStackSupervisor.inResumeTopActivity = <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">if</span> (mService.mLockScreenShown == ActivityManagerService.LOCK_SCREEN_LEAVING) &#123;</span><br><span class="line">                mService.mLockScreenShown = ActivityManagerService.LOCK_SCREEN_HIDDEN;</span><br><span class="line">                mService.updateSleepIfNeededLocked();</span><br><span class="line">            &#125;</span><br><span class="line">            result = resumeTopActivityInnerLocked(prev, options); <span class="comment">// 🏁</span></span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            mStackSupervisor.inResumeTopActivity = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step28-ActivityStack-resumeTopActivityInnerLocked-…"><a href="#Step28-ActivityStack-resumeTopActivityInnerLocked-…" class="headerlink" title="Step28 ActivityStack::resumeTopActivityInnerLocked(…)"></a>Step28 ActivityStack::resumeTopActivityInnerLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityStack.java:1561</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">resumeTopActivityInnerLocked</span><span class="params">(ActivityRecord prev, Bundle options)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// Find the first activity that is not finishing.</span></span><br><span class="line">        <span class="keyword">final</span> ActivityRecord next = topRunningActivityLocked(<span class="keyword">null</span>);</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// 前面ActivityManagerServer已经调用过resumeTopActivityLocked试图启动</span></span><br><span class="line">        <span class="comment">// Activity组件了，但由于那时候Launcher尚未进入Paused状态，就先调用</span></span><br><span class="line">        <span class="comment">// startPausingLocke执行中止Launcher的操作。在向Launcher发送中止通知前，</span></span><br><span class="line">        <span class="comment">// 已经将mResumedActivity置null了，因此此处为false</span></span><br><span class="line">        <span class="keyword">if</span> (mResumedActivity != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            pausing |= startPausingLocked(userLeaving, <span class="keyword">false</span>, <span class="keyword">true</span>, dontWaitForPause);</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// 即将启动的Activity组件尚未被启动起来，因此app为null</span></span><br><span class="line">        <span class="keyword">if</span> (next.app != <span class="keyword">null</span> &amp;&amp; next.app.thread != <span class="keyword">null</span>) &#123; ... &#125; </span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 🏁启动next</span></span><br><span class="line">            mStackSupervisor.startSpecificActivityLocked(next, <span class="keyword">true</span>, <span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step29-ActivityStackSupervisor-startSpecificActivityLocked-…"><a href="#Step29-ActivityStackSupervisor-startSpecificActivityLocked-…" class="headerlink" title="Step29 ActivityStackSupervisor::startSpecificActivityLocked(…)"></a>Step29 ActivityStackSupervisor::startSpecificActivityLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityStack.java:1365</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">startSpecificActivityLocked</span><span class="params">(ActivityRecord r,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> andResume, <span class="keyword">boolean</span> checkConfig)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获得r对应的Activity所在的进程</span></span><br><span class="line">        ProcessRecord app = mService.getProcessRecordLocked(r.processName,</span><br><span class="line">                r.info.applicationInfo.uid, <span class="keyword">true</span>);</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">if</span> (app != <span class="keyword">null</span> &amp;&amp; app.thread != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="comment">// 如果进程已存在，则通知进程启动组件</span></span><br><span class="line">                realStartActivityLocked(r, app, andResume, checkConfig);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123; ... &#125;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 否则先将进程启动起来</span></span><br><span class="line">        mService.startProcessLocked(r.processName, r.info.applicationInfo, <span class="keyword">true</span>, <span class="number">0</span>,</span><br><span class="line">                <span class="string">"activity"</span>, r.intent.getComponent(), <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>mService</code>的类型为ActivityManagerService。</p>
+<h1 id="Step30-ActivityManagerService-startProcessLocked-…"><a href="#Step30-ActivityManagerService-startProcessLocked-…" class="headerlink" title="Step30 ActivityManagerService::startProcessLocked(…)"></a>Step30 ActivityManagerService::startProcessLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java:3106</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> ProcessRecord <span class="title">startProcessLocked</span><span class="params">(String processName,</span></span></span><br><span class="line"><span class="function"><span class="params">            ApplicationInfo info, <span class="keyword">boolean</span> knownToBeDead, <span class="keyword">int</span> intentFlags,</span></span></span><br><span class="line"><span class="function"><span class="params">            String hostingType, ComponentName hostingName, <span class="keyword">boolean</span> allowWhileBooting,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> isolated, <span class="keyword">boolean</span> keepIfLarge)</span> </span>&#123; <span class="comment">// isolated=false</span></span><br><span class="line">        <span class="keyword">return</span> startProcessLocked(processName, info, knownToBeDead, intentFlags, hostingType,</span><br><span class="line">                hostingName, allowWhileBooting, isolated, <span class="number">0</span> <span class="comment">/* isolatedUid */</span>, keepIfLarge,</span><br><span class="line">                <span class="keyword">null</span> <span class="comment">/* ABI override */</span>, <span class="keyword">null</span> <span class="comment">/* entryPoint */</span>, <span class="keyword">null</span> <span class="comment">/* entryPointArgs */</span>,</span><br><span class="line">                <span class="keyword">null</span> <span class="comment">/* crashHandler */</span>); <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">// :3116</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> ProcessRecord <span class="title">startProcessLocked</span><span class="params">(String processName, ApplicationInfo info,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> knownToBeDead, <span class="keyword">int</span> intentFlags, String hostingType, ComponentName hostingName,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> allowWhileBooting, <span class="keyword">boolean</span> isolated, <span class="keyword">int</span> isolatedUid, <span class="keyword">boolean</span> keepIfLarge,</span></span></span><br><span class="line"><span class="function"><span class="params">            String abiOverride, String entryPoint, String[] entryPointArgs, Runnable crashHandler)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> startTime = SystemClock.elapsedRealtime();</span><br><span class="line">        ProcessRecord app;</span><br><span class="line">        <span class="keyword">if</span> (!isolated) &#123; <span class="comment">// isolated=false</span></span><br><span class="line">            app = getProcessRecordLocked(processName, info.uid, keepIfLarge);</span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;...&#125;</span><br><span class="line">        ... ...</span><br><span class="line">        String hostingNameStr = hostingName != <span class="keyword">null</span></span><br><span class="line">                ? hostingName.flattenToShortString() : <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (app == <span class="keyword">null</span>) &#123;</span><br><span class="line">            ... ... <span class="comment">// 如果请求创建的进程不存在，则根据指定名称和UID创建ProcessRecord对象</span></span><br><span class="line">            app = newProcessRecordLocked(info, processName, isolated, isolatedUid);</span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; ... &#125;</span><br><span class="line">        ... ... <span class="comment">// 🏁创建进程</span></span><br><span class="line">        startProcessLocked(</span><br><span class="line">                app, hostingType, hostingNameStr, abiOverride, entryPoint, entryPointArgs);</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">return</span> (app.pid != <span class="number">0</span>) ? app : <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Step30-1-ActivityManagerService-startProcessLocked-…"><a href="#Step30-1-ActivityManagerService-startProcessLocked-…" class="headerlink" title="Step30.1 ActivityManagerService::startProcessLocked(…)"></a>Step30.1 ActivityManagerService::startProcessLocked(…)</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java:3247</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">startProcessLocked</span><span class="params">(ProcessRecord app, String hostingType,</span></span></span><br><span class="line"><span class="function"><span class="params">            String hostingNameStr, String abiOverride, String entryPoint, String[] entryPointArgs)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">int</span> uid = app.uid;</span><br><span class="line">            <span class="keyword">int</span>[] gids = <span class="keyword">null</span>;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">if</span> (!app.isolated) &#123;</span><br><span class="line">                <span class="keyword">int</span>[] permGids = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    ... ... <span class="comment">// 获取要创建进程的uid和gid</span></span><br><span class="line">                    <span class="keyword">final</span> IPackageManager pm = AppGlobals.getPackageManager();</span><br><span class="line">                    permGids = pm.getPackageGids(app.info.packageName, app.userId);</span><br><span class="line">                    ... ...</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123; ... &#125;</span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">int</span> debugFlags = <span class="number">0</span>;</span><br><span class="line">            ... ...</span><br><span class="line">            app.gids = gids;</span><br><span class="line">            app.requiredAbi = requiredAbi;</span><br><span class="line">            app.instructionSet = instructionSet;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 指定函数入口为entryPoint的main函数</span></span><br><span class="line">            <span class="keyword">if</span> (entryPoint == <span class="keyword">null</span>) entryPoint = <span class="string">"android.app.ActivityThread"</span>;</span><br><span class="line">            ... ...</span><br><span class="line">            Process.ProcessStartResult startResult = Process.start(entryPoint,</span><br><span class="line">                    app.processName, uid, uid, gids, debugFlags, mountExternal,</span><br><span class="line">                    app.info.targetSdkVersion, app.info.seinfo, requiredAbi, instructionSet,</span><br><span class="line">                    app.info.dataDir, entryPointArgs);</span><br><span class="line">            ... ...</span><br><span class="line">                <span class="comment">// 以pid为关键字，将app保存到mPidsSelfLocked中</span></span><br><span class="line">                <span class="keyword">this</span>.mPidsSelfLocked.put(startResult.pid, app);</span><br><span class="line">                <span class="keyword">if</span> (isActivityProcess) &#123;</span><br><span class="line">                    <span class="comment">// 向ActivityManagerService发送此消息，并制定该消息在</span></span><br><span class="line">                    <span class="comment">// PROC_START_TIMEOUT毫秒后处理。新的应用程序必须在次时间内完成启</span></span><br><span class="line">                    <span class="comment">// 动工作，并向ActivityManagerService发送一个启动完成的通知，以便</span></span><br><span class="line">                    <span class="comment">// ActivityManagerService在它里面启动一个Activity组件；否则就会</span></span><br><span class="line">                    <span class="comment">// 认为它超时了，就不能将Activity启动起来。</span></span><br><span class="line">                    Message msg = mHandler.obtainMessage(PROC_START_TIMEOUT_MSG);</span><br><span class="line">                    msg.obj = app;</span><br><span class="line">                    mHandler.sendMessageDelayed(msg, startResult.usingWrapper</span><br><span class="line">                            ? PROC_START_TIMEOUT_WITH_WRAPPER : PROC_START_TIMEOUT);</span><br><span class="line">                &#125;</span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;...&#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>以上Step23~Step30.1的操作是在AvtivityManagerService中执行，如下图：<br><img src="/2016/10/27/2016/1027ActivityStarting2/img04.png" alt="Step23~Step30.1"></p>
+<p>调用<code>Process::start(...)</code>启动新进程时，指定该进程的入口函数为<code>android.app.ActivityThread</code>类的静态成员函数<code>main</code>，因此接下来就从新应用的<code>main</code>函数开始分析其启动过程。</p>
+<h1 id="Step31-ActivityThread-main-…"><a href="#Step31-ActivityThread-main-…" class="headerlink" title="Step31 ActivityThread::main(…)"></a>Step31 ActivityThread::main(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:5379</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        Looper.prepareMainLooper();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建thread对象时，会在它内部创建一个ApplicationThread对象mAppThread</span></span><br><span class="line">        <span class="comment">// 这是一个Binder本地对象，ActivityManagerService通过它和应用程序进程通信</span></span><br><span class="line">        ActivityThread thread = <span class="keyword">new</span> ActivityThread();</span><br><span class="line">        thread.attach(<span class="keyword">false</span>); <span class="comment">// 发送启动完成通知</span></span><br><span class="line">        ... ...</span><br><span class="line">        Looper.loop();        <span class="comment">// 进入消息循环</span></span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step32-ActivityThread-attach-…"><a href="#Step32-ActivityThread-attach-…" class="headerlink" title="Step32 ActivityThread::attach(…)"></a>Step32 ActivityThread::attach(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:5230</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">attach</span><span class="params">(<span class="keyword">boolean</span> system)</span> </span>&#123;</span><br><span class="line">        sCurrentActivityThread = <span class="keyword">this</span>;</span><br><span class="line">        mSystemThread = system;</span><br><span class="line">        <span class="keyword">if</span> (!system) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 获得ActivityManagerService的代理对象</span></span><br><span class="line">            <span class="keyword">final</span> IActivityManager mgr = ActivityManagerNative.getDefault();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 🏁向ActivityManagerService发送进程间通信请求，把mAppThread传递给它</span></span><br><span class="line">                mgr.attachApplication(mAppThread);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RemoteException ex) &#123;...&#125;</span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; ... &#125;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>mAppThread</code>的类型为<code>ApplicationThread</code>，</p>
+<h1 id="Step33-ActivityManagerProxy-attachApplication-…"><a href="#Step33-ActivityManagerProxy-attachApplication-…" class="headerlink" title="Step33 ActivityManagerProxy::attachApplication(…)"></a>Step33 ActivityManagerProxy::attachApplication(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityManagerNative.java:3093</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">attachApplication</span><span class="params">(IApplicationThread app)</span> <span class="keyword">throws</span> RemoteException</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Parcel data = Parcel.obtain();</span><br><span class="line">        Parcel reply = Parcel.obtain();</span><br><span class="line">        data.writeInterfaceToken(IActivityManager.descriptor);</span><br><span class="line">        data.writeStrongBinder(app.asBinder());</span><br><span class="line">        mRemote.transact(ATTACH_APPLICATION_TRANSACTION, data, reply, <span class="number">0</span>);</span><br><span class="line">        reply.readException();</span><br><span class="line">        data.recycle();</span><br><span class="line">        reply.recycle();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>此处向ActivityManagerService发送进程间通信请求，Step31~Step33的操作是在新进程中执行，如下图：<br><img src="/2016/10/27/2016/1027ActivityStarting2/img05.png" alt="Step31~Step33"><br><strong>接下来将转入ActivityManagerService中执行</strong>。</p>
+<h1 id="Step34-ActivityManagerService-attachApplication-…"><a href="#Step34-ActivityManagerService-attachApplication-…" class="headerlink" title="Step34 ActivityManagerService::attachApplication(…)"></a>Step34 ActivityManagerService::attachApplication(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java:6246</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">attachApplication</span><span class="params">(IApplicationThread thread)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            attachApplicationLocked(thread, callingPid);</span><br><span class="line">            ... ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step35-ActivityManagerService-attachApplicationLocked-…"><a href="#Step35-ActivityManagerService-attachApplicationLocked-…" class="headerlink" title="Step35 ActivityManagerService::attachApplicationLocked(…)"></a>Step35 ActivityManagerService::attachApplicationLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java:6016</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">attachApplicationLocked</span><span class="params">(IApplicationThread thread,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> pid)</span> </span>&#123; </span><br><span class="line">        <span class="comment">// pid为将要创建的进程PID，前面曾以此为关键字将ProcessRecord保存到</span></span><br><span class="line">        <span class="comment">// mPidSelfLocked中，此处先根据pid将它取出</span></span><br><span class="line">        ... ...</span><br><span class="line">        ProcessRecord app;</span><br><span class="line">        <span class="keyword">if</span> (pid != MY_PID &amp;&amp; pid &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (mPidsSelfLocked) &#123;</span><br><span class="line">                app = mPidsSelfLocked.get(pid);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; ... &#125;</span><br><span class="line">        ... ...  <span class="comment">// 进程已经起来，对app做初始化</span></span><br><span class="line">        <span class="comment">// thread指向ApplicationThread代理对象，以便ActivityManagerService通过此对象</span></span><br><span class="line">        <span class="comment">// 和新创建的进程通信</span></span><br><span class="line">        app.makeActive(thread, mProcessStats); </span><br><span class="line">        app.curAdj = app.setAdj = -<span class="number">100</span>;</span><br><span class="line">        app.curSchedGroup = app.setSchedGroup = Process.THREAD_GROUP_DEFAULT;</span><br><span class="line">        app.forcingToForeground = <span class="keyword">null</span>;</span><br><span class="line">        updateProcessForegroundLocked(app, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line">        app.hasShownUi = <span class="keyword">false</span>;</span><br><span class="line">        app.debugging = <span class="keyword">false</span>;</span><br><span class="line">        app.cached = <span class="keyword">false</span>;</span><br><span class="line">        app.killedByAm = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 删除此消息，因为新的应用程序已经在规定的时间内启动起来了</span></span><br><span class="line">        mHandler.removeMessages(PROC_START_TIMEOUT_MSG, app);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> normalMode = mProcessesReady || isAllowedWhileBooting(app.info);</span><br><span class="line">        List&lt;ProviderInfo&gt; providers = normalMode ? generateApplicationProvidersLocked(app) : <span class="keyword">null</span>;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// See if the top visible activity is waiting to run in this process...</span></span><br><span class="line">        <span class="keyword">if</span> (normalMode) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 🏁请求进程启动一个Activity组件</span></span><br><span class="line">                <span class="keyword">if</span> (mStackSupervisor.attachApplicationLocked(app)) &#123;</span><br><span class="line">                    didSomething = <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123; ... &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step36-ActivityStackSupervisor-attachApplicationLocked-…"><a href="#Step36-ActivityStackSupervisor-attachApplicationLocked-…" class="headerlink" title="Step36 ActivityStackSupervisor::attachApplicationLocked(…)"></a>Step36 ActivityStackSupervisor::attachApplicationLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityStackSupervisor.java:610</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">attachApplicationLocked</span><span class="params">(ProcessRecord app)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> String processName = app.processName;</span><br><span class="line">        <span class="keyword">boolean</span> didSomething = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> displayNdx = mActivityDisplays.size() - <span class="number">1</span>; displayNdx &gt;= <span class="number">0</span>; --displayNdx) &#123;</span><br><span class="line">            ArrayList&lt;ActivityStack&gt; stacks = mActivityDisplays.valueAt(displayNdx).mStacks;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> stackNdx = stacks.size() - <span class="number">1</span>; stackNdx &gt;= <span class="number">0</span>; --stackNdx) &#123;</span><br><span class="line">                <span class="keyword">final</span> ActivityStack stack = stacks.get(stackNdx);</span><br><span class="line">                <span class="keyword">if</span> (!isFrontStack(stack)) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 得到栈顶ActivityRecord对象</span></span><br><span class="line">                ActivityRecord hr = stack.topRunningActivityLocked(<span class="keyword">null</span>);</span><br><span class="line">                <span class="keyword">if</span> (hr != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (hr.app == <span class="keyword">null</span> &amp;&amp; app.uid == hr.info.applicationInfo.uid</span><br><span class="line">                            &amp;&amp; processName.equals(hr.processName)) &#123;</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            <span class="comment">// 🏁</span></span><br><span class="line">                            <span class="keyword">if</span> (realStartActivityLocked(hr, app, <span class="keyword">true</span>, <span class="keyword">true</span>)) &#123;</span><br><span class="line">                                didSomething = <span class="keyword">true</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (RemoteException e) &#123; ... &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">return</span> didSomething;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step37-ActivityStackSupervisor-realStartActivityLocked-…"><a href="#Step37-ActivityStackSupervisor-realStartActivityLocked-…" class="headerlink" title="Step37 ActivityStackSupervisor::realStartActivityLocked(…)"></a>Step37 ActivityStackSupervisor::realStartActivityLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityStackSupervisor.java:1179</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">realStartActivityLocked</span><span class="params">(ActivityRecord r,</span></span></span><br><span class="line"><span class="function"><span class="params">            ProcessRecord app, <span class="keyword">boolean</span> andResume, <span class="keyword">boolean</span> checkConfig)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        r.app = app; <span class="comment">// 即将启动的进程</span></span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">int</span> idx = app.activities.indexOf(r);</span><br><span class="line">        <span class="keyword">if</span> (idx &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            app.activities.add(r);  <span class="comment">// 将此Activity添加到app所描述的进程组件列表中</span></span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">final</span> ActivityStack stack = task.stack;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ... ...</span><br><span class="line">            List&lt;ResultInfo&gt; results = <span class="keyword">null</span>;</span><br><span class="line">            List&lt;ReferrerIntent&gt; newIntents = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (andResume) &#123;</span><br><span class="line">                results = r.results;</span><br><span class="line">                newIntents = r.newIntents;</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 通知前面创建的进程启动有r所描述的Activity组件</span></span><br><span class="line">            app.thread.scheduleLaunchActivity(<span class="keyword">new</span> Intent(r.intent), r.appToken,</span><br><span class="line">                    System.identityHashCode(r), r.info, <span class="keyword">new</span> Configuration(mService.mConfiguration),</span><br><span class="line">                    <span class="keyword">new</span> Configuration(stack.mOverrideConfig), r.compat, r.launchedFromPackage,</span><br><span class="line">                    task.voiceInteractor, app.repProcState, r.icicle, r.persistentState, results,</span><br><span class="line">                    newIntents, !andResume, mService.isNextTransitionForward(), profilerInfo);</span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RemoteException e) &#123; ... &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>app.thread是一个类型为ApplicationThreadProxy的Binder代理对象。</p>
+<h1 id="Step38-ApplicationThreadProxy-scheduleLaunchActivity-…"><a href="#Step38-ApplicationThreadProxy-scheduleLaunchActivity-…" class="headerlink" title="Step38 ApplicationThreadProxy::scheduleLaunchActivity(…)"></a>Step38 ApplicationThreadProxy::scheduleLaunchActivity(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ApplicationThreadNative.java:791</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">scheduleLaunchActivity</span><span class="params">(Intent intent, IBinder token, <span class="keyword">int</span> ident,</span></span></span><br><span class="line"><span class="function"><span class="params">            ActivityInfo info, Configuration curConfig, Configuration overrideConfig,</span></span></span><br><span class="line"><span class="function"><span class="params">            CompatibilityInfo compatInfo, String referrer, IVoiceInteractor voiceInteractor,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> procState, Bundle state, PersistableBundle persistentState,</span></span></span><br><span class="line"><span class="function"><span class="params">            List&lt;ResultInfo&gt; pendingResults, List&lt;ReferrerIntent&gt; pendingNewIntents,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> notResumed, <span class="keyword">boolean</span> isForward, ProfilerInfo profilerInfo)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        Parcel data = Parcel.obtain();</span><br><span class="line">        data.writeInterfaceToken(IApplicationThread.descriptor);</span><br><span class="line">        intent.writeToParcel(data, <span class="number">0</span>);</span><br><span class="line">        data.writeStrongBinder(token);</span><br><span class="line">        data.writeInt(ident);</span><br><span class="line">        ... ...</span><br><span class="line">        mRemote.transact(SCHEDULE_LAUNCH_ACTIVITY_TRANSACTION, data, <span class="keyword">null</span>,</span><br><span class="line">                IBinder.FLAG_ONEWAY);</span><br><span class="line">        data.recycle();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>此处向刚刚创建的应用程序发送一个进程间通信请求。以上Step34~Step38是在ActivityManagerService中执行，如下图：<br><img src="/2016/10/27/2016/1027ActivityStarting2/img06.png" alt="Step34~Step38"><br><strong>接下来又转到刚刚创建的应用程序中执行。</strong></p>
+<h1 id="Step39-ActivityThread-scheduleLaunchActivity-…"><a href="#Step39-ActivityThread-scheduleLaunchActivity-…" class="headerlink" title="Step39 ActivityThread::scheduleLaunchActivity(…)"></a>Step39 ActivityThread::scheduleLaunchActivity(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:630</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">scheduleLaunchActivity</span><span class="params">(Intent intent, IBinder token, <span class="keyword">int</span> ident,</span></span></span><br><span class="line"><span class="function"><span class="params">                ActivityInfo info, Configuration curConfig, Configuration overrideConfig,</span></span></span><br><span class="line"><span class="function"><span class="params">                CompatibilityInfo compatInfo, String referrer, IVoiceInteractor voiceInteractor,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">int</span> procState, Bundle state, PersistableBundle persistentState,</span></span></span><br><span class="line"><span class="function"><span class="params">                List&lt;ResultInfo&gt; pendingResults, List&lt;ReferrerIntent&gt; pendingNewIntents,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">boolean</span> notResumed, <span class="keyword">boolean</span> isForward, ProfilerInfo profilerInfo)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            updateProcessState(procState, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">            ActivityClientRecord r = <span class="keyword">new</span> ActivityClientRecord();</span><br><span class="line"></span><br><span class="line">            r.token = token;</span><br><span class="line">            r.ident = ident;</span><br><span class="line">            r.intent = intent;</span><br><span class="line">            ... ...</span><br><span class="line">            sendMessage(H.LAUNCH_ACTIVITY, r); <span class="comment">// 🏁</span></span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>此处把将要启动的Activity封装成一个ActivityClientRecord对象，再将此对象通过sendMessage发送到消息队列。回顾Step19，该消息最终落到ActivityThread::handleMessage(…)中处理。</p>
+<h1 id="Step40-ActivityThread-handleMessage-…"><a href="#Step40-ActivityThread-handleMessage-…" class="headerlink" title="Step40 ActivityThread::handleMessage(…)"></a>Step40 ActivityThread::handleMessage(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:1335</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">                <span class="keyword">case</span> LAUNCH_ACTIVITY: &#123;</span><br><span class="line">                    ... ...</span><br><span class="line">                    <span class="keyword">final</span> ActivityClientRecord r = (ActivityClientRecord) msg.obj;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 每个Android应用程序都打包在一个Apk文件中，一个Apk文件包含此应用</span></span><br><span class="line">                    <span class="comment">// 的所有资源，应用进程在启动一个Activity组件时需要加载它所属的Apk</span></span><br><span class="line">                    <span class="comment">// 文件以便访问里面的资源。packageInfo就用来描述已加载的Apk文件，</span></span><br><span class="line">                    <span class="comment">// 其类型为LoadedApk</span></span><br><span class="line">                    r.packageInfo = getPackageInfoNoCheck(</span><br><span class="line">                            r.activityInfo.applicationInfo, r.compatInfo);</span><br><span class="line">                    handleLaunchActivity(r, <span class="keyword">null</span>); <span class="comment">// 🏁启动由r指定的Activity组件</span></span><br><span class="line">                    ... ...</span><br><span class="line">                &#125; <span class="keyword">break</span>;</span><br><span class="line">            ...</span><br><span class="line">        &#125;...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step41-ActivityThread-handleLaunchActivity-…"><a href="#Step41-ActivityThread-handleLaunchActivity-…" class="headerlink" title="Step41 ActivityThread::handleLaunchActivity(…)"></a>Step41 ActivityThread::handleLaunchActivity(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:2456</span></span><br><span class="line">``` java</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleLaunchActivity</span><span class="params">(ActivityClientRecord r, Intent customIntent)</span> </span>&#123;</span><br><span class="line">        ... ... <span class="comment">// 🏁将Activity组件启动起来</span></span><br><span class="line">        Activity a = performLaunchActivity(r, customIntent);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (a != <span class="keyword">null</span>) &#123;</span><br><span class="line">            r.createdConfig = <span class="keyword">new</span> Configuration(mConfiguration);</span><br><span class="line">            Bundle oldState = r.state;</span><br><span class="line">            <span class="comment">// 将Activity组件的状态设为Resumed，表示它是当前的活动Activity</span></span><br><span class="line">            handleResumeActivity(r.token, <span class="keyword">false</span>, r.isForward,</span><br><span class="line">                    !r.activity.mFinished &amp;&amp; !r.startsNotResumed);</span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; ... &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step42-ActivityThread-performLaunchActivity-…"><a href="#Step42-ActivityThread-performLaunchActivity-…" class="headerlink" title="Step42 ActivityThread::performLaunchActivity(…)"></a>Step42 ActivityThread::performLaunchActivity(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:2293</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Activity <span class="title">performLaunchActivity</span><span class="params">(ActivityClientRecord r, Intent customIntent)</span> </span>&#123;</span><br><span class="line">        ... ...  <span class="comment">// 要启动的Activity包名、类名</span></span><br><span class="line">        ComponentName component = r.intent.getComponent(); </span><br><span class="line">        ... ...</span><br><span class="line">        Activity activity = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123; <span class="comment">// 加载到内存并创建Activity实例</span></span><br><span class="line">            java.lang.ClassLoader cl = r.packageInfo.getClassLoader();</span><br><span class="line">            activity = mInstrumentation.newActivity(</span><br><span class="line">                    cl, component.getClassName(), r.intent);</span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123; ... &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Application app = r.packageInfo.makeApplication(<span class="keyword">false</span>, mInstrumentation);</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">if</span> (activity != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// appContext用来作为刚刚创建的Activity对象运行的上下文环境，通过它就</span></span><br><span class="line">                <span class="comment">// 可以访问到特定的应用程序资源，以及启动其他的应用程序组件。</span></span><br><span class="line">                Context appContext = createBaseContextForActivity(r, activity);</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="comment">// 使用appContext和r来初始化Activity对象</span></span><br><span class="line">                activity.attach(appContext, <span class="keyword">this</span>, getInstrumentation(), r.token,</span><br><span class="line">                        r.ident, app, r.intent, r.activityInfo, title, r.parent,</span><br><span class="line">                        r.embeddedID, r.lastNonConfigurationInstances, config,</span><br><span class="line">                        r.referrer, r.voiceInteractor);</span><br><span class="line">                ... ...</span><br><span class="line">                <span class="comment">// 将Activity对象启动起来，在此过程中，Activity::onCreate就会被调用</span></span><br><span class="line">                <span class="keyword">if</span> (r.isPersistable()) &#123;</span><br><span class="line">                    mInstrumentation.callActivityOnCreate(activity, r.state, r.persistentState);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    mInstrumentation.callActivityOnCreate(activity, r.state);</span><br><span class="line">                &#125;</span><br><span class="line">                ... ...</span><br><span class="line">            <span class="comment">// r.token是一个Binder代理对象，指向ActivityManagerService内部一个</span></span><br><span class="line">            <span class="comment">// ActivityRecord对象，该对象和ActivityClientRecord对象r一样，用来描述</span></span><br><span class="line">            <span class="comment">// 刚刚启动的Activity组件，只不过r.token是在ActivityManagerService中使</span></span><br><span class="line">            <span class="comment">// 用，而r在应用程序进程中使用。</span></span><br><span class="line">            <span class="comment">// 以token为关键字，将r保存到mActivities中</span></span><br><span class="line">            mActivities.put(r.token, r);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (SuperNotCalledException e) &#123; ... &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception e) &#123; ... &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> activity;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>接下来调用指定组件的<code>onCreate</code>函数，Activity组件的启动过程就完成了。<br>最后的Step39~Step42是在新进程中执行的，如下图：<br><img src="/2016/10/27/2016/1027ActivityStarting2/img06.png" alt="Step39~Step42"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Activity启动过程/" rel="tag"># Activity启动过程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/27/2016/1027ActivityStarting1/" rel="next" title="Activity启动过程学习笔记（一）">
+                <i class="fa fa-chevron-left"></i> Activity启动过程学习笔记（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/31/2016/1031PyQt/" rel="prev" title="Qt的QHBoxLayout、QVBoxLayout布局管理">
+                Qt的QHBoxLayout、QVBoxLayout布局管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/27/2016/1027ActivityStarting2/" data-title="Activity启动过程学习笔记（二）" data-url="http://palanceli.github.io/2016/10/27/2016/1027ActivityStarting2/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step18-ApplicationThread-schedulePauseActivity-…"><span class="nav-number">1.</span> <span class="nav-text">Step18 ApplicationThread::schedulePauseActivity(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step19-ActivityThread-sendMessage-…"><span class="nav-number">2.</span> <span class="nav-text">Step19 ActivityThread::sendMessage(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step20-ActivityThread-handleMessage-…"><span class="nav-number">3.</span> <span class="nav-text">Step20 ActivityThread::handleMessage(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step21-ActivityThread-handlePauseActivity-…"><span class="nav-number">4.</span> <span class="nav-text">Step21 ActivityThread::handlePauseActivity(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step22-ActivityManagerProxy-activityPaused-…"><span class="nav-number">5.</span> <span class="nav-text">Step22 ActivityManagerProxy::activityPaused(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step23-ActivityManagerService-activityPaused-…"><span class="nav-number">6.</span> <span class="nav-text">Step23 ActivityManagerService::activityPaused(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step24-ActivityStack-activityPausedLocked-…"><span class="nav-number">7.</span> <span class="nav-text">Step24 ActivityStack::activityPausedLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step25-ActivityStack-completePauseLocked-…"><span class="nav-number">8.</span> <span class="nav-text">Step25 ActivityStack::completePauseLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step26-ActivityStackSupervisor-resumeTopActivitiesLocked-…"><span class="nav-number">9.</span> <span class="nav-text">Step26 ActivityStackSupervisor::resumeTopActivitiesLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step27-ActivityStack-resumeTopActivityLocked-…"><span class="nav-number">10.</span> <span class="nav-text">Step27 ActivityStack::resumeTopActivityLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step28-ActivityStack-resumeTopActivityInnerLocked-…"><span class="nav-number">11.</span> <span class="nav-text">Step28 ActivityStack::resumeTopActivityInnerLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step29-ActivityStackSupervisor-startSpecificActivityLocked-…"><span class="nav-number">12.</span> <span class="nav-text">Step29 ActivityStackSupervisor::startSpecificActivityLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step30-ActivityManagerService-startProcessLocked-…"><span class="nav-number">13.</span> <span class="nav-text">Step30 ActivityManagerService::startProcessLocked(…)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Step30-1-ActivityManagerService-startProcessLocked-…"><span class="nav-number">13.1.</span> <span class="nav-text">Step30.1 ActivityManagerService::startProcessLocked(…)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step31-ActivityThread-main-…"><span class="nav-number">14.</span> <span class="nav-text">Step31 ActivityThread::main(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step32-ActivityThread-attach-…"><span class="nav-number">15.</span> <span class="nav-text">Step32 ActivityThread::attach(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step33-ActivityManagerProxy-attachApplication-…"><span class="nav-number">16.</span> <span class="nav-text">Step33 ActivityManagerProxy::attachApplication(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step34-ActivityManagerService-attachApplication-…"><span class="nav-number">17.</span> <span class="nav-text">Step34 ActivityManagerService::attachApplication(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step35-ActivityManagerService-attachApplicationLocked-…"><span class="nav-number">18.</span> <span class="nav-text">Step35 ActivityManagerService::attachApplicationLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step36-ActivityStackSupervisor-attachApplicationLocked-…"><span class="nav-number">19.</span> <span class="nav-text">Step36 ActivityStackSupervisor::attachApplicationLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step37-ActivityStackSupervisor-realStartActivityLocked-…"><span class="nav-number">20.</span> <span class="nav-text">Step37 ActivityStackSupervisor::realStartActivityLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step38-ApplicationThreadProxy-scheduleLaunchActivity-…"><span class="nav-number">21.</span> <span class="nav-text">Step38 ApplicationThreadProxy::scheduleLaunchActivity(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step39-ActivityThread-scheduleLaunchActivity-…"><span class="nav-number">22.</span> <span class="nav-text">Step39 ActivityThread::scheduleLaunchActivity(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step40-ActivityThread-handleMessage-…"><span class="nav-number">23.</span> <span class="nav-text">Step40 ActivityThread::handleMessage(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step41-ActivityThread-handleLaunchActivity-…"><span class="nav-number">24.</span> <span class="nav-text">Step41 ActivityThread::handleLaunchActivity(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step42-ActivityThread-performLaunchActivity-…"><span class="nav-number">25.</span> <span class="nav-text">Step42 ActivityThread::performLaunchActivity(…)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

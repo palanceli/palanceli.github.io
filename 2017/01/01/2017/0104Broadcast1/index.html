@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="广播机制,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="广播的使用分两个环节：注册和发送/接收。首先完成注册，才能接收到广播，接下来先研究注册环节。">
+<meta name="keywords" content="广播机制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="广播机制学习笔记（一）——BroadcastReceiver的注册">
+<meta property="og:url" content="http://palanceli.github.io/2017/01/01/2017/0104Broadcast1/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="广播的使用分两个环节：注册和发送/接收。首先完成注册，才能接收到广播，接下来先研究注册环节。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.786Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="广播机制学习笔记（一）——BroadcastReceiver的注册">
+<meta name="twitter:description" content="广播的使用分两个环节：注册和发送/接收。首先完成注册，才能接收到广播，接下来先研究注册环节。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/01/01/2017/0104Broadcast1/">
+
+
+
+
+
+  <title>广播机制学习笔记（一）——BroadcastReceiver的注册 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/01/01/2017/0104Broadcast1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">广播机制学习笔记（一）——BroadcastReceiver的注册</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-01T22:23:45+08:00">
+                2017-01-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/01/2017/0104Broadcast1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/01/2017/0104Broadcast1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>广播的使用分两个环节：注册和发送/接收。首先完成注册，才能接收到广播，接下来先研究注册环节。<a id="more"></a></p>
+<p>客户端通过调用registerReceiver(…)来将一个广播接收者注册到ActivityManagerService中，该函数来自ContextWrapper类。</p>
+<h1 id="Step1-ContextWrapper-registerReceiver-…"><a href="#Step1-ContextWrapper-registerReceiver-…" class="headerlink" title="Step1 ContextWrapper::registerReceiver(…)"></a>Step1 ContextWrapper::registerReceiver(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ContextImpl.java:1145</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Intent <span class="title">registerReceiver</span><span class="params">(BroadcastReceiver receiver, IntentFilter filter)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> registerReceiver(receiver, filter, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Intent <span class="title">registerReceiver</span><span class="params">(BroadcastReceiver receiver, IntentFilter filter,</span></span></span><br><span class="line"><span class="function"><span class="params">            String broadcastPermission, Handler scheduler)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// getOuterContext()返回调用者所在的Activity组件</span></span><br><span class="line">        <span class="keyword">return</span> registerReceiverInternal(receiver, getUserId(),</span><br><span class="line">                filter, broadcastPermission, scheduler, getOuterContext());</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">private</span> Intent <span class="title">registerReceiverInternal</span><span class="params">(BroadcastReceiver receiver, <span class="keyword">int</span> userId,</span></span></span><br><span class="line"><span class="function"><span class="params">            IntentFilter filter, String broadcastPermission,</span></span></span><br><span class="line"><span class="function"><span class="params">            Handler scheduler, Context context)</span> </span>&#123;</span><br><span class="line">        IIntentReceiver rd = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (receiver != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mPackageInfo != <span class="keyword">null</span> &amp;&amp; context != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (scheduler == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// mMainThread描述当前进程</span></span><br><span class="line">                    <span class="comment">// getHandler()返回Handler对象，用来向主线程消息队列发送消息</span></span><br><span class="line">                    scheduler = mMainThread.getHandler();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 🏁将receiver封装成实现了IIntentReceiver接口的Binder本地对象=&gt;rd</span></span><br><span class="line">                rd = mPackageInfo.getReceiverDispatcher(</span><br><span class="line">                    receiver, context, scheduler,</span><br><span class="line">                    mMainThread.getInstrumentation(), <span class="keyword">true</span>);</span><br><span class="line">            &#125; ...</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123; </span><br><span class="line">            <span class="comment">// 🏁Step4 将rd及filter发送给ActivityManagerService，以便它将rd</span></span><br><span class="line">            <span class="comment">// 注册在其内部，并将filter描述的广播转发给他处理</span></span><br><span class="line">            <span class="keyword">return</span> ActivityManagerNative.getDefault().registerReceiver(</span><br><span class="line">                    mMainThread.getApplicationThread(), mBasePackageName,</span><br><span class="line">                    rd, filter, broadcastPermission, userId);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RemoteException e) ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step2-LoadedApk-getReceiverDispatcher-…"><a href="#Step2-LoadedApk-getReceiverDispatcher-…" class="headerlink" title="Step2 LoadedApk::getReceiverDispatcher(…)"></a>Step2 LoadedApk::getReceiverDispatcher(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/LoadedApk.java:706</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IIntentReceiver <span class="title">getReceiverDispatcher</span><span class="params">(BroadcastReceiver r,</span></span></span><br><span class="line"><span class="function"><span class="params">            Context context, Handler handler,</span></span></span><br><span class="line"><span class="function"><span class="params">            Instrumentation instrumentation, <span class="keyword">boolean</span> registered)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (mReceivers) &#123;</span><br><span class="line">            LoadedApk.ReceiverDispatcher rd = <span class="keyword">null</span>;</span><br><span class="line">            ArrayMap&lt;BroadcastReceiver, LoadedApk.ReceiverDispatcher&gt; map = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (registered) &#123;</span><br><span class="line">                map = mReceivers.get(context);</span><br><span class="line">                <span class="keyword">if</span> (map != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    rd = map.get(r);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (rd == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 保存注册它的Activity组件信息</span></span><br><span class="line">                rd = <span class="keyword">new</span> ReceiverDispatcher(r, context, handler,</span><br><span class="line">                        instrumentation, registered);</span><br><span class="line">                <span class="keyword">if</span> (registered) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (map == <span class="keyword">null</span>) &#123; <span class="comment">// 以context为key保存到mReceivers</span></span><br><span class="line">                        map = <span class="keyword">new</span> ArrayMap&lt;BroadcastReceiver, LoadedApk.ReceiverDispatcher&gt;();</span><br><span class="line">                        mReceivers.put(context, map);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 将被注册的广播接收者r与注册它的Activity组件rd关联起来</span></span><br><span class="line">                    map.put(r, rd);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                rd.validate(context, handler);</span><br><span class="line">            &#125;</span><br><span class="line">            rd.mForgotten = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">return</span> rd.getIIntentReceiver(); <span class="comment">// 🏁</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step3-LoadedApk-ReceiverDispatcher-getIIntentReceiver"><a href="#Step3-LoadedApk-ReceiverDispatcher-getIIntentReceiver" class="headerlink" title="Step3 LoadedApk.ReceiverDispatcher::getIIntentReceiver()"></a>Step3 LoadedApk.ReceiverDispatcher::getIIntentReceiver()</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/LoadedApk.java:80</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">LoadedApk</span> </span>&#123;</span><br><span class="line"><span class="comment">// :786</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ReceiverDispatcher</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ④ 类型定义于此</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">InnerReceiver</span> <span class="keyword">extends</span> <span class="title">IIntentReceiver</span>.<span class="title">Stub</span> </span>&#123;</span><br><span class="line">            <span class="keyword">final</span> WeakReference&lt;LoadedApk.ReceiverDispatcher&gt; mDispatcher;</span><br><span class="line">...</span><br><span class="line">            InnerReceiver(LoadedApk.ReceiverDispatcher rd, <span class="keyword">boolean</span> strong) &#123;</span><br><span class="line">                mDispatcher = <span class="keyword">new</span> WeakReference&lt;LoadedApk.ReceiverDispatcher&gt;(rd);</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="comment">// :827</span></span><br><span class="line">    <span class="keyword">final</span> IIntentReceiver.Stub mIIntentReceiver; <span class="comment">// ②定义于此</span></span><br><span class="line">    <span class="keyword">final</span> BroadcastReceiver mReceiver; <span class="comment">// 与该Activity组件关联的BroadcastReceiver</span></span><br><span class="line">    <span class="keyword">final</span> Context mContext;            <span class="comment">// 指向调用者所在的Activity组件</span></span><br><span class="line">    <span class="keyword">final</span> Handler mActivityThread;     <span class="comment">// 与该Activity组件关联的Handler对象</span></span><br><span class="line">    ...</span><br><span class="line">    ReceiverDispatcher(BroadcastReceiver receiver, Context context,</span><br><span class="line">            Handler activityThread, Instrumentation instrumentation,</span><br><span class="line">            <span class="keyword">boolean</span> registered) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// ③在此处初始化</span></span><br><span class="line">        mIIntentReceiver = <span class="keyword">new</span> InnerReceiver(<span class="keyword">this</span>, !registered);</span><br><span class="line">        mReceiver = receiver;</span><br><span class="line">        mContext = context;</span><br><span class="line">        mActivityThread = activityThread;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"><span class="comment">// :944</span></span><br><span class="line">    <span class="function">IIntentReceiver <span class="title">getIIntentReceiver</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mIIntentReceiver; <span class="comment">// ① 返回值</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>LoadedApk.ReceiverDispatcher::getIIntentReceiver()</code>的返回值即<code>LoadedApk.ReceiverDispatcher::mIIntentReceiver</code>。该值的定义、初始化在代码中用①②③④标出。</p>
+<h1 id="Step4-ActivityManagerProxy-registerReceiver-…"><a href="#Step4-ActivityManagerProxy-registerReceiver-…" class="headerlink" title="Step4 ActivityManagerProxy::registerReceiver(…)"></a>Step4 ActivityManagerProxy::registerReceiver(…)</h1><p>回到Step1中ContextWrapper::registerReceiverInternal(…)，在创建完IIntentReceiver对象rd后，调用ActivityManagerNative.getDefault().registerReceiver(…)继续完成注册。ActivityManagerNative.getDefault()返回的是ActivityManagerService的本地代理对象。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityManagerNative.java:2998</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Intent <span class="title">registerReceiver</span><span class="params">(IApplicationThread caller, String packageName,</span></span></span><br><span class="line"><span class="function"><span class="params">            IIntentReceiver receiver,</span></span></span><br><span class="line"><span class="function"><span class="params">            IntentFilter filter, String perm, <span class="keyword">int</span> userId)</span> <span class="keyword">throws</span> RemoteException</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Parcel data = Parcel.obtain();</span><br><span class="line">        Parcel reply = Parcel.obtain();</span><br><span class="line">        data.writeInterfaceToken(IActivityManager.descriptor);</span><br><span class="line">        data.writeStrongBinder(caller != <span class="keyword">null</span> ? caller.asBinder() : <span class="keyword">null</span>);</span><br><span class="line">        data.writeString(packageName);</span><br><span class="line">        data.writeStrongBinder(receiver != <span class="keyword">null</span> ? receiver.asBinder() : <span class="keyword">null</span>);</span><br><span class="line">        filter.writeToParcel(data, <span class="number">0</span>);</span><br><span class="line">        data.writeString(perm);</span><br><span class="line">        data.writeInt(userId);</span><br><span class="line">        mRemote.transact(REGISTER_RECEIVER_TRANSACTION, data, reply, <span class="number">0</span>);</span><br><span class="line">        reply.readException();</span><br><span class="line">        Intent intent = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">int</span> haveIntent = reply.readInt();</span><br><span class="line">        <span class="keyword">if</span> (haveIntent != <span class="number">0</span>) &#123;</span><br><span class="line">            intent = Intent.CREATOR.createFromParcel(reply);</span><br><span class="line">        &#125;</span><br><span class="line">        reply.recycle();</span><br><span class="line">        data.recycle();</span><br><span class="line">        <span class="keyword">return</span> intent;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>此处向ActivityManagerService发送一个REGISTER_RECEIVER_TRANSACTION请求，以上都是在客户端进程中执行的，接下来将转入ActivityManagerService中执行。</p>
+<h1 id="ActivityManagerService-registerReceiver-…"><a href="#ActivityManagerService-registerReceiver-…" class="headerlink" title="ActivityManagerService::registerReceiver(…)"></a>ActivityManagerService::registerReceiver(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/com/android/server/am/ActivityManagerService.java:16208</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Intent <span class="title">registerReceiver</span><span class="params">(IApplicationThread caller, String callerPackage,</span></span></span><br><span class="line"><span class="function"><span class="params">            IIntentReceiver receiver, IntentFilter filter, String permission, <span class="keyword">int</span> userId)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">synchronized</span>(<span class="keyword">this</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (caller != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 描述正在祖册BroadcastReceiver的Activity组件所在的进程</span></span><br><span class="line">                callerApp = getRecordForAppLocked(caller);</span><br><span class="line">                ...</span><br><span class="line">            &#125; </span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ArrayList&lt;Intent&gt; allSticky = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (stickyIntents != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">final</span> ContentResolver resolver = mContext.getContentResolver();</span><br><span class="line">            <span class="comment">// Look for any matching sticky broadcasts...</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, N = stickyIntents.size(); i &lt; N; i++) &#123;</span><br><span class="line">                Intent intent = stickyIntents.get(i);</span><br><span class="line">                <span class="comment">// If intent has scheme "content", it will need to acccess</span></span><br><span class="line">                <span class="comment">// provider that needs to lock mProviderMap in ActivityThread</span></span><br><span class="line">                <span class="comment">// and also it may need to wait application response, so we</span></span><br><span class="line">                <span class="comment">// cannot lock ActivityManagerService here.</span></span><br><span class="line">                <span class="keyword">if</span> (filter.match(resolver, intent, <span class="keyword">true</span>, TAG) &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (allSticky == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        allSticky = <span class="keyword">new</span> ArrayList&lt;Intent&gt;();</span><br><span class="line">                    &#125;</span><br><span class="line">                    allSticky.add(intent);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Activity组件注册一个BroadcastReceiver并不是将该Reciever注册到</span></span><br><span class="line">    <span class="comment">// ActivityManagerService中，而是注册与他关联的InnerReceiver对象。</span></span><br><span class="line">    <span class="comment">// ActivityManagerService接收到广播时，会根据该广播类型在内部找到对应的</span></span><br><span class="line">    <span class="comment">// InnerReceiver对象，再根据此对象将广播发送给对应的BroadcastReceiver</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在ActivityManagerService中使用BroadcastFilter来描述广播接收者，</span></span><br><span class="line">    <span class="comment">// BroadcastFilter是根据InnerReceiver对象和要接收到的广播类型而创建出来。</span></span><br><span class="line">    <span class="comment">// 在一个进程的不同Activity可能使用同一个InnerReceiver来注册不同的广播接收者，</span></span><br><span class="line">    <span class="comment">// ActivityManagerService使用一个ReceiverList来保存这些使用了相同InnserReceiver</span></span><br><span class="line">    <span class="comment">// 对象来注册的广播接收者，并以他们所使用的InnerReceiver为key。</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果ActivityManagerService内部存在与filter对应的黏性广播，则将allSticky</span></span><br><span class="line">        <span class="comment">// 中第一个黏性广播取出来</span></span><br><span class="line">        <span class="comment">// The first sticky in the list is returned directly back to the client.</span></span><br><span class="line">        Intent sticky = allSticky != <span class="keyword">null</span> ? allSticky.get(<span class="number">0</span>) : <span class="keyword">null</span>;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">if</span> (receiver == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> sticky;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">            ...</span><br><span class="line">            ReceiverList rl = mRegisteredReceivers.get(receiver.asBinder());</span><br><span class="line">            <span class="keyword">if</span> (rl == <span class="keyword">null</span>) &#123;</span><br><span class="line">                rl = <span class="keyword">new</span> ReceiverList(<span class="keyword">this</span>, callerApp, callingPid, callingUid,</span><br><span class="line">                        userId, receiver);</span><br><span class="line">                ...</span><br><span class="line">                mRegisteredReceivers.put(receiver.asBinder(), rl);</span><br><span class="line">            &#125; <span class="keyword">else</span> ...</span><br><span class="line">            <span class="comment">// 描述正在注册的广播接收者</span></span><br><span class="line">            BroadcastFilter bf = <span class="keyword">new</span> BroadcastFilter(filter, rl, callerPackage,</span><br><span class="line">                    permission, callingUid, userId);</span><br><span class="line">            rl.add(bf);</span><br><span class="line">            ...</span><br><span class="line">            mReceiverResolver.addFilter(bf);</span><br><span class="line">            <span class="comment">// 以后ActivityManagerService接收到广播时，就可以在mReceiverResolver中</span></span><br><span class="line">            <span class="comment">// 找到对应的广播接收者了</span></span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">return</span> sticky;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>黏性广播被发送到ActivityManagerService之后会被一直保存，直到下次再接收到另一个同类型的黏性广播为止。一个Activity组件在向ActivityManagerService注册接收某一种类型的广播时，如果其内部恰好保存有该类型的黏性广播，就会将此黏性广播返回给Activity，以便他知道系统上次发出的他所感兴趣的广播内容。可以通过ContextWrapper::sendStickyBroadcast(…)发送一个黏性广播。</p>
+<p>到此，BroadcastReceiver的注册过程就走完了，接下来继续研究广播的发送过程。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/广播机制/" rel="tag"># 广播机制</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/01/2017/0104Broadcast2/" rel="next" title="广播机制学习笔记（二）——Broadcast的发送">
+                <i class="fa fa-chevron-left"></i> 广播机制学习笔记（二）——Broadcast的发送
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/27/2017/0127init1/" rel="prev" title="创世记（一）——Zygote进程的启动">
+                创世记（一）——Zygote进程的启动 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/01/01/2017/0104Broadcast1/" data-title="广播机制学习笔记（一）——BroadcastReceiver的注册" data-url="http://palanceli.github.io/2017/01/01/2017/0104Broadcast1/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-ContextWrapper-registerReceiver-…"><span class="nav-number">1.</span> <span class="nav-text">Step1 ContextWrapper::registerReceiver(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-LoadedApk-getReceiverDispatcher-…"><span class="nav-number">2.</span> <span class="nav-text">Step2 LoadedApk::getReceiverDispatcher(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-LoadedApk-ReceiverDispatcher-getIIntentReceiver"><span class="nav-number">3.</span> <span class="nav-text">Step3 LoadedApk.ReceiverDispatcher::getIIntentReceiver()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-ActivityManagerProxy-registerReceiver-…"><span class="nav-number">4.</span> <span class="nav-text">Step4 ActivityManagerProxy::registerReceiver(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ActivityManagerService-registerReceiver-…"><span class="nav-number">5.</span> <span class="nav-text">ActivityManagerService::registerReceiver(…)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

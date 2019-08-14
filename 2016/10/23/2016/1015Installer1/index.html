@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="安装过程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在Android下安装一个APP时，PackageManagerService会解析该APP的AndroidManifest.xml文件，以便获取它的安装信息，同时为该APP分配Linux用户ID和Linux用户组ID。 PackageManagerService是在SystemService启动的时候由该进程启动起来的：">
+<meta name="keywords" content="安装过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android App安装过程学习笔记（一）">
+<meta property="og:url" content="http://palanceli.github.io/2016/10/23/2016/1015Installer1/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="在Android下安装一个APP时，PackageManagerService会解析该APP的AndroidManifest.xml文件，以便获取它的安装信息，同时为该APP分配Linux用户ID和Linux用户组ID。 PackageManagerService是在SystemService启动的时候由该进程启动起来的：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.755Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android App安装过程学习笔记（一）">
+<meta name="twitter:description" content="在Android下安装一个APP时，PackageManagerService会解析该APP的AndroidManifest.xml文件，以便获取它的安装信息，同时为该APP分配Linux用户ID和Linux用户组ID。 PackageManagerService是在SystemService启动的时候由该进程启动起来的：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/10/23/2016/1015Installer1/">
+
+
+
+
+
+  <title>Android App安装过程学习笔记（一） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/10/23/2016/1015Installer1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android App安装过程学习笔记（一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-23T20:01:42+08:00">
+                2016-10-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/23/2016/1015Installer1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/23/2016/1015Installer1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在Android下安装一个APP时，PackageManagerService会解析该APP的AndroidManifest.xml文件，以便获取它的安装信息，同时为该APP分配Linux用户ID和Linux用户组ID。</p>
+<p>PackageManagerService是在SystemService启动的时候由该进程启动起来的：<br><a id="more"></a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/java/com/android/server/SystemServer.java:366</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">SystemServer</span> </span>&#123;</span><br><span class="line">... ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;    <span class="comment">// 入口函数</span></span><br><span class="line">        <span class="keyword">new</span> SystemServer().run();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ... ... </span><br><span class="line">        <span class="keyword">try</span> &#123; </span><br><span class="line">            startBootstrapServices();           <span class="comment">// :268</span></span><br><span class="line">            ... ...</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">            ... ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startBootstrapServices</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="comment">// Start the package manager.</span></span><br><span class="line">    Slog.i(TAG, <span class="string">"Package Manager"</span>);             <span class="comment">// :365</span></span><br><span class="line">    <span class="comment">// 🏁调用PackageManagerService的静态函数main(...)安装系统中的应用</span></span><br><span class="line">    mPackageManagerService = PackageManagerService.main(mSystemContext, installer,</span><br><span class="line">            mFactoryTestMode != FactoryTest.FACTORY_TEST_OFF, mOnlyCore);</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>PackageManagerService在启动过程中会对系统中的应用程序进行安装，以它的main函数作为起点开启探索。</p>
+<h1 id="Step1-PackageManagerService-main-…"><a href="#Step1-PackageManagerService-main-…" class="headerlink" title="Step1: PackageManagerService.main(…)"></a>Step1: PackageManagerService.main(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java:1765</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> PackageManagerService <span class="title">main</span><span class="params">(Context context, Installer installer,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">boolean</span> factoryTest, <span class="keyword">boolean</span> onlyCore)</span> </span>&#123;</span><br><span class="line">    PackageManagerService m = <span class="keyword">new</span> PackageManagerService(context, installer,</span><br><span class="line">            factoryTest, onlyCore); <span class="comment">// 🏁</span></span><br><span class="line">    ServiceManager.addService(<span class="string">"package"</span>, m);</span><br><span class="line">    <span class="keyword">return</span> m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step2-PackageManagerService的构造函数"><a href="#Step2-PackageManagerService的构造函数" class="headerlink" title="Step2: PackageManagerService的构造函数"></a>Step2: PackageManagerService的构造函数</h1><p>Android系统在启动时，会把已安装的app重新安装一遍，所谓的“安装”就是遍历各安装目录，解析各app的AndroidManifest.xml，记录它们的安装信息，并为各app分配uid和gid。<br>这里是系统启动时，安装app的逻辑起点。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java:1801</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">PackageManagerService</span><span class="params">(Context context, Installer installer,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> factoryTest, <span class="keyword">boolean</span> onlyCore)</span> </span>&#123;</span><br><span class="line">        ... ...</span><br><span class="line">        mSettings = <span class="keyword">new</span> Settings(mPackages);</span><br><span class="line">        ... ...            </span><br><span class="line">            File dataDir = Environment.getDataDirectory();      <span class="comment">// 目录/data</span></span><br><span class="line">            mAppDataDir = <span class="keyword">new</span> File(dataDir, <span class="string">"data"</span>);            <span class="comment">// /data/data</span></span><br><span class="line">            mAppInstallDir = <span class="keyword">new</span> File(dataDir, <span class="string">"app"</span>);          <span class="comment">// /data/app </span></span><br><span class="line">            mAppLib32InstallDir = <span class="keyword">new</span> File(dataDir, <span class="string">"app-lib"</span>); <span class="comment">// /data/app-lib   </span></span><br><span class="line">            mAsecInternalPath = <span class="keyword">new</span> File(dataDir, <span class="string">"app-asec"</span>).getPath(); <span class="comment">// /data/app-asec</span></span><br><span class="line">            mUserAppDataDir = <span class="keyword">new</span> File(dataDir, <span class="string">"user"</span>);        <span class="comment">// /data/user</span></span><br><span class="line">            mDrmAppPrivateInstallDir = <span class="keyword">new</span> File(dataDir, <span class="string">"app-private"</span>); <span class="comment">// /data/app-private</span></span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 🏁系统中安装的应用程序信息会记录在配置文件中，此处读取该配置文件</span></span><br><span class="line">            mRestoredSettings = mSettings.readLPw(<span class="keyword">this</span>, sUserManager.getUsers(<span class="keyword">false</span>),</span><br><span class="line">                    mSdkVersion, mOnlyCore);</span><br><span class="line"></span><br><span class="line">            File frameworkDir = <span class="keyword">new</span> File(Environment.getRootDirectory(), <span class="string">"framework"</span>);</span><br><span class="line">            ... ...</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 🏁Step9: 调用scanDirLI(...)分别安装保存在几个目录下的应用程序</span></span><br><span class="line">            <span class="comment">// /vendor/overlay保存厂商提供的覆盖包</span></span><br><span class="line">            File vendorOverlayDir = <span class="keyword">new</span> File(VENDOR_OVERLAY_DIR);</span><br><span class="line">            scanDirLI(vendorOverlayDir, PackageParser.PARSE_IS_SYSTEM</span><br><span class="line">                    | PackageParser.PARSE_IS_SYSTEM_DIR, scanFlags | SCAN_TRUSTED_OVERLAY, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// /system/framework保存不含代码的资源包</span></span><br><span class="line">            <span class="comment">// Find base frameworks (resource packages without code).</span></span><br><span class="line">            scanDirLI(frameworkDir, PackageParser.PARSE_IS_SYSTEM</span><br><span class="line">                    | PackageParser.PARSE_IS_SYSTEM_DIR</span><br><span class="line">                    | PackageParser.PARSE_IS_PRIVILEGED,</span><br><span class="line">                    scanFlags | SCAN_NO_DEX, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// /system/priv-app 有特权的系统包</span></span><br><span class="line">            <span class="comment">// Collected privileged system packages.</span></span><br><span class="line">            <span class="keyword">final</span> File privilegedAppDir = <span class="keyword">new</span> File(Environment.getRootDirectory(), <span class="string">"priv-app"</span>);</span><br><span class="line">            scanDirLI(privilegedAppDir, PackageParser.PARSE_IS_SYSTEM</span><br><span class="line">                    | PackageParser.PARSE_IS_SYSTEM_DIR</span><br><span class="line">                    | PackageParser.PARSE_IS_PRIVILEGED, scanFlags, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// /system/app 系统自带的应用程序</span></span><br><span class="line">            <span class="comment">// Collect ordinary system packages.</span></span><br><span class="line">            <span class="keyword">final</span> File systemAppDir = <span class="keyword">new</span> File(Environment.getRootDirectory(), <span class="string">"app"</span>);</span><br><span class="line">            scanDirLI(systemAppDir, PackageParser.PARSE_IS_SYSTEM</span><br><span class="line">                    | PackageParser.PARSE_IS_SYSTEM_DIR, scanFlags, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// /vendor/app 设备厂商提供的应用程序</span></span><br><span class="line">            <span class="comment">// Collect all vendor packages.</span></span><br><span class="line">            File vendorAppDir = <span class="keyword">new</span> File(<span class="string">"/vendor/app"</span>);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                vendorAppDir = vendorAppDir.getCanonicalFile();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;...&#125;</span><br><span class="line">            scanDirLI(vendorAppDir, PackageParser.PARSE_IS_SYSTEM</span><br><span class="line">                    | PackageParser.PARSE_IS_SYSTEM_DIR, scanFlags, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// /oem/app 所有OEM包</span></span><br><span class="line">            <span class="comment">// Collect all OEM packages.</span></span><br><span class="line">            <span class="keyword">final</span> File oemAppDir = <span class="keyword">new</span> File(Environment.getOemDirectory(), <span class="string">"app"</span>);</span><br><span class="line">            scanDirLI(oemAppDir, PackageParser.PARSE_IS_SYSTEM</span><br><span class="line">                    | PackageParser.PARSE_IS_SYSTEM_DIR, scanFlags, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">int</span> updateFlags = UPDATE_PERMISSIONS_ALL;</span><br><span class="line">            <span class="keyword">if</span> (ver.sdkVersion != mSdkVersion) &#123;</span><br><span class="line">                ... ...</span><br><span class="line">                updateFlags |= UPDATE_PERMISSIONS_REPLACE_PKG | UPDATE_PERMISSIONS_REPLACE_ALL;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 🏁Step23: 为申请了特定资源访问权限的app分配相应的Linux用户组ID</span></span><br><span class="line">            updatePermissionsLPw(<span class="keyword">null</span>, <span class="keyword">null</span>, StorageManager.UUID_PRIVATE_INTERNAL, updateFlags); </span><br><span class="line">            ver.sdkVersion = mSdkVersion;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// can downgrade to reader</span></span><br><span class="line">            mSettings.writeLPr();   <span class="comment">// 🏁Step24: 把前面获得的app安装信息保存回配置文件</span></span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Step3-Settings-readLPw-…"><a href="#Step3-Settings-readLPw-…" class="headerlink" title="Step3: Settings.readLPw(…)"></a>Step3: Settings.readLPw(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/Settings.java</span></span><br><span class="line"><span class="comment">// :346</span></span><br><span class="line">    Settings(File dataDir, Object lock) &#123;</span><br><span class="line">        ... ...</span><br><span class="line">        mSystemDir = <span class="keyword">new</span> File(dataDir, <span class="string">"system"</span>);</span><br><span class="line">        mSystemDir.mkdirs();</span><br><span class="line">        ... ...</span><br><span class="line">        mSettingsFilename = <span class="keyword">new</span> File(mSystemDir, <span class="string">"packages.xml"</span>);</span><br><span class="line">        mBackupSettingsFilename = <span class="keyword">new</span> File(mSystemDir, <span class="string">"packages-backup.xml"</span>);</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// :2500</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">readLPw</span><span class="params">(PackageManagerService service, List&lt;UserInfo&gt; users, <span class="keyword">int</span> sdkVersion,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> onlyCore)</span> </span>&#123;</span><br><span class="line">        FileInputStream str = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (mBackupSettingsFilename.exists()) &#123; </span><br><span class="line">            <span class="keyword">try</span> &#123;   <span class="comment">// 优先读取配置的备份文件/data/system/packages-backup.xml</span></span><br><span class="line">                str = <span class="keyword">new</span> FileInputStream(mBackupSettingsFilename);</span><br><span class="line">                ... ...</span><br><span class="line">            &#125; <span class="keyword">catch</span> (java.io.IOException e) &#123;...&#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">try</span> &#123;        <span class="comment">// 🏁读取配置文件/data/system/packages.xml</span></span><br><span class="line">            <span class="keyword">if</span> (str == <span class="keyword">null</span>) &#123;                 </span><br><span class="line">                ... ... </span><br><span class="line">                str = <span class="keyword">new</span> FileInputStream(mSettingsFilename);</span><br><span class="line">            &#125;</span><br><span class="line">            XmlPullParser parser = Xml.newPullParser(); <span class="comment">// 解析配置文件</span></span><br><span class="line">            parser.setInput(str, StandardCharsets.UTF_8.name());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> type;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">int</span> outerDepth = parser.getDepth();</span><br><span class="line">            <span class="keyword">while</span> ((type = parser.next()) != XmlPullParser.END_DOCUMENT</span><br><span class="line">                    &amp;&amp; (type != XmlPullParser.END_TAG || parser.getDepth() &gt; outerDepth)) &#123;</span><br><span class="line">                ... ...</span><br><span class="line">                String tagName = parser.getName();</span><br><span class="line">                <span class="comment">// 此处只关注与app的Linux用户ID相关的信息</span></span><br><span class="line">                <span class="keyword">if</span> (tagName.equals(<span class="string">"package"</span>)) &#123; </span><br><span class="line">                    <span class="comment">// 🏁Step4: 该标签描述上一次安装的app信息</span></span><br><span class="line">                    readPackageLPw(parser);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (tagName.equals(<span class="string">"shared-user"</span>)) &#123; </span><br><span class="line">                    <span class="comment">// 🏁Step5: 描述上一次安装app时分配的共享Linux用户ID</span></span><br><span class="line">                    readSharedUserLPw(parser);</span><br><span class="line">                &#125; </span><br><span class="line">                ... ...</span><br><span class="line">            &#125;</span><br><span class="line">            str.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> ...</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="comment">// 解析完app安装信息中的共享Linux用户信息后，再为它们保留上一次所使用的Linux UID</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> N = mPendingPackages.size();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; N; i++) &#123; <span class="comment">// 遍历mPendingPackage</span></span><br><span class="line">            <span class="keyword">final</span> PendingPackage pp = mPendingPackages.get(i);</span><br><span class="line">            Object idObj = getUserIdLPr(pp.sharedId);</span><br><span class="line">            <span class="comment">// 如果sharedId存在相应的SharedUserSetting记录，说明pp所描述的app上次</span></span><br><span class="line">            <span class="comment">// 所使用的LinuxUID是有效的</span></span><br><span class="line">            <span class="keyword">if</span> (idObj != <span class="keyword">null</span> &amp;&amp; idObj <span class="keyword">instanceof</span> SharedUserSetting) &#123;</span><br><span class="line">                <span class="comment">// 🏁为它创建一个PackageSetting对象，并保存在mPackage中</span></span><br><span class="line">                PackageSetting p = getPackageLPw(pp.name, <span class="keyword">null</span>, pp.realName,</span><br><span class="line">                        (SharedUserSetting) idObj, pp.codePath, pp.resourcePath,</span><br><span class="line">                        pp.legacyNativeLibraryPathString, pp.primaryCpuAbiString,</span><br><span class="line">                        pp.secondaryCpuAbiString, pp.versionCode, pp.pkgFlags, pp.pkgPrivateFlags,</span><br><span class="line">                        <span class="keyword">null</span>, <span class="keyword">true</span> <span class="comment">/* add */</span>, <span class="keyword">false</span> <span class="comment">/* allowInstall */</span>);</span><br><span class="line">                ... ...</span><br><span class="line">                p.copyFrom(pp);</span><br><span class="line">            &#125; ... ...</span><br><span class="line">        &#125;</span><br><span class="line">        mPendingPackages.clear();</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="data-system-packages-xml内容"><a href="#data-system-packages-xml内容" class="headerlink" title="/data/system/packages.xml内容"></a>/data/system/packages.xml内容</h1><p>/data/system/packages.xml的内容如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version='1.0' encoding='utf-8' standalone='yes' ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">packages</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span> <span class="attr">sdkVersion</span>=<span class="string">"23"</span> <span class="attr">databaseVersion</span>=<span class="string">"3"</span> <span class="attr">fingerprint</span>=<span class="string">"Android/aosp_arm/generic:6.0.1/MMB29Q/palance09252259:eng/debug,test-keys"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span> <span class="attr">volumeUuid</span>=<span class="string">"primary_physical"</span> <span class="attr">sdkVersion</span>=<span class="string">"23"</span> <span class="attr">databaseVersion</span>=<span class="string">"3"</span> <span class="attr">fingerprint</span>=<span class="string">"Android/aosp_arm/generic:6.0.1/MMB29Q/palance09252259:eng/debug,test-keys"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">permission-trees</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">permissions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.REAL_GET_TASKS"</span> <span class="attr">package</span>=<span class="string">"android"</span> <span class="attr">protection</span>=<span class="string">"18"</span> /&gt;</span></span><br><span class="line">        ... ...</span><br><span class="line">        <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.REMOTE_AUDIO_PLAYBACK"</span> <span class="attr">package</span>=<span class="string">"android"</span> <span class="attr">protection</span>=<span class="string">"2"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">permissions</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- package部分，描述app的信息 --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- name: package名称 --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- userId: app的独立UID --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- sharedUserId: app的共享UID --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">package</span> <span class="attr">name</span>=<span class="string">"com.android.providers.telephony"</span> <span class="attr">codePath</span>=<span class="string">"/system/priv-app/TelephonyProvider"</span> <span class="attr">nativeLibraryPath</span>=<span class="string">"/system/priv-app/TelephonyProvider/lib"</span> <span class="attr">publicFlags</span>=<span class="string">"940064261"</span> <span class="attr">privateFlags</span>=<span class="string">"8"</span> <span class="attr">ft</span>=<span class="string">"15761def440"</span> <span class="attr">it</span>=<span class="string">"15761def440"</span> <span class="attr">ut</span>=<span class="string">"15761def440"</span> <span class="attr">version</span>=<span class="string">"23"</span> <span class="attr">sharedUserId</span>=<span class="string">"1001"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sigs</span> <span class="attr">count</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">cert</span> <span class="attr">index</span>=<span class="string">"0"</span> <span class="attr">key</span>=<span class="string">"308204a... ..."</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">sigs</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">perms</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.WRITE_SETTINGS"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.MODIFY_AUDIO_SETTINGS"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            ... ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">perms</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">proper-signing-keyset</span> <span class="attr">identifier</span>=<span class="string">"1"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">package</span>&gt;</span></span><br><span class="line">    ... ...</span><br><span class="line">    <span class="tag">&lt;<span class="name">package</span> <span class="attr">name</span>=<span class="string">"com.sohu.inputmethod.sogou"</span> <span class="attr">codePath</span>=<span class="string">"/data/app/com.sohu.inputmethod.sogou-1"</span> <span class="attr">nativeLibraryPath</span>=<span class="string">"/data/app/com.sohu.inputmethod.sogou-1/lib"</span> <span class="attr">primaryCpuAbi</span>=<span class="string">"armeabi"</span> <span class="attr">publicFlags</span>=<span class="string">"940064324"</span> <span class="attr">privateFlags</span>=<span class="string">"0"</span> <span class="attr">ft</span>=<span class="string">"157cd4e7e80"</span> <span class="attr">it</span>=<span class="string">"157cd4ea0d6"</span> <span class="attr">ut</span>=<span class="string">"157cd4ea0d6"</span> <span class="attr">version</span>=<span class="string">"590"</span> <span class="attr">userId</span>=<span class="string">"10053"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sigs</span> <span class="attr">count</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">cert</span> <span class="attr">index</span>=<span class="string">"3"</span> <span class="attr">key</span>=<span class="string">"308202... ..."</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">sigs</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">perms</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.EXPAND_STATUS_BAR"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"com.android.launcher.permission.UNINSTALL_SHORTCUT"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.INTERNET"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            ... ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">perms</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">proper-signing-keyset</span> <span class="attr">identifier</span>=<span class="string">"5"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">package</span>&gt;</span></span><br><span class="line">    ... ...    </span><br><span class="line">    <span class="comment">&lt;!-- shared-user部分，描述安装app时分配的共享UID --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- name: 共享的Linux用户名称 --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- userId: 共享的Linux UID --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- system: 该UID是分配给一个系统类型的app使用，还是用户类型的app使用 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">shared-user</span> <span class="attr">name</span>=<span class="string">"android.media"</span> <span class="attr">userId</span>=<span class="string">"10006"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sigs</span> <span class="attr">count</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">cert</span> <span class="attr">index</span>=<span class="string">"2"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">sigs</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">perms</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.ACCESS_CACHE_FILESYSTEM"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.WRITE_SETTINGS"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            ... ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">perms</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">shared-user</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">shared-user</span> <span class="attr">name</span>=<span class="string">"android.uid.shared"</span> <span class="attr">userId</span>=<span class="string">"10002"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sigs</span> <span class="attr">count</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">cert</span> <span class="attr">index</span>=<span class="string">"4"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">sigs</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">perms</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.WRITE_SETTINGS"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android.permission.USE_CREDENTIALS"</span> <span class="attr">granted</span>=<span class="string">"true"</span> <span class="attr">flags</span>=<span class="string">"0"</span> /&gt;</span></span><br><span class="line">            ... ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">perms</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">shared-user</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">keyset-settings</span> <span class="attr">version</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">keys</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">public-key</span> <span class="attr">identifier</span>=<span class="string">"1"</span> <span class="attr">value</span>=<span class="string">"MIIBI... ..."</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">public-key</span> <span class="attr">identifier</span>=<span class="string">"2"</span> <span class="attr">value</span>=<span class="string">"MIIBIDANBg... ..."</span> /&gt;</span></span><br><span class="line">            ... ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">keys</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">keysets</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">keyset</span> <span class="attr">identifier</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">key-id</span> <span class="attr">identifier</span>=<span class="string">"1"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">keyset</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">keyset</span> <span class="attr">identifier</span>=<span class="string">"2"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">key-id</span> <span class="attr">identifier</span>=<span class="string">"2"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">keyset</span>&gt;</span></span><br><span class="line">            ... ...</span><br><span class="line">        <span class="tag">&lt;/<span class="name">keysets</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">lastIssuedKeyId</span> <span class="attr">value</span>=<span class="string">"5"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">lastIssuedKeySetId</span> <span class="attr">value</span>=<span class="string">"5"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">keyset-settings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">packages</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="Step4-Settings-readPackageLPw-…"><a href="#Step4-Settings-readPackageLPw-…" class="headerlink" title="Step4: Settings::readPackageLPw(…)"></a>Step4: Settings::readPackageLPw(…)</h1><p>这里关注标签”package”的三个属性：</p>
+<ul>
+<li>name 描述app的Package名称</li>
+<li>userId 描述该app所使用的uid</li>
+<li>sharedUserId 描述该app所使用的shared uid<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/Settings.java</span></span><br><span class="line"><span class="comment">// :336</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ArrayList&lt;PendingPackage&gt; mPendingPackages = <span class="keyword">new</span> ArrayList&lt;PendingPackage&gt;();</span><br><span class="line"><span class="comment">// :3256</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readPackageLPw</span><span class="params">(XmlPullParser parser)</span> <span class="keyword">throws</span> XmlPullParserException, IOException </span>&#123;</span><br><span class="line">        String name = <span class="keyword">null</span>;</span><br><span class="line">        ... ...</span><br><span class="line">        String idStr = <span class="keyword">null</span>;</span><br><span class="line">        String sharedIdStr = <span class="keyword">null</span>;</span><br><span class="line">        ... ...</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// app的Package名称</span></span><br><span class="line">            name = parser.getAttributeValue(<span class="keyword">null</span>, ATTR_NAME); </span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 该app所使用的uid</span></span><br><span class="line">            idStr = parser.getAttributeValue(<span class="keyword">null</span>, <span class="string">"userId"</span>); </span><br><span class="line">            ... ...</span><br><span class="line">            <span class="comment">// 该app所使用的shared uid</span></span><br><span class="line">            sharedIdStr = parser.getAttributeValue(<span class="keyword">null</span>, <span class="string">"sharedUserId"</span>);</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">int</span> userId = idStr != <span class="keyword">null</span> ? Integer.parseInt(idStr) : <span class="number">0</span>;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">if</span> (name == <span class="keyword">null</span>) &#123;  ... &#125;  <span class="comment">// 该字段必须存在</span></span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (userId &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                packageSetting = addPackageLPw(name.intern(), realName, <span class="keyword">new</span> File(codePathStr),</span><br><span class="line">                        <span class="keyword">new</span> File(resourcePathStr), legacyNativeLibraryPathStr, primaryCpuAbiString,</span><br><span class="line">                        secondaryCpuAbiString, cpuAbiOverrideString, userId, versionCode, pkgFlags,</span><br><span class="line">                        pkgPrivateFlags); <span class="comment">// 🏁将读取到的安装信息和uid信息保存到内存数据结构</span></span><br><span class="line">                ... ...</span><br><span class="line">                    packageSetting.setTimeStamp(timeStamp);</span><br><span class="line">                    packageSetting.firstInstallTime = firstInstallTime;</span><br><span class="line">                    packageSetting.lastUpdateTime = lastUpdateTime;</span><br><span class="line">                ... ...</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sharedIdStr != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 如果sharedIdStr非空，说明上次并没有给他分配独立Linux用户ID，</span></span><br><span class="line">                <span class="comment">// 而是让它与其它app共享同一个Linux用户ID。此时不能马上为它保留上次使用的</span></span><br><span class="line">                <span class="comment">// Linux用户ID，因为该ID实际是别的app所有，此时可能是无效的。</span></span><br><span class="line">                userId = sharedIdStr != <span class="keyword">null</span> ? Integer.parseInt(sharedIdStr) : <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">if</span> (userId &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="comment">// 为之创建一个PendingPackage，表示该Linux用户ID还未确定</span></span><br><span class="line">                    <span class="comment">// 需要等到PackageManagerService解析完成之后，才能才能确认保存在</span></span><br><span class="line">                    <span class="comment">// mPendingPackages中的ID是否有效，如果有效，</span></span><br><span class="line">                    <span class="comment">// PackageManagerService才会为它们保留上一次所使用的Linux用户ID</span></span><br><span class="line">                    packageSetting = <span class="keyword">new</span> PendingPackage(name.intern(), realName, <span class="keyword">new</span> File(</span><br><span class="line">                            codePathStr), <span class="keyword">new</span> File(resourcePathStr), legacyNativeLibraryPathStr,</span><br><span class="line">                            primaryCpuAbiString, secondaryCpuAbiString, cpuAbiOverrideString,</span><br><span class="line">                            userId, versionCode, pkgFlags, pkgPrivateFlags);</span><br><span class="line">                    packageSetting.setTimeStamp(timeStamp);</span><br><span class="line">                    packageSetting.firstInstallTime = firstInstallTime;</span><br><span class="line">                    packageSetting.lastUpdateTime = lastUpdateTime;</span><br><span class="line">                    mPendingPackages.add((PendingPackage) packageSetting);</span><br><span class="line">                    ... ...</span><br><span class="line">                &#125; ... ...</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;...&#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;...&#125;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="Step5-Settings-addPackageLPw-…"><a href="#Step5-Settings-addPackageLPw-…" class="headerlink" title="Step5: Settings::addPackageLPw(…)"></a>Step5: Settings::addPackageLPw(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/Settings.java:474</span></span><br><span class="line">    <span class="function">PackageSetting <span class="title">addPackageLPw</span><span class="params">(String name, String realName, File codePath, File resourcePath,</span></span></span><br><span class="line"><span class="function"><span class="params">            String legacyNativeLibraryPathString, String primaryCpuAbiString, String secondaryCpuAbiString,</span></span></span><br><span class="line"><span class="function"><span class="params">            String cpuAbiOverrideString, <span class="keyword">int</span> uid, <span class="keyword">int</span> vc, <span class="keyword">int</span> pkgFlags, <span class="keyword">int</span> pkgPrivateFlags)</span> </span>&#123;</span><br><span class="line">        PackageSetting p = mPackages.get(name); <span class="comment">// 根据包名找到已记录的安装信息</span></span><br><span class="line">        <span class="keyword">if</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (p.appId == uid) &#123;</span><br><span class="line">                <span class="keyword">return</span> p;</span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果没有找到则创建，并使用指定的uid</span></span><br><span class="line">        p = <span class="keyword">new</span> PackageSetting(name, realName, codePath, resourcePath,</span><br><span class="line">                legacyNativeLibraryPathString, primaryCpuAbiString, secondaryCpuAbiString,</span><br><span class="line">                cpuAbiOverrideString, vc, pkgFlags, pkgPrivateFlags);</span><br><span class="line">        p.appId = uid;</span><br><span class="line">        <span class="keyword">if</span> (addUserIdLPw(uid, p, name)) &#123; <span class="comment">// 🏁保存uid信息</span></span><br><span class="line">            mPackages.put(name, p); <span class="comment">// 将安装信息保存到mPackages</span></span><br><span class="line">            <span class="keyword">return</span> p;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step6-Settings-addUserIdLPw-…"><a href="#Step6-Settings-addUserIdLPw-…" class="headerlink" title="Step6: Settings::addUserIdLPw(…)"></a>Step6: Settings::addUserIdLPw(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/Settings.java:967</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">addUserIdLPw</span><span class="params">(<span class="keyword">int</span> uid, Object obj, Object name)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 检查uid的合法性</span></span><br><span class="line">        <span class="keyword">if</span> (uid &gt; Process.LAST_APPLICATION_UID) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (uid &gt;= Process.FIRST_APPLICATION_UID) &#123;</span><br><span class="line">            <span class="comment">// mUserIds是以UID为索引的列表，如果指定uid比它的容量大，则用null填充</span></span><br><span class="line">            <span class="keyword">int</span> N = mUserIds.size();</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> index = uid - Process.FIRST_APPLICATION_UID;</span><br><span class="line">            <span class="keyword">while</span> (index &gt;= N) &#123;</span><br><span class="line">                mUserIds.add(<span class="keyword">null</span>);</span><br><span class="line">                N++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (mUserIds.get(index) != <span class="keyword">null</span>) &#123; <span class="comment">// 指定uid已存在</span></span><br><span class="line">                ... ...</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            mUserIds.set(index, obj);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// mOtherUserIds是已分配给特权用户的UID的稀疏数组</span></span><br><span class="line">            <span class="keyword">if</span> (mOtherUserIds.get(uid) != <span class="keyword">null</span>) &#123; <span class="comment">// 如果已分配，则返回</span></span><br><span class="line">                ... ...</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            mOtherUserIds.put(uid, obj);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>区间<br><code>[FIRST_APPLICATION_UID, FIRST_APPLICATION_UID + MAX_APPLICATION_UIDS)</code><br>中的UID是保留给应用程序的，<br><code>(0, FIRST_APPLICATION_UID)</code>是留给特权用户的。<br><code>FIRST_APPLICATION_UID=10000</code>,<br><code>MAX_APPLICATION_UIDS=1000</code>。</p>
+<p>Step5把从/data/system/packages.xml中读取到的安装信息保存到mPackageSetting对象中，并将此对象以包名为key保存到mPackages中；Step6把此包使用的uid保存到mUserIds中，并关联到对应的PackageSetting对象。</p>
+<p>在Step4中，如果配置文件记录安装包被分配了独立的uid，就走以上的逻辑分支；如果没有独立uid，而是被分配了shared uid，则走另一个逻辑分支，将安装信息暂时封装为PendingPackage对象，保存到mPendingPackages，后面还会用到。</p>
+<p>回到Step3中，通过<code>readPackageLPw(...)</code>读取了app安装信息之后，接下来调用<code>readSharedUserLPw(...)</code>读取系统分配的shared uid。</p>
+<h1 id="Step7-Settings-readSharedUserLPw-…"><a href="#Step7-Settings-readSharedUserLPw-…" class="headerlink" title="Step7: Settings::readSharedUserLPw(…)"></a>Step7: Settings::readSharedUserLPw(…)</h1><p>这里关注标签“shared-user”的三个属性：</p>
+<ul>
+<li>name: shared uid的名称</li>
+<li>userId: shared uid</li>
+<li>system: 此uid是否分配给了一个系统应用程序使用<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/Settings.java:3605</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readSharedUserLPw</span><span class="params">(XmlPullParser parser)</span> <span class="keyword">throws</span> XmlPullParserException,IOException </span>&#123;</span><br><span class="line">        String name = <span class="keyword">null</span>;</span><br><span class="line">        String idStr = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">int</span> pkgFlags = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> pkgPrivateFlags = <span class="number">0</span>;</span><br><span class="line">        SharedUserSetting su = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            name = parser.getAttributeValue(<span class="keyword">null</span>, ATTR_NAME); <span class="comment">// shared uid对应的名称</span></span><br><span class="line">            idStr = parser.getAttributeValue(<span class="keyword">null</span>, <span class="string">"userId"</span>); <span class="comment">// shared uid</span></span><br><span class="line">            <span class="keyword">int</span> userId = idStr != <span class="keyword">null</span> ? Integer.parseInt(idStr) : <span class="number">0</span>;<span class="comment">//shared uid=&gt;int</span></span><br><span class="line">            <span class="comment">// 此uid是否分配给了一个系统类型的应用程序使用</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"true"</span>.equals(parser.getAttributeValue(<span class="keyword">null</span>, <span class="string">"system"</span>))) &#123;</span><br><span class="line">                pkgFlags |= ApplicationInfo.FLAG_SYSTEM;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (name == <span class="keyword">null</span>) &#123; ... &#125;<span class="comment">// name和uid都必须存在</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (userId == <span class="number">0</span>) &#123; ... &#125; </span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 🏁保存shared uid信息</span></span><br><span class="line">                <span class="keyword">if</span> ((su = addSharedUserLPw(name.intern(), userId, pkgFlags, pkgPrivateFlags))</span><br><span class="line">                        == <span class="keyword">null</span>) &#123; ... &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123; ... &#125;</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="Step8-Settings-addSharedUserLPw-…"><a href="#Step8-Settings-addSharedUserLPw-…" class="headerlink" title="Step8: Settings::addSharedUserLPw(…)"></a>Step8: Settings::addSharedUserLPw(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/pm/Settings.java:497</span></span><br><span class="line">    <span class="function">SharedUserSetting <span class="title">addSharedUserLPw</span><span class="params">(String name, <span class="keyword">int</span> uid, <span class="keyword">int</span> pkgFlags, <span class="keyword">int</span> pkgPrivateFlags)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 每个共享Linux用户都由一个SharedUserSetting来描述，以name为key保存在mSharedUsers</span></span><br><span class="line">        SharedUserSetting s = mSharedUsers.get(name);</span><br><span class="line">        <span class="keyword">if</span> (s != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (s.userId == uid) &#123;</span><br><span class="line">                <span class="keyword">return</span> s; <span class="comment">// 说明已经为该name的用户分配了指定的uid</span></span><br><span class="line">            &#125;</span><br><span class="line">            ... ...</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 不存在指定名称的共享用户，则创建</span></span><br><span class="line">        s = <span class="keyword">new</span> SharedUserSetting(name, pkgFlags, pkgPrivateFlags);</span><br><span class="line">        s.userId = uid;</span><br><span class="line">        <span class="keyword">if</span> (addUserIdLPw(uid, s, name)) &#123;   <span class="comment">// 见Step6，把uid保存到mUserIds，并关联到s</span></span><br><span class="line">            mSharedUsers.put(name, s);      <span class="comment">// 将s保存到mSharedUsers</span></span><br><span class="line">            <span class="keyword">return</span> s;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>Step8将从/data/system/packages.xml中读取到的shared-user信息封装为<code>SharedUserSetting</code>对象，并以shared uid的名称为key保存到mSharedUser中；将shared uid保存到mUserIds中，并关联到该SharedUserSetting对象。</p>
+<p>至此就完成了packages.xml文件的加载：</p>
+<ul>
+<li>对于“package”标签记录的app安装信息，有独立uid的app信息，封装为PackageSetting对象，保存到mPackages中；有shareduid的app，封装为PendingPackage对象，保存到mPendingPackages中</li>
+<li>对于“shared-user”标签记录的shared uid信息，封装为SharedUserSetting对象，保存到mSharedUser中</li>
+<li>在此过程中遇到的uid和shared uid都保存在mUserIds中，并让每个uid指向与之关联的PackageSetting对象或SharedUserSetting对象。</li>
+</ul>
+<p>本步完成后回到Step3，完成共享Linux用户信息的读取。接下来就可以为保存在mPendingPackage中的app保留他们上一次所使用的Linux UID了。然后返回到Step2，readLPw(…)完成恢复上一次应用程序安装信息的读取。接下来调用scanDirLI来安装保存在/system/framework、/system/app、/vendor/app、/data/app和/data/app-private的应用程序。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/安装过程/" rel="tag"># 安装过程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/21/2016/10DayDayUp/" rel="next" title="2016年10月DayDayUp">
+                <i class="fa fa-chevron-left"></i> 2016年10月DayDayUp
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/23/2016/1024Installer2/" rel="prev" title="Android App安装过程学习笔记（二）">
+                Android App安装过程学习笔记（二） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/23/2016/1015Installer1/" data-title="Android App安装过程学习笔记（一）" data-url="http://palanceli.github.io/2016/10/23/2016/1015Installer1/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-PackageManagerService-main-…"><span class="nav-number">1.</span> <span class="nav-text">Step1: PackageManagerService.main(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-PackageManagerService的构造函数"><span class="nav-number">2.</span> <span class="nav-text">Step2: PackageManagerService的构造函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-Settings-readLPw-…"><span class="nav-number">3.</span> <span class="nav-text">Step3: Settings.readLPw(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#data-system-packages-xml内容"><span class="nav-number">4.</span> <span class="nav-text">/data/system/packages.xml内容</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-Settings-readPackageLPw-…"><span class="nav-number">5.</span> <span class="nav-text">Step4: Settings::readPackageLPw(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step5-Settings-addPackageLPw-…"><span class="nav-number">6.</span> <span class="nav-text">Step5: Settings::addPackageLPw(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step6-Settings-addUserIdLPw-…"><span class="nav-number">7.</span> <span class="nav-text">Step6: Settings::addUserIdLPw(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step7-Settings-readSharedUserLPw-…"><span class="nav-number">8.</span> <span class="nav-text">Step7: Settings::readSharedUserLPw(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step8-Settings-addSharedUserLPw-…"><span class="nav-number">9.</span> <span class="nav-text">Step8: Settings::addSharedUserLPw(…)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

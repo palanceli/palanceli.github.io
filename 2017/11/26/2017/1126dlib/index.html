@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="dlib,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章要点：  dlib的安装 dlib简单使用 人脸检测、识别 人脸合成 训练自己的人脸关键点模型">
+<meta name="keywords" content="dlib">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dlib的使用">
+<meta property="og:url" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章要点：  dlib的安装 dlib简单使用 人脸检测、识别 人脸合成 训练自己的人脸关键点模型">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img07.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.182Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dlib的使用">
+<meta name="twitter:description" content="本章要点：  dlib的安装 dlib简单使用 人脸检测、识别 人脸合成 训练自己的人脸关键点模型">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/11/26/2017/1126dlib/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/11/26/2017/1126dlib/">
+
+
+
+
+
+  <title>dlib的使用 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/11/26/2017/1126dlib/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">dlib的使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-26T20:00:00+08:00">
+                2017-11-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/人脸识别/" itemprop="url" rel="index">
+                    <span itemprop="name">人脸识别</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/26/2017/1126dlib/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/26/2017/1126dlib/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章要点：</p>
+<ul>
+<li>dlib的安装</li>
+<li>dlib简单使用</li>
+<li>人脸检测、识别</li>
+<li>人脸合成</li>
+<li>训练自己的人脸关键点模型</li>
+</ul>
+<a id="more"></a>
+<p>因为要用dlib做一个人脸识别，昨晚搞了一下dlib python的安装和使用，在macOS下遇到了一些问题。</p>
+<h1 id="dlib的安装"><a href="#dlib的安装" class="headerlink" title="dlib的安装"></a>dlib的安装</h1><p>主要安装步骤非常简单，如果pip能自己搞定依赖问题就好了。</p>
+<h2 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h2><p>dlib依赖boost，所以理想情况下只需要<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ brew install boost-python</span><br><span class="line">$ sudo pip install dlib</span><br><span class="line">$ sudo pip install scikit-image</span><br></pre></td></tr></table></figure></p>
+<p>因为下面要跑一个示例的需要，最后一步安装了scikit-image。</p>
+<h2 id="关闭SIP"><a href="#关闭SIP" class="headerlink" title="关闭SIP"></a>关闭SIP</h2><p>如果系统开启了系统完整性保护SIP（SystemIntegrity Protection），需要：</p>
+<ul>
+<li>重启OS，按住⌘+R</li>
+<li>从菜单中进入终端，输入<code>csrutil disable</code>，关闭SIP</li>
+<li>重启OS</li>
+</ul>
+<p>完成这些步骤之后再操作前面的dlib安装步骤，安装成功后记得同样的步骤，通过命令<code>csrutil enable</code>恢复SIP</p>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><p>折腾最久的是这个错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#error &quot;DLIB_NO_GUI_SUPPORT is defined so you can&apos;t use the GUI code.  Turn DLIB_NO_GUI_SUPPORT off if you want to use it.&quot;</span><br><span class="line">     ^</span><br><span class="line">    /usr/local/include/dlib/gui_core/gui_core_kernel_2.h:12:2: error: &quot;Also make sure you have libx11-dev installed on your system&quot;</span><br><span class="line">    #error &quot;Also make sure you have libx11-dev installed on your system&quot;</span><br><span class="line">     ^</span><br></pre></td></tr></table></figure></p>
+<p>不知道最根本的原因是啥，尝试了N种办法，最后我更新了一把Xcode：<br><code>$ sudo xcode-select --install</code><br>就OK了。</p>
+<h1 id="dlib的使用"><a href="#dlib的使用" class="headerlink" title="dlib的使用"></a>dlib的使用</h1><h2 id="检测人脸区域"><a href="#检测人脸区域" class="headerlink" title="检测人脸区域"></a>检测人脸区域</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">img = cv2.imread(<span class="string">'images/girls.jpg'</span>)</span><br><span class="line">rgbImg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</span><br><span class="line">detector = dlib.get_frontal_face_detector() <span class="comment"># 正脸检测器</span></span><br><span class="line">faces = detector(rgbImg, <span class="number">1</span>) <span class="comment"># 返回脸的信息</span></span><br><span class="line"><span class="keyword">for</span> face <span class="keyword">in</span> faces:          <span class="comment"># 框出每张脸</span></span><br><span class="line">    cv2.rectangle(img, (face.left(), face.top()), (face.right(), face.bottom()), (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>如图，输入一个多人图片，通过正脸检测器可以检测出每张脸的矩形区域<br><img src="/2017/11/26/2017/1126dlib/img01.png" alt></p>
+<h2 id="检测人脸特征点"><a href="#检测人脸特征点" class="headerlink" title="检测人脸特征点"></a>检测人脸特征点</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">img = cv2.imread(<span class="string">'images/girls.jpg'</span>)</span><br><span class="line">rgbImg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</span><br><span class="line">detector = dlib.get_frontal_face_detector()</span><br><span class="line">faces = detector(rgbImg, <span class="number">1</span>)</span><br><span class="line"><span class="keyword">for</span> face <span class="keyword">in</span> faces:</span><br><span class="line">    <span class="comment"># 识别出关键点，keyPts的类型是dlib.points</span></span><br><span class="line">    keyPts = self.shapePredictor(img, face).parts()</span><br><span class="line">    landmarks = numpy.matrix([[p.x,p.y] <span class="keyword">for</span> p <span class="keyword">in</span> keyPts]) </span><br><span class="line">    <span class="comment"># 画出关键点</span></span><br><span class="line">    pts = numpy.array([landmarks], numpy.int32)</span><br><span class="line">    cv2.polylines(img, pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>), <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="/2017/11/26/2017/1126dlib/img03.png" alt></p>
+<h2 id="计算人脸特征"><a href="#计算人脸特征" class="headerlink" title="计算人脸特征"></a>计算人脸特征</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">img = io.imread(imgFile) <span class="comment"># 输入单人头像</span></span><br><span class="line">detector = dlib.get_frontal_face_detector()</span><br><span class="line"><span class="comment"># 检测出人脸区域</span></span><br><span class="line">faces = detector(img, <span class="number">1</span>)</span><br><span class="line">...</span><br><span class="line">faceRect = faces[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练好的人脸关键点检测器数据</span></span><br><span class="line">predictorPath = <span class="string">'extdata/shape_predictor_68_face_landmarks.dat'</span></span><br><span class="line"><span class="comment"># 训练好的ResNet人脸识别模型</span></span><br><span class="line">faceRecModelPath = <span class="string">'extdata/dlib_face_recognition_resnet_model_v1.dat'</span></span><br><span class="line">shapePredictor = dlib.shape_predictor(predictorPath) <span class="comment"># 人脸关键点监测器</span></span><br><span class="line">faceRec = dlib.face_recognition_model_v1(faceRecModelPath) <span class="comment"># 人脸识别模型</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关键点检测</span></span><br><span class="line">shape = shapePredictor(img, faceRect)</span><br><span class="line"><span class="comment"># 描述项提取， 128D向量</span></span><br><span class="line">faceDescriptor = faceRec.compute_face_descriptor(img, shape)</span><br><span class="line"><span class="comment"># 转换为numpu array</span></span><br><span class="line"><span class="keyword">return</span> numpy.array(faceDescriptor)</span><br></pre></td></tr></table></figure>
+<p>其中：<br><code>shape_predictor_68_face_landmarks.dat</code>是已经训练好的<a href="http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2" target="_blank" rel="noopener">人脸关键点检测器数据</a>。<br><code>dlib_face_recognition_resnet_model_v1.dat</code>是已经训练好的<a href="http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2" target="_blank" rel="noopener">ResNet人脸识别模型</a>。<br>我在faceRek/setup.sh中写了工程依赖的外部数据，运行python代码前先执行<br><code>sh setup.sh</code></p>
+<p>该段代码提取到的128D向量形式如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ python -m unittest sample.DLibUT.test02</span><br><span class="line">14:40 0117 DEBUG    </span><br><span class="line">[ -1.32817209e-01   7.43134990e-02   7.68444687e-02  -1.05091885e-01</span><br><span class="line">  -1.46399811e-01   4.86346148e-03  -1.23881295e-01  -1.71705186e-01</span><br><span class="line">  ...               ...             ...             ...</span><br><span class="line">  -1.90864969e-03   1.68816522e-02  -2.53906399e-01   1.30065437e-02</span><br><span class="line">   1.57092661e-01  -9.88340452e-02   9.43705738e-02   5.99186197e-02]</span><br></pre></td></tr></table></figure></p>
+<h2 id="人脸识别"><a href="#人脸识别" class="headerlink" title="人脸识别"></a>人脸识别</h2><p>现有一堆候选人照片，给定一个待识别人照片，识别出他是候选人中的哪一个，这是人脸识别解决的主要问题。应用上一节计算出的人脸特征，计算待识别人和每位候选人之间的特征差，求最小的那个候选人，就是人脸识别的主要方法。<br>使用<code>numpy.linalg.norm(candDesc - testDesc)</code>可以将128D向量转化成一个数值，求这个最小值即可。在faceRek/sample.DLibUT.test03有完整的代码，识别结果如下，蓝色是识别正确的，红色是识别错误的：<br><img src="/2017/11/26/2017/1126dlib/img02.png" alt><br>它把莫文蔚识成了ruru 😂</p>
+<h2 id="人脸合成"><a href="#人脸合成" class="headerlink" title="人脸合成"></a>人脸合成</h2><p>我本来想找的合成是根据一张面孔的特征去变换另一张面孔，但我只找到了两张面孔特征部分的叠加，暂时也先收着吧。不忍心拿美女开刀，就用我自己的看效果吧🤣<br><img src="/2017/11/26/2017/1126dlib/img04.png" alt></p>
+<h1 id="训练自己的人脸关键点模型"><a href="#训练自己的人脸关键点模型" class="headerlink" title="训练自己的人脸关键点模型"></a>训练自己的人脸关键点模型</h1><p>在<a href="https://github.com/davisking/dlib-models" target="_blank" rel="noopener">dlib-models</a>中Davis King提到：<a href="http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2" target="_blank" rel="noopener">shape_predictor_68_face_landmarks.dat</a>所使用的数据集许可证不包括商业用途，因此该训练模型也不能用于商业产品。</p>
+<p>而且该模型压缩尺寸有61M，解开后99M，作者在<a href="http://blog.dlib.net/2014/08/real-time-face-pose-estimation.html" target="_blank" rel="noopener">Real-Time Face Pose Estimation</a>的中有大量的答疑，关于性能、和编译等问题，Davis King真是勤奋！</p>
+<ul>
+<li><a href="http://blog.dlib.net/2014/08/real-time-face-pose-estimation.html?showComment=1445290037220#c6512573392805280310" target="_blank" rel="noopener">这里</a>提到：如果想得到更小的数据模型，可以在原先的数据集上删减一些landmarks，并自己完成训练，原先的训练集数据可以从<a href="http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz" target="_blank" rel="noopener">http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz</a>下载；训练代码参见<a href="http://dlib.net/train_shape_predictor_ex.cpp.html" target="_blank" rel="noopener">http://dlib.net/train_shape_predictor_ex.cpp.html</a>，该代码位于<code>dlib/examples/train_shape_predictor_ex.cpp</code>。这里还有一个5 landmarks的训练集<a href="http://dlib.net/files/data/dlib_faces_5points.tar" target="_blank" rel="noopener">http://dlib.net/files/data/dlib_faces_5points.tar</a>.</li>
+<li><a href="http://blog.dlib.net/2014/08/real-time-face-pose-estimation.html?showComment=1410219350404#c1560932319064417228" target="_blank" rel="noopener">这里</a>提到：可以从HELEN数据集<a href="http://www.ifp.illinois.edu/~vuongle2/helen/" target="_blank" rel="noopener">http://www.ifp.illinois.edu/~vuongle2/helen/</a>中获取194 landmarks的训练数据，完成自己的训练。</li>
+<li><a href="https://github.com/davisking/dlib-models" target="_blank" rel="noopener">这里</a>提到：模型shape_predictor_68_face_landmarks.dat.bz2的数据源来自<a href="https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/" target="_blank" rel="noopener">https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/</a>，这是300万数据集。</li>
+</ul>
+<p>作者提供的素材就这些，足够了！我的编译环境是mac OS，git clone dlib到本地，创建目录dlib/examples/build，然后使用cmake：<br><img src="/2017/11/26/2017/1126dlib/img05.png" alt><br>有一个警告但是可以忽略。使用Xcode打开project，我打算训练数据集dlib_faces_5points，将其目录下的两个xml文件分别改名为：<br><code>test_cleaned.xml</code> =&gt; <code>testing_with_face_landmarks.xml</code><br><code>train_cleaned.xml</code> =&gt; <code>training_with_face_landmarks.xml</code><br>在Xcode中点击菜单Product &gt; Scheme &gt; Edit Scheme…，设置命令行的输入参数：<br><img src="/2017/11/26/2017/1126dlib/img06.png" alt><br>然后就可以运行了，不过要做好思想准备，我把<code>training_with_face_landmarks.xml</code>中的5000多张图砍到200多张，整个训练和测试过程需要半个小时；如果把5000多张图跑一遍，从log输出的提示上来看，需要24小时！我不知道那300多万张ibug的数据跑完得要多长时间。</p>
+<p>训练完成后，会自动跑出评测结果，看起来还不错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mean training error: 0.011435</span><br><span class="line">mean testing error:  0.00745601</span><br></pre></td></tr></table></figure></p>
+<p>接下来用python验证一下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DLibTrainingUT</span><span class="params">(unittest.TestCase)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setUp</span><span class="params">(self)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        self.mDetector = dlib.get_frontal_face_detector()   <span class="comment"># 正脸检测器</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getFaceLandmarksFromImg</span><span class="params">(self, img, predictorPath)</span>:</span></span><br><span class="line">        <span class="comment"># 检测出人脸区域</span></span><br><span class="line">        faces = self.mDetector(img, <span class="number">1</span>)</span><br><span class="line">        ...</span><br><span class="line">        faceRect = faces[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">        self.mShapePredictor = dlib.shape_predictor(predictorPath) <span class="comment"># 人脸关键点监测器</span></span><br><span class="line">        <span class="comment"># 提取关键点</span></span><br><span class="line">        keyPts = self.mShapePredictor(img, faceRect).parts()</span><br><span class="line">        landmarks = numpy.matrix([[p.x, p.y] <span class="keyword">for</span> p <span class="keyword">in</span> keyPts])</span><br><span class="line">        <span class="keyword">return</span> landmarks</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test01</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">''' 验证自己训练的模型效果 '''</span></span><br><span class="line">        imgFile = <span class="string">'images/2-0.jpg'</span></span><br><span class="line">        img = cv2.imread(imgFile)</span><br><span class="line">        modelPath = <span class="string">'/Users/palance/Documents/SubVersions/dlib/examples/build/Debug/sp.dat'</span></span><br><span class="line">        landmarks = self.getFaceLandmarksFromImg(img, modelPath)</span><br><span class="line"></span><br><span class="line">        pts = numpy.array(landmarks, numpy.int32)</span><br><span class="line">        cv2.polylines(img, pts.reshape(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">2</span>), <span class="literal">True</span>, (<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>), <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        font = cv2.FONT_HERSHEY_SIMPLEX </span><br><span class="line">        index = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> pt <span class="keyword">in</span> landmarks:</span><br><span class="line">            x, y = pt[<span class="number">0</span>, <span class="number">0</span>], pt[<span class="number">0</span>, <span class="number">1</span>]</span><br><span class="line">            text = <span class="string">'%d'</span> % index</span><br><span class="line">            cv2.putText(img, text, (x, y), font, <span class="number">0.5</span>, (<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">            index += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        self.waitToClose(img)</span><br></pre></td></tr></table></figure></p>
+<p>结果如下：<br><img src="/2017/11/26/2017/1126dlib/img07.png" alt><br>虽然只用了200多张图片，结果好像还不错！</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://github.com/davisking/dlib" target="_blank" rel="noopener">dlib github</a><br><a href="http://dlib.net/" target="_blank" rel="noopener">dlib 官网</a><br><a href="http://scikit-image.org" target="_blank" rel="noopener">scikit-image 官网</a><br><a href="http://scikit-learn.org/stable/" target="_blank" rel="noopener">scikit-learn 官网</a><br><a href="http://blog.csdn.net/xingchenbingbuyu/article/details/68482838?ref=myrecommend" target="_blank" rel="noopener">《40行代码的人脸识别实践》</a><br><a href="http://blog.csdn.net/xingchenbingbuyu/article/details/51116354" target="_blank" rel="noopener">《OpenCV实践之路——用dlib库进行人脸检测与人脸标记（Python）》</a><br><a href="http://www.csc.kth.se/~vahidk/papers/KazemiCVPR14.pdf" target="_blank" rel="noopener">《One Millisecond Face Alignment with an Ensemble of Regression Trees》</a><br><a href="https://en.wikipedia.org/wiki/Orthogonal_Procrustes_problem" target="_blank" rel="noopener">《Orthogonal Procrustes problem》</a><br><a href="https://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations" target="_blank" rel="noopener">《Transformation matrix》</a><br><a href="http://matthewearl.github.io/2015/07/28/switching-eds-with-python/" target="_blank" rel="noopener">《Switching Eds: Face swapping with Python, dlib, and OpenCV》</a><br><a href="http://geek.csdn.net/news/detail/36873" target="_blank" rel="noopener">《教你用200行Python代码“换脸”》</a><br><a href="https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&amp;mid=2651641340&amp;idx=1&amp;sn=29e39cb6113120fe73b3c397f1c9d555" target="_blank" rel="noopener">《手把手：使用OpenCV进行面部合成— C++ / Python》</a><br><a href="https://github.com/iamwx/FaceMorph" target="_blank" rel="noopener">https://github.com/iamwx/FaceMorph</a><br><a href="http://blog.csdn.net/elaine_bao/article/details/53054533" target="_blank" rel="noopener">人脸关键点检测器的训练</a></p>
+<blockquote>
+<p>本文涉及的所有代码都已提交到github上：<br><a href="https://github.com/palanceli/facemojiSample/tree/master/faceRek" target="_blank" rel="noopener">https://github.com/palanceli/facemojiSample/tree/master/faceRek</a>。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/dlib/" rel="tag"># dlib</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/15/2017/1115AndroidProgrammingBNRG35/" rel="next" title="《Android Programming BNRG》笔记三十五">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记三十五
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/12/2017/1212dlib/" rel="prev" title="dlib提取人脸关键点的性能">
+                dlib提取人脸关键点的性能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/11/26/2017/1126dlib/" data-title="dlib的使用" data-url="http://palanceli.github.io/2017/11/26/2017/1126dlib/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#dlib的安装"><span class="nav-number">1.</span> <span class="nav-text">dlib的安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装步骤"><span class="nav-number">1.1.</span> <span class="nav-text">安装步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭SIP"><span class="nav-number">1.2.</span> <span class="nav-text">关闭SIP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遇到的问题"><span class="nav-number">1.3.</span> <span class="nav-text">遇到的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dlib的使用"><span class="nav-number">2.</span> <span class="nav-text">dlib的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#检测人脸区域"><span class="nav-number">2.1.</span> <span class="nav-text">检测人脸区域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检测人脸特征点"><span class="nav-number">2.2.</span> <span class="nav-text">检测人脸特征点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#计算人脸特征"><span class="nav-number">2.3.</span> <span class="nav-text">计算人脸特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#人脸识别"><span class="nav-number">2.4.</span> <span class="nav-text">人脸识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#人脸合成"><span class="nav-number">2.5.</span> <span class="nav-text">人脸合成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#训练自己的人脸关键点模型"><span class="nav-number">3.</span> <span class="nav-text">训练自己的人脸关键点模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

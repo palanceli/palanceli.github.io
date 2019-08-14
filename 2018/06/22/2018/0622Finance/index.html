@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="绝对估值是关于企业内在价值的一种估算方法，其中现金流贴现法（Discounted Cash Flow DCF）是最经典的绝对估值法，它是基于企业自由现金流的计算公式。本文就采用这种方法算算几家比较著名公司的绝对估值。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用现金流贴现法算算几家美国公司的绝对估值">
+<meta property="og:url" content="http://palanceli.github.io/2018/06/22/2018/0622Finance/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="绝对估值是关于企业内在价值的一种估算方法，其中现金流贴现法（Discounted Cash Flow DCF）是最经典的绝对估值法，它是基于企业自由现金流的计算公式。本文就采用这种方法算算几家比较著名公司的绝对估值。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/06/22/2018/0622Finance/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.353Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用现金流贴现法算算几家美国公司的绝对估值">
+<meta name="twitter:description" content="绝对估值是关于企业内在价值的一种估算方法，其中现金流贴现法（Discounted Cash Flow DCF）是最经典的绝对估值法，它是基于企业自由现金流的计算公式。本文就采用这种方法算算几家比较著名公司的绝对估值。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/06/22/2018/0622Finance/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/06/22/2018/0622Finance/">
+
+
+
+
+
+  <title>使用现金流贴现法算算几家美国公司的绝对估值 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/06/22/2018/0622Finance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用现金流贴现法算算几家美国公司的绝对估值</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-22T14:00:00+08:00">
+                2018-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/金融/" itemprop="url" rel="index">
+                    <span itemprop="name">金融</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/22/2018/0622Finance/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/06/22/2018/0622Finance/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>绝对估值是关于企业内在价值的一种估算方法，其中<strong>现金流贴现法（Discounted Cash Flow DCF）</strong>是最经典的绝对估值法，它是基于企业自由现金流的计算公式。本文就采用这种方法算算几家比较著名公司的绝对估值。</p>
+<a id="more"></a>
+<h1 id="获取财报"><a href="#获取财报" class="headerlink" title="获取财报"></a>获取财报</h1><p>这是我第一次写金融相关的笔记，因此把中途遇到的基础问题都一一记录下来，首先就是怎么获取美国上市公司的财报。<br>来<a href="https://www.sec.gov/" target="_blank" rel="noopener">美国证券交易委员会官网</a>，在EDGAR（Electronic Data Gathering, Analysis, and Retrieval System 即 电子化数据收集、分析及检索系统）搜索框中键入待查公司，比如<code>facebook</code>，可以搜到各类文件，它们的缩写和含义的对应关系为：<br><code>10-Q</code> 季报 　　　　　　　　　　　　　　　　 <code>10-K</code> 年报<br><code>F-1</code> 部分美国以外公司注册上市声明  　　　　　<code>Form D</code> 规则D下的证券发行豁免注册公告<br><code>3</code> 首次持股声明  　　　 　　　 　　　 　　　　 <code>4</code> 持股变动声明<br><code>5</code> 持股变动年度报告  　　　 　　　 　　　　　 <code>S-1</code> 注册上市声明<br><code>POS AM</code> 招股信息更正说明  　　　 　　　 　　　 <code>13D</code> 股东单独或合并持有5%以上公司股份公告<br><code>144</code> 证券拟出售报告  　　　 　　　 　　　　　 <code>20-F</code> 美国以外上市公司的年度报告或过度报告<br><code>ARS</code> 股东年报  　　　 　　　 　　　 　　 　　　 <code>6-K</code> 美国以外上市公司的临时报告<br><code>DEF 14-A</code> 股东委托书决议  　　　　　　　　　　<code>11-K</code> 员工持股变动年度报告<br><code>8-K</code> 季报发布期间的重要事件或公司变化临时报告  </p>
+<p>此外美国的上市公司在他们的官方网站的底端都有投资者关系（Investor Relationship IR），这里也都能查到它们的财报。有的隐藏比较深，比如可口可乐，可以直接Google 搜索<code>coca cola investor relationship</code>，点开页面后找<code>Annual Reports</code>，然后再在顶部tab中找到<code>SEC Filings</code>，即可查找历史文件。<br>不过我通过各个渠道查可口可乐的历史财报，最早也只能查到1994年。在《得到》上咨询香帅老师，答复是：更早的财务稳健如果在SEC上都查不到，就要借助专业数据库了，行业研究员会用到bloomberg, thomson reuters，学术界喜欢用compustat。我大致搜了一下，这些数据库应该都是付费服务，国内一些大学图书馆有终端可用，貌似还能申请免费的试用版，正在申请中，慢慢研究吧j~</p>
+<h1 id="自由现金流"><a href="#自由现金流" class="headerlink" title="自由现金流"></a>自由现金流</h1><p>自由现金流（Free Cash Flow，FCF）是指企业经营活动产生的现金流量扣除资本性支出(Capital Expenditures，CE）的差额。即：FCF=OCF-CE。  </p>
+<h2 id="Facebook"><a href="#Facebook" class="headerlink" title="Facebook"></a>Facebook</h2><p>Facebook的自由现金流在它的10-K年报中有直接的体现：<br><strong>年份</strong>　 <strong>自由现金流（百万$）</strong><br>——————————————————————————————————————————<br><code>2017</code> 　　17,483<br><code>2016</code> 　　11,617<br><code>2015</code> 　　6,076<br><code>2014</code> 　　3,626<br><code>2013</code> 　　2,849<br><code>2012</code> 　　37   </p>
+<h2 id="Amazon"><a href="#Amazon" class="headerlink" title="Amazon"></a>Amazon</h2><p>在亚马逊的10-K年报中，2004年之后的财报是有自由现金流这个字段的，之前没有，需要自己计算。不过好在2004这一年的财报中包含了2001、2002、2003的自由现金流的计算过程：<br><img src="/2018/06/22/2018/0622Finance/img01.png" alt><br>这里有一个细节：在财报中，负数是使用圆括号括住的来表示的，这也是在在excel中的默认设置，因此在2001年的营业性收入是-119,782，支出是-50,321，因此自由现金流是-170,103。它是用运营的净收入减去购买固定资产的支出。<br><strong>年份</strong>　　　    <strong>自由现金流</strong><br>2017　　　 8,376,000,000<br>2016　　　 10,535,000,000<br>2015　　　 7,450,000,000<br>2014　　　 1,949,000,000<br>2013　　　 2,031,000,000<br>2012　　　 395,000,000<br>2011　　　 2,092,000,000<br>2010　　　 2,516,000,000<br>2009　　　 2,920,000,000<br>2008　　　 1,364,000,000<br>2007　　　 1,181,000,000<br>2006　　　 486,000,000<br>2005　　　 529,000,000<br>2004　　　 477,000,000<br>2003　　　 347,000,000<br>2002　　　 135,000,000<br>2001　　　 170,000,000<br>2000　　　-4,316,000<br>1999　　　-196,180,000<br>1998　　　 2,702,000<br>1997　　　-6,916,000<br>1996　　　 675,000<br>1995　　　 180,000   </p>
+<h2 id="Apple"><a href="#Apple" class="headerlink" title="Apple"></a>Apple</h2><p>再来看苹果的财报，苹果财报则始终没有Free Cash Flow这一项，需要自己去算，找到它的CONSOLIDATED STATEMENTS OF CASH FLOWS这种表，其中<code>Cash generated by operating activities</code>是企业运营收入，支出它没有像亚马逊的<code>Purchase of fixed assets, including internal-use software and  Website development</code> 这一项，这就需要自己分析了，在<code>Investing activities</code>一栏中，包含：</p>
+<p><code>Purchases of marketable securities</code> 购买有价证券<br><code>Proceeds from maturities of marketable securities</code> 从有价证券的到期收益<br><code>Proceeds from sales of marketable securities</code> 销售有价证券所得收益<br><code>Payments made in connection with business acquisitions, net</code> 与商业收购相关的付款，净额<br><code>Payments for acquisition of property, plant and equipment</code> <strong>收购物业、厂房和设备的付款</strong><br><code>Payments for acquisition of intangible assets</code> <strong>无形资产收购付款</strong><br><code>Payments for strategic investments, net</code> 战略投资支付净额<br>——————————————————————————————————————————<br>如果和亚马逊对标的话，我认为和经营相关的支出应该是第5、6项。我觉得苹果的成本支出应该有一大部分是付给供应商的原材料，为啥这里看不到呢？<br>按照这个计算方式，苹果的自由现金流为：<br><strong>年份</strong>　　    <strong>自由现金流（百万）</strong><br>2017　　     50,803<br>2016　　     52,276<br>2015　　     69,778<br>2014　　     49,900<br>2013　　     44,590<br>2012　　     41,454<br>2011　　     30,077<br>2010　　     16,474<br>2009　　     8,946<br>2008　　     8,397<br>2007　　     4,484<br>2006　　     1,535<br>2005　　     2,275<br>2004　　     758<br>2003　　     125<br>2002　　     (85)<br>2001　　     (47)<br>2000　　     726<br>1999　　     751<br>1998　　     729<br>1997　　     101<br>1996　　     452<br>1995　　     (399)<br>1994　　     577  </p>
+<h2 id="Google"><a href="#Google" class="headerlink" title="Google"></a>Google</h2><p>再看google，谷歌也没有直接列出Free Cash Flow，但是有了苹果的经验，计算就是轻车熟路了：<br><strong>年份</strong>    　　<strong>自由现金流（百万）</strong><br>2017　　     23,907<br>2016　　     25,824<br>2015　　     16,622<br>2014　　     11,417<br>2013　　     11,301<br>2012　　     13,346<br>2011　　     11,127<br>2010　　     7,063<br>2009　　     8,506<br>2008　　     5,494<br>2007　　     3,372<br>2006　　     1,677<br>2005　　     1,621<br>2004　　     588<br>2003　　     218<br>2002　　     118   </p>
+<h2 id="阿里巴巴"><a href="#阿里巴巴" class="headerlink" title="阿里巴巴"></a>阿里巴巴</h2><p>再看阿里巴巴，需要注意，美国以外的上市公司的年报不是10-k，而是20-F。阿里巴巴由于上市不久，财报数据还不多。需要注意的是阿里的现金流是以人民币计的：<br><strong>年份</strong>　　    <strong>自由现金流（百万￥）</strong><br>2017　　     68,790<br>2016　　     51,279<br>2015　　     48,121<br>2014　　     32,269<br>2013　　     19,745   </p>
+<h2 id="腾讯"><a href="#腾讯" class="headerlink" title="腾讯"></a>腾讯</h2><p>再看腾讯，腾讯是在香港上市，应该去<a href="http://www.hkexnews.hk/" target="_blank" rel="noopener">香港交易所官网</a>，点击<code>进阶搜寻</code>，输入相关信息完成搜索。腾讯现金流也是以人民币计：<br><strong>年份</strong>　　    <strong>自由现金流（百万￥）</strong><br>2017　　     74,182<br>2016　　     48,270<br>2015　　     35,371<br>2014　　     26,095<br>2013　　     18,386<br>2012　　     14,903<br>2011　　     8,523<br>2010　　     10,529<br>2009　　     7,578<br>2008　　     3,375<br>2007　　     772<br>2006　　     1,170<br>2005　　     729<br>2004　　     117   </p>
+<hr>
+<p>这几家公司的年复合增长最厉害的是FaceBook，涨势最漂亮的是腾讯，一路向上几乎没有出现波动。苹果和谷歌最近两年有波动。</p>
+<h1 id="现金流贴现法"><a href="#现金流贴现法" class="headerlink" title="现金流贴现法"></a>现金流贴现法</h1><p>现金流贴现法是计算出企业未来所有的的自由现金流求合，就等于对现在的估值。<br>假设企业第0年的自由现金流为A，每年保持α的增长率，贴现率为β。（贴现率可以理解为投资的一般回报率，比如如果存定期，明年的100块钱，在今年值多少钱x，$\frac{100-x}{x}$就是贴现率）<br>那么第1年它的自由现金流就为$A(1+α)$，折合到现在的现金为$\frac{A(1+α)}{1+β}$<br>那么第2年它的自由现金流就为$A(1+α)^2$，折合到现在的现金为$\frac{A(1+α)^2}{(1+β)^2}$<br>…<br>那么第n年它的自由现金流就为$A(1+α)^N$，折合到现在的现金为$\frac{A(1+α)^n}{(1+β)^n}$<br>如果这家公司永远能保持α的速度发展，那么他当前的估值就等于每年自由现金折现到现在的总和：<br>$\frac{A(1+α)}{1+β} + \frac{A(1+α)^2}{(1+β)^2} + … + \frac{A(1+α)^N}{(1+β)^N} = A×\frac{1-(\frac{1+α}{1+β}　)^N}{1-\frac{1+α}{1+β}}$  </p>
+<p>但是通常一家公司很难保持长时间的高增长，所以我们给它估计一个短期增长率和一个长期增长率，短期增长率是在n年内保持α，长期增长率是在n+1年之后保持γ，于是在第n年前它折合当前现金流为<br>$A×\frac{1-(\frac{1+α}{1+β}　)^n}{1-\frac{1+α}{1+β}}=A×\frac{1+β}{β-α}×\frac{(1+β)^n - (1+α)^n}{(1+β)^n}$<br>第n+1年后所有现金这和当前现金流为：$\frac{A(1+α)^n}{(1+β)^n}×\frac{1-(\frac{1+γ}{1+β}　)^N}{1-\frac{1+γ}{1+β}}$ （以第n年为起点的等比数列求合）<br>如果γ＜β，则第n+1年后所有现金这和当前现金流为：$\frac{A(1+α)^n}{(1+β)^n}× \frac{1+β}{β-γ}$   </p>
+<p>综上所述，该公司未来所有现金流折合当前价值为：$A×\frac{1+β}{β-α}×\frac{(1+β)^n - (1+α)^n}{(1+β)^n} + A×\frac{(1+α)^n}{(1+β)^n}× \frac{1+β}{β-γ}$  </p>
+<hr>
+<p>我根据上面列出的这些公司，把他们未来n年的增长率设定为历史增长率的一半，贴现率8%，n年后的增长率为3%~5%，n在5~10年。计算出绝对估值为：<br><strong>公司</strong>　　　　<strong>绝对估值（亿）</strong>　　<strong>2018年6月市值（亿）</strong>　　<strong>市盈率</strong><br>Apple 　　　　18,000　　　　　9,098　　　　　　　　　17.82<br>FaceBook　　 14,000　　　　　5,820　　　　　　　　　33.4<br>Tencent　　　 10,924　　　　　5,901　　　　　　　　　43.63<br>Google　　　　10,355　　　　　8,025　　　　　　　　　48.96<br>Alibaba　　　　 6,887　　　　　5,183　　　　　　　　　51.02<br>Amazon　　　　6,780　　　　　8,325　　　　　　　　　216.1  </p>
+<p>具体的算法放在了<a href="https://github.com/palanceli/finance-learning/blob/master/analysis.xlsx" target="_blank" rel="noopener">analysis.xlsx</a>。<br>本节是学习了香帅的绝对估值法做出了自己的计算，应该还很肤浅，继续学习继续完善吧。</p>
+<p>最后，汇总一下本节使用的网站：  </p>
+<blockquote>
+<p><a href="https://www.sec.gov/" target="_blank" rel="noopener">美国证券交易委员会官网</a><br><a href="http://www.hkexnews.hk/" target="_blank" rel="noopener">香港交易所官网</a><br><a href="http://www.cninfo.com.cn/cninfo-new/index" target="_blank" rel="noopener">巨潮资讯</a>，这是中国证监会指定信息披露网站  </p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/19/2018/0619BuildASimpleInterpreter2/" rel="next" title="编写编译器和解释器二">
+                <i class="fa fa-chevron-left"></i> 编写编译器和解释器二
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/22/2018/0626GitSubmodule/" rel="prev" title="git submodules">
+                git submodules <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/06/22/2018/0622Finance/" data-title="使用现金流贴现法算算几家美国公司的绝对估值" data-url="http://palanceli.github.io/2018/06/22/2018/0622Finance/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#获取财报"><span class="nav-number">1.</span> <span class="nav-text">获取财报</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自由现金流"><span class="nav-number">2.</span> <span class="nav-text">自由现金流</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Facebook"><span class="nav-number">2.1.</span> <span class="nav-text">Facebook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Amazon"><span class="nav-number">2.2.</span> <span class="nav-text">Amazon</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Apple"><span class="nav-number">2.3.</span> <span class="nav-text">Apple</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Google"><span class="nav-number">2.4.</span> <span class="nav-text">Google</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#阿里巴巴"><span class="nav-number">2.5.</span> <span class="nav-text">阿里巴巴</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#腾讯"><span class="nav-number">2.6.</span> <span class="nav-text">腾讯</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#现金流贴现法"><span class="nav-number">3.</span> <span class="nav-text">现金流贴现法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

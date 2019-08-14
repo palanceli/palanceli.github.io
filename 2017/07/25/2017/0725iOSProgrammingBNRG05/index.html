@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="第五章增加了TabBarViewController，一个Tab关联到前面做的QA界面，另一个关联了MapView。本章要点：  TabBarViewController的使用 具有多个ViewController的应用 framework 在项目中添加图片资源">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记五">
+<meta property="og:url" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="第五章增加了TabBarViewController，一个Tab关联到前面做的QA界面，另一个关联了MapView。本章要点：  TabBarViewController的使用 具有多个ViewController的应用 framework 在项目中添加图片资源">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img10.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.948Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记五">
+<meta name="twitter:description" content="第五章增加了TabBarViewController，一个Tab关联到前面做的QA界面，另一个关联了MapView。本章要点：  TabBarViewController的使用 具有多个ViewController的应用 framework 在项目中添加图片资源">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记五 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记五</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-25T23:00:00+08:00">
+                2017-07-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/25/2017/0725iOSProgrammingBNRG05/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/25/2017/0725iOSProgrammingBNRG05/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第五章增加了TabBarViewController，一个Tab关联到前面做的QA界面，另一个关联了MapView。<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img01.png" alt="base ui"><br>本章要点：</p>
+<ul>
+<li>TabBarViewController的使用</li>
+<li>具有多个ViewController的应用</li>
+<li>framework</li>
+<li>在项目中添加图片资源<a id="more"></a>
+</li>
+</ul>
+<h1 id="1-TabBarController"><a href="#1-TabBarController" class="headerlink" title="1 TabBarController"></a>1 TabBarController</h1><h2 id="1-1-在Interface-Builder中引入TabBarController？"><a href="#1-1-在Interface-Builder中引入TabBarController？" class="headerlink" title="1.1 在Interface Builder中引入TabBarController？"></a>1.1 在Interface Builder中引入TabBarController？</h2><p>在Interface Builder中选中VC，菜单Editor &gt; Embed in &gt; Tab Bar Container<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img02.png" alt="base ui"><br>Interface Builder会为之创建TabBarController：<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img03.png" alt="base ui"></p>
+<h2 id="1-2-把已有的VC装入TabBarController？"><a href="#1-2-把已有的VC装入TabBarController？" class="headerlink" title="1.2 把已有的VC装入TabBarController？"></a>1.2 把已有的VC装入TabBarController？</h2><p>如下图，从TabBarController的VC，Ctrl拖动到需要装进来的子VC，然后在面板上选择view controllers<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img04.png" alt="base ui"><br>Interface Builder就会把VC装到TabBarController里来，新增加的连线就表示这个含义：<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img05.png" alt="base ui"></p>
+<h2 id="1-3-点击TabBarController底部的tab页后，由谁来处理切换的消息？"><a href="#1-3-点击TabBarController底部的tab页后，由谁来处理切换的消息？" class="headerlink" title="1.3 点击TabBarController底部的tab页后，由谁来处理切换的消息？"></a>1.3 点击TabBarController底部的tab页后，由谁来处理切换的消息？</h2><p>切换消息的处理应该是被TabBarController封装在其内部了，所以只要把子VC包含进来，自然就有切换的逻辑。</p>
+<h2 id="1-4-怎么修改TabBarController底部Tab页的标题和图片？"><a href="#1-4-怎么修改TabBarController底部Tab页的标题和图片？" class="headerlink" title="1.4 怎么修改TabBarController底部Tab页的标题和图片？"></a>1.4 怎么修改TabBarController底部Tab页的标题和图片？</h2><p>点击被包含的VC底部的TabBar，直接修改Title，如果资源里有导入的图片，下拉Image就能找到该资源。<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img06.png" alt="base ui"></p>
+<h1 id="2-多个View-Controllers？"><a href="#2-多个View-Controllers？" class="headerlink" title="2 多个View Controllers？"></a>2 多个View Controllers？</h1><h2 id="2-1-为什么有多个View-Controllers？而不是一个View-Controller控制多个View？"><a href="#2-1-为什么有多个View-Controllers？而不是一个View-Controller控制多个View？" class="headerlink" title="2.1 为什么有多个View Controllers？而不是一个View Controller控制多个View？"></a>2.1 为什么有多个View Controllers？而不是一个View Controller控制多个View？</h2><p>我分析应该是方便做模块化的封装，VC就是业务逻辑的中枢，子业务逻辑之间应当隔离。比如TabBarController的逻辑是写在它的VC里，而不是写在总VC里，这样就把业务逻辑和UI逻辑分层分模块隔离开了。</p>
+<blockquote>
+<p>如果每个View Controller控制一个View，那在两个View Controller之上应该还有一个View Controller咯？用来控制底部的tab和上面的view同步？<br>实际情况确实如此，TabBarController就是这个上层的View Controller。它用来维护底部tab和上面的VC而不是View的同步</p>
+</blockquote>
+<h2 id="2-2-什么是懒加载？"><a href="#2-2-什么是懒加载？" class="headerlink" title="2.2 什么是懒加载？"></a>2.2 什么是懒加载？</h2><p>直到要在屏幕上显示的时候，ViewController才创建其中的子视图，这种优化手段称作懒加载。</p>
+<font color="red">怎么控制使用/不使用懒加载？</font>
+
+<h2 id="2-3-View-Controller创建其下View层次结构都有哪些途径？"><a href="#2-3-View-Controller创建其下View层次结构都有哪些途径？" class="headerlink" title="2.3 View Controller创建其下View层次结构都有哪些途径？"></a>2.3 View Controller创建其下View层次结构都有哪些途径？</h2><p>第一种：在Interface Builder通过storyboard拖拽出界面。Interface Builder默认有一个ViewController及其根View，如果要创建更多的VC，则可以从Object Library中拖到Interface Builder中。如果要替换掉VC的默认View，只需先把原先的View删除，再从Object Library中找到想要的View，拖到VC里即可。<br>第二种：通过覆写ViewController的loadView()方法，在此方法中创建子视图</p>
+<p>注1：ViewController有一个重要的属性var view:UIView!，它是该ViewController的根视图。把ViewController的根视图添加到一个window，会让该ViewController的整个视图层次结构全部添加进来。<br>注2：UIWindow有一个rootViewController属性，当一个ViewController被设置为window的rootViewController，该window之前的所有子视图均被删除，新VC的所有视图都被添加到window中。<br>注3：每个app有一个主界面，它指向一个storyboard。该storyboard中被设为initial viewcontroller的VC就是UIWindow的rootViewController，也就是这个app启动时的默认界面。如果项目存在多个storyboard，在项目设置中可以设定主界面指向哪一个storyboard：<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img07.png" alt></p>
+<h2 id="2-4-当有多个VC时，怎么设置默认，即程序一启动时展现的VC？"><a href="#2-4-当有多个VC时，怎么设置默认，即程序一启动时展现的VC？" class="headerlink" title="2.4 当有多个VC时，怎么设置默认，即程序一启动时展现的VC？"></a>2.4 当有多个VC时，怎么设置默认，即程序一启动时展现的VC？</h2><p><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img08.png" alt></p>
+<h1 id="3-framework"><a href="#3-framework" class="headerlink" title="3 framework"></a>3 framework</h1><h2 id="3-1-什么是framework？"><a href="#3-1-什么是framework？" class="headerlink" title="3.1 什么是framework？"></a>3.1 什么是framework？</h2><p>在第166页提到：framework是一个静态库，包括代码、资源如界面文件和图片。</p>
+<h2 id="3-2-都有哪些方式可以导入framework？"><a href="#3-2-都有哪些方式可以导入framework？" class="headerlink" title="3.2 都有哪些方式可以导入framework？"></a>3.2 都有哪些方式可以导入framework？</h2><p>首先就是书中介绍的手动导入步骤<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img09.png" alt><br>从2.3中的书中解释还可以推测使用import关键字应该也可以。</p>
+<h2 id="3-3-在本章例程中，在Interface-Builder中创建了一个VC，并在其中添加了MKMapView，并没有为此创建什么代码。为什么这个操作会导致运行时错误？"><a href="#3-3-在本章例程中，在Interface-Builder中创建了一个VC，并在其中添加了MKMapView，并没有为此创建什么代码。为什么这个操作会导致运行时错误？" class="headerlink" title="3.3 在本章例程中，在Interface Builder中创建了一个VC，并在其中添加了MKMapView，并没有为此创建什么代码。为什么这个操作会导致运行时错误？"></a>3.3 在本章例程中，在Interface Builder中创建了一个VC，并在其中添加了MKMapView，并没有为此创建什么代码。为什么这个操作会导致运行时错误？</h2><p>书中的解释是：MKMapView所在的framework并没有被加载到应用程序中。原因是如果仅通过import把MapKit导入进来，而没有任何代码使用该framework，编译器就会把该framework优化掉。</p>
+<font color="red">我们的操作实际上只是在Interface Builder中添加了MKMapView，并没有写一行代码，也没有使用import关键字把它导入，我猜测是在Interface Builder的这个行为实际会触发import操作，但是我不理解的是，既然VC会被加载，其View就是MKMapView，自然一定有使用MapKit framework的相关代码吧？而且理论上说，静态库如果不是内部代码的逻辑错误，应该触发的是编译时错误，而不应该是运行时错误呀？</font>
+
+<h1 id="4-图片资源的添加"><a href="#4-图片资源的添加" class="headerlink" title="4 图片资源的添加"></a>4 图片资源的添加</h1><h2 id="4-1-为不同设备添加一套2x、3x的图片资源"><a href="#4-1-为不同设备添加一套2x、3x的图片资源" class="headerlink" title="4.1 为不同设备添加一套2x、3x的图片资源"></a>4.1 为不同设备添加一套2x、3x的图片资源</h2><p>如图，进入Asserts.xcassets，准备好为不同设备准备的同名文件，将它们一起拖入Interface Builder，Xcode将根据文件名为他们创建一套资源：<br><img src="/2017/07/25/2017/0725iOSProgrammingBNRG05/img10.png" alt></p>
+<h1 id="5-VC加载的初期函数调用"><a href="#5-VC加载的初期函数调用" class="headerlink" title="5 VC加载的初期函数调用"></a>5 VC加载的初期函数调用</h1><h2 id="5-1-viewDidLoad-和viewWillAppear"><a href="#5-1-viewDidLoad-和viewWillAppear" class="headerlink" title="5.1 viewDidLoad()和viewWillAppear(_:)"></a>5.1 viewDidLoad()和viewWillAppear(_:)</h2><p><code>viewDidLoad()</code>是在VC的interface文件被加载后调用，此时，所有vc的outlets都已指向了正确的实例<br><code>viewWillAppear(_:)</code>是当view被添加到winow时被调用。<br>这两个函数的调用谁先谁后呢？我判断应该是先<code>viewDidLoad()</code>，之后才<code>viewWillAppear(_:)</code>，因为要先为每个loutlets指向正确实例，再把这些实例添加到window<br>两个函数还有一个区别：<code>viewDidLoad()</code>仅会调用一次，而<code>viewWillAppear(_:)</code>会在每次view展现的时候都被调用。</p>
+<font color="red">问题又来了：本章不是说过当window的rootViewController变化时，原来的VC包含的窗体都会被删除么？如果是这样，下次再被切回来的时候应该重新创建咯？那就不应该仅创建一次了吧？</font>
+
+<h2 id="5-2-几个重要的VC的函数"><a href="#5-2-几个重要的VC的函数" class="headerlink" title="5.2 几个重要的VC的函数"></a>5.2 几个重要的VC的函数</h2><p><code>init(coder:)</code>当从storyboard中创建VC实例时会被调用。<br><code>init(nibName: bundle:)</code>当VC不是通过storyboard创建时，该函数会被调用一次。<br><code>loadView()</code>重载该函数可以用来通过代码（而不是storyboard）来创建VC的子视图。<br><code>viewDidLoad()</code>在VC的子视图创建完成后调用，重载该函数可以用来配置从Interface文件中加载进来的子视图。<br><code>viewWillAppear(_:)</code>重载该函数同样可以配置从Interface文件中加载进来的子视图。<code>viewDidAppear(_:)</code>在每次VC被显示到屏幕时会被调用。<code>viewWillDisappear(_:)</code>和<code>viewDidDisappear(_:)</code>会在每次VC从屏幕上消失时被调用。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/24/2017/0724iOSProgrammingBNRG04/" rel="next" title="《iOS Programming BNRG》笔记四">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记四
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/26/2017/0726iOSProgrammingBNRG06/" rel="prev" title="《iOS Programming BNRG》笔记六">
+                《iOS Programming BNRG》笔记六 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/07/25/2017/0725iOSProgrammingBNRG05/" data-title="《iOS Programming BNRG》笔记五" data-url="http://palanceli.github.io/2017/07/25/2017/0725iOSProgrammingBNRG05/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-TabBarController"><span class="nav-number">1.</span> <span class="nav-text">1 TabBarController</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-在Interface-Builder中引入TabBarController？"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 在Interface Builder中引入TabBarController？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-把已有的VC装入TabBarController？"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 把已有的VC装入TabBarController？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-点击TabBarController底部的tab页后，由谁来处理切换的消息？"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 点击TabBarController底部的tab页后，由谁来处理切换的消息？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-怎么修改TabBarController底部Tab页的标题和图片？"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 怎么修改TabBarController底部Tab页的标题和图片？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-多个View-Controllers？"><span class="nav-number">2.</span> <span class="nav-text">2 多个View Controllers？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-为什么有多个View-Controllers？而不是一个View-Controller控制多个View？"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 为什么有多个View Controllers？而不是一个View Controller控制多个View？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-什么是懒加载？"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 什么是懒加载？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-View-Controller创建其下View层次结构都有哪些途径？"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 View Controller创建其下View层次结构都有哪些途径？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-当有多个VC时，怎么设置默认，即程序一启动时展现的VC？"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 当有多个VC时，怎么设置默认，即程序一启动时展现的VC？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-framework"><span class="nav-number">3.</span> <span class="nav-text">3 framework</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-什么是framework？"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 什么是framework？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-都有哪些方式可以导入framework？"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 都有哪些方式可以导入framework？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-在本章例程中，在Interface-Builder中创建了一个VC，并在其中添加了MKMapView，并没有为此创建什么代码。为什么这个操作会导致运行时错误？"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 在本章例程中，在Interface Builder中创建了一个VC，并在其中添加了MKMapView，并没有为此创建什么代码。为什么这个操作会导致运行时错误？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-图片资源的添加"><span class="nav-number">4.</span> <span class="nav-text">4 图片资源的添加</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-为不同设备添加一套2x、3x的图片资源"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 为不同设备添加一套2x、3x的图片资源</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-VC加载的初期函数调用"><span class="nav-number">5.</span> <span class="nav-text">5 VC加载的初期函数调用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-viewDidLoad-和viewWillAppear"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 viewDidLoad()和viewWillAppear(_:)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-几个重要的VC的函数"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 几个重要的VC的函数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

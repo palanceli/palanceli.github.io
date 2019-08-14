@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="随笔,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《结构化机器学习项目》第二周《机器学习（ML)策略（2）》。本课主要讨论数据，标注错误、训练集和开发/测试集不同分布，遇到这些情况该怎么应对。后半部分进一步扩展了机器学习的方法，引入迁移学习、多任务学习、端到端学习的概念。">
+<meta name="keywords" content="随笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLearning.ai笔记（八）">
+<meta property="og:url" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="《结构化机器学习项目》第二周《机器学习（ML)策略（2）》。本课主要讨论数据，标注错误、训练集和开发/测试集不同分布，遇到这些情况该怎么应对。后半部分进一步扩展了机器学习的方法，引入迁移学习、多任务学习、端到端学习的概念。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img11.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.237Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DeepLearning.ai笔记（八）">
+<meta name="twitter:description" content="《结构化机器学习项目》第二周《机器学习（ML)策略（2）》。本课主要讨论数据，标注错误、训练集和开发/测试集不同分布，遇到这些情况该怎么应对。后半部分进一步扩展了机器学习的方法，引入迁移学习、多任务学习、端到端学习的概念。">
+<meta name="twitter:image" content="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/">
+
+
+
+
+
+  <title>DeepLearning.ai笔记（八） | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLearning.ai笔记（八）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T10:00:00+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/02/2018/0403DeepLearningAI10/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/02/2018/0403DeepLearningAI10/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>《结构化机器学习项目》第二周《机器学习（ML)策略（2）》。<br>本课主要讨论数据，标注错误、训练集和开发/测试集不同分布，遇到这些情况该怎么应对。后半部分进一步扩展了机器学习的方法，引入迁移学习、多任务学习、端到端学习的概念。</p>
+<a id="more"></a>
+<h1 id="2-1-进行误差分析"><a href="#2-1-进行误差分析" class="headerlink" title="2.1 进行误差分析"></a>2.1 进行误差分析</h1><p>本节核心思想是：在误差分析时应分清主要矛盾和次要矛盾，从而集中力量解决主要矛盾，这需要付出一些人工成本，但对解决问题的方向起着至关重要的作用，因此这个人工投入是非常值得的。  </p>
+<p>本节依然以识猫为例，需要把在开发集上识别错误的图人工扫一遍，记录错误的原因并归纳统计，然后优先解决占比最大的问题。<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img01.png" alt><br>在本例中，显然最应该做的是在训练集中增加低分辨率图片的占比，而不是增加狗图的占比。</p>
+<h1 id="2-2-清除标注错误的数据"><a href="#2-2-清除标注错误的数据" class="headerlink" title="2.2 清除标注错误的数据"></a>2.2 清除标注错误的数据</h1><p>机器学习算法有较好的鲁棒性来抵御随机的标注错误，但对于系统性错误却没有免疫力。比如把所有的白狗都标注为猫，那训练出来的模型就会把白狗认定成猫。因此在训练集中出现的少量随机性错误，通常可以不用花时间修改。而对于开发集和测试集中出现的标注错误，则应判断这些错误是否严重影响了在开发集上评估算法的能力。此时上一节的人工分析就非常重要，如果发现标注错误占比在总误差中较低则可以忽略，否则就应该修正。例如，<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img02.png" alt><br>第一组标注误差仅占总误差的0.6/10=6%，不会对开发集的评估能力造成严重影响；而第二组标注误差占总误差0.6/2=30%，这就比较严重了。假设两个分类器的误差分别为2.1%和1.9%，你就无法区分开究竟因为标注误差带来的性能差异还是两个分类器真有这样的差距。  </p>
+<p>确定了是否应该清除标注错误后，下一步就要确定具体在清除时应遵循的原则。  </p>
+<ol>
+<li>清除工作要对开发/测试集做同样的处理，以确保两个集合必须服从同分布。</li>
+<li>强烈建议同时检验算法判断正确和判断错误的例子。因为有<code>标注错误&amp;&amp;判断不符合标注</code>的假阳性，就有<code>标注错误&amp;&amp;判断符合标注</code>的假阴性，只修正一种可能会导致系统性偏差，对算法评估不公平。但检验算法判断正确的所有例子确实成本很高。</li>
+<li>修正训练集通常是个超高代价的事，通常不会这么做，不修正问题也不大。但要了解这会令训练集与开发/测试集产生一些分布偏差，这个问题后面会专门讲解。  </li>
+</ol>
+<p>最后老师再次重申花一些人工精力去做误差分析的重要性，亲自看错误的例子是非常必要且值得的。</p>
+<h1 id="2-3-快速搭建你的第一个系统，并进行迭代"><a href="#2-3-快速搭建你的第一个系统，并进行迭代" class="headerlink" title="2.3 快速搭建你的第一个系统，并进行迭代"></a>2.3 快速搭建你的第一个系统，并进行迭代</h1><p>本节的建议并不是让尽快找一个框架，让代码跑起来，而是：</p>
+<ul>
+<li>尽快确定目标和方向，划出开发/测试集。前者是单一数字评估指标</li>
+<li>搭建初始系统，让训练跑起来，从简单的系统逐步优化</li>
+<li>使用偏差/方差分析和误差分析，确认每轮迭代后主要问题出在哪，针对性调整，从而进入下一轮迭代</li>
+</ul>
+<p>在有的领域，行业已经有了很多成熟的论文和解决方案，比如图像识别。这种情况下，可以基于它们搭建更复杂的神经网络。  </p>
+<p>我的理解，老师的核心精神是搭建一个你能掌控的学习框架，而且尽量简单，让它在迭代中针对主要矛盾再改进，防止过度设计，防止让复杂的系统变得不可控。尤其应当避免的是把机器学习系统搞成一个玄学系统，不知从哪里拷一坨代码，不了解背后的思想，更没有能力对中间环节做出调节，这比工程时代的拷贝粘贴导致的后果会更令人崩溃。</p>
+<h1 id="2-4-在不同分布的数据上进行训练并测试"><a href="#2-4-在不同分布的数据上进行训练并测试" class="headerlink" title="2.4 在不同分布的数据上进行训练并测试"></a>2.4 在不同分布的数据上进行训练并测试</h1><p>很多时候训练集和开发/测试集是不同分布的，例如在识猫的案例中，只有10,000张图来自实际的用户，这些图的分辨率、亮度、角度可能都不好，但这来自实际的应用场景；又有200,000张图来自网络爬虫，它们很容易获取，而且数据量巨大，但和用户上传的图片却有很大差异。这个时候该如何分配训练集、开发集和测试集呢？  </p>
+<p>老师不建议将200,000+10,000混合后随机抽取开发/测试集，这虽然能令所有数据同分布，实际上却设定了错误的“靶心”。因为模型最终的应用场景是识别用户上传图片。<br>建议的做法是：将10,000张用户上传图片分两半，一半给训练集，即200,000+10,000/2=205,000，将剩余5,000再随机分两半，给开发集和测试集。</p>
+<h1 id="2-5-不匹配数据划分的偏差和方差"><a href="#2-5-不匹配数据划分的偏差和方差" class="headerlink" title="2.5 不匹配数据划分的偏差和方差"></a>2.5 不匹配数据划分的偏差和方差</h1><p>本节讨论当训练集和开发集分布不一致时分析偏差和方差的方法。<br>当看到下面一组数据，如果训练集和开发集属于同一个分布，可以确认模型的方差过大。<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img03.png" alt><br>但如果二者不同分布，就不能确认这9%的差距是由于模型方差过大导致的还是数据分布不同导致的。  </p>
+<p>首先应该把二者区分开，方法是从训练集中再选取与训练集同分布的一部分数据作为训练-开发集：<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img04.png" alt><br>训练-开发集不参与训练，而是当开发集使用，每次使用开发集检验模型同时也用训练-开发集验证一下。以下面的数据为例，第一组模型在训练集误差比较小，而在同分布的训练-开发集上的误差较大，说明模型对训练集过拟合了；第二组模型在同分布的训练集和训练-开发集上的误差很接近，而在开发集上的误差较大，则说明这是由于数据不同分布导致的。<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img05.png" alt><br>因此当训练集和开发集不同分布时，通常的分析步骤是列出五个误差，并计算他们之间的差距，找到差距最大的优先解决：<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img06.png" alt><br>课件的结尾给出分析的一般性原则：<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img07.png" alt><br>对于系统解决“数据分布不同”的问题，并没有很好的通用方法，下一节会给出一些尝试的办法。</p>
+<h1 id="2-6-定位数据不匹配"><a href="#2-6-定位数据不匹配" class="headerlink" title="2.6 定位数据不匹配"></a>2.6 定位数据不匹配</h1><p>当训练集与开发集不同分布即数据不匹配时，老师的建议是人工观察数据，感受数据的差异点在哪里，然后想一些人工合成数据的办法。<br>例如车载系统的语音识别，如果训练集是正常环境下的语音，而实际应用是有车噪背景的，二者的差异会导致模型在后者环境下误差较大，可以尝试采集少量车噪，再与训练集合成带车噪的语音。  </p>
+<p>但是合成不一定完全有效，因为合成的数据可能存在人工无法察觉的偏向性，比如将1小时的车噪与10,000小时语音合成，而这1小时车噪可能在所有车噪特征中存在系统性偏差，人耳是无法分辨的，但训练出的模型就会对这1个小时车噪产生过拟合。而且车厢内说话的回声特征与合成的也不一样，不同品牌的车，车噪也不同，麦克风放在不同的位置上收集到的车噪也不同，这些都可能导致合成的数据过拟合，且人工无法直接分辨。图片数据的合成也有一样的问题，总的来说就是“骗”过了人，却“骗”不过机器。因此老师说没有系统的解决方案，只能试试看了。</p>
+<h1 id="2-7-迁移学习"><a href="#2-7-迁移学习" class="headerlink" title="2.7 迁移学习"></a>2.7 迁移学习</h1><p>当任务A和任务B有着相同的输入，例如：<br>$\begin{cases}任务A:识猫\任务B:识别X光片中的病理特征\end{cases}$或$\begin{cases}任务A：语音识别\任务B:识别智能音箱唤醒音\end{cases}$<br>任务A比任务B的训练数据多出很多，此时A的低级特征或许对B的学习有用，可以将A的神经网络嫁接给B来使用。具体做法是删掉A神经网络的输出层，然后为输出层重新赋予随机权重，将标注样本替换为B，重新训练该网络。<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img08.png" alt><br>如果B的样本量非常小，可以在新的训练中只替换最后一层$W^{[L]}、b^{[L]}$；如果B的样本量比较大，可以多迭代几层；如果B的样本量非常大，也可以得到所有层，但这就没必要使用迁移学习了。  </p>
+<p>迁移学习有效性的直观理解是神经网络越靠前面的隐藏层学到的是领域内越低层次的特征，比如从边缘检测→五官→形态。低层特征在相关领域内是可以复用的，比如图像识别、声音识别，越靠后的隐藏层越与具体业务相关，因此可以根据数据量的情况替换掉。</p>
+<h1 id="2-8-多任务学习"><a href="#2-8-多任务学习" class="headerlink" title="2.8 多任务学习"></a>2.8 多任务学习</h1><p>多任务学习是指在一个神经网络中同时判断多个特征。比如自动驾驶在视觉处理中同时判断图片中是否存在车辆、路标、信号灯等。由于这些特征存在于相同的输入样本，且具有类似的低层特征，因此它们可以复用同一个神经网络，这也是多任务学习的必要条件。它的网络结构和Softmax有点类似，所不同的是它不要求输出层个节点和为1：<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img09.png" alt><br>其中ŷ是4维向量，定义损失函数：<br>$L(ŷ, y) = \frac{1}{m}\sum<em>{i=1}^{m}\sum</em>{j=1}^{n^{[L]}}L(ŷ<em>j^{(i)}, y_j^{(i)})\<br>=\frac{1}{m}\sum</em>{i=1}^{m}\sum_{j=1}^{n^{[L]}}[-y_j^{(i)}\log{ŷ_j^{(i)}} - (1-y_j^{(i)})\log{(1-ŷ_j^{(i)})}]$<br>有时会遇到这种情况：有的样本只标注了部分特征，未标注的不能确定是或否，此时成本函数则只对标注的数据求和即可。  </p>
+<p>多任务学习的使用场景：</p>
+<ul>
+<li>训练的一组任务可以共用底层特征，这种场景其实并不是很多，图像识别是一类。</li>
+<li>每个任务的数据量很接近，老师说这一点并不是必须。</li>
+<li>可以训练一个足够大的网络同时做好所有任务。</li>
+</ul>
+<h1 id="2-9-什么是端到端的深度学习"><a href="#2-9-什么是端到端的深度学习" class="headerlink" title="2.9 什么是端到端的深度学习"></a>2.9 什么是端到端的深度学习</h1><p>以语音识别为例，传统做法从音频到文本要经历若干阶段：<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img10.png" alt><br>而端到端的学习则是构造一个巨大的神经网络，输入一段音频，直接输出文本：<br><img src="/2018/04/02/2018/0403DeepLearningAI10/img11.png" alt><br>端到端的学习需要大量的数据才能让系统表现良好。以门禁系统中的人脸识别为例，传统方法分两步：</p>
+<ol>
+<li>识别出图片中人脸的位置</li>
+<li>识别该人脸的ID  </li>
+</ol>
+<p>传统方法的好处在于，分解后的每个子任务都更纯粹和简单，而且样本数据可能都更多。而组合后相当于叠加了更多条件，样本量可能就没那么大了。<br>端到端的好处也显而易见，它省略了中间过程中很多繁琐的过程，让更多的工作交给机器，让人从业务逻辑的细节中解脱出来。</p>
+<h1 id="2-10-是否要使用端到端的深度学习"><a href="#2-10-是否要使用端到端的深度学习" class="headerlink" title="2.10 是否要使用端到端的深度学习"></a>2.10 是否要使用端到端的深度学习</h1><p>本节分析了端到端的深度学习的优缺点。<br>优点：<br>① 只让数据说话。只要有足够多的数据，就能让神经网络自己搞清楚从X到Y的映射关系，而不必人为地引入人的理解，比如语音识别中音位的概念。<br>② 手工设计的组件更少。<br>缺点：<br>① 需要更海量的数据。<br>② 它排除了可能有用的手工设计组件。这是一把双刃剑，仍以语音识别中音位的概念为例，尽管它是人为创造的概念，但在目前它是有效的。端到端的方法使得中间过程不能再接受人工干预。但是人类无法断定现在有效的手工设计是否就是终极方法，也许随着数据规模扩大和运算能力提升，深度学习网络会更贴近客观的X→Y映射关系。  </p>
+<p>所以我认为端到端的深度学习是机器学习长期值得探索的方向。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随笔/" rel="tag"># 随笔</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/30/2018/0331DeepLearningAI08/" rel="next" title="DeepLearning.ai笔记（七）">
+                <i class="fa fa-chevron-left"></i> DeepLearning.ai笔记（七）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/02/2018/0402DeepLearningAI09/" rel="prev" title="DeepLearning.ai笔记（八）">
+                DeepLearning.ai笔记（八） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/04/02/2018/0403DeepLearningAI10/" data-title="DeepLearning.ai笔记（八）" data-url="http://palanceli.github.io/2018/04/02/2018/0403DeepLearningAI10/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-进行误差分析"><span class="nav-number">1.</span> <span class="nav-text">2.1 进行误差分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2-清除标注错误的数据"><span class="nav-number">2.</span> <span class="nav-text">2.2 清除标注错误的数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-3-快速搭建你的第一个系统，并进行迭代"><span class="nav-number">3.</span> <span class="nav-text">2.3 快速搭建你的第一个系统，并进行迭代</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4-在不同分布的数据上进行训练并测试"><span class="nav-number">4.</span> <span class="nav-text">2.4 在不同分布的数据上进行训练并测试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-5-不匹配数据划分的偏差和方差"><span class="nav-number">5.</span> <span class="nav-text">2.5 不匹配数据划分的偏差和方差</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-6-定位数据不匹配"><span class="nav-number">6.</span> <span class="nav-text">2.6 定位数据不匹配</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-7-迁移学习"><span class="nav-number">7.</span> <span class="nav-text">2.7 迁移学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-8-多任务学习"><span class="nav-number">8.</span> <span class="nav-text">2.8 多任务学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-9-什么是端到端的深度学习"><span class="nav-number">9.</span> <span class="nav-text">2.9 什么是端到端的深度学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-10-是否要使用端到端的深度学习"><span class="nav-number">10.</span> <span class="nav-text">2.10 是否要使用端到端的深度学习</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

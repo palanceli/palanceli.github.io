@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章在app顶部的toolbar中添加两个菜单项：“+”号菜单用于添加新数据，Hide Subtitle/Show Subtitle用于显示/隐藏Crime总数。 本章要点：  创建菜单，并关联响应函数 添加系统图标 设置层级导航关系">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记十三">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章在app顶部的toolbar中添加两个菜单项：“+”号菜单用于添加新数据，Hide Subtitle/Show Subtitle用于显示/隐藏Crime总数。 本章要点：  创建菜单，并关联响应函数 添加系统图标 设置层级导航关系">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/img05.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.123Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记十三">
+<meta name="twitter:description" content="本章在app顶部的toolbar中添加两个菜单项：“+”号菜单用于添加新数据，Hide Subtitle/Show Subtitle用于显示/隐藏Crime总数。 本章要点：  创建菜单，并关联响应函数 添加系统图标 设置层级导航关系">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/img06.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记十三 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记十三</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-24T20:00:00+08:00">
+                2017-10-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/24/2017/1024AndroidProgrammingBNRG13/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/24/2017/1024AndroidProgrammingBNRG13/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章在app顶部的toolbar中添加两个菜单项：“+”号菜单用于添加新数据，Hide Subtitle/Show Subtitle用于显示/隐藏Crime总数。<br><img src="/2017/10/24/2017/1024AndroidProgrammingBNRG13/img06.png" alt></p>
+<p>本章要点：</p>
+<ul>
+<li>创建菜单，并关联响应函数</li>
+<li>添加系统图标</li>
+<li>设置层级导航关系<a id="more"></a>
+</li>
+</ul>
+<h1 id="怎么创建菜单"><a href="#怎么创建菜单" class="headerlink" title="怎么创建菜单"></a>怎么创建菜单</h1><h2 id="1-添加菜单的xml布局文件"><a href="#1-添加菜单的xml布局文件" class="headerlink" title="1. 添加菜单的xml布局文件"></a>1. 添加菜单的xml布局文件</h2><p>在res上右键 &gt; New &gt; Android resource file，资源类型选择Menu：<br><img src="/2017/10/24/2017/1024AndroidProgrammingBNRG13/img01.png" alt></p>
+<p>添加菜单项item：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">menu</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:app</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/new_crime"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:icon</span>=<span class="string">"@drawable/ic_menu_add"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:title</span>=<span class="string">"@string/new_crime"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:showAsAction</span>=<span class="string">"ifRoom|withText"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">menu</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>其中showAsAction用于设定展现形态，<code>ifRoom</code>表示如果有空间就展现；否则显示<code>...</code>，组合<code>withText</code>后表示如果空间足够则展现文字，如果不够则只展现图标，如果还不够则展现<code>...</code>。其它showAsAction选项还有<code>always</code>和<code>never</code>，不建议使用<code>always</code>，它表示总是完全展现；<code>never</code>则是总展现成<code>...</code>。</p>
+<h2 id="2-创建菜单"><a href="#2-创建菜单" class="headerlink" title="2. 创建菜单"></a>2. 创建菜单</h2><p>实现回调函数<code>onCreateOptionsMenu(Menu)</code>。对于Activity和Fragment，有两个回调函数与菜单相关：<br><code>public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)</code> 负责创建菜单<br><code>public boolean onOptionsItemSelected(MenuItem item)</code> 负责响应菜单项点击<br>这是两个回调函数，如果要创建菜单，需要先调用<code>Fragment::setHasOptionsMenu(boolean)</code>，并设置参数为true，告诉FragmentManager“我要显示菜单”，FragmentManager会调用<code>onCreateOptionsMenu(Menu)</code>完成菜单创建。</p>
+<p>本节的具体代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setHasOptionsMenu(<span class="keyword">true</span>); <span class="comment">// 要求创建菜单</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span> <span class="comment">// 完成创建菜单</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreateOptionsMenu</span><span class="params">(Menu menu, MenuInflater inflater)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreateOptionsMenu(menu, inflater);</span><br><span class="line">        inflater.inflate(R.menu.fragment_crime_list, menu);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>默认的空间只够显示图标，长按会显示提示文字：<br><img src="/2017/10/24/2017/1024AndroidProgrammingBNRG13/img03.png" alt></p>
+<h2 id="3-响应菜单项点击"><a href="#3-响应菜单项点击" class="headerlink" title="3. 响应菜单项点击"></a>3. 响应菜单项点击</h2><p>在前一步中已经提到，响应菜单点击需要实现回调函数<code>onOptionsItemSelected(MenuItem item)</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">...</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (item.getItemId())&#123;</span><br><span class="line">        <span class="keyword">case</span> R.id.new_crime: <span class="comment">// 判断菜单项id</span></span><br><span class="line">            Crime crime = <span class="keyword">new</span> Crime(); <span class="comment">// 添加数据</span></span><br><span class="line">            CrimeLab.get(getActivity()).addCrime(crime);</span><br><span class="line">            <span class="comment">// 启动Activity编辑新数据</span></span><br><span class="line">            Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());</span><br><span class="line">            startActivity(intent);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.onOptionsItemSelected(item);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="怎么添加系统的剪辑图标"><a href="#怎么添加系统的剪辑图标" class="headerlink" title="怎么添加系统的剪辑图标"></a>怎么添加系统的剪辑图标</h1><p>如果要添加系统图标，例如“+”号，可以<br>①直接使用@android.drawable/ic_menu_add，但不建议这么做，因为不同的设备和系统使用什么图标是可变的，未必总是适合自己的app<br>②从~/Library/Android/sdk/platforms/android-25/data/res找到这些资源，并添加到app项目里<br>③通过AndroidStudio添加资源，这种方式最简单。步骤如下：</p>
+<p>在drawable右键 &gt; New &gt; Image Asset，在弹出面板上选择<code>Icon Type</code>为<code>Action Bar and Tab Icons</code>，点击<code>Clip Art</code>，在弹出图片库中选择要使用的图标：<br><img src="/2017/10/24/2017/1024AndroidProgrammingBNRG13/img02.png" alt><br>然后选择需要支持的屏幕密度即可。</p>
+<h1 id="动态调整菜单项文字"><a href="#动态调整菜单项文字" class="headerlink" title="动态调整菜单项文字"></a>动态调整菜单项文字</h1><p>本节又添加了一条Hide Subtitle/Show Subtitle菜单，用于显示和隐藏数据项的个数。每次点击该菜单项后，菜单项文字会随之变化。本节的做法是在创建菜单时，根据当前状态决定显示<code>Hide Subtitle</code>还是<code>Show Subtitle</code>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListFragment.java</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreateOptionsMenu</span><span class="params">(Menu menu, MenuInflater inflater)</span></span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreateOptionsMenu(menu, inflater);</span><br><span class="line">    inflater.inflate(R.menu.fragment_crime_list, menu);</span><br><span class="line">    MenuItem subtitleItem = menu.findItem(R.id.show_subtitle);</span><br><span class="line">    <span class="keyword">if</span>(mSubtitleVisible)&#123;</span><br><span class="line">        subtitleItem.setTitle(R.string.hide_subtitle);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        subtitleItem.setTitle(R.string.show_subtitle);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>这就需要每次点击菜单都重新创建菜单才行，菜单项的响应代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeListFragment.java</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (item.getItemId())&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">case</span> R.id.show_subtitle:</span><br><span class="line">            mSubtitleVisible = !mSubtitleVisible;</span><br><span class="line">            <span class="comment">// 它会导致菜单无效而重新创建</span></span><br><span class="line">            getActivity().invalidateOptionsMenu();	 </span><br><span class="line">            updateSubtitle();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.onOptionsItemSelected(item);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="使用分层导航Hierarchical-Navigation"><a href="#使用分层导航Hierarchical-Navigation" class="headerlink" title="使用分层导航Hierarchical Navigation"></a>使用分层导航Hierarchical Navigation</h1><p>在AndroidManifest.xml中可以直接设置Activity之间的父子关系：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">...</span> &gt;</span></span><br><span class="line">    ...</span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".CrimePagerActivity"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:parentActivityName</span>=<span class="string">".CrimeListActivity"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><code>android:parentActivityName</code>会在Activity的标题栏添加导航按钮：<br><img src="/2017/10/24/2017/1024AndroidProgrammingBNRG13/img04.png" alt><br>看起来它和点击系统的Back按钮效果一样，而实际上它相当于做了如下操作：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, CrimeListActivity.class);</span><br><span class="line">intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);</span><br><span class="line">startActivity(intent);</span><br><span class="line">finish();</span><br></pre></td></tr></table></figure></p>
+<p>FLAG_ACTIVITY_CLEAR_TOP的含义是：在activity栈中查找指定Activity，如果找到，则弹出其上的所有Activity，直到使得该Activity称为栈顶：<br><img src="/2017/10/24/2017/1024AndroidProgrammingBNRG13/img05.png" alt></p>
+<h2 id="分层导航的副作用"><a href="#分层导航的副作用" class="headerlink" title="分层导航的副作用"></a>分层导航的副作用</h2><p>在本节的例子中，你会发现当从CrimePagerActivity使用分层导航按钮回到CrimeListActivity后，标题栏中的Hide Subtitle/Show Subtitle状态被重置了，使用Back按钮则不存在这样的问题。这是因为使用分层导航的向上按钮会导致上一层Activity被重建。这意味着Activity任何状态变量保存的数据都会消失。也就是说，他其实并不是在Activity栈中找到目标Activity，让它显示出来那么简单，而是彻底重新创建了这个Activity。<br>本节给出的解决方案是：<br>1、自己实现navigate up机制，让CrimePagerActivity弹回到CrimeListActivity。<br>2、当CrimeListActivity弹出CrimePagerActivity时，让后者记住前者的标题，在重建CrimeListActivity时，再把标题传回去。<br>我其实没有理解这两种方案的差异，但他们都有一个缺陷就是父子Activity的耦合性太强了。书中也没有给出很好的解决方案，竟然说让用户多点一次按钮也不是什么大问题。<br>为什么Android会使用这么屎的方式来实现Up呢？我觉得这是个致命的缺陷。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/23/2017/1023AndroidProgrammingBNRG12/" rel="next" title="《Android Programming BNRG》笔记十二">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记十二
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/25/2017/1025AndroidProgrammingBNRG14/" rel="prev" title="《Android Programming BNRG》笔记十四">
+                《Android Programming BNRG》笔记十四 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/24/2017/1024AndroidProgrammingBNRG13/" data-title="《Android Programming BNRG》笔记十三" data-url="http://palanceli.github.io/2017/10/24/2017/1024AndroidProgrammingBNRG13/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#怎么创建菜单"><span class="nav-number">1.</span> <span class="nav-text">怎么创建菜单</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-添加菜单的xml布局文件"><span class="nav-number">1.1.</span> <span class="nav-text">1. 添加菜单的xml布局文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-创建菜单"><span class="nav-number">1.2.</span> <span class="nav-text">2. 创建菜单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-响应菜单项点击"><span class="nav-number">1.3.</span> <span class="nav-text">3. 响应菜单项点击</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#怎么添加系统的剪辑图标"><span class="nav-number">2.</span> <span class="nav-text">怎么添加系统的剪辑图标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#动态调整菜单项文字"><span class="nav-number">3.</span> <span class="nav-text">动态调整菜单项文字</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用分层导航Hierarchical-Navigation"><span class="nav-number">4.</span> <span class="nav-text">使用分层导航Hierarchical Navigation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#分层导航的副作用"><span class="nav-number">4.1.</span> <span class="nav-text">分层导航的副作用</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

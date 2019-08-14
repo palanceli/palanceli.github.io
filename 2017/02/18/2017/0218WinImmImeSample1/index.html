@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="输入法,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="基于IMM框架的输入法是一个按照系统要求导出十几个函数的DLL文件，这十几个导出函数的原型定义于imm.h文件，系统定义了它们的调用时机，比如切出输入法、按键处理等。接下来就从最核心的要求开始，逐步分析基于IMM的输入法实现步骤。">
+<meta name="keywords" content="输入法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows下创建基于IMM的输入法">
+<meta property="og:url" content="http://palanceli.github.io/2017/02/18/2017/0218WinImmImeSample1/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="基于IMM框架的输入法是一个按照系统要求导出十几个函数的DLL文件，这十几个导出函数的原型定义于imm.h文件，系统定义了它们的调用时机，比如切出输入法、按键处理等。接下来就从最核心的要求开始，逐步分析基于IMM的输入法实现步骤。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.807Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows下创建基于IMM的输入法">
+<meta name="twitter:description" content="基于IMM框架的输入法是一个按照系统要求导出十几个函数的DLL文件，这十几个导出函数的原型定义于imm.h文件，系统定义了它们的调用时机，比如切出输入法、按键处理等。接下来就从最核心的要求开始，逐步分析基于IMM的输入法实现步骤。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/02/18/2017/0218WinImmImeSample1/">
+
+
+
+
+
+  <title>Windows下创建基于IMM的输入法 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/02/18/2017/0218WinImmImeSample1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Windows下创建基于IMM的输入法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-18T23:33:00+08:00">
+                2017-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/18/2017/0218WinImmImeSample1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/18/2017/0218WinImmImeSample1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>基于IMM框架的输入法是一个按照系统要求导出十几个函数的DLL文件，这十几个导出函数的原型定义于imm.h文件，系统定义了它们的调用时机，比如切出输入法、按键处理等。接下来就从最核心的要求开始，逐步分析基于IMM的输入法实现步骤。<br><a id="more"></a><br>要确保输入法能运转起来，需要具备四个条件：</p>
+<ol>
+<li>是一个DLL文件</li>
+<li>依照imm.h导出十几个函数</li>
+<li>有一个UI窗口</li>
+<li>有一系列扩展窗口</li>
+<li>执行特定的安装过程</li>
+</ol>
+<p>能最小化运转不代表能正常交互，只是技术路径上跑通了。像一个完备的输入法那样正常交互起来还要具备写作窗、候选窗，还要处理从拼音到汉字、词的转化。本节先介绍最小化运转的实现细节。</p>
+<h1 id="DLL文件"><a href="#DLL文件" class="headerlink" title="DLL文件"></a>DLL文件</h1><ol>
+<li>要在<code>DllMain</code>的<code>DLL_PROCESS_ATTACH</code>分支下注册UI窗体类，系统IMM框架会负责创建该窗体，并通过向该窗体发消息让输入法知道什么时候该显示/隐藏写作窗，什么时候该显示/隐藏候选窗。关于UI窗口在下文还有详细介绍。</li>
+<li>要在资源文件（*.rc）中设置几个key:<br><code>FILEOS</code> = <code>0x4L</code><br><code>FILETYPE</code> = <code>VFT_DRV</code><br><code>FILESUBTYPE</code> = <code>VFT2_DRV_INPUTMETHOD</code><br><code>Block Header</code> = <code>中文（简体，中国）（0x0404b0）</code> 选择Language为<code>Chinese（Simplified PRC）</code>即为此设置。</li>
+<li>包含一个icon图标，该图标用于在系统语言栏显示创建的输入法。</li>
+</ol>
+<h1 id="导出函数"><a href="#导出函数" class="headerlink" title="导出函数"></a>导出函数</h1><h2 id="引入imm-h文件"><a href="#引入imm-h文件" class="headerlink" title="引入imm.h文件"></a>引入<code>imm.h</code>文件</h2><p>这些函数原型定义在<code>imm.h</code>，需要注意该文件有两份定义，一份来自DDK，一份来自SDK。开发输入法时应使用DDK版本。这个文件，在不同的Windows DDK版本中命名发生过变化，最早是<code>imm.h</code>，在win2kDDK的某个版本中就变成了<code>immdev.h</code>，后来的Windows DDK一直沿用<code>immdev.h</code>。</p>
+<p>使用<code>imm.h</code>会导致和SDK版本重名，确实不方便。这要求包含该文件的时候必须这么写：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="meta-keyword">define</span> NOIME</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"imm.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _DDKIMM_H_</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p><code>windows.h</code>必须写在<code>imm.h</code>前面，因为<code>imm.h</code>依赖<code>windows.h</code>，可是在<code>windows.h</code>中又包含了SDK版本的<code>imm.h</code>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// windows.h</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> NOIME</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;imm.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>因此，我们在<code>#include &lt;windows.h&gt;</code>前必须先定义<code>NOIME</code>，让windows.h中的imm.h无效。<br>如果使用<code>immdev.h</code>，则不存在头文件命名冲突的问题。不过我在编写输入法时，还是使用老版本的<code>imm.h</code>，因为不确定使用<code>immdev.h</code>能否完全与老的Windows系统兼容。</p>
+<h2 id="定义十五个导出函数"><a href="#定义十五个导出函数" class="headerlink" title="定义十五个导出函数"></a>定义十五个导出函数</h2><p>关于这些函数的介绍，可以参见win2kddk，这个版本的DDK在Ntddk/src/ime/docs目录下有两份输入法开发文档，这也是为数不多的微软发布的输入法开发官方文档。我们只挑最必须的文件重点介绍。</p>
+<h2 id="ImeInquire"><a href="#ImeInquire" class="headerlink" title="ImeInquire"></a>ImeInquire</h2><p>该函数在输入法首次切出时被调用，负责处理输入法的初始化，它返回一个<code>IMEINFO</code>结构体以及输入法的UI窗体类名。这里的实现过程为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL WINAPI <span class="title">ImeInquire</span><span class="params">(LPIMEINFO lpImeInfo, LPTSTR lpszUIClass, LPCTSTR lpszOptions)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="comment">// 如果宿主进程为Winlogon，则直接退出</span></span><br><span class="line">  <span class="keyword">if</span>((DWORD_PTR)lpszOptions &amp; IME_SYSINFO_WINLOGON )</span><br><span class="line">    <span class="keyword">return</span> FALSE;</span><br><span class="line"></span><br><span class="line">  lpImeInfo-&gt;dwPrivateDataSize  = <span class="number">0</span>; <span class="comment">//sizeof(t_uiExtra);</span></span><br><span class="line"></span><br><span class="line">  lpImeInfo-&gt;fdwProperty  = IME_PROP_COMPLETE_ON_UNSELECT | </span><br><span class="line">    IME_PROP_SPECIAL_UI | IME_PROP_CANDLIST_START_FROM_1 |</span><br><span class="line">    IME_PROP_UNICODE | IME_PROP_KBD_CHAR_FIRST;                 <span class="comment">// 输入法属性</span></span><br><span class="line"></span><br><span class="line">  lpImeInfo-&gt;fdwConversionCaps  = IME_CMODE_SYMBOL | </span><br><span class="line">    IME_CMODE_SOFTKBD | IME_CMODE_FULLSHAPE;                    <span class="comment">// 转换模式</span></span><br><span class="line">  lpImeInfo-&gt;fdwSentenceCaps    = IME_SMODE_NONE;               <span class="comment">// 句子模式</span></span><br><span class="line">  lpImeInfo-&gt;fdwUICaps          = UI_CAP_SOFTKBD| UI_CAP_2700;  <span class="comment">// UI标记</span></span><br><span class="line">  lpImeInfo-&gt;fdwSCSCaps         = <span class="number">0x00000000</span>;</span><br><span class="line">  lpImeInfo-&gt;fdwSelectCaps      = <span class="number">0x00000000</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 窗体类名</span></span><br><span class="line">  _tcscpy_s(lpszUIClass, MAX_CLASSNAME_UI, UIWnd::GetUIWndClassName());</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>系统通过该函数返回的窗体类名创建输入法UI窗体。</p>
+<h2 id="ImeProcessKey"><a href="#ImeProcessKey" class="headerlink" title="ImeProcessKey"></a>ImeProcessKey</h2><p>每当产生一个按键操作，IMM会调用该函数，输入法根据按键预判断是否要处理，如果处理返回TRUE；否则返回FALSE。这里我们只处理字符A~Z以及回车、空格和ESC：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL WINAPI <span class="title">ImeProcessKey</span><span class="params">(HIMC hImc, UINT unVirtKey, DWORD unScanCode, CONST LPBYTE achKeyState)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="function">ImcHandle <span class="title">imcHandle</span><span class="params">(hImc)</span></span>;</span><br><span class="line">  Comp* pComp = imcHandle.GetComp();</span><br><span class="line">  LPTSTR szCompString = pComp-&gt;GetCompString();</span><br><span class="line">  <span class="keyword">if</span> (unVirtKey &gt;= <span class="number">0x41</span> &amp;&amp; unVirtKey &lt;= <span class="number">0x5A</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> TRUE;    <span class="comment">// 从A到Z</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (_tcslen(szCompString) &gt; <span class="number">0</span> &amp;&amp;(unVirtKey == VK_RETURN || unVirtKey == VK_SPACE || unVirtKey == VK_ESCAPE)) &#123;</span><br><span class="line">    <span class="keyword">return</span> TRUE;  <span class="comment">// 当有写作串且当前按键为回车、空格或ESC</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> FALSE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="ImeToAsciiEx"><a href="#ImeToAsciiEx" class="headerlink" title="ImeToAsciiEx"></a>ImeToAsciiEx</h2><p>如果经过上一步的输入法预判断，需要处理，IMM则继续调用该函数进入处理逻辑；如果不需要处理，则不会调用该函数，而是直接把按键以WM_KEYDOWN/WM_KEYUP的形式发给应用程序。这里的处理分三个步骤：</p>
+<ol>
+<li>处理按键，通常要追加当前的输入内容进入写作串；</li>
+<li>完成转换，这是输入法最核心的部分，根据写作串里的拼音转成汉字；</li>
+<li>完成界面的更新，只需要组装相应的消息到lpdwTransBuf指向的数组中，IMM会把这些消息发送给输入法UI窗口，由UI窗口继续完成界面的处理。<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">UINT WINAPI <span class="title">ImeToAsciiEx</span><span class="params">(UINT unKey, UINT unScanCode, CONST LPBYTE achKeyState, LPDWORD lpdwTransBuf, UINT fuState, HIMC hImc)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  </span><br><span class="line">  <span class="function">ImcHandle <span class="title">imcHandle</span><span class="params">(hImc)</span></span>;</span><br><span class="line">  Comp* pComp = imcHandle.GetComp();</span><br><span class="line">  LPTSTR szCompString = pComp-&gt;GetCompString();</span><br><span class="line">  COMPOSITIONSTRING&amp; compCore = pComp-&gt;GetCore();</span><br><span class="line">  <span class="keyword">size_t</span> ccOriginCompLen = _tcslen(szCompString);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (HIWORD(unKey) &gt;= <span class="string">'a'</span> &amp;&amp; HIWORD(unKey) &lt;= <span class="string">'z'</span>) &#123;</span><br><span class="line">    TCHAR szKey[<span class="number">2</span>] = &#123; HIWORD(unKey), <span class="number">0</span> &#125;;</span><br><span class="line">    _tcscat_s(szCompString, Comp::c_MaxCompString, szKey);  <span class="comment">// 将字符追加到写作串</span></span><br><span class="line">    compCore.dwCompStrLen = (DWORD)_tcslen(szCompString);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> DWORD dwBufLen = *lpdwTransBuf;</span><br><span class="line">  lpdwTransBuf += <span class="keyword">sizeof</span>(<span class="keyword">size_t</span>) / <span class="keyword">sizeof</span>(DWORD);</span><br><span class="line">  UINT cMsg = <span class="number">0</span>;</span><br><span class="line">  LPTRANSMSG lpTransMsg = (LPTRANSMSG)lpdwTransBuf;</span><br><span class="line">  <span class="keyword">if</span>(ccOriginCompLen == <span class="number">0</span>)&#123;  <span class="comment">// 没有写作串</span></span><br><span class="line">    <span class="keyword">if</span>(HIWORD(unKey) &gt;= <span class="string">'a'</span> &amp;&amp; HIWORD(unKey) &lt;= <span class="string">'z'</span>)&#123;</span><br><span class="line">      lpTransMsg[<span class="number">0</span>].message = WM_IME_STARTCOMPOSITION;  <span class="comment">// 打开写作窗</span></span><br><span class="line">      lpTransMsg[<span class="number">0</span>].wParam = <span class="number">0</span>;</span><br><span class="line">      lpTransMsg[<span class="number">0</span>].lParam = <span class="number">0</span>;</span><br><span class="line">      cMsg++;</span><br><span class="line"></span><br><span class="line">      lpTransMsg[<span class="number">1</span>].message = WM_IME_COMPOSITION; <span class="comment">// 更新写作窗</span></span><br><span class="line">      lpTransMsg[<span class="number">1</span>].wParam = <span class="number">0</span>;</span><br><span class="line">      lpTransMsg[<span class="number">1</span>].lParam = GCS_COMPSTR | GCS_CURSORPOS | GCS_COMPATTR;</span><br><span class="line">      cMsg++;</span><br><span class="line"></span><br><span class="line">      lpTransMsg[<span class="number">2</span>].message = WM_IME_NOTIFY;      <span class="comment">// 打开候选窗</span></span><br><span class="line">      lpTransMsg[<span class="number">2</span>].wParam = IMN_OPENCANDIDATE;</span><br><span class="line">      lpTransMsg[<span class="number">2</span>].lParam = <span class="number">1</span>;</span><br><span class="line">      cMsg++;</span><br><span class="line"></span><br><span class="line">      lpTransMsg[<span class="number">3</span>].message = WM_IME_NOTIFY;      <span class="comment">// 更新候选窗</span></span><br><span class="line">      lpTransMsg[<span class="number">3</span>].wParam = IMN_CHANGECANDIDATE;</span><br><span class="line">      lpTransMsg[<span class="number">3</span>].lParam = <span class="number">1</span>;</span><br><span class="line">      cMsg++;</span><br><span class="line">      <span class="keyword">return</span> cMsg;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;<span class="keyword">else</span>&#123; <span class="comment">// _tcslen(szCompString) &gt; 0     // 有写作串</span></span><br><span class="line">    <span class="keyword">if</span>(HIWORD(unKey) &gt;= <span class="string">'a'</span> &amp;&amp; HIWORD(unKey) &lt;= <span class="string">'z'</span>)&#123;</span><br><span class="line">      <span class="comment">// 更新写作窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="comment">// 更新候选窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">return</span> cMsg;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(HIWORD(unKey) == VK_RETURN || HIWORD(unKey) == VK_SPACE)&#123; <span class="comment">// 回车或空格</span></span><br><span class="line">      LPTSTR szResultString = pComp-&gt;GetResultString();</span><br><span class="line">      _tcscpy_s(szResultString, Comp::c_MaxResultString, szCompString); <span class="comment">// 将写作串拷入结果串</span></span><br><span class="line">      compCore.dwResultStrLen = (DWORD)_tcslen(szResultString);</span><br><span class="line">      <span class="built_in">memset</span>(szCompString, <span class="number">0</span>, <span class="keyword">sizeof</span>(TCHAR) * Comp::c_MaxCompString);   <span class="comment">// 清空写作串</span></span><br><span class="line">      compCore.dwCompStrLen = <span class="number">0</span>;</span><br><span class="line">      <span class="comment">// 更新写作窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="comment">// 关闭写作窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="comment">// 关闭候选窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">return</span> cMsg;</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(HIWORD(unKey) == VK_ESCAPE)&#123; <span class="comment">// ESC</span></span><br><span class="line">      <span class="built_in">memset</span>(szCompString, <span class="number">0</span>, <span class="keyword">sizeof</span>(TCHAR) * Comp::c_MaxCompString);</span><br><span class="line">      compCore.dwCompStrLen = <span class="number">0</span>;</span><br><span class="line">      <span class="comment">// 更新写作窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="comment">// 关闭写作窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="comment">// 关闭候选窗</span></span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">return</span> cMsg;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> cMsg;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>以上就是输入法最最关键的三个导出函数，即使一个丰满的输入法，主要逻辑也是在这几个函数中，尤其是<code>ImeProcessKey</code>和<code>ImeToAsciiEx</code>中。<br><strong> 特别注意 </strong><br>在DDK的<code>immdev.h</code>中定义的数据类型<code>LPTRANSMSGLIST</code>是错误的，它定义缓冲区长度<code>TRANSMSGLIST::uMsgCount</code>的类型为UINT，其实该字段的长度在32位和64位系统下不一样，32位下是4字节，64位下是8字节。因此在上面代码中有：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lpdwTransBuf += <span class="keyword">sizeof</span>(<span class="keyword">size_t</span>) / <span class="keyword">sizeof</span>(DWORD);</span><br></pre></td></tr></table></figure></p>
+<h1 id="UI窗口"><a href="#UI窗口" class="headerlink" title="UI窗口"></a>UI窗口</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>输入法可分为框架层和逻辑层，框架层定义了控制流、数据流的流转路径，以及控制类型。比如，当一个按键被按下，首先由导出函数ImeProcessKey、ImeToAsciiEx处理，之后再通过IMM消息通知UI窗口，这些都属于控制流。通知UI窗口的消息则属于控制类型，比如显示/隐藏写作窗、显示/隐藏候选窗。以上这些都是框架层的工作，而在业务层则负责处理具体收到显示/隐藏写作窗的时候怎么显示，显示在哪，等等。</p>
+<p>通常我们能看到的输入法窗口都属于业务逻辑层的范畴，而不是框架层。它们都是UI窗口的子窗口，你可以根据自己业务逻辑的需要决定创建多少个子窗口，并决定怎么显示它们。</p>
+<p>UI窗口是框架层和业务层的桥梁——框架层把消息发送给UI窗口，由它决定要不要告诉业务层的子窗体，也由它来控制要不要显示或隐藏这些窗体。</p>
+<h2 id="注册窗体类"><a href="#注册窗体类" class="headerlink" title="注册窗体类"></a>注册窗体类</h2><p>既然是Windows窗体，必然包含注册窗体类、创建窗体、执行窗体函数这三个关键步骤。注册窗体类是在<code>DllMain</code>函数的<code>DLL_PROCESS_ATTACH</code>分支中完成，在<code>DLL_PROCESS_DETACH</code>分支完成注销窗体类。和普通的自定义窗体类不同在于<code>style</code>字段和<code>cbWndExtra</code>字段：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> UIWnd::RegisterUIWndClass(HINSTANCE hInstance)</span><br><span class="line">&#123;</span><br><span class="line">  WNDCLASSEX wc = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">  wc.cbSize = <span class="keyword">sizeof</span>(WNDCLASSEX);</span><br><span class="line">  wc.style = CS_IME;  <span class="comment">// 注意1</span></span><br><span class="line">  wc.lpfnWndProc = UIWndProc;</span><br><span class="line">  wc.cbClsExtra = <span class="number">0</span>;</span><br><span class="line">  wc.cbWndExtra = <span class="number">2</span> * <span class="keyword">sizeof</span>(LONG_PTR); <span class="comment">// 注意2：系统要存放IMMGWL_IMC 和 IMMGWL_PRIVATE</span></span><br><span class="line">  wc.hInstance = hInstance;</span><br><span class="line">  wc.hCursor = <span class="literal">NULL</span>;</span><br><span class="line">  wc.hIcon = <span class="literal">NULL</span>;</span><br><span class="line">  wc.lpszMenuName = <span class="literal">NULL</span>;</span><br><span class="line">  wc.lpszClassName = GetUIWndClassName();</span><br><span class="line">  wc.hbrBackground = <span class="literal">NULL</span>;</span><br><span class="line">  wc.hIconSm = <span class="literal">NULL</span>;</span><br><span class="line">  ATOM atomUi = RegisterClassEx(&amp;wc);</span><br><span class="line">  mhInstance = hInstance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="创建窗体"><a href="#创建窗体" class="headerlink" title="创建窗体"></a>创建窗体</h2><p>输入法UI窗体和普通自定义窗体最不同之处在于窗体的创建，自定义窗体要通过调用<code>CreateWindow(...)</code>函数来完成创建，但输入法UI窗体则是由系统负责创建的。该函数的第一个参数要传入窗体类名，系统怎么知道窗体类名的呢？前面已经讲过：在导出函数<code>ImeInquire</code>那里。</p>
+<h2 id="窗体函数"><a href="#窗体函数" class="headerlink" title="窗体函数"></a>窗体函数</h2><p>窗体函数中要注意：不要让WM_IME_xxx类的消息交给<code>DefWindowProc</code>函数来处理，因为它会把这类消息再交给输入法窗口，这会导致死循环。对于不处理的WM_IME_xxx消息，返回0即可。</p>
+<p>与普通用户窗体的不同之处在于他要处理一系列的WM_IME_xxx消息，以响应来自<code>ImeToAsciiEx</code>的消息——显示或隐藏写作窗、候选窗、状态栏以及更新它们。本文我们先不着急引入这些窗口，你会看到当敲字母键的时候没有反应，而实际上输入法把这些字母“吃掉”了，再按空格或回车会一次上屏，按ESC则清空“吃掉”的字母，进入重新输入的状态。</p>
+<h1 id="扩展窗口"><a href="#扩展窗口" class="headerlink" title="扩展窗口"></a>扩展窗口</h1><p>扩展窗口包括写作窗、候选窗、状态栏等。这些窗口需要具备一些共同的特征：</p>
+<ol>
+<li>关于窗体类风格，需要指定CS_IME标记。但我觉得其实只有输入法UI窗口用该风格，其余的扩展窗口应该不用，因为它们的创建是由开发者创建的。</li>
+<li>在创建输入法窗体的时候，<strong>必须</strong>指定窗体风格为<strong>WS_DISABLED</strong>。这是因为输入法窗体不能接受输入焦点，否则就又会激活输入法，输入逻辑就嵌套了。</li>
+<li>这些窗口可以在输入法UI窗口的WM_CREATE函数中完成注册和创建。</li>
+<li>这些窗口里要现实的内容需要作为IMCC在IMC中创建。IMC中有一些默认的IMCC是不需要在此创建的，比如：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagINPUTCONTEXT</span> &#123;</span> </span><br><span class="line">  ...</span><br><span class="line">  HIMCC   hCompStr; </span><br><span class="line">  HIMCC   hCandInfo; </span><br><span class="line">  HIMCC   hGuideLine; </span><br><span class="line">  HIMCC   hPrivate; </span><br><span class="line">  ...</span><br><span class="line">&#125; INPUTCONTEXT, *PINPUTCONTEXT, NEAR *NPINPUTCONTEXT, FAR *LPINPUTCONTEXT;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在<code>ImeSelect</code>函数中首次获得IMC，你可以尝试获得这些IMCC的尺寸，发现是非0的，说明这些IMCC已经存在了。但是为了适配自己的业务逻辑，我在<code>ImeSelect</code>中初始化IMC，调用<code>ImmReSizeIMCC(m_pContext-&gt;hCompStr, sizeof(Comp));</code>，用自己的Comp类替换掉了原先的hCompStr。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>输入法的安装要做两件事：1、将ime文件拷贝到Windows/System32目录下；2、调用<code>ImmInstallIME</code>注册该输入法。<br>需要注意，在64位机器下，应该为32位和64位生成两份ime文件，这样在64位和32位的应用程序里才能分别切出对应的输入法。64位ime文件放在Windows/System32下，32位放在Windows/SysWOW64下。 </p>
+<p>通常这些活是由NSIS脚本干的，此处我写了一个ImeInstall程序来做，注意：因为要往Windows/System32下写文件，该程序必须具备管理员权限，因此在CMake文件中添加如下链接选项：<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET_TARGET_PROPERTIES</span>(ImeInstaller PROPERTIES LINK_FLAGS <span class="string">"/level='requireAdministrator' /uiAccess='false'"</span>)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>本文代码已提交至<a href="https://github.com/palanceli/WinImmImeSample" target="_blank" rel="noopener">WinImmImeSample-MiniIme</a></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/输入法/" rel="tag"># 输入法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/11/2017/0211CMakeDemo2/" rel="next" title="CMake Demo （二）带GoogleTest的多项目构建">
+                <i class="fa fa-chevron-left"></i> CMake Demo （二）带GoogleTest的多项目构建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/19/2017/0218CMake/" rel="prev" title="使用CMake+Boost中遇到的几个问题">
+                使用CMake+Boost中遇到的几个问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/02/18/2017/0218WinImmImeSample1/" data-title="Windows下创建基于IMM的输入法" data-url="http://palanceli.github.io/2017/02/18/2017/0218WinImmImeSample1/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#DLL文件"><span class="nav-number">1.</span> <span class="nav-text">DLL文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#导出函数"><span class="nav-number">2.</span> <span class="nav-text">导出函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#引入imm-h文件"><span class="nav-number">2.1.</span> <span class="nav-text">引入imm.h文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义十五个导出函数"><span class="nav-number">2.2.</span> <span class="nav-text">定义十五个导出函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ImeInquire"><span class="nav-number">2.3.</span> <span class="nav-text">ImeInquire</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ImeProcessKey"><span class="nav-number">2.4.</span> <span class="nav-text">ImeProcessKey</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ImeToAsciiEx"><span class="nav-number">2.5.</span> <span class="nav-text">ImeToAsciiEx</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UI窗口"><span class="nav-number">3.</span> <span class="nav-text">UI窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">3.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注册窗体类"><span class="nav-number">3.2.</span> <span class="nav-text">注册窗体类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建窗体"><span class="nav-number">3.3.</span> <span class="nav-text">创建窗体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#窗体函数"><span class="nav-number">3.4.</span> <span class="nav-text">窗体函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#扩展窗口"><span class="nav-number">4.</span> <span class="nav-text">扩展窗口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">5.</span> <span class="nav-text">安装</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

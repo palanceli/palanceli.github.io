@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Binder学习笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Binder驱动层的代码在kernel/goldfish/drivers/staging/android下的binder.c和binder.h。Android源码是不带Linux内核的，驱动正是在这个内核里，需要单独下载，出门左转参见《Anrdoid源码、内核编译》。驱动的相关知识先不在这里展开了，那又是一个庞大的体系，以后再啃。直奔我们的主题——客户端为test()组织的请求数据是：驱动程序是如">
+<meta name="keywords" content="Binder学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="binder学习笔记（十）—— 穿越到驱动层">
+<meta property="og:url" content="http://palanceli.github.io/2016/05/28/2016/0528BinderLearning10/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="Binder驱动层的代码在kernel/goldfish/drivers/staging/android下的binder.c和binder.h。Android源码是不带Linux内核的，驱动正是在这个内核里，需要单独下载，出门左转参见《Anrdoid源码、内核编译》。驱动的相关知识先不在这里展开了，那又是一个庞大的体系，以后再啃。直奔我们的主题——客户端为test()组织的请求数据是：驱动程序是如">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://palanceli.github.io/2016/05/14/2016/0514BinderLearning8/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2016/05/28/2016/0528BinderLearning10/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.552Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="binder学习笔记（十）—— 穿越到驱动层">
+<meta name="twitter:description" content="Binder驱动层的代码在kernel/goldfish/drivers/staging/android下的binder.c和binder.h。Android源码是不带Linux内核的，驱动正是在这个内核里，需要单独下载，出门左转参见《Anrdoid源码、内核编译》。驱动的相关知识先不在这里展开了，那又是一个庞大的体系，以后再啃。直奔我们的主题——客户端为test()组织的请求数据是：驱动程序是如">
+<meta name="twitter:image" content="https://palanceli.github.io/2016/05/14/2016/0514BinderLearning8/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2016/05/28/2016/0528BinderLearning10/">
+
+
+
+
+
+  <title>binder学习笔记（十）—— 穿越到驱动层 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2016/05/28/2016/0528BinderLearning10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">binder学习笔记（十）—— 穿越到驱动层</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-28T21:58:36+08:00">
+                2016-05-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/05/28/2016/0528BinderLearning10/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/28/2016/0528BinderLearning10/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Binder驱动层的代码在<code>kernel/goldfish/drivers/staging/android</code>下的<code>binder.c</code>和<code>binder.h</code>。Android源码是不带Linux内核的，驱动正是在这个内核里，需要单独下载，出门左转参见<a href="http://www.cnblogs.com/palance/p/5187103.html" target="_blank" rel="noopener">《Anrdoid源码、内核编译》</a>。驱动的相关知识先不在这里展开了，那又是一个庞大的体系，以后再啃。直奔我们的主题——客户端为<code>test()</code>组织的请求数据是：<br><img src="https://palanceli.github.io/2016/05/14/2016/0514BinderLearning8/img01.png" alt="客户端为test()组织的请求数据"><br>驱动程序是如何处理这个数据包的呢？<br><a id="more"></a></p>
+<h1 id="从应用层登陆，顺流直下"><a href="#从应用层登陆，顺流直下" class="headerlink" title="从应用层登陆，顺流直下"></a>从应用层登陆，顺流直下</h1><p>为此，还需要先从应用层往下看，frameworks/native/libs/binder/IPCThreadState.cpp:548，就从这里登陆吧。客户端组织test()请求数据时，调用到IPCThreadState::transact(…)<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">status_t</span> IPCThreadState::transact(<span class="keyword">int32_t</span> handle,</span><br><span class="line">                                  <span class="keyword">uint32_t</span> code, <span class="keyword">const</span> Parcel&amp; data,</span><br><span class="line">                                  Parcel* reply, <span class="keyword">uint32_t</span> flags)</span><br><span class="line">&#123;   <span class="comment">// code=TEST, flag=0</span></span><br><span class="line"></span><br><span class="line">    flags |= TF_ACCEPT_FDS;</span><br><span class="line">    ......</span><br><span class="line">    </span><br><span class="line">        err = writeTransactionData(BC_TRANSACTION, flags, handle, code, data, <span class="literal">NULL</span>);</span><br><span class="line">    </span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">if</span> (reply) &#123;</span><br><span class="line">            err = waitForResponse(reply);  <span class="comment">// 这次重点看这里</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            Parcel fakeReply;</span><br><span class="line">            err = waitForResponse(&amp;fakeReply);</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>函数使用writeTransactionData(…)打包好数据后，接下来调用waitForResponse(…)把数据发出去。<br>frameworks/native/libs/binder/IPCThreadState.cpp:712<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">status_t</span> IPCThreadState::waitForResponse(Parcel *reply, <span class="keyword">status_t</span> *acquireResult)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">uint32_t</span> cmd;</span><br><span class="line">    <span class="keyword">int32_t</span> err;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((err=talkWithDriver()) &lt; NO_ERROR) <span class="keyword">break</span>;</span><br><span class="line">        ......</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>继续调用talkWithDriver()和驱动对话,frameworks/native/libs/binder/IPCThreadState.cpp:803<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">status_t</span> IPCThreadState::talkWithDriver(<span class="keyword">bool</span> doReceive)</span><br><span class="line">&#123;   <span class="comment">// doReceive=true</span></span><br><span class="line">    ......</span><br><span class="line">    binder_write_read bwr;</span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">bool</span> needRead = mIn.dataPosition() &gt;= mIn.dataSize();<span class="comment">// mIn有上一轮IO读出尚未解析的数据，因此needRead=true</span></span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">size_t</span> outAvail = (!doReceive || needRead) ? mOut.dataSize() : <span class="number">0</span>; <span class="comment">// outAvail=mOut.dataSize()</span></span><br><span class="line">    </span><br><span class="line">    bwr.write_size = outAvail;</span><br><span class="line">    bwr.write_buffer = (<span class="keyword">uintptr_t</span>)mOut.data();</span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">if</span> (doReceive &amp;&amp; needRead) &#123;</span><br><span class="line">        bwr.read_size = mIn.dataCapacity();</span><br><span class="line">        bwr.read_buffer = (<span class="keyword">uintptr_t</span>)mIn.data();</span><br><span class="line">    &#125; </span><br><span class="line">    ......</span><br><span class="line">    bwr.write_consumed = <span class="number">0</span>;</span><br><span class="line">    bwr.read_consumed = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">status_t</span> err;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">if</span> (ioctl(mProcess-&gt;mDriverFD, BINDER_WRITE_READ, &amp;bwr) &gt;= <span class="number">0</span>) <span class="comment">// 重点在这</span></span><br><span class="line">            err = NO_ERROR;</span><br><span class="line">        ......</span><br><span class="line">    &#125; <span class="keyword">while</span> (err == -EINTR);</span><br><span class="line">    ......    </span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>doReceive取默认值为true，在通过<code>test()</code>调用到<code>talkWithDriver(...)</code>之前，和驱动的对话已经做了好几轮了，比如<code>defaultServiceManager()</code>和ServiceManager的对话，<code>getService(...)</code>和Service的对话，此时mIn中应该是有之前读出尚未解析的数据，因此needRead=true，outAvail=mOut.dataSize()。可以组织一个gdb确认mIn此时的内容。</p>
+<h2 id="组织一个gdb确认此时mIn的内容"><a href="#组织一个gdb确认此时mIn的内容" class="headerlink" title="组织一个gdb确认此时mIn的内容"></a>组织一个gdb确认此时mIn的内容</h2><p>需要开启三个终端完成调试：</p>
+<ol>
+<li><p>Target1 在模拟器上启动server</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ adb shell /data/<span class="built_in">local</span>/tmp/testservice/TestServer</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Target2 在模拟器上通过gdbserver启动客户端</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ adb shell gdbserver :1234 /data/<span class="built_in">local</span>/tmp/testservice/TestClient</span><br><span class="line">Process /data/<span class="built_in">local</span>/tmp/testservice/TestClient created; pid = 1254</span><br><span class="line">Listening on port 1234</span><br><span class="line">Remote debugging from host 127.0.0.1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Host1 在宿主端启动gdb</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">$ ./prebuilts/gcc/darwin-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-gdb out/debug/target/product/generic/obj/EXECUTABLES/TestClient_intermediates/LINKED/TestClient</span><br><span class="line">......</span><br><span class="line">(gdb) b main</span><br><span class="line">Breakpoint 1 at 0xb6f571fc: file external/testservice/TestClient.cpp, line 14.</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line">......</span><br><span class="line">(gdb) <span class="built_in">set</span> solib-absolute-prefix out/debug/target/product/generic/symbols/</span><br><span class="line">Reading symbols from ...... linker...done.</span><br><span class="line">......</span><br><span class="line">Loaded symbols <span class="keyword">for</span> ......</span><br><span class="line">......</span><br><span class="line">(gdb) b IPCThreadState.cpp:846 <span class="comment"># 在talkWithDriver(...)内下断点</span></span><br><span class="line">Breakpoint 2 at 0xb6eaf884: file frameworks/native/libs/binder/IPCThreadState.cpp, line 846.</span><br><span class="line">(gdb) c</span><br><span class="line">......</span><br><span class="line"><span class="comment"># 然后就是若干轮的continue和backtrace，直到停在由test()调用触发的talkWithDriver(...)</span></span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">Breakpoint 2, android::IPCThreadState::talkWithDriver (this=this@entry=0xb6c24000, doReceive=doReceive@entry=<span class="literal">true</span>) at frameworks/native/libs/binder/IPCThreadState.cpp:846</span><br><span class="line">846     <span class="keyword">if</span> ((bwr.write_size == 0) &amp;&amp; (bwr.read_size == 0)) <span class="built_in">return</span> NO_ERROR;</span><br><span class="line">(gdb) bt</span><br><span class="line"><span class="comment">#0  android::IPCThreadState::talkWithDriver (this=this@entry=0xb6c24000, doReceive=doReceive@entry=true) at frameworks/native/libs/binder/IPCThreadState.cpp:846</span></span><br><span class="line"><span class="comment">#1  0xb6eafed2 in android::IPCThreadState::waitForResponse (this=0xb6c24000, reply=0xbeaa1ad4, acquireResult=0x0) at frameworks/native/libs/binder/IPCThreadState.cpp:718</span></span><br><span class="line"><span class="comment">#2  0xb6eb0088 in android::IPCThreadState::transact (this=0xb6c24000, handle=1, code=code@entry=1, data=..., reply=reply@entry=0xbeaa1ad4, flags=16, flags@entry=0) at frameworks/native/libs/binder/IPCThreadState.cpp:604</span></span><br><span class="line"><span class="comment">#3  0xb6eab08e in android::BpBinder::transact (this=0xb6c090c0, code=1, data=..., reply=0xbeaa1ad4, flags=0) at frameworks/native/libs/binder/BpBinder.cpp:165</span></span><br><span class="line"><span class="comment">#4  0xb6f3e42e in android::BpTestService::test (this=&lt;optimized out&gt;) at external/testservice/TestClient.cpp:10</span></span><br><span class="line"><span class="comment">#5  0xb6f3e23c in main () at external/testservice/TestClient.cpp:18</span></span><br><span class="line">(gdb) p mIn</span><br><span class="line"><span class="variable">$1</span> = &#123;mError = 0, mData = 0xb6c27000 <span class="string">"\fr"</span>, mDataSize = 48, mDataCapacity = 256, mDataPos = 48, mObjects = 0x0, mObjectsSize = 0, mObjectsCapacity = 0, mNextObjectHint = 0, mFdsKnown = <span class="literal">true</span>, mHasFds = <span class="literal">false</span>, mAllowFds = <span class="literal">true</span>, mOwner = 0x0, mOwnerCookie = 0x0,</span><br><span class="line">  mOpenAshmemSize = 0&#125;</span><br><span class="line">(gdb) p needRead</span><br><span class="line"><span class="variable">$2</span> = <span class="literal">true</span></span><br><span class="line"><span class="comment"># 结果和我猜测的一致</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>综上所述，在<code>IPCThreadState::talkWithDriver(...)</code>中调用<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ioctl(mProcess-&gt;mDriverFD, BINDER_WRITE_READ, &amp;brw)</span><br></pre></td></tr></table></figure></p>
+<p>传入的数据bwr即为：<br><img src="/2016/05/28/2016/0528BinderLearning10/img01.png" alt="客户端为test()组织的"></p>
+<h1 id="进入驱动层"><a href="#进入驱动层" class="headerlink" title="进入驱动层"></a>进入驱动层</h1><p>终于可以有此穿越到驱动层了！binder驱动层对接ioctl的函数是binder_ioctl(…)。kernel/goldfish/drivers/staging/android/binder.c:2716<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">long</span> <span class="title">binder_ioctl</span><span class="params">(struct file *filp, <span class="keyword">unsigned</span> <span class="keyword">int</span> cmd, <span class="keyword">unsigned</span> <span class="keyword">long</span> arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;   <span class="comment">// cmd=BINDER_WRITE_READ</span></span><br><span class="line">    <span class="keyword">int</span> ret;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_proc</span> *<span class="title">proc</span> = <span class="title">filp</span>-&gt;<span class="title">private_data</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">binder_thread</span> *<span class="title">thread</span>;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> size = _IOC_SIZE(cmd);</span><br><span class="line">    <span class="keyword">void</span> __user *ubuf = (<span class="keyword">void</span> __user *)arg;</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">    thread = binder_get_thread(proc);</span><br><span class="line">    ......</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (cmd) &#123;</span><br><span class="line">    <span class="keyword">case</span> BINDER_WRITE_READ: &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">binder_write_read</span> <span class="title">bwr</span>;</span></span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">if</span> (copy_from_user(&amp;bwr, ubuf, <span class="keyword">sizeof</span>(bwr))) &#123;<span class="comment">// 把上图总用户空间的bwr复制到内核</span></span><br><span class="line">            ......</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">if</span> (bwr.write_size &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            ret = binder_thread_write(proc, thread, (<span class="keyword">void</span> __user *)bwr.write_buffer, bwr.write_size, &amp;bwr.write_consumed);</span><br><span class="line">            trace_binder_write_done(ret);</span><br><span class="line">            ......</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// bwr.read_size来自IPCThreadState::talkWithDriver，当读缓冲区为空，会将</span></span><br><span class="line">        <span class="comment">// mIn缓冲区交给它，bwr.read_size=mIn.dataCapacity()</span></span><br><span class="line">        <span class="keyword">if</span> (bwr.read_size &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            ret = binder_thread_read(proc, thread, (<span class="keyword">void</span> __user *)bwr.read_buffer, bwr.read_size, &amp;bwr.read_consumed, filp-&gt;f_flags &amp; O_NONBLOCK);</span><br><span class="line">            trace_binder_read_done(ret);</span><br><span class="line">            <span class="keyword">if</span> (!list_empty(&amp;proc-&gt;todo))</span><br><span class="line">                wake_up_interruptible(&amp;proc-&gt;wait);</span><br><span class="line">            ... ...</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br><span class="line">    ......</span><br><span class="line">    &#125;</span><br><span class="line">    ret = <span class="number">0</span>;</span><br><span class="line">......</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>先尽可能地剪掉细枝末节，来看重点调用<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">binder_thread_write(proc, thread, (<span class="keyword">void</span> __user *)bwr.write_buffer,</span><br><span class="line">                            bwr.write_size, &amp;bwr.write_consumed);</span><br></pre></td></tr></table></figure></p>
+<p>kernel/goldfish/drivers/staging/android/binder.c:1837<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">binder_thread_write</span><span class="params">(struct binder_proc *proc, struct binder_thread *thread,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">void</span> __user *buffer, <span class="keyword">int</span> size, <span class="keyword">signed</span> <span class="keyword">long</span> *consumed)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">uint32_t</span> cmd;</span><br><span class="line">    <span class="keyword">void</span> __user *ptr = buffer + *consumed;</span><br><span class="line">    <span class="keyword">void</span> __user *end = buffer + size;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (ptr &lt; end &amp;&amp; thread-&gt;return_error == BR_OK) &#123;</span><br><span class="line">        <span class="keyword">if</span> (get_user(cmd, (<span class="keyword">uint32_t</span> __user *)ptr))</span><br><span class="line">            <span class="keyword">return</span> -EFAULT;</span><br><span class="line">        ptr += <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>);</span><br><span class="line">        trace_binder_command(cmd);</span><br><span class="line">        <span class="keyword">if</span> (_IOC_NR(cmd) &lt; ARRAY_SIZE(binder_stats.bc)) &#123;</span><br><span class="line">            binder_stats.bc[_IOC_NR(cmd)]++;</span><br><span class="line">            proc-&gt;stats.bc[_IOC_NR(cmd)]++;</span><br><span class="line">            thread-&gt;stats.bc[_IOC_NR(cmd)]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">switch</span> (cmd) &#123;</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">case</span> BC_TRANSACTION:</span><br><span class="line">        <span class="keyword">case</span> BC_REPLY: &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">binder_transaction_data</span> <span class="title">tr</span>;</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (copy_from_user(&amp;tr, ptr, <span class="keyword">sizeof</span>(tr)))</span><br><span class="line">                <span class="keyword">return</span> -EFAULT;</span><br><span class="line">            ptr += <span class="keyword">sizeof</span>(tr); <span class="comment">// 对照前面的图逆向拆解</span></span><br><span class="line">            binder_transaction(proc, thread, &amp;tr, cmd == BC_REPLY);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ......</span><br><span class="line">        &#125;</span><br><span class="line">        *consumed = ptr - buffer;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个cmd的值是BC_TRANSACTION，因此应该继续<code>binder_transaction(proc, thread, &amp;tr, false)</code>。这个函数实在太长了，后面再花一节的篇幅深入该函数。</p>
+<p>不过很清晰的一点：该函数仅在出错的时候才返回小于零的整数，如果一切正常就返回0。函数<code>binder_ioctl(...)在case BINDER_WRITE_READ</code>这一枝上，如果没有发生错误，则返回<code>binder_thread_write(...)</code>。也就是说：如果一切正常，<code>binder_ioctl(...)</code>会返回0，不管io的数据有多大。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Binder学习笔记/" rel="tag"># Binder学习笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/21/2016/0521小雨点参加钢琴比赛/" rel="next" title="小雨点第一次参加钢琴比赛">
+                <i class="fa fa-chevron-left"></i> 小雨点第一次参加钢琴比赛
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/10/2016/0610BinderLearning11/" rel="prev" title="Binder学习笔记（十一）—— 智能指针">
+                Binder学习笔记（十一）—— 智能指针 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/05/28/2016/0528BinderLearning10/" data-title="binder学习笔记（十）—— 穿越到驱动层" data-url="http://palanceli.github.io/2016/05/28/2016/0528BinderLearning10/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#从应用层登陆，顺流直下"><span class="nav-number">1.</span> <span class="nav-text">从应用层登陆，顺流直下</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#组织一个gdb确认此时mIn的内容"><span class="nav-number">1.1.</span> <span class="nav-text">组织一个gdb确认此时mIn的内容</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#进入驱动层"><span class="nav-number">2.</span> <span class="nav-text">进入驱动层</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

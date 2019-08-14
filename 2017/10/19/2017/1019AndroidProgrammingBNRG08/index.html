@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章继续实现CriminalIntent的list部分，并且抽象出供list和details公用Fragment的布局和java类。这是一个RecyclerView，点击每个Item弹出Toast：本章要点：  抽象一个通用的Fragment，包括xml容器和java实现 RecyclerView的设计思想，实现步骤">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记八">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章继续实现CriminalIntent的list部分，并且抽象出供list和details公用Fragment的布局和java类。这是一个RecyclerView，点击每个Item弹出Toast：本章要点：  抽象一个通用的Fragment，包括xml容器和java实现 RecyclerView的设计思想，实现步骤">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/img05.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.105Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记八">
+<meta name="twitter:description" content="本章继续实现CriminalIntent的list部分，并且抽象出供list和details公用Fragment的布局和java类。这是一个RecyclerView，点击每个Item弹出Toast：本章要点：  抽象一个通用的Fragment，包括xml容器和java实现 RecyclerView的设计思想，实现步骤">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/img06.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记八 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记八</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-19T20:00:00+08:00">
+                2017-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/19/2017/1019AndroidProgrammingBNRG08/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/19/2017/1019AndroidProgrammingBNRG08/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章继续实现CriminalIntent的list部分，并且抽象出供list和details公用Fragment的布局和java类。<br>这是一个RecyclerView，点击每个Item弹出Toast：<br><img src="/2017/10/19/2017/1019AndroidProgrammingBNRG08/img06.png" alt><br>本章要点：</p>
+<ul>
+<li>抽象一个通用的Fragment，包括xml容器和java实现</li>
+<li>RecyclerView的设计思想，实现步骤</li>
+</ul>
+<a id="more"></a>
+<h1 id="修改fragment的容器、java文件"><a href="#修改fragment的容器、java文件" class="headerlink" title="修改fragment的容器、java文件"></a>修改fragment的容器、java文件</h1><h2 id="重命名fragment-xml容器文件"><a href="#重命名fragment-xml容器文件" class="headerlink" title="重命名fragment xml容器文件"></a>重命名fragment xml容器文件</h2><p>本节为了让Fragment更通用，把原先的<code>activity_crime.xml</code>改名为<code>activity_fragment.xml</code>：<br><img src="/2017/10/19/2017/1019AndroidProgrammingBNRG08/img01.png" alt><br>内容如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">android.support.constraint.ConstraintLayout</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/fragment_container"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>AndroidStudio会自动修改引用该资源的代码，比如<code>CrimeActivity.java</code>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        setContentView(R.layout.activity_fragment); <span class="comment">// 自动修改</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果没有自动修改，需要手动解决。</p>
+<h2 id="为通用的Fragment配备对应的java文件"><a href="#为通用的Fragment配备对应的java文件" class="headerlink" title="为通用的Fragment配备对应的java文件"></a>为通用的Fragment配备对应的java文件</h2><p>xml容器文件只是在命名上体现出通用性，具体实现更多是在java代码上:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SingleFragmentActivity.java</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">SingleFragmentActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> Fragment <span class="title">createFragment</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_fragment);</span><br><span class="line"></span><br><span class="line">        FragmentManager fm = getSupportFragmentManager();</span><br><span class="line">        Fragment fragment = fm.findFragmentById(R.id.fragment_container);</span><br><span class="line">        <span class="keyword">if</span>(fragment  == <span class="keyword">null</span>)&#123;</span><br><span class="line">            fragment = createFragment();</span><br><span class="line">            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>SingleFragmentActivity在<code>onCreate(...)</code>中加载Fragment容器文件，并创建Fragment实例，具体的实例的创建则由派生类来实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CrimeActivity.java</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeActivity</span> <span class="keyword">extends</span> <span class="title">SingleFragmentActivity</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Fragment <span class="title">createFragment</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CrimeFragment();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>疑问：把Fragment的添加放到基类里，这不会导致所有Fragment共用同一个id么？FragmentManager是绑定在Activity的，也就是说Fragment ID的唯一性只要在具体Activity的范围内即可。</p>
+</blockquote>
+<h2 id="向manifest添加新的Activity并置为启动项"><a href="#向manifest添加新的Activity并置为启动项" class="headerlink" title="向manifest添加新的Activity并置为启动项"></a>向manifest添加新的Activity并置为启动项</h2><p>在<a href="/2016/10/16/2017/1016AndroidProgrammingBNRG05/#启动本应用内的Activity的要求">启动本应用内的Activity的要求</a>中提到，如果希望应用的Activity能被启动，必须在其manifest文件中声明该组件。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">"com.bnrg.bnrg07"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span></span></span><br><span class="line"><span class="tag">        <span class="attr">...</span> <span class="attr">android:theme</span>=<span class="string">"@style/AppTheme"</span>&gt;</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">&lt;!-- 新加入的Activity，并设置为启动项 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".CrimeListActivity"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.MAIN"</span> /&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">"android.intent.category.LAUNCHER"</span> /&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".CrimeActivity"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="RecyclerView的设计思想"><a href="#RecyclerView的设计思想" class="headerlink" title="RecyclerView的设计思想"></a>RecyclerView的设计思想</h1><p>我们还拿集装箱码头做个类比：RecyclerView就是集装箱码头，需要装100箱的货物也许并不需要100个集装箱，10个可能就够了，因为可以分多次运输。为了运作起来，还需要几个角色共同配合。</p>
+<ul>
+<li>Adapter调度中心 根据码头的规模和集装箱的尺寸决定订做多少个集装箱，以及如何调配。</li>
+<li>ViewHolder集装箱 负责包装货物</li>
+</ul>
+<p>它们和RecyclerView共同完成“可回收视图”的业务逻辑。在具体实现的时候需要派生Adapter和ViewHolder，因为要在ViewHolder的子类中实现装入具体的货物，在Adapter的子类中实现创建和调配ViewHolder的子类实例。</p>
+<h2 id="ViewHolder的职责"><a href="#ViewHolder的职责" class="headerlink" title="ViewHolder的职责"></a>ViewHolder的职责</h2><p>它负责维护一个具体的View<br>为什么需要ViewHolder这一层抽象？它抽象的又是什么？<br>答案还可以套用“集装箱码头”的类比：ViewHolder就是“集装箱”，它向调度中心Adapter提供了统一的接口，便于Adapter生产和搬运。这是这一层抽象的作用。</p>
+<p>而每一个集装箱会调用内部货物接口，显示相关信息。本质上ViewHolder就是一个View，它需要从布局文件中获得widget，再从Model层获取数据，将数据展现到widget。</p>
+<h2 id="Adapter的职责"><a href="#Adapter的职责" class="headerlink" title="Adapter的职责"></a>Adapter的职责</h2><p>Adapter位于RecyclerView和Model之间，它的职责是：</p>
+<ol>
+<li>创建必要的ViewHolders</li>
+<li>将Modle层的数据传入ViewHolder</li>
+</ol>
+<p>即：调度中心负责创建和调配集装箱，也负责把货物装入集装箱。</p>
+<p>Adapter和RecyclerView之间的关系如下：<br><img src="/2017/10/19/2017/1019AndroidProgrammingBNRG08/img02.png" alt></p>
+<p>在P624中提到：当这些调用完成后，RecyclerView将把list item显示到屏幕上。onCreateViewHolder(…)的调用次数会比onBindViewHolder(…)少得多，因为一旦创建了足够多的ViewHolder之后，RecyclerView将不再调用onCreateViewHolder(…)。<br>可见，复用集装箱的核心逻辑是写在RecyclerView内部的，RecyclerView才是“复用”策略的司令部，Adapter这个调度中心也只是负责执行司令部的命令。</p>
+<h1 id="RecyclerView的具体实现步骤"><a href="#RecyclerView的具体实现步骤" class="headerlink" title="RecyclerView的具体实现步骤"></a>RecyclerView的具体实现步骤</h1><h2 id="添加RecyclerView的依赖"><a href="#添加RecyclerView的依赖" class="headerlink" title="添加RecyclerView的依赖"></a>添加RecyclerView的依赖</h2><p>项目 &gt; 右键 &gt; Open Module Settings：<br><img src="/2017/10/19/2017/1019AndroidProgrammingBNRG08/img03.png" alt><br>app &gt; Dependencies &gt; +号 &gt; Library dependency：<br><img src="/2017/10/19/2017/1019AndroidProgrammingBNRG08/img04.png" alt><br>搜索recyclerview，并选择com.android.support:recyclerview-v7：<br><img src="/2017/10/19/2017/1019AndroidProgrammingBNRG08/img05.png" alt><br>但实际情况是添加了次依赖会导致如下错误：</p>
+<blockquote>
+<p>Manifest merger failed : Attribute meta-data#android.support.VERSION@value value=(25.3.1) from [com.android.support:appcompat-v7:25.3.1] AndroidManifest.xml:27:9-31<br>is also present at [com.android.support:recyclerview-v7:26.0.0-alpha1] AndroidManifest.xml:24:9-38 value=(26.0.0-alpha1).<br>Suggestion: add ‘tools:replace=”android:value”‘ to element at AndroidManifest.xml:25:5-27:34 to override.</p>
+</blockquote>
+<p>这主要是android.support:appcompat-v7:25.3.1和android.support:recyclerview-v7:26.0.0-alpha1有冲突，修改<code>app/build.gradle</code>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">dependencies &#123;</span><br><span class="line">    ...</span><br><span class="line">    compile &apos;com.android.support:recyclerview-v7:26.0.0-alpha1&apos;</span><br><span class="line">    compile &apos;com.android.support:appcompat-v7:26.0.0-alpha1&apos;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="为RecyclerView创建layout布局文件"><a href="#为RecyclerView创建layout布局文件" class="headerlink" title="为RecyclerView创建layout布局文件"></a>为RecyclerView创建layout布局文件</h2><p>命名为fragment_crime_list.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">android.support.v7.widget.RecyclerView</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/crime_recycler_view"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="为RecyclerView创建java代码"><a href="#为RecyclerView创建java代码" class="headerlink" title="为RecyclerView创建java代码"></a>为RecyclerView创建java代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeListFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> RecyclerView mCrimeRecyclerView;</span><br><span class="line">    <span class="keyword">private</span> CrimeAdapter mAdapter;</span><br><span class="line">    <span class="comment">// ④</span></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeHolder</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span></span>&#123;</span><br><span class="line">        <span class="keyword">private</span> TextView mTitleTextView;</span><br><span class="line">        <span class="keyword">private</span> TextView mDateTextView;</span><br><span class="line">        <span class="keyword">private</span> Crime mCrime;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">CrimeHolder</span><span class="params">(LayoutInflater inflater, ViewGroup parent)</span></span>&#123;</span><br><span class="line">            <span class="keyword">super</span>(inflater.inflate(R.layout.list_item_crime, parent, <span class="keyword">false</span>));</span><br><span class="line"></span><br><span class="line">            mTitleTextView = (TextView)itemView.findViewById(R.id.crime_title);</span><br><span class="line">            mDateTextView = (TextView)itemView.findViewById(R.id.crime_date);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bind</span><span class="params">(Crime crime)</span></span>&#123;</span><br><span class="line">            mCrime = crime;</span><br><span class="line">            mTitleTextView.setText(mCrime.getTitle());</span><br><span class="line">            mDateTextView.setText(mCrime.getDate().toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ③</span></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeAdapter</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">Adapter</span>&lt;<span class="title">CrimeHolder</span>&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> List&lt;Crime&gt; mCrimes;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">CrimeAdapter</span><span class="params">(List&lt;Crime&gt; crimes)</span></span>&#123;</span><br><span class="line">            mCrimes = crimes;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> CrimeHolder <span class="title">onCreateViewHolder</span><span class="params">(ViewGroup parent, <span class="keyword">int</span> viewType)</span> </span>&#123;</span><br><span class="line">            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> CrimeHolder(layoutInflater, parent);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBindViewHolder</span><span class="params">(CrimeHolder holder, <span class="keyword">int</span> position)</span> </span>&#123;</span><br><span class="line">            Crime crime = mCrimes.get(position);</span><br><span class="line">            holder.bind(crime);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getItemCount</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> mCrimes.size();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ①</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">        View view = inflater.inflate(R.layout.fragment_crime_list, container, <span class="keyword">false</span>);</span><br><span class="line">        mCrimeRecyclerView = (RecyclerView)view.findViewById(R.id.crime_recycler_view);</span><br><span class="line">        mCrimeRecyclerView.setLayoutManager(<span class="keyword">new</span> LinearLayoutManager(getActivity()));</span><br><span class="line"></span><br><span class="line">        updateUI();</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ②</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">updateUI</span><span class="params">()</span></span>&#123;</span><br><span class="line">        CrimeLab crimeLab = CrimeLab.get(getActivity());</span><br><span class="line">        List&lt;Crime&gt; crimes = crimeLab.getCrimes();</span><br><span class="line">        mAdapter = <span class="keyword">new</span> CrimeAdapter(crimes);</span><br><span class="line">        mCrimeRecyclerView.setAdapter(mAdapter);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码略长，但是理解了RecyclerView的设计思想，就很容易掌握，我们按照注释中标定的顺序。</p>
+<ul>
+<li>① 载入布局文件，并从中提领到RecyclerView实例<br>注意：RecyclerView必须需要一个LayoutManager实例才能正常工作，因为它并不直接负责布局itmes，而是通过这个LayoutManager实例来完成的，除了负责布局每一个item，LayoutManager还负责定义如何滚动的逻辑。</li>
+<li>② 创建“调度中心”Adapter，并将该实例设置为RecyclerView的Adapter。</li>
+<li>③ 实现“调度中心”CrimeAdapter，其中有几个要点：1、连接到Model数据，此处为mCrimes；2、实现<code>onCreateViewHolder(...)</code>接口，用于创建新的ViewHolder实例；3、实现<code>onBindViewHolder(...)</code>接口，用于将某个货物装入已存在的集装箱；4、实现<code>getItemCount()</code>接口，返回货物的数量。</li>
+<li>④ 实现“集装箱”CrimeHolder，它负责：1、根据布局文件提领widget；2、把传入的数据显示到widget。</li>
+</ul>
+<h2 id="集装箱的布局文件"><a href="#集装箱的布局文件" class="headerlink" title="集装箱的布局文件"></a>集装箱的布局文件</h2><p>在“集装箱”CrimeHolder的代码中，根据布局文件提领widget，它的布局文件list_item_crime.xml如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">LinearLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:orientation</span>=<span class="string">"vertical"</span> <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">TextView</span> <span class="attr">android:id</span>=<span class="string">"@+id/crime_title"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">"Crime Title"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">TextView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/crime_date"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">"Crime Date"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>它包含两个TextView，一个用来显示标题，另一个显示日期。</p>
+<h1 id="让RecyclerView响应点击"><a href="#让RecyclerView响应点击" class="headerlink" title="让RecyclerView响应点击"></a>让RecyclerView响应点击</h1><p>本节只是在点击了每个Item的时候，弹出Toast。原理非常简单：①、把CrimeHolder::itemView的clickListener设置为ViewHolder自身；②、让CrimeHolder实现View.OnClickListener接口。代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">CrimeHolder</span> <span class="keyword">extends</span> <span class="title">RecyclerView</span>.<span class="title">ViewHolder</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">View</span>.<span class="title">OnClickListener</span></span>&#123; <span class="comment">// ②</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">CrimeHolder</span><span class="params">(LayoutInflater inflater, ViewGroup parent)</span></span>&#123;</span><br><span class="line">            <span class="keyword">super</span>(inflater.inflate(R.layout.list_item_crime, parent, <span class="keyword">false</span>));</span><br><span class="line">            itemView.setOnClickListener(<span class="keyword">this</span>); <span class="comment">// ①</span></span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View view)</span></span>&#123; <span class="comment">// ②</span></span><br><span class="line">            Toast.makeText(getActivity(), mCrime.getTitle() + <span class="string">" clicked!"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/18/2017/1018AndroidProgrammingBNRG07/" rel="next" title="《Android Programming BNRG》笔记七">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记七
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/20/2017/1020AndroidProgrammingBNRG09/" rel="prev" title="《Android Programming BNRG》笔记九">
+                《Android Programming BNRG》笔记九 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/19/2017/1019AndroidProgrammingBNRG08/" data-title="《Android Programming BNRG》笔记八" data-url="http://palanceli.github.io/2017/10/19/2017/1019AndroidProgrammingBNRG08/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#修改fragment的容器、java文件"><span class="nav-number">1.</span> <span class="nav-text">修改fragment的容器、java文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#重命名fragment-xml容器文件"><span class="nav-number">1.1.</span> <span class="nav-text">重命名fragment xml容器文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为通用的Fragment配备对应的java文件"><span class="nav-number">1.2.</span> <span class="nav-text">为通用的Fragment配备对应的java文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#向manifest添加新的Activity并置为启动项"><span class="nav-number">1.3.</span> <span class="nav-text">向manifest添加新的Activity并置为启动项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RecyclerView的设计思想"><span class="nav-number">2.</span> <span class="nav-text">RecyclerView的设计思想</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ViewHolder的职责"><span class="nav-number">2.1.</span> <span class="nav-text">ViewHolder的职责</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Adapter的职责"><span class="nav-number">2.2.</span> <span class="nav-text">Adapter的职责</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RecyclerView的具体实现步骤"><span class="nav-number">3.</span> <span class="nav-text">RecyclerView的具体实现步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#添加RecyclerView的依赖"><span class="nav-number">3.1.</span> <span class="nav-text">添加RecyclerView的依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为RecyclerView创建layout布局文件"><span class="nav-number">3.2.</span> <span class="nav-text">为RecyclerView创建layout布局文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为RecyclerView创建java代码"><span class="nav-number">3.3.</span> <span class="nav-text">为RecyclerView创建java代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集装箱的布局文件"><span class="nav-number">3.4.</span> <span class="nav-text">集装箱的布局文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#让RecyclerView响应点击"><span class="nav-number">4.</span> <span class="nav-text">让RecyclerView响应点击</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

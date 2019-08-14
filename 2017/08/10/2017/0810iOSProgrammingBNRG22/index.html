@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章把从web server上获取的数据保存到Core Data。本章要点：  Core Data">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记二十二">
+<meta property="og:url" content="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章把从web server上获取的数据保存到Core Data。本章要点：  Core Data">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/img05.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.027Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记二十二">
+<meta name="twitter:description" content="本章把从web server上获取的数据保存到Core Data。本章要点：  Core Data">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记二十二 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记二十二</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-10T23:00:00+08:00">
+                2017-08-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/10/2017/0810iOSProgrammingBNRG22/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/10/2017/0810iOSProgrammingBNRG22/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章把从web server上获取的数据保存到Core Data。<br>本章要点：</p>
+<ul>
+<li>Core Data</li>
+</ul>
+<a id="more"></a>
+<h1 id="1-CoreData"><a href="#1-CoreData" class="headerlink" title="1 CoreData"></a>1 CoreData</h1><h2 id="1-1-为什么使用CoreData"><a href="#1-1-为什么使用CoreData" class="headerlink" title="1.1 为什么使用CoreData"></a>1.1 为什么使用CoreData</h2><p>Archiving最大的缺点是all-or-nothing特性：如果要读取archive文件，必须把它全部unarchive；如果要写入也必须写入整个文件。<br>CoreData则可以只读取文件的子集，或者只修改一部分。</p>
+<h2 id="1-2-怎么创建CoreData"><a href="#1-2-怎么创建CoreData" class="headerlink" title="1.2 怎么创建CoreData"></a>1.2 怎么创建CoreData</h2><p>关系数据库是由表组成的，表是由字段组成的，CoreData是关系数据库的另一种表述方式：表在CoreData中被称作实体（entity），字段在CoreData中被称作属性（attribute）。CoreData文件正是用来描述实体的。<br>一、新建CoreData文件<br><img src="/2017/08/10/2017/0810iOSProgrammingBNRG22/img01.png" alt><br>二、在CoreData编辑器中添加实体，添加属性<br><img src="/2017/08/10/2017/0810iOSProgrammingBNRG22/img02.png" alt><br>￼</p>
+<h2 id="1-3-Transformable数据类型是干嘛用的"><a href="#1-3-Transformable数据类型是干嘛用的" class="headerlink" title="1.3 Transformable数据类型是干嘛用的"></a>1.3 Transformable数据类型是干嘛用的</h2><p>CoreData是一个OC层的framework，只能处理某些数据类型。比如：它不能处理URL（这是一个struct），但可以处理NSURL（这是一个class）。<br>swift提供了URL和NSURL相互转换的机制。类型为<code>transformable</code>的属性需要使用<code>ValueTransformer</code>的子类来完成类型转换，如果没有明确指定子类，系统默认使用<code>NSKeyedUnarchiveFromDataTransformer</code>来完成转换，它通过archiving把数据转成Data对象。由于NSURL遵循NSCoding协议，默认的<code>NSKeyedUnarchiverFromDataTransformer</code>足以完成任务；如果被转换的数据类型不遵循NSCoding协议，你就得自己为他写<code>ValueTransformer</code>子类了。</p>
+<h2 id="1-4-怎么为CoreData生成代码"><a href="#1-4-怎么为CoreData生成代码" class="headerlink" title="1.4 怎么为CoreData生成代码"></a>1.4 怎么为CoreData生成代码</h2><p>创建CoreData只是创建了一个数据模型，或者可理解为建表，还需要为这个数据模型生成代码，以操作这个数据实体。<br><img src="/2017/08/10/2017/0810iOSProgrammingBNRG22/img03.png" alt><br>把实体的Codegen设置为Manual/None，在Editor中选择未知生成NSManagedObject Subclass。<br>一路下一步生成代码：<br><img src="/2017/08/10/2017/0810iOSProgrammingBNRG22/img04.png" alt><br><img src="/2017/08/10/2017/0810iOSProgrammingBNRG22/img05.png" alt><br>所有CoreData的对象必须是<code>NSManagedObject</code>的子类，该类负责管理CoreData对象。<br>生成的代码包含：<code>Photo+CoreDataClass.swift</code> 和 <code>Photo+CoreDataProperties.swift</code>两个文件。Xcode根据CoreData实体的定义生成<code>Photo+CoreDataProperties.swift</code>文件，因此不要直接修改该文件，如果CoreData实体发生变化，应当直接删除并重新生成该文件。任何自定义的属性和代码都应当放到<code>Photo+CoreDataClass.swift</code>中。</p>
+<p><code>Photo+CoreDataProperties.swift</code>的内容如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import Foundation</span><br><span class="line">import CoreData</span><br><span class="line"></span><br><span class="line">extension Photo &#123;</span><br><span class="line"></span><br><span class="line">    @nonobjc public <span class="keyword">class</span> func fetchRequest() -&gt; <span class="built_in">NSFetchRequest</span>&lt;Photo&gt; &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">NSFetchRequest</span>&lt;Photo&gt;(entityName: <span class="string">"Photo"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @<span class="built_in">NSManaged</span> public var photoID: String?</span><br><span class="line">    @<span class="built_in">NSManaged</span> public var title: String?</span><br><span class="line">    @<span class="built_in">NSManaged</span> public var dateTaken: <span class="built_in">NSDate</span>?</span><br><span class="line">    @<span class="built_in">NSManaged</span> public var remoteURL: <span class="built_in">NSURL</span>?</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中@NSManaged关键字表示该字段来自CoreData，它的存储和实现会在运行时提供。</p>
+<h2 id="1-5-NSPersistentContainer的作用"><a href="#1-5-NSPersistentContainer的作用" class="headerlink" title="1.5 NSPersistentContainer的作用"></a>1.5 NSPersistentContainer的作用</h2><p>NSPersistentContainer像是文件读写的“文件”，通过它可以加载数据：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoStore &#123;</span><br><span class="line">    ……</span><br><span class="line">    let persistentContainer: <span class="built_in">NSPersistentContainer</span> = &#123;</span><br><span class="line">        let container = <span class="built_in">NSPersistentContainer</span>(name: <span class="string">"Photorama"</span>)	<span class="comment">// name必须与CoreData文件名相同</span></span><br><span class="line">        container.loadPersistentStores&#123;(description, error) <span class="keyword">in</span>			<span class="comment">// 读取文件，这是一个异步操作</span></span><br><span class="line">            <span class="keyword">if</span> let error = error&#123;</span><br><span class="line">                print(<span class="string">"Error setting up Core Data (\(error))."</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> container</span><br><span class="line">    &#125;()</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<font color="red">问题：文件的具体位置在哪里？</font>
+
+<h2 id="1-6-NSManagedObjectContext的作用"><a href="#1-6-NSManagedObjectContext的作用" class="headerlink" title="1.6 NSManagedObjectContext的作用"></a>1.6 NSManagedObjectContext的作用</h2><p><code>viewContext</code>是<code>NSPersistentContainer</code>的一个成员变量，类型为<code>NSManagedObjectContext</code>。这很像是数据库游标的概念，是用来操作CoreData的入口。</p>
+<h2 id="1-7-怎么写入CoreData数据"><a href="#1-7-怎么写入CoreData数据" class="headerlink" title="1.7 怎么写入CoreData数据"></a>1.7 怎么写入CoreData数据</h2><p>CoreData数据的写入分两步：<br>一、将数据写入“游标”<code>viewContext</code><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> FlickrAPI &#123;</span><br><span class="line">    ……</span><br><span class="line">    private <span class="keyword">static</span> func photo(fromJSON json: [String: Any], into context: <span class="built_in">NSManagedObjectContext</span>) -&gt; Photo?&#123;</span><br><span class="line">        guard							<span class="comment">// 从json中读取一个photo对象</span></span><br><span class="line">        let photoID = json[<span class="string">"id"</span>] as? String,</span><br><span class="line">        let title = json[<span class="string">"title"</span>] as? String,</span><br><span class="line">        let dateString = json[<span class="string">"datetaken"</span>] as? String,</span><br><span class="line">        let photoURLString = json[<span class="string">"url_h"</span>] as? String,</span><br><span class="line">            let url = URL(string: photoURLString),</span><br><span class="line">            let dateTaken = dateFormatter.date(from: dateString)<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        var photo: Photo!</span><br><span class="line">        <span class="comment">// context即persistentContainer.viewContext，将这个photo对象写入CoreData</span></span><br><span class="line">        context.performAndWait&#123; </span><br><span class="line">            photo = Photo(context: context)</span><br><span class="line">            photo.title = title</span><br><span class="line">            photo.photoID = photoID</span><br><span class="line">            photo.remoteURL = url as <span class="built_in">NSURL</span></span><br><span class="line">            photo.dateTaken = dateTaken as <span class="built_in">NSDate</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> photo</span><br><span class="line">    &#125;</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这只是写入了游标，按照数据库的操作步骤，还需要把游标中的数据commit到文件。</p>
+<p>二、将“游标”保存到文件：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoStore &#123;</span><br><span class="line">    ……    </span><br><span class="line">    let persistentContainer: <span class="built_in">NSPersistentContainer</span> = &#123;</span><br><span class="line">        let container = <span class="built_in">NSPersistentContainer</span>(name: <span class="string">"Photorama"</span>)</span><br><span class="line">        container.loadPersistentStores&#123;(description, error) <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> let error = error&#123;</span><br><span class="line">                print(<span class="string">"Error setting up Core Data (\(error))."</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> container</span><br><span class="line">    &#125;()</span><br><span class="line">   ……</span><br><span class="line">    func fetchInterestingPhotoes(completion: @escaping(PhotoesResult) -&gt; Void)&#123;</span><br><span class="line">        let url = FlickrAPI.interestingPhotoesURL</span><br><span class="line">        let request = URLRequest(url: url)</span><br><span class="line">        let task = session.dataTask(with: request, completionHandler:&#123;</span><br><span class="line">            (data, response, error) -&gt; Void <span class="keyword">in</span></span><br><span class="line">		<span class="comment">// 从web server请求数据，并通过前面的FlickrAPI::photoes生成Photo对象，插入游标</span></span><br><span class="line">            var result = <span class="keyword">self</span>.processPhotoesRequest(data: data, error: error) </span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">case</span> .success = result&#123;</span><br><span class="line">                <span class="keyword">do</span>&#123;</span><br><span class="line">                    <span class="comment">// 成功读取数据后，数据都进入了游标，这里保存到文件</span></span><br><span class="line">                    try <span class="keyword">self</span>.persistentContainer.viewContext.save()	</span><br><span class="line">                &#125;catch let error&#123;</span><br><span class="line">                    result = .failure(error)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            OperationQueue.main.addOperation &#123;</span><br><span class="line">                completion(result)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">        task.resume()</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上两步就完成了数据写入游标，保存游标到文件的过程。</p>
+<h2 id="1-8-排序描述符和谓词"><a href="#1-8-排序描述符和谓词" class="headerlink" title="1.8 排序描述符和谓词"></a>1.8 排序描述符和谓词</h2><p>从CoreData读取数据也很像操作数据库，只不过数据库有SQL语句来描述要获取的数据，而CoreData是通过排序描述符和谓词。<br>排序描述符<code>sortDescriptors</code>是一个<code>NSSortDescriptor</code>数组，记录主排序规则、次排序规则以及更低一级的排序规则。相当于SQL中的order by 从句<br>谓词则用来描述查询出的数据应满足的条件，相当于SQL中的where从句。<br>最后这些从句都将配置到<code>NSFetchRequest</code>对象，<code>NSFetchRequest</code>相当于完整的SQL</p>
+<h2 id="1-9-怎么从CoreData读出数据"><a href="#1-9-怎么从CoreData读出数据" class="headerlink" title="1.9 怎么从CoreData读出数据"></a>1.9 怎么从CoreData读出数据</h2><p>一、构造NSFetchRequest实例<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let fetchRequest: <span class="built_in">NSFetchRequest</span>&lt;Photo&gt; = Photo.fetchRequest()</span><br></pre></td></tr></table></figure></p>
+<p>二、构造排序和谓词<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">let sortByDateTaken = <span class="built_in">NSSortDescriptor</span>(key: <span class="meta">#keyPath(Photo.dateTaken), ascending: true)</span></span><br><span class="line">fetchRequest.sortDescriptors = [sortByDateTaken]</span><br><span class="line">let predicate = <span class="built_in">NSPredicate</span>(format: <span class="string">"#keyPath(Photo.photoID) == \(someIdentifier)"</span>) </span><br><span class="line">request.predicate = predicate</span><br></pre></td></tr></table></figure></p>
+<p>三、通过游标执行查询<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let viewContext = persistentContainer.viewContext   <span class="comment">// 获取游标</span></span><br><span class="line">viewContext.perform &#123;</span><br><span class="line">    <span class="keyword">do</span>&#123;</span><br><span class="line">        let allPhotoes = try viewContext.fetch(fetchRequest)  <span class="comment">// 执行查询</span></span><br><span class="line">        completion(.success(allPhotoes))</span><br><span class="line">    &#125;catch&#123;……&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-10-本章中完整的读取数据的逻辑是什么"><a href="#1-10-本章中完整的读取数据的逻辑是什么" class="headerlink" title="1.10 本章中完整的读取数据的逻辑是什么"></a>1.10 本章中完整的读取数据的逻辑是什么</h2><p>程序在初始化的时候，数据获取包含两部分：从本地CoreData中读取之前已保存的数据，从web server读取数据。<br>一、在viewDidLoad中发起数据加载<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoesViewController: <span class="built_in">UIViewController</span>, <span class="built_in">UICollectionViewDelegate</span> &#123;</span><br><span class="line">    ……</span><br><span class="line">    override func viewDidLoad() &#123;</span><br><span class="line">        <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">        ……</span><br><span class="line">        <span class="keyword">self</span>.updateDataSource()		<span class="comment">// 加载本地数据</span></span><br><span class="line">        </span><br><span class="line">        store.fetchInterestingPhotoes&#123;	<span class="comment">// 读取web server数据，存入本地</span></span><br><span class="line">            (photoesResult) -&gt; Void <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">self</span>.updateDataSource()	<span class="comment">// 再次加载本地数据</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private func updateDataSource()&#123;</span><br><span class="line">        store.fetchAllPhotoes&#123;      <span class="comment">// 从CoreData加载所有数据</span></span><br><span class="line">            (PhotoesResult) <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">switch</span> PhotoesResult&#123;</span><br><span class="line">            <span class="keyword">case</span> let .success(photoes):</span><br><span class="line">                <span class="keyword">self</span>.photoDataSource.photoes = photoes</span><br><span class="line">            <span class="keyword">case</span> .failure:</span><br><span class="line">                <span class="keyword">self</span>.photoDataSource.photoes.removeAll()</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">self</span>.collectionView.reloadSections(IndexSet(integer: <span class="number">0</span>))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在viewDidLoad中之所以重复调用<code>self.updateDataSource()</code>是因为从web server读取数据是个长程操作，因此要先从本地加载，之后从web server读完，排重后再读一次。</p>
+<p>二、在<code>photoStore.fetchAllPhotoes</code>中读取CoreData<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoStore &#123;</span><br><span class="line">    ……</span><br><span class="line">    func fetchAllPhotoes(completion: @escaping(PhotoesResult) -&gt; Void)&#123;</span><br><span class="line">        let fetchRequest: <span class="built_in">NSFetchRequest</span>&lt;Photo&gt; = Photo.fetchRequest()</span><br><span class="line">        let sortByDateTaken = <span class="built_in">NSSortDescriptor</span>(key: <span class="meta">#keyPath(Photo.dateTaken), ascending: true)</span></span><br><span class="line">        fetchRequest.sortDescriptors = [sortByDateTaken]</span><br><span class="line">        </span><br><span class="line">        let viewContext = persistentContainer.viewContext</span><br><span class="line">        viewContext.perform &#123;</span><br><span class="line">            <span class="keyword">do</span>&#123;</span><br><span class="line">                let allPhotoes = try viewContext.fetch(fetchRequest)	<span class="comment">// 从CoreData读取本地数据</span></span><br><span class="line">                completion(.success(allPhotoes))</span><br><span class="line">            &#125;catch&#123;</span><br><span class="line">                completion(.failure(error))</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>三、在<code>photoStore.fetchInterestingPhotoes</code>从web server读取数据<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoStore &#123;</span><br><span class="line">    ……</span><br><span class="line">    func fetchInterestingPhotoes(completion: @escaping(PhotoesResult) -&gt; Void)&#123;</span><br><span class="line">        let url = FlickrAPI.interestingPhotoesURL</span><br><span class="line">        let request = URLRequest(url: url)</span><br><span class="line">        let task = session.dataTask(with: request, completionHandler:&#123;</span><br><span class="line">            (data, response, error) -&gt; Void <span class="keyword">in</span></span><br><span class="line">            var result = <span class="keyword">self</span>.processPhotoesRequest(data: data, error: error) <span class="comment">// 组织request，请求json</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">case</span> .success = result&#123;</span><br><span class="line">                <span class="keyword">do</span>&#123;</span><br><span class="line">                    try <span class="keyword">self</span>.persistentContainer.viewContext.save()	<span class="comment">// 把读到的数据保存入CoreData</span></span><br><span class="line">                &#125;catch let error&#123;……&#125;</span><br><span class="line">            &#125;</span><br><span class="line">            OperationQueue.main.addOperation &#123;</span><br><span class="line">                completion(result)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">        task.resume()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private func processPhotoesRequest(data: Data?, error: Error?) -&gt;PhotoesResult&#123;</span><br><span class="line">        guard let jsonData = data <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> .failure(error!)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> FlickrAPI.photoes(fromJSON: jsonData, into: persistentContainer.viewContext)</span><br><span class="line">    &#125;</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>四、在<code>FlickrAPI.photoes</code>中将web server中读取的数据写入CoreData<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> FlickrAPI &#123;</span><br><span class="line">……</span><br><span class="line">    <span class="keyword">static</span> func photoes(fromJSON data: Data, into context: <span class="built_in">NSManagedObjectContext</span>) -&gt; PhotoesResult&#123;</span><br><span class="line">        <span class="keyword">do</span>&#123;</span><br><span class="line">            let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])</span><br><span class="line">            guard</span><br><span class="line">                let jsonDictionary = jsonObject as? [AnyHashable:Any],</span><br><span class="line">                let photoes = jsonDictionary[<span class="string">"photos"</span>] as? [String:Any],</span><br><span class="line">                let photoesArray = photoes[<span class="string">"photo"</span>] as? [[String: Any]] <span class="keyword">else</span>&#123;……&#125;</span><br><span class="line">            var finalPhotoes = [Photo]()</span><br><span class="line">            <span class="keyword">for</span> photoJSON <span class="keyword">in</span> photoesArray&#123;</span><br><span class="line">                <span class="keyword">if</span> let photo = photo(fromJSON: photoJSON, into:context)&#123;	<span class="comment">// 读取photo数组</span></span><br><span class="line">                    finalPhotoes.append(photo)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            ……</span><br><span class="line">            <span class="keyword">return</span> .success(finalPhotoes)</span><br><span class="line">        &#125;catch let error&#123;……&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private <span class="keyword">static</span> func photo(fromJSON json: [String: Any], into context: <span class="built_in">NSManagedObjectContext</span>) -&gt; Photo?&#123;</span><br><span class="line">        guard</span><br><span class="line">        let photoID = json[<span class="string">"id"</span>] as? String,</span><br><span class="line">        let title = json[<span class="string">"title"</span>] as? String,</span><br><span class="line">        let dateString = json[<span class="string">"datetaken"</span>] as? String,</span><br><span class="line">        let photoURLString = json[<span class="string">"url_h"</span>] as? String,</span><br><span class="line">            let url = URL(string: photoURLString),</span><br><span class="line">            let dateTaken = dateFormatter.date(from: dateString)<span class="keyword">else</span>&#123;……&#125;</span><br><span class="line">        <span class="comment">// 如果从web server下到的photo，本地CoreData已经存在，就不再往CoreData中保存了，避免dup</span></span><br><span class="line">        let fetchRequest: <span class="built_in">NSFetchRequest</span>&lt;Photo&gt; = Photo.fetchRequest()</span><br><span class="line">        let predicate = <span class="built_in">NSPredicate</span>(format: <span class="string">"\(#keyPath(Photo.photoID)) == \(photoID)"</span>)</span><br><span class="line">        fetchRequest.predicate = predicate</span><br><span class="line">        </span><br><span class="line">        var fetchedPhotoes: [Photo]?</span><br><span class="line">        context.performAndWait &#123;</span><br><span class="line">            fetchedPhotoes = try? fetchRequest.execute()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> let existingPhoto = fetchedPhotoes?.first&#123;</span><br><span class="line">            <span class="keyword">return</span> existingPhoto</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        var photo: Photo!</span><br><span class="line">        context.performAndWait&#123;		<span class="comment">// 将web server中读到的photo写入游标</span></span><br><span class="line">            photo = Photo(context: context)</span><br><span class="line">            photo.title = title</span><br><span class="line">            photo.photoID = photoID</span><br><span class="line">            photo.remoteURL = url as <span class="built_in">NSURL</span></span><br><span class="line">            photo.dateTaken = dateTaken as <span class="built_in">NSDate</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> photo</span><br><span class="line">    &#125;</span><br><span class="line">……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/09/2017/0809iOSProgrammingBNRG21/" rel="next" title="《iOS Programming BNRG》笔记二十一">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记二十一
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/11/2017/0811iOSProgrammingBNRG23/" rel="prev" title="《iOS Programming BNRG》笔记二十三">
+                《iOS Programming BNRG》笔记二十三 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/08/10/2017/0810iOSProgrammingBNRG22/" data-title="《iOS Programming BNRG》笔记二十二" data-url="http://palanceli.github.io/2017/08/10/2017/0810iOSProgrammingBNRG22/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-CoreData"><span class="nav-number">1.</span> <span class="nav-text">1 CoreData</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-为什么使用CoreData"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 为什么使用CoreData</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-怎么创建CoreData"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 怎么创建CoreData</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-Transformable数据类型是干嘛用的"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 Transformable数据类型是干嘛用的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-怎么为CoreData生成代码"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 怎么为CoreData生成代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-NSPersistentContainer的作用"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 NSPersistentContainer的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-NSManagedObjectContext的作用"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 NSManagedObjectContext的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-7-怎么写入CoreData数据"><span class="nav-number">1.7.</span> <span class="nav-text">1.7 怎么写入CoreData数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-8-排序描述符和谓词"><span class="nav-number">1.8.</span> <span class="nav-text">1.8 排序描述符和谓词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-9-怎么从CoreData读出数据"><span class="nav-number">1.9.</span> <span class="nav-text">1.9 怎么从CoreData读出数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-10-本章中完整的读取数据的逻辑是什么"><span class="nav-number">1.10.</span> <span class="nav-text">1.10 本章中完整的读取数据的逻辑是什么</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="广播机制,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="广播的发送始于客户端对sendBroadcast(…)的调用，该函数继承自ContextWrapper::sendBroadcast(…)。">
+<meta name="keywords" content="广播机制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="广播机制学习笔记（二）——Broadcast的发送">
+<meta property="og:url" content="http://palanceli.github.io/2017/01/01/2017/0104Broadcast2/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="广播的发送始于客户端对sendBroadcast(…)的调用，该函数继承自ContextWrapper::sendBroadcast(…)。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-14T03:46:28.786Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="广播机制学习笔记（二）——Broadcast的发送">
+<meta name="twitter:description" content="广播的发送始于客户端对sendBroadcast(…)的调用，该函数继承自ContextWrapper::sendBroadcast(…)。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/01/01/2017/0104Broadcast2/">
+
+
+
+
+
+  <title>广播机制学习笔记（二）——Broadcast的发送 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/01/01/2017/0104Broadcast2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">广播机制学习笔记（二）——Broadcast的发送</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-01T22:23:45+08:00">
+                2017-01-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">Android学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/01/01/2017/0104Broadcast2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/01/2017/0104Broadcast2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>广播的发送始于客户端对sendBroadcast(…)的调用，该函数继承自ContextWrapper::sendBroadcast(…)。<br><a id="more"></a></p>
+<h1 id="Step1-ContextWrapper-sendBroadcast-…"><a href="#Step1-ContextWrapper-sendBroadcast-…" class="headerlink" title="Step1 ContextWrapper::sendBroadcast(…)"></a>Step1 ContextWrapper::sendBroadcast(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ContextImpl.java:395</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendBroadcast</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        mBase.sendBroadcast(intent);  <span class="comment">// 🏁</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>mBase的类型为ContextImpl。</p>
+<h1 id="Step2-ContextImpl-Broadcast-…"><a href="#Step2-ContextImpl-Broadcast-…" class="headerlink" title="Step2 ContextImpl::Broadcast(…)"></a>Step2 ContextImpl::Broadcast(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ContextImpl.java:762</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendBroadcast</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        String resolvedType = intent.resolveTypeIfNeeded(getContentResolver());</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            intent.prepareToLeaveProcess();</span><br><span class="line">            ActivityManagerNative.getDefault().broadcastIntent(</span><br><span class="line">                    mMainThread.getApplicationThread(), intent, resolvedType, <span class="keyword">null</span>,</span><br><span class="line">                    Activity.RESULT_OK, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, AppOpsManager.OP_NONE, <span class="keyword">null</span>, <span class="keyword">false</span>, <span class="keyword">false</span>,</span><br><span class="line">                    getUserId()); <span class="comment">// 🏁</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step3-ActivityManagerProxy-broadcastIntent-…"><a href="#Step3-ActivityManagerProxy-broadcastIntent-…" class="headerlink" title="Step3 ActivityManagerProxy::broadcastIntent(…)"></a>Step3 ActivityManagerProxy::broadcastIntent(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityManagerNative.java:3033</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">broadcastIntent</span><span class="params">(IApplicationThread caller,</span></span></span><br><span class="line"><span class="function"><span class="params">            Intent intent, String resolvedType, IIntentReceiver resultTo,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> resultCode, String resultData, Bundle map,</span></span></span><br><span class="line"><span class="function"><span class="params">            String[] requiredPermissions, <span class="keyword">int</span> appOp, Bundle options, <span class="keyword">boolean</span> serialized,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> userId)</span> <span class="keyword">throws</span> RemoteException</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Parcel data = Parcel.obtain();</span><br><span class="line">        Parcel reply = Parcel.obtain();</span><br><span class="line">        data.writeInterfaceToken(IActivityManager.descriptor);</span><br><span class="line">        data.writeStrongBinder(caller != <span class="keyword">null</span> ? caller.asBinder() : <span class="keyword">null</span>);</span><br><span class="line">        intent.writeToParcel(data, <span class="number">0</span>);</span><br><span class="line">        data.writeString(resolvedType);</span><br><span class="line">        data.writeStrongBinder(resultTo != <span class="keyword">null</span> ? resultTo.asBinder() : <span class="keyword">null</span>);</span><br><span class="line">        data.writeInt(resultCode);</span><br><span class="line">        data.writeString(resultData);</span><br><span class="line">        data.writeBundle(map);</span><br><span class="line">        data.writeStringArray(requiredPermissions);</span><br><span class="line">        data.writeInt(appOp);</span><br><span class="line">        data.writeBundle(options);</span><br><span class="line">        data.writeInt(serialized ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">        data.writeInt(sticky ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">        data.writeInt(userId);</span><br><span class="line">        mRemote.transact(BROADCAST_INTENT_TRANSACTION, data, reply, <span class="number">0</span>);</span><br><span class="line">        reply.readException();</span><br><span class="line">        <span class="keyword">int</span> res = reply.readInt();</span><br><span class="line">        reply.recycle();</span><br><span class="line">        data.recycle();</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>它向ActivityManagerService发送一个BROADCAST_INTENT_TRANSACTION请求，以上步骤是在客户端完成的，接下来将转入ActivityManagerService。</p>
+<h1 id="Step4-ActivityManagerService-broadcastIntent-…"><a href="#Step4-ActivityManagerService-broadcastIntent-…" class="headerlink" title="Step4 ActivityManagerService::broadcastIntent(…)"></a>Step4 ActivityManagerService::broadcastIntent(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java:17001</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">broadcastIntent</span><span class="params">(IApplicationThread caller,</span></span></span><br><span class="line"><span class="function"><span class="params">            Intent intent, String resolvedType, IIntentReceiver resultTo,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> resultCode, String resultData, Bundle resultExtras,</span></span></span><br><span class="line"><span class="function"><span class="params">            String[] requiredPermissions, <span class="keyword">int</span> appOp, Bundle options,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> serialized, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> userId)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">synchronized</span>(<span class="keyword">this</span>) &#123;</span><br><span class="line">            intent = verifyBroadcastLocked(intent);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">final</span> ProcessRecord callerApp = getRecordForAppLocked(caller);</span><br><span class="line">            <span class="comment">// 获得广播发送进程的身份</span></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> callingPid = Binder.getCallingPid();</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> callingUid = Binder.getCallingUid(); </span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">long</span> origId = Binder.clearCallingIdentity();</span><br><span class="line">            <span class="comment">// 🏁处理intent描述的广播</span></span><br><span class="line">            <span class="keyword">int</span> res = broadcastIntentLocked(callerApp,</span><br><span class="line">                    callerApp != <span class="keyword">null</span> ? callerApp.info.packageName : <span class="keyword">null</span>,</span><br><span class="line">                    intent, resolvedType, resultTo, resultCode, resultData, resultExtras,</span><br><span class="line">                    requiredPermissions, appOp, <span class="keyword">null</span>, serialized, sticky,</span><br><span class="line">                    callingPid, callingUid, userId);</span><br><span class="line">            Binder.restoreCallingIdentity(origId);</span><br><span class="line">            <span class="keyword">return</span> res;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step5-ActivityManagerService-broadcastIntentLocked-…"><a href="#Step5-ActivityManagerService-broadcastIntentLocked-…" class="headerlink" title="Step5 ActivityManagerService::broadcastIntentLocked(…)"></a>Step5 ActivityManagerService::broadcastIntentLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java:16497</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">broadcastIntentLocked</span><span class="params">(ProcessRecord callerApp,</span></span></span><br><span class="line"><span class="function"><span class="params">            String callerPackage, Intent intent, String resolvedType,</span></span></span><br><span class="line"><span class="function"><span class="params">            IIntentReceiver resultTo, <span class="keyword">int</span> resultCode, String resultData,</span></span></span><br><span class="line"><span class="function"><span class="params">            Bundle resultExtras, String[] requiredPermissions, <span class="keyword">int</span> appOp, Bundle options,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> ordered, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> callingPid, <span class="keyword">int</span> callingUid, <span class="keyword">int</span> userId)</span> </span>&#123;</span><br><span class="line">        intent = <span class="keyword">new</span> Intent(intent);</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">final</span> String action = intent.getAction();</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// Add to the sticky list if requested.</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果是粘性广播，需要将它保存下来，以便后面注册接收此种类型广播的</span></span><br><span class="line">        <span class="comment">// BroadcastReceiver可以获得此广播</span></span><br><span class="line">        <span class="keyword">if</span> (sticky) &#123;</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 所有类型相同的黏性广播都保存在一个列表中，这些列表又保存在mStickBroadcasts</span></span><br><span class="line">            <span class="comment">// 中，并以广播类型为关键字。</span></span><br><span class="line">            <span class="comment">// 先根据广播类型找到匹配的广播列表</span></span><br><span class="line">            ArrayMap&lt;String, ArrayList&lt;Intent&gt;&gt; stickies = mStickyBroadcasts.get(userId);</span><br><span class="line">            <span class="keyword">if</span> (stickies == <span class="keyword">null</span>) &#123;</span><br><span class="line">                stickies = <span class="keyword">new</span> ArrayMap&lt;&gt;();</span><br><span class="line">                mStickyBroadcasts.put(userId, stickies);</span><br><span class="line">            &#125;</span><br><span class="line">            ArrayList&lt;Intent&gt; list = stickies.get(intent.getAction());</span><br><span class="line">            <span class="keyword">if</span> (list == <span class="keyword">null</span>) &#123;</span><br><span class="line">                list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">                stickies.put(intent.getAction(), list);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 再从广播列表中找到与intent一致的广播</span></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> stickiesCount = list.size();</span><br><span class="line">            <span class="keyword">int</span> i;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; stickiesCount; i++) &#123;</span><br><span class="line">                <span class="comment">// 查找是否存在于intent一致的广播</span></span><br><span class="line">                <span class="keyword">if</span> (intent.filterEquals(list.get(i))) &#123;</span><br><span class="line">                    <span class="comment">// This sticky already exists, replace it.</span></span><br><span class="line">                    list.set(i, <span class="keyword">new</span> Intent(intent));</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (i &gt;= stickiesCount) &#123;</span><br><span class="line">                list.add(<span class="keyword">new</span> Intent(intent));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[] users;</span><br><span class="line">        <span class="keyword">if</span> (userId == UserHandle.USER_ALL) &#123;</span><br><span class="line">            <span class="comment">// Caller wants broadcast to go to all started users.</span></span><br><span class="line">            users = mStartedUserArray;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Caller wants broadcast to go to one specific user.</span></span><br><span class="line">            users = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123;userId&#125;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Figure out who all will receive this broadcast.</span></span><br><span class="line">        List receivers = <span class="keyword">null</span>;  <span class="comment">// 保存静态注册的接收者</span></span><br><span class="line">        List&lt;BroadcastFilter&gt; registeredReceivers = <span class="keyword">null</span>; <span class="comment">// 保存动态注册的接收者</span></span><br><span class="line">        <span class="comment">// Need to resolve the intent to interested receivers...</span></span><br><span class="line">        <span class="keyword">if</span> ((intent.getFlags()&amp;Intent.FLAG_RECEIVER_REGISTERED_ONLY)</span><br><span class="line">                 == <span class="number">0</span>) &#123;</span><br><span class="line">            receivers = collectReceiverComponents(intent, resolvedType, callingUid, users);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (intent.getComponent() == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (userId == UserHandle.USER_ALL &amp;&amp; callingUid == Process.SHELL_UID) &#123;</span><br><span class="line">                <span class="comment">// Query one target user at a time, excluding shell-restricted users</span></span><br><span class="line">                UserManagerService ums = getUserManagerLocked();</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; users.length; i++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (ums.hasUserRestriction(</span><br><span class="line">                            UserManager.DISALLOW_DEBUGGING_FEATURES, users[i])) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    List&lt;BroadcastFilter&gt; registeredReceiversForUser =</span><br><span class="line">                            mReceiverResolver.queryIntent(intent,</span><br><span class="line">                                    resolvedType, <span class="keyword">false</span>, users[i]);</span><br><span class="line">                    <span class="keyword">if</span> (registeredReceivers == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        registeredReceivers = registeredReceiversForUser;</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (registeredReceiversForUser != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        registeredReceivers.addAll(registeredReceiversForUser);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                registeredReceivers = mReceiverResolver.queryIntent(intent,</span><br><span class="line">                        resolvedType, <span class="keyword">false</span>, userId);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 上次接收的广播还未来得及转发给接收者</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> replacePending =</span><br><span class="line">                (intent.getFlags()&amp;Intent.FLAG_RECEIVER_REPLACE_PENDING) != <span class="number">0</span>;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">int</span> NR = registeredReceivers != <span class="keyword">null</span> ? registeredReceivers.size() : <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 当前发送的广播是无序广播 &amp;&amp; 存在动态注册的接收者</span></span><br><span class="line">        <span class="keyword">if</span> (!ordered &amp;&amp; NR &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// If we are not serializing this broadcast, then send the</span></span><br><span class="line">            <span class="comment">// registered receivers separately so they don't wait for the</span></span><br><span class="line">            <span class="comment">// components to be launched.</span></span><br><span class="line">            <span class="comment">// 将intent描述的广播转发给目标接收者，由此可见动态注册的广播要比静态注册的</span></span><br><span class="line">            <span class="comment">// 优先收到无序广播</span></span><br><span class="line">            <span class="keyword">final</span> BroadcastQueue queue = broadcastQueueForIntent(intent);</span><br><span class="line">            <span class="comment">// r用来描述ActivityManagerService要执行的广播转发任务</span></span><br><span class="line">            BroadcastRecord r = <span class="keyword">new</span> BroadcastRecord(queue, intent, callerApp,</span><br><span class="line">                    callerPackage, callingPid, callingUid, resolvedType, requiredPermissions,</span><br><span class="line">                    appOp, brOptions, registeredReceivers, resultTo, resultCode, resultData,</span><br><span class="line">                    resultExtras, ordered, sticky, <span class="keyword">false</span>, userId);</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">boolean</span> replaced = replacePending &amp;&amp; queue.replaceParallelBroadcastLocked(r);</span><br><span class="line">            <span class="comment">// 如果没有需要替换的广播，则将r插入无序广播调度队列；如果有，则不再重复插入</span></span><br><span class="line">            <span class="keyword">if</span> (!replaced) &#123; </span><br><span class="line">                queue.enqueueParallelBroadcastLocked(r);</span><br><span class="line">                queue.scheduleBroadcastsLocked(); <span class="comment">// 🏁重新调度队列中的广播转发任务</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 此时，对于无序广播，已将intent所描述的广播转发给那些动态注册的接收者</span></span><br><span class="line">            registeredReceivers = <span class="keyword">null</span>;</span><br><span class="line">            NR = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 无论ActivityManagerService当前接收到的是无序广播还是有序广播，都会将</span></span><br><span class="line">        <span class="comment">// 该广播及目标接收者封装成转发任务，并添加到有序广播调度队列中。</span></span><br><span class="line">        <span class="comment">// mOrderedBroadcasts描述有序广播调度队列，其中每个转发任务的目标接收者都是按照</span></span><br><span class="line">        <span class="comment">// 优先级由高到低排列的。</span></span><br><span class="line">        <span class="comment">// Merge into one list.</span></span><br><span class="line">        <span class="keyword">int</span> ir = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 合并动态注册和静态注册的目标接收者，按照优先级从高到低排列，存放到receivers</span></span><br><span class="line">        <span class="keyword">if</span> (receivers != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">int</span> NT = receivers != <span class="keyword">null</span> ? receivers.size() : <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">int</span> it = <span class="number">0</span>;</span><br><span class="line">            ResolveInfo curt = <span class="keyword">null</span>;</span><br><span class="line">            BroadcastFilter curr = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">while</span> (it &lt; NT &amp;&amp; ir &lt; NR) &#123;</span><br><span class="line">                <span class="keyword">if</span> (curt == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    curt = (ResolveInfo)receivers.get(it);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (curr == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    curr = registeredReceivers.get(ir);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (curr.getPriority() &gt;= curt.priority) &#123;</span><br><span class="line">                    <span class="comment">// Insert this broadcast record into the final list.</span></span><br><span class="line">                    receivers.add(it, curr);</span><br><span class="line">                    ir++;</span><br><span class="line">                    curr = <span class="keyword">null</span>;</span><br><span class="line">                    it++;</span><br><span class="line">                    NT++;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// Skip to the next ResolveInfo in the final list.</span></span><br><span class="line">                    it++;</span><br><span class="line">                    curt = <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (ir &lt; NR) &#123;</span><br><span class="line">            <span class="keyword">if</span> (receivers == <span class="keyword">null</span>) &#123;</span><br><span class="line">                receivers = <span class="keyword">new</span> ArrayList();</span><br><span class="line">            &#125;</span><br><span class="line">            receivers.add(registeredReceivers.get(ir));</span><br><span class="line">            ir++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ((receivers != <span class="keyword">null</span> &amp;&amp; receivers.size() &gt; <span class="number">0</span>)</span><br><span class="line">                || resultTo != <span class="keyword">null</span>) &#123;</span><br><span class="line">            BroadcastQueue queue = broadcastQueueForIntent(intent);</span><br><span class="line">            BroadcastRecord r = <span class="keyword">new</span> BroadcastRecord(queue, intent, callerApp,</span><br><span class="line">                    callerPackage, callingPid, callingUid, resolvedType,</span><br><span class="line">                    requiredPermissions, appOp, brOptions, receivers, resultTo, resultCode,</span><br><span class="line">                    resultData, resultExtras, ordered, sticky, <span class="keyword">false</span>, userId);</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">boolean</span> replaced = replacePending &amp;&amp; queue.replaceOrderedBroadcastLocked(r);</span><br><span class="line">            <span class="keyword">if</span> (!replaced) &#123;</span><br><span class="line">                queue.enqueueOrderedBroadcastLocked(r);</span><br><span class="line">                queue.scheduleBroadcastsLocked();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 至此，ActivityManagerService就找到intent所描述的目标接收者，并分别将他们</span></span><br><span class="line">        <span class="comment">// 保存在内部无序广播调度队列mParallelBroadcasts和有序广播队列</span></span><br><span class="line">        <span class="comment">// mOrderedBroadcasts中</span></span><br><span class="line">        <span class="keyword">return</span> ActivityManager.BROADCAST_SUCCESS;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>由此可见，无论对于有序还是无序广播，都会把目标接收者保存到mOrderedBroadcasts中，对于无序广播，会再保存到mParallelBroadcasts中。</p>
+<h1 id="Step6-BroadcastQueue-scheduleBroadcastsLocked"><a href="#Step6-BroadcastQueue-scheduleBroadcastsLocked" class="headerlink" title="Step6 BroadcastQueue::scheduleBroadcastsLocked()"></a>Step6 BroadcastQueue::scheduleBroadcastsLocked()</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/BroadcastQueue.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">BroadcastQueue</span> </span>&#123;</span><br><span class="line">...</span><br><span class="line"><span class="comment">// :155</span></span><br><span class="line">    <span class="keyword">final</span> BroadcastHandler mHandler;</span><br><span class="line">...</span><br><span class="line"><span class="comment">// :346</span></span><br><span class="line"><span class="comment">// 成员变量mBroadcastsScheduled描述ActivityManagerService是否已经向它所在线程消息队列</span></span><br><span class="line"><span class="comment">// 发送了类型为BROADCAST_INTENT_MSG的消息。ActivityManagerService就是通过该消息来调度</span></span><br><span class="line"><span class="comment">// 两个队列中的广播。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleBroadcastsLocked</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// ActivityManagerService所在线程消息队列中已经存在BROADCAST_INTENT_MSG消息了</span></span><br><span class="line">        <span class="keyword">if</span> (mBroadcastsScheduled) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        mHandler.sendMessage(mHandler.obtainMessage(BROADCAST_INTENT_MSG, <span class="keyword">this</span>));</span><br><span class="line">        mBroadcastsScheduled = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>mBroadcastsScheduled的类型为BroadcastHandler。</p>
+<h1 id="Step7-BroadcastHandler-handleMessage-…"><a href="#Step7-BroadcastHandler-handleMessage-…" class="headerlink" title="Step7 BroadcastHandler::handleMessage(…)"></a>Step7 BroadcastHandler::handleMessage(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/BroadcastQueue.java:163</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">            <span class="keyword">case</span> BROADCAST_INTENT_MSG: &#123;</span><br><span class="line">                ...</span><br><span class="line">                processNextBroadcast(<span class="keyword">true</span>);  <span class="comment">// 🏁</span></span><br><span class="line">            &#125; <span class="keyword">break</span>;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step8-BroadcastQueue-processNextBroadcast-…"><a href="#Step8-BroadcastQueue-processNextBroadcast-…" class="headerlink" title="Step8 BroadcastQueue::processNextBroadcast(…)"></a>Step8 BroadcastQueue::processNextBroadcast(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/BroadcastQueue.java:639</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">processNextBroadcast</span><span class="params">(<span class="keyword">boolean</span> fromMsg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span>(mService) &#123;</span><br><span class="line">            BroadcastRecord r;</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 表示前面发送到ActivityManagerService的BROADCAST_INTENT_MSG已被处理</span></span><br><span class="line">            <span class="keyword">if</span> (fromMsg) &#123; </span><br><span class="line">                mBroadcastsScheduled = <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// First, deliver any non-serialized broadcasts right away.</span></span><br><span class="line">            <span class="comment">// 将保存在无序队列mParallelBroadcasts中的转发任务发送给接收者</span></span><br><span class="line">            <span class="keyword">while</span> (mParallelBroadcasts.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                r = mParallelBroadcasts.remove(<span class="number">0</span>); <span class="comment">// 遍历</span></span><br><span class="line">                ...</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">int</span> N = r.receivers.size();</span><br><span class="line">                ...</span><br><span class="line">                <span class="comment">// 将他所描述的无序广播发送给每一个接收者</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;N; i++) &#123;</span><br><span class="line">                    Object target = r.receivers.get(i);</span><br><span class="line">                    ...</span><br><span class="line">                    <span class="comment">// 🏁</span></span><br><span class="line">                    deliverToRegisteredReceiverLocked(r, (BroadcastFilter)target, <span class="keyword">false</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 继续处理保存在有序队列mOrderedBroadcasts中的广播</span></span><br><span class="line">            <span class="comment">// 有序队列mOrderedBroadcast描述的目标接收者有可能是静态注册，此时可能尚未</span></span><br><span class="line">            <span class="comment">// 被启动，因此ActivityManagerService将广播发送给他们处理时，首先要将它们</span></span><br><span class="line">            <span class="comment">// 启动起来</span></span><br><span class="line">            <span class="comment">// Now take care of the next serialized one...</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// If we are waiting for a process to come up to handle the next</span></span><br><span class="line">            <span class="comment">// broadcast, then do nothing at this point.  Just in case, we</span></span><br><span class="line">            <span class="comment">// check that the process we're waiting for still exists.</span></span><br><span class="line">            <span class="comment">// mPendingBroadcast描述正在等待静态注册的目标接收者启动起来的广播转发任务</span></span><br><span class="line">            <span class="keyword">if</span> (mPendingBroadcast != <span class="keyword">null</span>) &#123; <span class="comment">// 检查目标接收者所在进程是否启动</span></span><br><span class="line">                ...</span><br><span class="line">                <span class="keyword">boolean</span> isDead;</span><br><span class="line">                <span class="keyword">synchronized</span> (mService.mPidsSelfLocked) &#123;</span><br><span class="line">                    ProcessRecord proc = mService.mPidsSelfLocked.get(mPendingBroadcast.curApp.pid);</span><br><span class="line">                    isDead = proc == <span class="keyword">null</span> || proc.crashing;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (!isDead) &#123; <span class="comment">// 如果进程正在启动，则ActivityManagerService继续等待</span></span><br><span class="line">                    <span class="comment">// It's still alive, so keep waiting</span></span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;        <span class="comment">// 否则准备向目标进程发送一个广播</span></span><br><span class="line">                    ...</span><br><span class="line">                    mPendingBroadcast.state = BroadcastRecord.IDLE;</span><br><span class="line">                    mPendingBroadcast.nextReceiver = mPendingBroadcastRecvIndex;</span><br><span class="line">                    mPendingBroadcast = <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">boolean</span> looped = <span class="keyword">false</span>;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">do</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (mOrderedBroadcasts.size() == <span class="number">0</span>) &#123;</span><br><span class="line">                    ...</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                r = mOrderedBroadcasts.get(<span class="number">0</span>); <span class="comment">// 遍历有序队列</span></span><br><span class="line">                <span class="keyword">boolean</span> forceReceive = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">                ...</span><br><span class="line">                <span class="comment">// 得到r的目标接收者的个数</span></span><br><span class="line">                <span class="keyword">int</span> numReceivers = (r.receivers != <span class="keyword">null</span>) ? r.receivers.size() : <span class="number">0</span>;</span><br><span class="line">                <span class="comment">// 检查前一个接收者是否在规定时间内处理完成上一个有序广播</span></span><br><span class="line">                <span class="keyword">if</span> (mService.mProcessesReady &amp;&amp; r.dispatchTime &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">long</span> now = SystemClock.uptimeMillis();</span><br><span class="line">                    <span class="comment">// ActivityManagerService在处理广播任务时，会将当前时间记录在</span></span><br><span class="line">                    <span class="comment">// r.dispatchTime中，如果该广播不能在</span></span><br><span class="line">                    <span class="comment">// (2*BROADCAST_TIMEOUT*numReceivers)毫秒处理完</span></span><br><span class="line">                    <span class="keyword">if</span> ((numReceivers &gt; <span class="number">0</span>) &amp;&amp;</span><br><span class="line">                            (now &gt; r.dispatchTime + (<span class="number">2</span>*mTimeoutPeriod*numReceivers))) &#123;</span><br><span class="line">                        ...</span><br><span class="line">                        <span class="comment">// 强制结束</span></span><br><span class="line">                        broadcastTimeoutLocked(<span class="keyword">false</span>); <span class="comment">// forcibly finish this broadcast</span></span><br><span class="line">                        <span class="comment">// 下面两行赋值表示要继续处理有序队列</span></span><br><span class="line">                        forceReceive = <span class="keyword">true</span>;</span><br><span class="line">                        r.state = BroadcastRecord.IDLE;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 检查r是否正在处理中，如果是，则等待处理完成后在转发给下一个目标接收者</span></span><br><span class="line">                <span class="comment">// 因此直接返回</span></span><br><span class="line">                <span class="keyword">if</span> (r.state != BroadcastRecord.IDLE) &#123;</span><br><span class="line">                    ...</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 如果r已经处理完成，或者被强制结束</span></span><br><span class="line">                <span class="keyword">if</span> (r.receivers == <span class="keyword">null</span> || r.nextReceiver &gt;= numReceivers</span><br><span class="line">                        || r.resultAbort || forceReceive) &#123;</span><br><span class="line">                    <span class="comment">// No more receivers for this broadcast!  Send the final</span></span><br><span class="line">                    <span class="comment">// result if requested...</span></span><br><span class="line">                    ...</span><br><span class="line">                    <span class="comment">// 删除前面发送到ActivityManagerService的</span></span><br><span class="line">                    <span class="comment">// BROADCAST_TIMEOUT_MSG消息</span></span><br><span class="line">                    cancelBroadcastTimeoutLocked();</span><br><span class="line">                    ...</span><br><span class="line">                    <span class="comment">// ... and on to the next...</span></span><br><span class="line">                    ...</span><br><span class="line">                    mOrderedBroadcasts.remove(<span class="number">0</span>);</span><br><span class="line">                    r = <span class="keyword">null</span>;</span><br><span class="line">                    ...</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">while</span> (r == <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// r.receivers保存广播r的目标接收者列表；r.nextReceiver保存下一个接收者序号</span></span><br><span class="line">            <span class="comment">// Get the next receiver...</span></span><br><span class="line">            <span class="keyword">int</span> recIdx = r.nextReceiver++;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Keep track of when this receiver started, and make sure there</span></span><br><span class="line">            <span class="comment">// is a timeout message pending to kill it if need be.</span></span><br><span class="line">            <span class="comment">// 表示有序广播r发送给下一个目标接收者处理的时间</span></span><br><span class="line">            r.receiverTime = SystemClock.uptimeMillis();</span><br><span class="line">            <span class="keyword">if</span> (recIdx == <span class="number">0</span>) &#123; <span class="comment">// 说明广播r刚开始被处理，因此记录dispatchTime</span></span><br><span class="line">                r.dispatchTime = r.receiverTime;</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 检查ActivityManagerService是否已经向它所在线程发送了</span></span><br><span class="line">            <span class="comment">// BROADCAST_TIMEOUT_MSG消息，如果还没发送，则发送，并指定它在</span></span><br><span class="line">            <span class="comment">// mTimeoutPeriod之后处理</span></span><br><span class="line">            <span class="keyword">if</span> (! mPendingBroadcastTimeoutMessage) &#123;</span><br><span class="line">                <span class="keyword">long</span> timeoutTime = r.receiverTime + mTimeoutPeriod;</span><br><span class="line">                ...</span><br><span class="line">                setBroadcastTimeoutLocked(timeoutTime);</span><br><span class="line">            &#125;</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">final</span> Object nextReceiver = r.receivers.get(recIdx);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nextReceiver <span class="keyword">instanceof</span> BroadcastFilter) &#123;<span class="comment">// 说明是动态注册的</span></span><br><span class="line">                <span class="comment">// Simple case: this is a registered receiver who gets</span></span><br><span class="line">                <span class="comment">// a direct call.</span></span><br><span class="line">                BroadcastFilter filter = (BroadcastFilter)nextReceiver;</span><br><span class="line">                ...</span><br><span class="line">                <span class="comment">// 🏁 因为动态注册的接收者肯定已启动，直接发送即可</span></span><br><span class="line">                deliverToRegisteredReceiverLocked(r, filter, r.ordered);</span><br><span class="line">                <span class="comment">// 检查如果是无序广播</span></span><br><span class="line">                <span class="keyword">if</span> (r.receiver == <span class="keyword">null</span> || !r.ordered) &#123;</span><br><span class="line">                    <span class="comment">// The receiver has already finished, so schedule to</span></span><br><span class="line">                    <span class="comment">// process the next one.</span></span><br><span class="line">                    ...</span><br><span class="line">                    <span class="comment">// 表示无需等待它前一个接收者处理完成，就可以将该广播继续发送给</span></span><br><span class="line">                    <span class="comment">// 它下一个目标接收者</span></span><br><span class="line">                    r.state = BroadcastRecord.IDLE; </span><br><span class="line">                    scheduleBroadcastsLocked();</span><br><span class="line">                &#125; ...</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            </span><br><span class="line">            <span class="comment">// Hard case: need to instantiate the receiver, possibly</span></span><br><span class="line">            <span class="comment">// starting its application process to host it.</span></span><br><span class="line">            <span class="comment">// 如果nextReceiver类型非BroadcastFilter，说明一定是ResoveInfo</span></span><br><span class="line">            <span class="comment">// 即静态注册，故可以强制转型</span></span><br><span class="line">            ResolveInfo info =</span><br><span class="line">                (ResolveInfo)nextReceiver;</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 获取接收者的android:process属性，即进程名</span></span><br><span class="line">            String targetProcess = info.activityInfo.processName;</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 检查该进程是否已启动</span></span><br><span class="line">            <span class="comment">// Is this receiver's application already running?</span></span><br><span class="line">            ProcessRecord app = mService.getProcessRecordLocked(targetProcess,</span><br><span class="line">                    info.activityInfo.applicationInfo.uid, <span class="keyword">false</span>);</span><br><span class="line">            <span class="keyword">if</span> (app != <span class="keyword">null</span> &amp;&amp; app.thread != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123; <span class="comment">// 如果已经启动，则直接发送给它处理</span></span><br><span class="line">                    ...</span><br><span class="line">                    processCurBroadcastLocked(r, app);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) ...</span><br><span class="line"></span><br><span class="line">                <span class="comment">// If a dead object exception was thrown -- fall through to</span></span><br><span class="line">                <span class="comment">// restart the application.</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 先启动进程</span></span><br><span class="line">            <span class="keyword">if</span> ((r.curApp=mService.startProcessLocked(targetProcess,</span><br><span class="line">                    info.activityInfo.applicationInfo, <span class="keyword">true</span>,</span><br><span class="line">                    r.intent.getFlags() | Intent.FLAG_FROM_BACKGROUND,</span><br><span class="line">                    <span class="string">"broadcast"</span>, r.curComponent,</span><br><span class="line">                    (r.intent.getFlags()&amp;Intent.FLAG_RECEIVER_BOOT_UPGRADE) != <span class="number">0</span>, <span class="keyword">false</span>, <span class="keyword">false</span>))</span><br><span class="line">                            == <span class="keyword">null</span>) &#123;</span><br><span class="line">                ... <span class="comment">// 如果启动失败，则结束对广播r的处理</span></span><br><span class="line">                scheduleBroadcastsLocked();</span><br><span class="line">                r.state = BroadcastRecord.IDLE;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 表示正在等待广播r下一个目标接收者所在进程启动起来</span></span><br><span class="line">            mPendingBroadcast = r;</span><br><span class="line">            mPendingBroadcastRecvIndex = recIdx;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>假设广播r的下一个目标接收者是：(动态注册 || (静态注册 &amp;&amp; 进程已经启动起来) )那么接下来就会调用deliverToRegisteredReceiverLocked(…)将广播转发给该接收者处理。</p>
+<h1 id="Step9-BroadcastQueue-deliverToRegisteredReceiverLocked-…"><a href="#Step9-BroadcastQueue-deliverToRegisteredReceiverLocked-…" class="headerlink" title="Step9 BroadcastQueue::deliverToRegisteredReceiverLocked(…)"></a>Step9 BroadcastQueue::deliverToRegisteredReceiverLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/BroadcastQueue.java:465</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">deliverToRegisteredReceiverLocked</span><span class="params">(BroadcastRecord r,</span></span></span><br><span class="line"><span class="function"><span class="params">            BroadcastFilter filter, <span class="keyword">boolean</span> ordered)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> skip = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (filter.requiredPermission != <span class="keyword">null</span>) &#123; <span class="comment">// 需要检查发送者权限</span></span><br><span class="line">            <span class="keyword">int</span> perm = mService.checkComponentPermission(filter.requiredPermission,</span><br><span class="line">                    r.callingPid, r.callingUid, -<span class="number">1</span>, <span class="keyword">true</span>);</span><br><span class="line">            <span class="keyword">if</span> (perm != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">                ...</span><br><span class="line">                skip = <span class="keyword">true</span>;</span><br><span class="line">            &#125; ...</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 需要检查接收者权限</span></span><br><span class="line">        <span class="keyword">if</span> (!skip &amp;&amp; r.requiredPermissions != <span class="keyword">null</span> &amp;&amp; r.requiredPermissions.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; r.requiredPermissions.length; i++) &#123;</span><br><span class="line">                String requiredPermission = r.requiredPermissions[i];</span><br><span class="line">                <span class="keyword">int</span> perm = mService.checkComponentPermission(requiredPermission,</span><br><span class="line">                        filter.receiverList.pid, filter.receiverList.uid, -<span class="number">1</span>, <span class="keyword">true</span>);</span><br><span class="line">                <span class="keyword">if</span> (perm != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">                    ...</span><br><span class="line">                    skip = <span class="keyword">true</span>;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">if</span> (!skip) &#123; <span class="comment">// 成功通过了权限检查</span></span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                ...</span><br><span class="line">                <span class="comment">// 🏁将r转发给filter所描述的接收者</span></span><br><span class="line">                performReceiveLocked(filter.receiverList.app, filter.receiverList.receiver,</span><br><span class="line">                        <span class="keyword">new</span> Intent(r.intent), r.resultCode, r.resultData,</span><br><span class="line">                        r.resultExtras, r.ordered, r.initialSticky, r.userId);</span><br><span class="line">                ...</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step10-BroadcastQueue-performReceiveLocked-…"><a href="#Step10-BroadcastQueue-performReceiveLocked-…" class="headerlink" title="Step10 BroadcastQueue::performReceiveLocked(…)"></a>Step10 BroadcastQueue::performReceiveLocked(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/services/core/java/com/android/server/am/BroadcastQueue.java:445</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">performReceiveLocked</span><span class="params">(ProcessRecord app, IIntentReceiver receiver,</span></span></span><br><span class="line"><span class="function"><span class="params">    Intent intent, <span class="keyword">int</span> resultCode, String data, Bundle extras,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">boolean</span> ordered, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> sendingUser)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">    <span class="comment">// app描述目标接收者所在进程</span></span><br><span class="line">    <span class="comment">// receiver描述目标接收者</span></span><br><span class="line">    <span class="comment">// intent描述即将发送的广播</span></span><br><span class="line">    <span class="comment">// Send the intent to the receiver asynchronously using one-way binder calls.</span></span><br><span class="line">    <span class="keyword">if</span> (app != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (app.thread != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// If we have an app thread, do the call through that so it is</span></span><br><span class="line">            <span class="comment">// correctly ordered with other one-way calls.</span></span><br><span class="line">            <span class="comment">// 🏁</span></span><br><span class="line">            app.thread.scheduleRegisteredReceiver(receiver, intent, resultCode,</span><br><span class="line">                    data, extras, ordered, sticky, sendingUser, app.repProcState);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Application has died. Receiver doesn't exist.</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RemoteException(<span class="string">"app.thread must not be null"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        receiver.performReceive(intent, resultCode, data, extras, ordered,</span><br><span class="line">                sticky, sendingUser);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>app.thread是引用了运行在该进程中的一个ApplicationThread对象的Binder代理对象，其类型为ApplicationThreadProxy。</p>
+<h1 id="Step11-ApplicationThreadProxy-scheduleRegisteredReceiver-…"><a href="#Step11-ApplicationThreadProxy-scheduleRegisteredReceiver-…" class="headerlink" title="Step11 ApplicationThreadProxy::scheduleRegisteredReceiver(…)"></a>Step11 ApplicationThreadProxy::scheduleRegisteredReceiver(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ApplicationThreadNative.java:707</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ApplicationThreadProxy</span> <span class="keyword">implements</span> <span class="title">IApplicationThread</span> </span>&#123;</span><br><span class="line">...</span><br><span class="line"><span class="comment">// :1114</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleRegisteredReceiver</span><span class="params">(IIntentReceiver receiver, Intent intent,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> resultCode, String dataStr, Bundle extras, <span class="keyword">boolean</span> ordered,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> sendingUser, <span class="keyword">int</span> processState)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">        Parcel data = Parcel.obtain();</span><br><span class="line">        data.writeInterfaceToken(IApplicationThread.descriptor);</span><br><span class="line">        data.writeStrongBinder(receiver.asBinder());</span><br><span class="line">        intent.writeToParcel(data, <span class="number">0</span>);</span><br><span class="line">        data.writeInt(resultCode);</span><br><span class="line">        data.writeString(dataStr);</span><br><span class="line">        data.writeBundle(extras);</span><br><span class="line">        data.writeInt(ordered ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">        data.writeInt(sticky ? <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">        data.writeInt(sendingUser);</span><br><span class="line">        data.writeInt(processState);</span><br><span class="line">        mRemote.transact(SCHEDULE_REGISTERED_RECEIVER_TRANSACTION, data, <span class="keyword">null</span>,</span><br><span class="line">                IBinder.FLAG_ONEWAY);</span><br><span class="line">        data.recycle();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>它向发送广播消息的应用程序发送SCHEDULE_REGISTERED_RECEIVER_TRANSACTION请求，接下来转入应用程序。</p>
+<h1 id="Step12-ApplicationThread-scheduleRegisteredReceiver-…"><a href="#Step12-ApplicationThread-scheduleRegisteredReceiver-…" class="headerlink" title="Step12 ApplicationThread::scheduleRegisteredReceiver(…)"></a>Step12 ApplicationThread::scheduleRegisteredReceiver(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/ActivityThread.java:150</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ActivityThread</span> </span>&#123;</span><br><span class="line"><span class="comment">//:574</span></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationThread</span> <span class="keyword">extends</span> <span class="title">ApplicationThreadNative</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line"><span class="comment">//:893</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleRegisteredReceiver</span><span class="params">(IIntentReceiver receiver, Intent intent,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">int</span> resultCode, String dataStr, Bundle extras, <span class="keyword">boolean</span> ordered,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> sendingUser, <span class="keyword">int</span> processState)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line">            updateProcessState(processState, <span class="keyword">false</span>);</span><br><span class="line">            <span class="comment">// 🏁</span></span><br><span class="line">            receiver.performReceive(intent, resultCode, dataStr, extras, ordered,</span><br><span class="line">                    sticky, sendingUser);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>receiver指向一个InnerReceiver对象。</p>
+<h1 id="Step13-InnerReceiver-performReceive-…"><a href="#Step13-InnerReceiver-performReceive-…" class="headerlink" title="Step13 InnerReceiver::performReceive(…)"></a>Step13 InnerReceiver::performReceive(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/LoadedApk.java:786</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ReceiverDispatcher</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">InnerReceiver</span> <span class="keyword">extends</span> <span class="title">IIntentReceiver</span>.<span class="title">Stub</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> WeakReference&lt;LoadedApk.ReceiverDispatcher&gt; mDispatcher;</span><br><span class="line">        ...</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">performReceive</span><span class="params">(Intent intent, <span class="keyword">int</span> resultCode, String data,</span></span></span><br><span class="line"><span class="function"><span class="params">                Bundle extras, <span class="keyword">boolean</span> ordered, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> sendingUser)</span> </span>&#123;</span><br><span class="line">            LoadedApk.ReceiverDispatcher rd = mDispatcher.get();</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">if</span> (rd != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 🏁</span></span><br><span class="line">                rd.performReceive(intent, resultCode, data, extras,</span><br><span class="line">                        ordered, sticky, sendingUser);</span><br><span class="line">            &#125; <span class="keyword">else</span> ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step14-ReceiverDispatcher-performReceive-…"><a href="#Step14-ReceiverDispatcher-performReceive-…" class="headerlink" title="Step14 ReceiverDispatcher::performReceive(…)"></a>Step14 ReceiverDispatcher::performReceive(…)</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/LoadedApk.java:786</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ReceiverDispatcher</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line"><span class="comment">//:956</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">performReceive</span><span class="params">(Intent intent, <span class="keyword">int</span> resultCode, String data,</span></span></span><br><span class="line"><span class="function"><span class="params">                Bundle extras, <span class="keyword">boolean</span> ordered, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> sendingUser)</span> </span>&#123;</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 将intent描述的广播封装成Args对象，并发送给主线程消息队列，该消息最终由</span></span><br><span class="line">            <span class="comment">// Args.run函数来处理</span></span><br><span class="line">            Args args = <span class="keyword">new</span> Args(intent, resultCode, data, extras, ordered,</span><br><span class="line">                    sticky, sendingUser);</span><br><span class="line">            <span class="keyword">if</span> (!mActivityThread.post(args)) &#123;</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Step15-Args-run"><a href="#Step15-Args-run" class="headerlink" title="Step15 Args::run()"></a>Step15 Args::run()</h1> <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// frameworks/base/core/java/android/app/LoadedApk.java:786</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ReceiverDispatcher</span> </span>&#123;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">final</span> BroadcastReceiver mReceiver; <span class="comment">// 指向广播接收者</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">boolean</span> mRegistered; <span class="comment">// 描述mReeiver是否已经注册到ActivityManagerService</span></span><br><span class="line">...</span><br><span class="line"><span class="comment">//:837</span></span><br><span class="line"> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Args</span> <span class="keyword">extends</span> <span class="title">BroadcastReceiver</span>.<span class="title">PendingResult</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Intent mCurIntent;      <span class="comment">// 描述一个广播</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> mOrdered; <span class="comment">// mCurOrdered是否为有序广播</span></span><br><span class="line"><span class="comment">//:850</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> BroadcastReceiver receiver = mReceiver; </span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> ordered = mOrdered;  </span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">final</span> IActivityManager mgr = ActivityManagerNative.getDefault();</span><br><span class="line">        <span class="keyword">final</span> Intent intent = mCurIntent;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ...</span><br><span class="line">            receiver.onReceive(mContext, intent); <span class="comment">// 到达接收者</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) ...</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (receiver.getPendingResult() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            finish();</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/广播机制/" rel="tag"># 广播机制</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/31/2016/1121ServiceStarting2/" rel="next" title="Service启动过程学习笔记（二）——进程内绑定Service组件">
+                <i class="fa fa-chevron-left"></i> Service启动过程学习笔记（二）——进程内绑定Service组件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/01/2017/0104Broadcast1/" rel="prev" title="广播机制学习笔记（一）——BroadcastReceiver的注册">
+                广播机制学习笔记（一）——BroadcastReceiver的注册 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/01/01/2017/0104Broadcast2/" data-title="广播机制学习笔记（二）——Broadcast的发送" data-url="http://palanceli.github.io/2017/01/01/2017/0104Broadcast2/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Step1-ContextWrapper-sendBroadcast-…"><span class="nav-number">1.</span> <span class="nav-text">Step1 ContextWrapper::sendBroadcast(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step2-ContextImpl-Broadcast-…"><span class="nav-number">2.</span> <span class="nav-text">Step2 ContextImpl::Broadcast(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step3-ActivityManagerProxy-broadcastIntent-…"><span class="nav-number">3.</span> <span class="nav-text">Step3 ActivityManagerProxy::broadcastIntent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step4-ActivityManagerService-broadcastIntent-…"><span class="nav-number">4.</span> <span class="nav-text">Step4 ActivityManagerService::broadcastIntent(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step5-ActivityManagerService-broadcastIntentLocked-…"><span class="nav-number">5.</span> <span class="nav-text">Step5 ActivityManagerService::broadcastIntentLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step6-BroadcastQueue-scheduleBroadcastsLocked"><span class="nav-number">6.</span> <span class="nav-text">Step6 BroadcastQueue::scheduleBroadcastsLocked()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step7-BroadcastHandler-handleMessage-…"><span class="nav-number">7.</span> <span class="nav-text">Step7 BroadcastHandler::handleMessage(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step8-BroadcastQueue-processNextBroadcast-…"><span class="nav-number">8.</span> <span class="nav-text">Step8 BroadcastQueue::processNextBroadcast(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step9-BroadcastQueue-deliverToRegisteredReceiverLocked-…"><span class="nav-number">9.</span> <span class="nav-text">Step9 BroadcastQueue::deliverToRegisteredReceiverLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step10-BroadcastQueue-performReceiveLocked-…"><span class="nav-number">10.</span> <span class="nav-text">Step10 BroadcastQueue::performReceiveLocked(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step11-ApplicationThreadProxy-scheduleRegisteredReceiver-…"><span class="nav-number">11.</span> <span class="nav-text">Step11 ApplicationThreadProxy::scheduleRegisteredReceiver(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step12-ApplicationThread-scheduleRegisteredReceiver-…"><span class="nav-number">12.</span> <span class="nav-text">Step12 ApplicationThread::scheduleRegisteredReceiver(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step13-InnerReceiver-performReceive-…"><span class="nav-number">13.</span> <span class="nav-text">Step13 InnerReceiver::performReceive(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step14-ReceiverDispatcher-performReceive-…"><span class="nav-number">14.</span> <span class="nav-text">Step14 ReceiverDispatcher::performReceive(…)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Step15-Args-run"><span class="nav-number">15.</span> <span class="nav-text">Step15 Args::run()</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章解决了当屏幕旋转时，因activity被销毁而导致的数据丢失问题。本章要点：  Activity的生命周期即关键回调 在不同情境下，当Activity退出时，保存/恢复数据的方法 在屏幕旋转、按下Home、按下Back等情景下，Activity的生命周期经历了什么">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记三">
+<meta property="og:url" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章解决了当屏幕旋转时，因activity被销毁而导致的数据丢失问题。本章要点：  Activity的生命周期即关键回调 在不同情境下，当Activity退出时，保存/恢复数据的方法 在屏幕旋转、按下Home、按下Back等情景下，Activity的生命周期经历了什么">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img05.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img07.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img08.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img09.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img10.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img11.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img04.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.070Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记三">
+<meta name="twitter:description" content="本章解决了当屏幕旋转时，因activity被销毁而导致的数据丢失问题。本章要点：  Activity的生命周期即关键回调 在不同情境下，当Activity退出时，保存/恢复数据的方法 在屏幕旋转、按下Home、按下Back等情景下，Activity的生命周期经历了什么">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记三 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记三</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-16T21:00:00+08:00">
+                2017-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG03/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/16/2017/1016AndroidProgrammingBNRG03/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章解决了当屏幕旋转时，因activity被销毁而导致的数据丢失问题。<br>本章要点：</p>
+<ul>
+<li>Activity的生命周期即关键回调</li>
+<li>在不同情境下，当Activity退出时，保存/恢复数据的方法</li>
+<li>在屏幕旋转、按下Home、按下Back等情景下，Activity的生命周期经历了什么<a id="more"></a>
+<h1 id="Activity的生命周期"><a href="#Activity的生命周期" class="headerlink" title="Activity的生命周期"></a>Activity的生命周期</h1><h2 id="Activity的状态迁移图"><a href="#Activity的状态迁移图" class="headerlink" title="Activity的状态迁移图"></a>Activity的状态迁移图</h2><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img01.png" alt><br>在某一时刻，系统只有一个Activity可以出于Resumed状态。</li>
+</ul>
+<h2 id="在onCreate-…-中经常做的事情"><a href="#在onCreate-…-中经常做的事情" class="headerlink" title="在onCreate(…)中经常做的事情"></a>在onCreate(…)中经常做的事情</h2><ul>
+<li>在setContentView(…)函数中，从xml读取并创建控件，把它们呈现在屏幕上</li>
+<li>提领前一步创建的控件</li>
+<li>为控件设置listener，以响应交互</li>
+<li>连接model</li>
+</ul>
+<h2 id="生命周期回调函数的基类函数都做了什么？"><a href="#生命周期回调函数的基类函数都做了什么？" class="headerlink" title="生命周期回调函数的基类函数都做了什么？"></a>生命周期回调函数的基类函数都做了什么？</h2><p>onCreate(…)<br>onStart()<br>onResume()<br>onPause()<br>onStop()<br>onDestroy()<br>这几个函数称为Activity的生命周期回调函数，这些函数不应由开发者调用，而是由系统调用，它们的调用时机在前面的状态迁移图中标出。在实现这些函数的时候，第一行要首先调用基类的同名函数，如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;    </span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<font color="red">这些基类的同名函数都做了什么？</font>
+
+<h2 id="Back和Home的不同含义"><a href="#Back和Home的不同含义" class="headerlink" title="Back和Home的不同含义"></a>Back和Home的不同含义</h2><p>Android手机底部三个按钮：◁ ○ □ 的名称分别为Back、Home、Recent。Back和Home都会让当前的activity退出，但它们的含义和具体执行的回调是不同的。<br>Back的含义：该activity的工作已经完成，我不再需要它了。它会导致onPause()、onStop()、onDestroy()回调，让activity进入nonexistent状态，它被从内存中清理掉了。<br>Home的含义：我要临时转到别的地方，很快还会回来。它会导致onPause()、onStop()回调，让activity进入Stopped状态，它还在内存中。</p>
+<h2 id="当activity处于paused状态时，什么时候部分可见，什么时候全部可见？"><a href="#当activity处于paused状态时，什么时候部分可见，什么时候全部可见？" class="headerlink" title="当activity处于paused状态时，什么时候部分可见，什么时候全部可见？"></a>当activity处于paused状态时，什么时候部分可见，什么时候全部可见？</h2><p>当一个背景透明的activity或者尺寸比屏幕小的activity启动成为顶层activity时，原先的顶层activity就会处于paused并且部分可见。<br>在多窗口模式下（Android 6.0及以后版本支持），当用户和其它窗口中的activity交互式，原先的activity就处于paused状态，并且全部可见。</p>
+<font color="red">如何实现这些效果？</font>
+
+<h1 id="旋转屏幕会发生什么？"><a href="#旋转屏幕会发生什么？" class="headerlink" title="旋转屏幕会发生什么？"></a>旋转屏幕会发生什么？</h1><p>当屏幕发生旋转，通过log会发现onPause()、onStop()、onDestroy()、onCreate()、oonStart()、onResume()被调用了，也就是说activity被先销毁再重新创建了！只是旋转一下屏幕，为什么这么大动静呢？</p>
+<p>当设备配置发生变化时，可能会有更适合新配置的资源可以利用，因此Android会销毁掉activity，寻找更适合新的设备配置的资源，重建activity。</p>
+<h2 id="什么是设备配置？"><a href="#什么是设备配置？" class="headerlink" title="什么是设备配置？"></a>什么是设备配置？</h2><p>设备配置（device configuration）是描述设备当前状态的一套参数，包括屏幕方向、屏幕密度、屏幕尺寸、键盘类型、dock mode、语言等等。有些参数是固定的，比如屏幕密度，有一些是可变的，例如屏幕方向。当这类可变的设备配置发生变化时，Android就会重建当前的activity。</p>
+<h2 id="怎么创建横屏布局？"><a href="#怎么创建横屏布局？" class="headerlink" title="怎么创建横屏布局？"></a>怎么创建横屏布局？</h2><p>系统默认的布局文件放在res/layout下，还可以创建res/layout-land或res/layout-port。<br>-land 后缀和-?dpi类似，是另一种与设备配置相关的资源后缀。参见<a href="https://developer.android.com/guide/topics/resources/providing-resources.html" target="_blank" rel="noopener">API指南之应用资源</a>可以找到所有设备配置相关的后缀命名规范。<br>-land表示横屏；-port表示竖屏。当屏幕方向发生变化时，Android会去res/ayout-land或res/layout-port找资源，如果找不到才去res/layout。</p>
+<p>具体步骤：<br>在Project窗口中，找到app/src/main/res，右键 &gt; New &gt; Android resource directory：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img05.png" alt><br>在弹出的面板中选择Available qualifiers=Orientation，填写Directory name，选择Resource type=layout：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img06.png" alt><br>点击&gt;&gt;按钮，在弹出面板中填写Directory name，选择Screen orientation=Landscape：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img07.png" alt><br>点击OK，Android Studio会创建目录：app/src/main/res/layout-land/<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img08.png" alt><br>将res/layout下的布局文件拷贝到res/layout-land下，修改横屏版的布局文件，即可在横屏发生时生效。</p>
+<h2 id="旋转屏幕时，重建前保存数据"><a href="#旋转屏幕时，重建前保存数据" class="headerlink" title="旋转屏幕时，重建前保存数据"></a>旋转屏幕时，重建前保存数据</h2><p>前面已经讲过，旋转屏幕会导致activity重建，这会导致业务数据重置。例如当前正在第2个问题，旋转屏幕后，变成第1个了。必须在旋转屏幕时，重建activity之前保存数据，重建后恢复数据。<br>可以覆盖<code>Activity::onSaveInstanceState(Bundle)</code>来完成该任务，该函数是在onStop()前被调用的。本章中的具体代码如下。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QuizActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;    </span><br><span class="line">    ...    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mCurrentIndex = <span class="number">0</span>;    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"QuizActivity"</span>;   </span><br><span class="line">    <span class="comment">// 定义mCurrentIndex保存的key </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_INDEX = <span class="string">"index"</span>; 	    </span><br><span class="line">    <span class="meta">@Override</span>    </span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;        </span><br><span class="line">        ...        </span><br><span class="line">        <span class="keyword">if</span>(savedInstanceState != <span class="keyword">null</span>)&#123;	<span class="comment">// 启动时读取            </span></span><br><span class="line">            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, <span class="number">0</span>);        </span><br><span class="line">        &#125;        </span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSaveInstanceState</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;        </span><br><span class="line">        ...			        <span class="comment">// 退出前写回        </span></span><br><span class="line">        savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<font color="red">通过savedInstanceState把数据写到哪了？</font>
+
+<p>注意：<code>onCreate(Bundle savedInstanceState)</code>的参数，如果是转屏导致activity重建，系统会传入该参数，该参数保存了activity重建前的数据；如果是通过Back按钮退出应用，再重新进入应用，该参数为null。这符合Back按钮的定义。</p>
+<h2 id="activity退出前的数据保存策略"><a href="#activity退出前的数据保存策略" class="headerlink" title="activity退出前的数据保存策略"></a>activity退出前的数据保存策略</h2><p>当系统其它的运行时配置发生变化而导致Activity被重建时，都可以使用<code>onSaveInstanceState(...)</code>来保存数据；当用户暂时导航到其它界面，Activity被暂时换到后台，此时系统回收内存导致Activity被销毁时，系统也会调用<code>onSaveInstanceState(...)</code>函数。当这些情况发生时，Activity调用了<code>onSaveInstanceState(...)</code>函数后会进入Stashed状态：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img09.png" alt></p>
+<p>在函数<code>onSaveInstanceState(...)</code>中，数据被保存到<code>Bundle</code>对象中，该对象被系统保存到Activity的<code>activity record</code>中。进入Stashed状态后，Activity就被销毁了，但是<code>activity record</code>仍然存在，系统可以通过它复活Activity。</p>
+<p>需要注意：Activity可能不会调用<code>onDestroy()</code>函数而直接进入Stashed状态，也就是说在<code>onDestroy()</code>中完成Activity退出时的数据保存是不可靠的，应当在<code>onStop()</code>中完成。</p>
+<p>那么<code>onSaveInstanceState(...)</code>和<code>onStop()</code>作为退出时数据保存的时机有什么差别呢？通常<code>onSaveInstanceState(...)</code>保存的是小的瞬态数据，比如当前所在界面；后者保存业务相关的永久性数据，比如用户当前正在编辑的文本。</p>
+<h2 id="activity-record在什么时候消失？"><a href="#activity-record在什么时候消失？" class="headerlink" title="activity record在什么时候消失？"></a>activity record在什么时候消失？</h2><p>activity record数据只是瞬态信息，而不是永久数据，系统可能会清除该数据。当用户点击Back按钮，或者系统重启，都会导致该数据被清除。</p>
+<h2 id="系统回收内存的机制"><a href="#系统回收内存的机制" class="headerlink" title="系统回收内存的机制"></a>系统回收内存的机制</h2><p>当出现低内存时，系统回收内存的单位不是activity，而是整个进程。拥有前台（resumed）activity或者可见（paused）activity的进程具有较高的优先级。系统清理资源的时候会选择低优先级的进程。对于前台/可见进程，除非发生了严重的错误，否则系统不会回收它们。</p>
+<h2 id="让应用退出时即销毁"><a href="#让应用退出时即销毁" class="headerlink" title="让应用退出时即销毁"></a>让应用退出时即销毁</h2><p>需要开启开发者模式：设置 &gt; 最下面的关于 &gt; 版本号 连续点击：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img10.png" alt><br>进入开发者选项，找到“不保留活动”，打开。这样当使用Home键退出activity时就和Back一样了：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img11.png" alt><br>这个选项的用处并不是很大，因为要模拟这种情况只需要使用Back键即可，平时应关闭该选项，因为它会拖累性能。</p>
+<h1 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h1><h2 id="关键字-Override的作用"><a href="#关键字-Override的作用" class="headerlink" title="关键字@Override的作用"></a>关键字@Override的作用</h2><p><code>@Override</code>的作用是告诉编译器：这是该类已经存在的方法，如果编译器找不到就会发出警告。这有助于发现笔误。</p>
+<h2 id="关键字final的作用？"><a href="#关键字final的作用？" class="headerlink" title="关键字final的作用？"></a>关键字final的作用？</h2><font color="red">关键字final的作用？</font>
+
+<h2 id="设置Logcat过滤器"><a href="#设置Logcat过滤器" class="headerlink" title="设置Logcat过滤器"></a>设置Logcat过滤器</h2><p>在AndroidStudio中选择Android Monitor &gt; logcat &gt; Edit Filter Configuation<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img02.png" alt><br>在弹出的面板中设置Log Tag关键字：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img03.png" alt><br>之后Log就只剩下与关键字匹配的内容：<br><img src="/2017/10/16/2017/1016AndroidProgrammingBNRG03/img04.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG02/" rel="next" title="《Android Programming BNRG》笔记二">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记二
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/16/2017/1016AndroidProgrammingBNRG04/" rel="prev" title="《Android Programming BNRG》笔记四">
+                《Android Programming BNRG》笔记四 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/10/16/2017/1016AndroidProgrammingBNRG03/" data-title="《Android Programming BNRG》笔记三" data-url="http://palanceli.github.io/2017/10/16/2017/1016AndroidProgrammingBNRG03/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Activity的生命周期"><span class="nav-number">1.</span> <span class="nav-text">Activity的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Activity的状态迁移图"><span class="nav-number">1.1.</span> <span class="nav-text">Activity的状态迁移图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在onCreate-…-中经常做的事情"><span class="nav-number">1.2.</span> <span class="nav-text">在onCreate(…)中经常做的事情</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期回调函数的基类函数都做了什么？"><span class="nav-number">1.3.</span> <span class="nav-text">生命周期回调函数的基类函数都做了什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Back和Home的不同含义"><span class="nav-number">1.4.</span> <span class="nav-text">Back和Home的不同含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#当activity处于paused状态时，什么时候部分可见，什么时候全部可见？"><span class="nav-number">1.5.</span> <span class="nav-text">当activity处于paused状态时，什么时候部分可见，什么时候全部可见？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#旋转屏幕会发生什么？"><span class="nav-number">2.</span> <span class="nav-text">旋转屏幕会发生什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是设备配置？"><span class="nav-number">2.1.</span> <span class="nav-text">什么是设备配置？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么创建横屏布局？"><span class="nav-number">2.2.</span> <span class="nav-text">怎么创建横屏布局？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#旋转屏幕时，重建前保存数据"><span class="nav-number">2.3.</span> <span class="nav-text">旋转屏幕时，重建前保存数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#activity退出前的数据保存策略"><span class="nav-number">2.4.</span> <span class="nav-text">activity退出前的数据保存策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#activity-record在什么时候消失？"><span class="nav-number">2.5.</span> <span class="nav-text">activity record在什么时候消失？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统回收内存的机制"><span class="nav-number">2.6.</span> <span class="nav-text">系统回收内存的机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#让应用退出时即销毁"><span class="nav-number">2.7.</span> <span class="nav-text">让应用退出时即销毁</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其它"><span class="nav-number">3.</span> <span class="nav-text">其它</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关键字-Override的作用"><span class="nav-number">3.1.</span> <span class="nav-text">关键字@Override的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关键字final的作用？"><span class="nav-number">3.2.</span> <span class="nav-text">关键字final的作用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置Logcat过滤器"><span class="nav-number">3.3.</span> <span class="nav-text">设置Logcat过滤器</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

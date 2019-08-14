@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章把读取到的图片通过CollectionView展现到界面上。本章要点：  Collection Views 扩展">
+<meta name="keywords" content="iOS BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《iOS Programming BNRG》笔记二十一">
+<meta property="og:url" content="http://palanceli.github.io/2017/08/09/2017/0809iOSProgrammingBNRG21/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章把读取到的图片通过CollectionView展现到界面上。本章要点：  Collection Views 扩展">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/08/09/2017/0809iOSProgrammingBNRG21/img01.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.024Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《iOS Programming BNRG》笔记二十一">
+<meta name="twitter:description" content="本章把读取到的图片通过CollectionView展现到界面上。本章要点：  Collection Views 扩展">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/08/09/2017/0809iOSProgrammingBNRG21/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/08/09/2017/0809iOSProgrammingBNRG21/">
+
+
+
+
+
+  <title>《iOS Programming BNRG》笔记二十一 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/08/09/2017/0809iOSProgrammingBNRG21/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《iOS Programming BNRG》笔记二十一</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-09T23:00:00+08:00">
+                2017-08-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/09/2017/0809iOSProgrammingBNRG21/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/09/2017/0809iOSProgrammingBNRG21/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章把读取到的图片通过CollectionView展现到界面上。<br>本章要点：</p>
+<ul>
+<li>Collection Views</li>
+<li>扩展<a id="more"></a>
+</li>
+</ul>
+<h1 id="1-CollectionView"><a href="#1-CollectionView" class="headerlink" title="1 CollectionView"></a>1 CollectionView</h1><h2 id="1-1-CollectionView的使用框架"><a href="#1-1-CollectionView的使用框架" class="headerlink" title="1.1 CollectionView的使用框架"></a>1.1 CollectionView的使用框架</h2><p>和UITableView类似，CollectionView的数据来自UICollectionViewDataSource。<br>在本章，这个DataSource不再是VC，而是独立的类。这样做的好处是增加了一层抽象层，未来如果数据长在其它的VC上，可以直接拿去复用。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> PhotoesViewController: <span class="built_in">UIViewController</span> &#123;</span><br><span class="line">    @IBOutlet var collectionView: <span class="built_in">UICollectionView</span>!</span><br><span class="line">    var store: PhotoStore!</span><br><span class="line">    let photoDataSource = PhotoDataSource()</span><br><span class="line">    </span><br><span class="line">    override func viewDidLoad() &#123;</span><br><span class="line">        <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">        <span class="comment">// 设置dataSource</span></span><br><span class="line">        collectionView.dataSource = photoDataSource	</span><br><span class="line">        ……</span><br><span class="line">    &#125;</span><br><span class="line">    ……</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CollectionViewDataSource必须实现两个接口，返回数据的个数以及制定位置的数据</span></span><br><span class="line"><span class="keyword">class</span> PhotoDataSource: <span class="built_in">NSObject</span>, <span class="built_in">UICollectionViewDataSource</span> &#123;</span><br><span class="line">    var photoes = [Photo]()</span><br><span class="line">    </span><br><span class="line">    func collectionView(_ collectionView: <span class="built_in">UICollectionView</span>, numberOfItemsInSection section: Int) -&gt; Int&#123;</span><br><span class="line">        <span class="keyword">return</span> photoes.count</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    func collectionView(_ collectionView: <span class="built_in">UICollectionView</span>, cellForItemAt indexPath: IndexPath) -&gt; <span class="built_in">UICollectionViewCell</span> &#123;</span><br><span class="line">        let identifier = <span class="string">"UICollectionViewCell"</span></span><br><span class="line">        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, <span class="keyword">for</span>: indexPath)</span><br><span class="line">        <span class="keyword">return</span> cell</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<font color="red">什么情况下使用override关键字？难道这些接口不是重载么？为什么没有加override关键字？</font>
+
+<h2 id="1-2-CollectionView的几个和布局相关的属性"><a href="#1-2-CollectionView的几个和布局相关的属性" class="headerlink" title="1.2 CollectionView的几个和布局相关的属性"></a>1.2 CollectionView的几个和布局相关的属性</h2><p><img src="/2017/08/09/2017/0809iOSProgrammingBNRG21/img01.png" alt></p>
+<h2 id="1-3-collectionView-和collectionView-是什么关系？"><a href="#1-3-collectionView-和collectionView-是什么关系？" class="headerlink" title="1.3 collectionView 和collectionView 是什么关系？"></a>1.3 collectionView 和collectionView 是什么关系？</h2><p><code>collectiononView(_:willDiaplay:forItemAt:)</code>是<code>UICollectionViewDelegate</code>方法，当某个位置的cell即将划入屏幕的时候会被调用；<br><code>collectionView(_:cellForItemAt:)</code>是<code>UICollectionViewDataSource</code>的方法，当需要显示某个位置的数据时被调用。<br>我怎么觉得这两个是一回事呢？下文回答这个问题。</p>
+<h2 id="1-4-为什么添加了collectionView-willDisplay-forItemAt-就显示出图片了？"><a href="#1-4-为什么添加了collectionView-willDisplay-forItemAt-就显示出图片了？" class="headerlink" title="1.4 为什么添加了collectionView(_:willDisplay:forItemAt:)就显示出图片了？"></a>1.4 为什么添加了collectionView(_:willDisplay:forItemAt:)就显示出图片了？</h2><p>在collectionView(_:cellForItemAt:)中仅仅从队列中取出cell对象：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">func collectionView(_ collectionView: <span class="built_in">UICollectionView</span>, cellForItemAt indexPath: IndexPath) -&gt; <span class="built_in">UICollectionViewCell</span> &#123;</span><br><span class="line">    let identifier = <span class="string">"UICollectionViewCell"</span></span><br><span class="line">    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, <span class="keyword">for</span>: indexPath) as! PhotoCollectionViewCell</span><br><span class="line">    <span class="keyword">return</span> cell</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>把每个格子想象成一个集装箱，这个函数只是集装箱体，使用了可重用的集装箱体可以节省箱体的资源。到此为止，这与箱体里面装什么无关。有了箱体之后还要往里面放满货物，这是<code>collectionView(_:willDisplay:forItemAt:)</code>做的事情：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">func collectionView(_ collectionView: <span class="built_in">UICollectionView</span>, willDisplay cell: <span class="built_in">UICollectionViewCell</span>, forItemAt indexPath: IndexPath)&#123;</span><br><span class="line">    let photo = photoDataSource.photoes[indexPath.row]</span><br><span class="line">    </span><br><span class="line">    store.fetchImage(<span class="keyword">for</span>: photo)&#123;(result) -&gt; Void <span class="keyword">in</span></span><br><span class="line">        </span><br><span class="line">        guard let photoIndex = <span class="keyword">self</span>.photoDataSource.photoes.index(of: photo),</span><br><span class="line">            <span class="keyword">case</span> let .success(image) = result <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">        &#125;</span><br><span class="line">        let photoIndexPath = IndexPath(item: photoIndex, section: <span class="number">0</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> let cell = <span class="keyword">self</span>.collectionView.cellForItem(at: photoIndexPath) as? PhotoCollectionViewCell&#123;</span><br><span class="line">            cell.update(with: image)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>他不关心箱体从哪来的，只负责往箱体里面装满货物。这就回答了1.3的疑问，这两个函数之间是有先后关系的，显然要先提供箱体，再装满货物。</p>
+<font color="red">我的问题：这里把提供箱体和装货分开做的目的是为了让格子在被看到的时候才触发下载，以节省流量；在第10章中是在提供箱体的时候就同时装货了。但是我觉得在本章中分离并没有起到这个目的呢？提供箱体本来就是在即将展现的时候才被请求的，所以在提供箱体的时候装货应该就能满足需求吧？</font>
+
+<h2 id="1-5-switch…case的另一种用法"><a href="#1-5-switch…case的另一种用法" class="headerlink" title="1.5 switch…case的另一种用法"></a>1.5 switch…case的另一种用法</h2><p>1.4中的代码<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">case</span> let .success(image) = result &#123;</span><br><span class="line">    photo.image = image</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>等价于<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> result &#123;</span><br><span class="line"><span class="keyword">case</span> let .success(image):</span><br><span class="line">    photo.image = image</span><br><span class="line"><span class="keyword">case</span> .failure:</span><br><span class="line">    <span class="keyword">break</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-6-CollectionViewCell的重置时机"><a href="#1-6-CollectionViewCell的重置时机" class="headerlink" title="1.6 CollectionViewCell的重置时机"></a>1.6 CollectionViewCell的重置时机</h2><p>有两个重置相关的时机：</p>
+<ul>
+<li><p>首次创建，此时会伴随调用</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">override func awakeFromNib()&#123;</span><br><span class="line">    <span class="keyword">super</span>.awakeFromNib()</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>CollectionViewCell被重用，此时会伴随调用</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">override func prepareForReuse()&#123;</span><br><span class="line">    <span class="keyword">super</span>.prepareForReuse()</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<font color="red">我的问题：被重用应该是个数据层的操作，怎么会通过framework层的调用通知到cell呢？重用是通过出队
+`collectionView.dequeueReusableCell(withReuseIdentifier: for: )`
+来完成的，我猜测应该是在这个函数内部调用了`prepareForReuse()`？ </font>
+
+<h2 id="1-7-回顾页面跳转是怎么完成的"><a href="#1-7-回顾页面跳转是怎么完成的" class="headerlink" title="1.7 回顾页面跳转是怎么完成的"></a>1.7 回顾页面跳转是怎么完成的</h2><p>在前面的章节中已经使用过segue，本章中点击了网格图片后会显示大图。这里简单回顾，步骤如下：</p>
+<ol>
+<li>在InterfaceBuilder中，添加VC并在上面添加ImageView</li>
+<li>在InterfaceBuilder中，从CollectionViewCell Ctrl拖拽到一中创建的VC，在弹出的面板中选择show，这就创建了一个segue</li>
+<li>选中segue，设置它的identifier为showPhoto</li>
+<li>在segue发生的起点VC中覆盖prepare(for: sender:)函数，把被点击的图片信息传给segue的目的VC</li>
+<li>在segue的目的VC中完成初始化</li>
+</ol>
+<h1 id="2-扩展"><a href="#2-扩展" class="headerlink" title="2 扩展"></a>2 扩展</h1><h2 id="2-1-扩展的目的和适用范围"><a href="#2-1-扩展的目的和适用范围" class="headerlink" title="2.1 扩展的目的和适用范围"></a>2.1 扩展的目的和适用范围</h2><p>通过扩展可以将若干个功能归拢到一个逻辑单元。它不仅可以用来扩展你自己的数据类型，也可以用来扩展系统或者别的framework提供的数据类型，即使你不拥有这个数据类型的源代码。</p>
+<p>书中P644：扩展可以适用于类、结构和枚举，可以给它们添加<font color="red">计算属性（computed properites）</font>、方法、协议，但是不能添加<font color="red">存储属性（stored properties）。<br>什么是计算属性，什么是存储属性？</font></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS-BNRG笔记/" rel="tag"># iOS BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/08/2017/0808iOSProgrammingBNRG20/" rel="next" title="《iOS Programming BNRG》笔记二十">
+                <i class="fa fa-chevron-left"></i> 《iOS Programming BNRG》笔记二十
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/10/2017/0810iOSProgrammingBNRG22/" rel="prev" title="《iOS Programming BNRG》笔记二十二">
+                《iOS Programming BNRG》笔记二十二 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/08/09/2017/0809iOSProgrammingBNRG21/" data-title="《iOS Programming BNRG》笔记二十一" data-url="http://palanceli.github.io/2017/08/09/2017/0809iOSProgrammingBNRG21/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-CollectionView"><span class="nav-number">1.</span> <span class="nav-text">1 CollectionView</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-CollectionView的使用框架"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 CollectionView的使用框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-CollectionView的几个和布局相关的属性"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 CollectionView的几个和布局相关的属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-collectionView-和collectionView-是什么关系？"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 collectionView 和collectionView 是什么关系？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-为什么添加了collectionView-willDisplay-forItemAt-就显示出图片了？"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 为什么添加了collectionView(_:willDisplay:forItemAt:)就显示出图片了？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-switch…case的另一种用法"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 switch…case的另一种用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-CollectionViewCell的重置时机"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 CollectionViewCell的重置时机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-7-回顾页面跳转是怎么完成的"><span class="nav-number">1.7.</span> <span class="nav-text">1.7 回顾页面跳转是怎么完成的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-扩展"><span class="nav-number">2.</span> <span class="nav-text">2 扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-扩展的目的和适用范围"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 扩展的目的和适用范围</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

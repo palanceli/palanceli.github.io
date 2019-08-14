@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android BNRG笔记,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本章引入随Google Play Services带的LocationService，使用地理位置信息，并向Flickr请求和位置信息相关的图片。本章要点：  Google Play Services LocationService，申请权限，请求服务，使用结果 在模拟器上模拟位置变化">
+<meta name="keywords" content="Android BNRG笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Android Programming BNRG》笔记三十三">
+<meta property="og:url" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="本章引入随Google Play Services带的LocationService，使用地理位置信息，并向Flickr请求和位置信息相关的图片。本章要点：  Google Play Services LocationService，申请权限，请求服务，使用结果 在模拟器上模拟位置变化">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/img01.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/img02.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/img03.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/img04.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/img06.png">
+<meta property="og:image" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/img07.png">
+<meta property="og:updated_time" content="2019-08-14T03:46:29.168Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Android Programming BNRG》笔记三十三">
+<meta name="twitter:description" content="本章引入随Google Play Services带的LocationService，使用地理位置信息，并向Flickr请求和位置信息相关的图片。本章要点：  Google Play Services LocationService，申请权限，请求服务，使用结果 在模拟器上模拟位置变化">
+<meta name="twitter:image" content="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/img01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/">
+
+
+
+
+
+  <title>《Android Programming BNRG》笔记三十三 | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Android Programming BNRG》笔记三十三</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-13T20:00:00+08:00">
+                2017-11-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Programming</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/13/2017/1113AndroidProgrammingBNRG33/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/13/2017/1113AndroidProgrammingBNRG33/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章引入随Google Play Services带的LocationService，使用地理位置信息，并向Flickr请求和位置信息相关的图片。<br>本章要点：</p>
+<ul>
+<li>Google Play Services</li>
+<li>LocationService，申请权限，请求服务，使用结果</li>
+<li>在模拟器上模拟位置变化<a id="more"></a>
+</li>
+</ul>
+<h1 id="Play-Services"><a href="#Play-Services" class="headerlink" title="Play Services"></a>Play Services</h1><p>除了随Android系统带的标准库外，Android还通过Google Play Service下发和更新API，以确保这类功能的更新速度更快，location service就属于这一类型，被称为<code>Fused Location Provider</code>。如果使用这类API，就要求设备必须安装了Google Play Service。</p>
+<h1 id="在模拟器上安装Play-Services"><a href="#在模拟器上安装Play-Services" class="headerlink" title="在模拟器上安装Play Services"></a>在模拟器上安装Play Services</h1><p>Android Studio菜单Tools &gt; Android &gt; SDK Manager，勾选“Show Package Details”，确保和模拟器对应版本的“Google APIs Intel x86 Atom System Imange”被勾选：<br><img src="/2017/11/13/2017/1113AndroidProgrammingBNRG33/img01.png" alt><br>来到Android Virutal Device Manager，确保模拟器Target里有“Google APIs”字样：<br><img src="/2017/11/13/2017/1113AndroidProgrammingBNRG33/img02.png" alt></p>
+<h1 id="使用Google-Play-Services"><a href="#使用Google-Play-Services" class="headerlink" title="使用Google Play Services"></a>使用Google Play Services</h1><h2 id="1-添加依赖"><a href="#1-添加依赖" class="headerlink" title="1.添加依赖"></a>1.添加依赖</h2><p>在AndroidStudio中，⌘+; &gt; Project Structure &gt; app &gt; Dependencies &gt; + &gt; Library dependency<br><img src="/2017/11/13/2017/1113AndroidProgrammingBNRG33/img03.png" alt><br>输入com.agoogle.android.gms，注意我们需要的是com.agoogle.android.gms:play-services-location:11.6.0这在搜索结果里没有，需要自己补上完整的名称：<br><img src="/2017/11/13/2017/1113AndroidProgrammingBNRG33/img04.png" alt></p>
+<font color="red">如果不知道完整的写法该如何是好？</font>
+
+<h2 id="2-检查Google-Play-Services是否可用"><a href="#2-检查Google-Play-Services是否可用" class="headerlink" title="2.检查Google Play Services是否可用"></a>2.检查Google Play Services是否可用</h2><p>我们在Activity即将弹出时检查服务是否可用，如果不可用则弹出提示。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// LocatrActivity.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocatrActivity</span> <span class="keyword">extends</span> <span class="title">SingleFragmentActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST_ERROR = <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onResume();</span><br><span class="line"></span><br><span class="line">        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> errorCode = apiAvailability.isGooglePlayServicesAvailable(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">if</span>(errorCode != ConnectionResult.SUCCESS)&#123; <span class="comment">// 如果服务不可用，则弹提示</span></span><br><span class="line">            Dialog errorDialog = apiAvailability.getErrorDialog(<span class="keyword">this</span>,</span><br><span class="line">                    errorCode, REQUEST_ERROR,</span><br><span class="line">                    <span class="keyword">new</span> DialogInterface.OnCancelListener() &#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCancel</span><span class="params">(DialogInterface dialogInterface)</span> </span>&#123;</span><br><span class="line">                            finish();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;);</span><br><span class="line">            errorDialog.show();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-申请权限"><a href="#3-申请权限" class="headerlink" title="3.申请权限"></a>3.申请权限</h2><h3 id="在AndroidManifest-xml中声明权限"><a href="#在AndroidManifest-xml中声明权限" class="headerlink" title="在AndroidManifest.xml中声明权限"></a>在<code>AndroidManifest.xml</code>中声明权限</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">...</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.ACCESS_FINE_LOCATION"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.ACCESS_COARSE_LOCATION"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.INTERNET"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">application...</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>其中<code>FINE_LOCATION</code>来自GPS，信号更精准；<code>COARSE_LOCATION</code>来自基站或WiFi，信号精度较差。二者都属于<code>dangerous</code>类型的权限，这类权限仅在<code>AndroidManifest.xml</code>里声明是不够的，必须在运行时，再实时申请。</p>
+<h3 id="在运行时申请"><a href="#在运行时申请" class="headerlink" title="在运行时申请"></a>在运行时申请</h3><p><code>dangerous</code>类型的权限被归成了几类：</p>
+<style>
+table th:nth-of-type(1){
+    width: 30px;
+}
+table th:nth-of-type(2){
+    width: 80px;
+}
+table th:nth-of-type(3){
+    width: 30px;
+}
+table th:nth-of-type(4){
+    width: 80px;
+}
+</style>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Permission Group</th>
+<th>Permissions</th>
+<th>Permission Group</th>
+<th>Permissions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CALENDAR</strong></td>
+<td>READ_CALENDAR<br>WRITE_CALENDAR</td>
+<td><strong>CAMERA</strong></td>
+<td>CAMERA</td>
+</tr>
+<tr>
+<td><strong>CONTACTS</strong></td>
+<td>READ_CONTACTS<br>WRITE_CONTACTS<br>GET_ACCOUNTS</td>
+<td><strong>LOCATION</strong></td>
+<td>ACCESS_FINE_LOCATION<br>ACCESS_COARSE_LOCATION</td>
+</tr>
+<tr>
+<td><strong>MICROPHONE</strong></td>
+<td>RECORD_AUDIO</td>
+<td><strong>SENSORS</strong></td>
+<td>BODY_SENSORS</td>
+</tr>
+<tr>
+<td><strong>PHONE</strong></td>
+<td>READ_PHONE_STATE<br>CALL_PHONE<br>READ_CALL_LOG<br>WRITE_CALL_LOG<br>ADD_VOICEMAIL<br>USE_SIP<br>PROCESS_OUTGOING_CALLS</td>
+<td><strong>SMS</strong></td>
+<td>SEND_SMS<br>RECEIVE_SMS<br>READ_SMS<br>RECEIVE_WAP_PUSH<br>RECEIVE_MMS</td>
+</tr>
+<tr>
+<td><strong>STORAGE</strong></td>
+<td>READ_EXTERNAL_STORAGE<br>WRITE_EXTERNAL_STORAGE</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>申请和授权是按照Permissions操作的，只要申请到了Group中某个权限，该Group中其它权限也就都具备了。运行时检查和申请权限步骤如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// LocatrFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocatrFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"LocatrFragment"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String[] LOCATION_PERMISSIONS = <span class="keyword">new</span> String[]&#123;</span><br><span class="line">            Manifest.permission.ACCESS_FINE_LOCATION,</span><br><span class="line">            Manifest.permission.ACCESS_COARSE_LOCATION,</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST_LOCATION_PERMISSION = <span class="number">0</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span></span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (item.getItemId())&#123;</span><br><span class="line">            <span class="keyword">case</span> R.id.action_locate:</span><br><span class="line">                <span class="keyword">if</span>(hasLocationPermission()) &#123; <span class="comment">// ②</span></span><br><span class="line">                    findImage();</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;<span class="comment">// ③</span></span><br><span class="line">                    requestPermissions(LOCATION_PERMISSIONS, REQUEST_LOCATION_PERMISSION);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span>   <span class="comment">// ④</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestPermissionsResult</span><span class="params">(<span class="keyword">int</span> requestCode, String[] permission,</span></span></span><br><span class="line"><span class="function"><span class="params">                                          <span class="keyword">int</span>[] grantResults)</span></span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (requestCode)&#123;</span><br><span class="line">            <span class="keyword">case</span> REQUEST_LOCATION_PERMISSION:</span><br><span class="line">                <span class="keyword">if</span>(hasLocationPermission())&#123;</span><br><span class="line">                    findImage();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">default</span>:</span><br><span class="line">                    <span class="keyword">super</span>.onRequestPermissionsResult(requestCode, permission,</span><br><span class="line">                            grantResults);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">findImage</span><span class="params">()</span></span>&#123; </span><br><span class="line">        ...     <span class="comment">// 使用LocationService</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">hasLocationPermission</span><span class="params">()</span></span>&#123; <span class="comment">// ①</span></span><br><span class="line">        <span class="keyword">int</span> result = ContextCompat.checkSelfPermission(getActivity(),</span><br><span class="line">                LOCATION_PERMISSIONS[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">return</span> result == PackageManager.PERMISSION_GRANTED;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>①检查是否具备LOCATION权限。<br>②当点击右上角“定位”图标时，判断如果已经有LOCATION权限，则调用<code>findImage()</code>使用Location Service；否则申请LOCATION权限。<br>③<code>requestPermissions(...)</code>是一个异步请求，它会触发Android弹出一个请求权限的对话框。<br><img src="/2017/11/13/2017/1113AndroidProgrammingBNRG33/img06.png" alt><br>第一个参数是请求的权限列表；第二个参数是requestCode，用来区分每个请求。当用户选择允许或者拒绝权限申请后，会收到回调，这是④干的事儿了。<br>④在回调中，首先根据requestCode分辨是哪一个请求。然后判断如果具备了LOCATION权限，说明用户通过了，接下来<code>findImage()</code>使用Location Service。也可以根据参数<code>grantResults</code>，这是得到授权的权限。</p>
+<h2 id="4-使用Location-Service"><a href="#4-使用Location-Service" class="headerlink" title="4.使用Location Service"></a>4.使用Location Service</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// LocatrFragment.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocatrFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ImageView mImageView;</span><br><span class="line">    <span class="keyword">private</span> GoogleApiClient mClient;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        mClient = <span class="keyword">new</span> GoogleApiClient.Builder(getActivity())</span><br><span class="line">                .addApi(LocationServices.API)</span><br><span class="line">                .addConnectionCallbacks(</span><br><span class="line">                        <span class="keyword">new</span> GoogleApiClient.ConnectionCallbacks() &#123;</span><br><span class="line">                            <span class="meta">@Override</span></span><br><span class="line">                            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onConnected</span><span class="params">(@Nullable Bundle bundle)</span> </span>&#123;</span><br><span class="line">                                getActivity().invalidateOptionsMenu();</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                            <span class="meta">@Override</span></span><br><span class="line">                            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onConnectionSuspended</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;)</span><br><span class="line">                .build(); <span class="comment">// ①</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(LayoutInflater inflater, ViewGroup container,</span></span></span><br><span class="line"><span class="function"><span class="params">                             Bundle savedInstanceState)</span></span>&#123;</span><br><span class="line">        View v = inflater.inflate(R.layout.fragment_locatr, container,</span><br><span class="line">                <span class="keyword">false</span>);</span><br><span class="line">        mImageView = (ImageView)v.findViewById(R.id.image);</span><br><span class="line">        <span class="keyword">return</span> v;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        getActivity().invalidateOptionsMenu();</span><br><span class="line">        mClient.connect(); <span class="comment">// ②</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        mClient.disconnect(); <span class="comment">// ③</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreateOptionsMenu</span><span class="params">(Menu menu, MenuInflater inflater)</span></span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreateOptionsMenu(menu, inflater);</span><br><span class="line">        inflater.inflate(R.menu.fragment_locatr, menu);</span><br><span class="line">        MenuItem searchItem = menu.findItem(R.id.action_locate);</span><br><span class="line">        searchItem.setEnabled(mClient.isConnected());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onOptionsItemSelected</span><span class="params">(MenuItem item)</span></span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> (item.getItemId())&#123;</span><br><span class="line">            <span class="keyword">case</span> R.id.action_locate:</span><br><span class="line">                <span class="keyword">if</span>(hasLocationPermission()) &#123;</span><br><span class="line">                    findImage();</span><br><span class="line">                &#125;...</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">findImage</span><span class="params">()</span></span>&#123;</span><br><span class="line">        LocationRequest request = LocationRequest.create(); <span class="comment">// ④</span></span><br><span class="line">        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);</span><br><span class="line">        request.setNumUpdates(<span class="number">1</span>);<span class="comment">// 更新多少次</span></span><br><span class="line">        request.setInterval(<span class="number">0</span>); <span class="comment">// 更新的频次，0表示尽可能频繁</span></span><br><span class="line"></span><br><span class="line">        LocationServices.FusedLocationApi</span><br><span class="line">                .requestLocationUpdates(mClient, request,</span><br><span class="line">                        <span class="keyword">new</span> LocationListener() &#123;</span><br><span class="line">                            <span class="meta">@Override</span></span><br><span class="line">                            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLocationChanged</span><span class="params">(Location location)</span> </span>&#123;</span><br><span class="line">                                Log.i(TAG, <span class="string">"Got a fix: "</span> + location);</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;); <span class="comment">// ⑤</span></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>①凡使用Play Services，必须先创建一个GoogleApiClient实例，使用GoogleApiClient.Builder完成创建。<br>①和②③是一套组合拳：由于Play Service来自Google Play Store app，这是另一个应用，Google建议在Fragment的<code>onStart()</code>中建立连接，在<code>onStop()</code>中释放链接，这就是②和③中做的事情。<br>一旦连接成功，需要让菜单中的“定位”图标变成enabled状态，否则为disabled状态。因此在创建Client时，调用<code>addConnectionCallbacks(...)</code>设置连接成功的回调。<br>④构造一个LocationRequest，待会儿会把它发送给LocationServices。除了这里设定的更新频次、次数、精度级别外，还可以设置到期时间，触发Location更新的最小移动距离。<br>⑤将LocationRequest发给LocationServices，如果位置信息发生变化，将收到回调<code>onLocationChanged(...)</code>，通过模拟器的设置界面可以修改经纬度，点击<code>SEND</code>即可更新到模拟器：<br><img src="/2017/11/13/2017/1113AndroidProgrammingBNRG33/img07.png" alt><br>以上代码接收到位置发生变化后，打印输出如下：<br><code>11-24 02:10:54.348 3017-3017/com.bnrg.locatr I/LocatrFragment: Got a fix: Location[fused 37.421998,-122.099998 hAcc=20 et=+1m33s663ms alt=0.0 vAcc=??? sAcc=??? bAcc=???]</code></p>
+<h2 id="5-使用Location结果"><a href="#5-使用Location结果" class="headerlink" title="5.使用Location结果"></a>5.使用Location结果</h2><p>从<code>LocationServices</code>请求得到的是一个Location数据，可以调用其成员函数获取经纬度：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FlickrFetchr.java</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">buildUrl</span><span class="params">(Location location)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ENDPOINT.buildUpon()</span><br><span class="line">                .appendQueryParameter(<span class="string">"method"</span>, SEARCH_METHOD)</span><br><span class="line">                .appendQueryParameter(<span class="string">"lat"</span>, <span class="string">""</span> + location.getLatitude())</span><br><span class="line">                .appendQueryParameter(<span class="string">"lon"</span>, <span class="string">""</span> + location.getLongitude())</span><br><span class="line">                .build().toString();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>本节剩下的部分就是纯业务逻辑了——把经纬度信息传入url中，获取和位置相关的图片。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-BNRG笔记/" rel="tag"># Android BNRG笔记</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/12/2017/1112AndroidProgrammingBNRG32/" rel="next" title="《Android Programming BNRG》笔记三十二">
+                <i class="fa fa-chevron-left"></i> 《Android Programming BNRG》笔记三十二
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/14/2017/1114AndroidProgrammingBNRG34/" rel="prev" title="《Android Programming BNRG》笔记三十四">
+                《Android Programming BNRG》笔记三十四 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/11/13/2017/1113AndroidProgrammingBNRG33/" data-title="《Android Programming BNRG》笔记三十三" data-url="http://palanceli.github.io/2017/11/13/2017/1113AndroidProgrammingBNRG33/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">213</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Play-Services"><span class="nav-number">1.</span> <span class="nav-text">Play Services</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在模拟器上安装Play-Services"><span class="nav-number">2.</span> <span class="nav-text">在模拟器上安装Play Services</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用Google-Play-Services"><span class="nav-number">3.</span> <span class="nav-text">使用Google Play Services</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-添加依赖"><span class="nav-number">3.1.</span> <span class="nav-text">1.添加依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-检查Google-Play-Services是否可用"><span class="nav-number">3.2.</span> <span class="nav-text">2.检查Google Play Services是否可用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-申请权限"><span class="nav-number">3.3.</span> <span class="nav-text">3.申请权限</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在AndroidManifest-xml中声明权限"><span class="nav-number">3.3.1.</span> <span class="nav-text">在AndroidManifest.xml中声明权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在运行时申请"><span class="nav-number">3.3.2.</span> <span class="nav-text">在运行时申请</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-使用Location-Service"><span class="nav-number">3.4.</span> <span class="nav-text">4.使用Location Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-使用Location结果"><span class="nav-number">3.5.</span> <span class="nav-text">5.使用Location结果</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
