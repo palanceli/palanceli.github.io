@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Palance">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="使用golang以来，打交道最频繁的是错误处理。和C/C++相比golang在错误处理上允许携带更多信息以方便调试跟踪，代价就是要在每个函数调用后处理error返回值。本来不是多大事儿，但由于函数调用太频繁，使得每次在写这三五行代码时，总希望更简洁并且不遗漏信息。本文总结我对error处理的演化过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="优雅地处理golang error">
+<meta property="og:url" content="http://palanceli.github.io/2019/09/24/2019/0924GolangError/index.html">
+<meta property="og:site_name" content="Palance&#39;s Blog">
+<meta property="og:description" content="使用golang以来，打交道最频繁的是错误处理。和C/C++相比golang在错误处理上允许携带更多信息以方便调试跟踪，代价就是要在每个函数调用后处理error返回值。本来不是多大事儿，但由于函数调用太频繁，使得每次在写这三五行代码时，总希望更简洁并且不遗漏信息。本文总结我对error处理的演化过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-09-25T15:18:02.593Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="优雅地处理golang error">
+<meta name="twitter:description" content="使用golang以来，打交道最频繁的是错误处理。和C/C++相比golang在错误处理上允许携带更多信息以方便调试跟踪，代价就是要在每个函数调用后处理error返回值。本来不是多大事儿，但由于函数调用太频繁，使得每次在写这三五行代码时，总希望更简洁并且不遗漏信息。本文总结我对error处理的演化过程。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://palanceli.github.io/2019/09/24/2019/0924GolangError/">
+
+
+
+
+
+  <title>优雅地处理golang error | Palance's Blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e9c9a05f15583e8039e36cfe85103e96";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Palance's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://palanceli.github.io/2019/09/24/2019/0924GolangError/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Palance Li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/13184524">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Palance's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">优雅地处理golang error</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-24T14:00:00+08:00">
+                2019-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/09/24/2019/0924GolangError/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/09/24/2019/0924GolangError/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>使用golang以来，打交道最频繁的是错误处理。和C/C++相比golang在错误处理上允许携带更多信息以方便调试跟踪，代价就是要在每个函数调用后处理error返回值。本来不是多大事儿，但由于函数调用太频繁，使得每次在写这三五行代码时，总希望更简洁并且不遗漏信息。本文总结我对error处理的演化过程。</p>
+<a id="more"></a>
+<h1 id="源头生成错误信息，中间层层转手"><a href="#源头生成错误信息，中间层层转手" class="headerlink" title="源头生成错误信息，中间层层转手"></a>源头生成错误信息，中间层层转手</h1><p>假设程序的配置来自几个文件，代码初始化加载配置时要依次读取。最初的代码是这么写的：仅在错误生成的源头处产生错误信息，中间层不做额外处理，仅负责中转。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span>(</span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"github.com/golang/glog"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readFile</span><span class="params">(path <span class="keyword">string</span>)</span><span class="params">(buf []<span class="keyword">byte</span>, err error)</span></span>&#123;</span><br><span class="line">	f, err := os.Open(path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	buf, err = ioutil.ReadAll(f)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Config <span class="keyword">struct</span>&#123;</span><br><span class="line">	Config1Path <span class="keyword">string</span></span><br><span class="line">	Config2Path <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Config)</span><span class="title">LoadConfig</span><span class="params">()</span><span class="params">(err error)</span></span>&#123;</span><br><span class="line">	content, err := readFile(c.Config1Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line"></span><br><span class="line">	content, err = readFile(c.Config2Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	config := Config&#123;</span><br><span class="line">		Config1Path: <span class="string">"/Users/palance/Desktop/config1.txt"</span>,</span><br><span class="line">		Config2Path: <span class="string">"/Users/palance/Desktop/config2.txt"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	err := config.LoadConfig()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		glog.Errorf(<span class="string">"FAILED to ReadConfig. err=%v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果如下:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> go run test1.go</span><br><span class="line">ERROR: logging before flag.Parse: E0925 14:47:47.528462   71768 test1.go:55] FAILED to ReadConfig. err=open /Users/palance/Desktop/config2.txt: no such file or directory</span><br></pre></td></tr></table></figure></p>
+<p>这么写的问题在于：由于中间层<code>LoadConfig(...)</code>多次调用<code>readFile(...)</code>，错误产生于后者，假设传入的配置文件路径不是这么明显，或者出错信息里不包含文件路径，那么从错误文本里就很难判断出错时的调用路径了。为了解决这个问题，需要在中间转手时追加更多信息。</p>
+<h1 id="源头生成错误信息，中间转手时追加辅助信息"><a href="#源头生成错误信息，中间转手时追加辅助信息" class="headerlink" title="源头生成错误信息，中间转手时追加辅助信息"></a>源头生成错误信息，中间转手时追加辅助信息</h1><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span>(</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"github.com/golang/glog"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readFile</span><span class="params">(path <span class="keyword">string</span>)</span><span class="params">(buf []<span class="keyword">byte</span>, err error)</span></span>&#123;</span><br><span class="line">	f, err := os.Open(path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = fmt.Errorf(<span class="string">"FAILED to os.Open(%v). err=%v"</span>, </span><br><span class="line">			path, err)	<span class="comment">// 追加辅助信息</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	buf, err = ioutil.ReadAll(f)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = fmt.Errorf(<span class="string">"FAILED to ioutil.ReadAll(%v). err=%v"</span>, </span><br><span class="line">			path, err)	<span class="comment">// 追加辅助信息</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Config <span class="keyword">struct</span>&#123;</span><br><span class="line">	Config1Path <span class="keyword">string</span></span><br><span class="line">	Config2Path <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Config)</span><span class="title">LoadConfig</span><span class="params">()</span><span class="params">(err error)</span></span>&#123;</span><br><span class="line">	content, err := readFile(c.Config1Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = fmt.Errorf(<span class="string">"FAILED to readFile(%v). err=%v"</span>, </span><br><span class="line">			c.Config1Path, err)	<span class="comment">// 追加辅助信息</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line"></span><br><span class="line">	content, err = readFile(c.Config2Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = fmt.Errorf(<span class="string">"FAILED to readFile(%v). err=%v"</span>, </span><br><span class="line">			c.Config2Path, err)	<span class="comment">// 追加辅助信息</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	config := Config&#123;</span><br><span class="line">		Config1Path: <span class="string">"/Users/palance/Desktop/config1.txt"</span>,</span><br><span class="line">		Config2Path: <span class="string">"/Users/palance/Desktop/config2.txt"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	err := config.LoadConfig()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		glog.Errorf(<span class="string">"FAILED to ReadConfig. err=%v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> go run test1.go</span><br><span class="line">ERROR: logging before flag.Parse: E0925 16:12:26.266804   73648 test1.go:58] </span><br><span class="line">FAILED to ReadConfig. err=</span><br><span class="line">FAILED to readFile(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">FAILED to os.Open(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">open /Users/palance/Desktop/config2.txt: no such file or directory</span><br></pre></td></tr></table></figure></p>
+<p>显然这个输出还是挺让人困惑的——不能直接定位到调用行数。</p>
+<h1 id="在每个中转处添加log以跟踪调用行号"><a href="#在每个中转处添加log以跟踪调用行号" class="headerlink" title="在每个中转处添加log以跟踪调用行号"></a>在每个中转处添加log以跟踪调用行号</h1><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">content, err := readFile(c.Config1Path)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">    err = fmt.Errorf(<span class="string">"FAILED to readFile(%v). err=%v"</span>, </span><br><span class="line">    	c.Config1Path, err)	<span class="comment">// 追加辅助信息</span></span><br><span class="line">    glog.Error(err.Error())</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果为：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> go run test1.go</span><br><span class="line">ERROR: logging before flag.Parse: E0925 18:09:40.68577 76292 test1.go:15] </span><br><span class="line">FAILED to os.Open(/Users/palance/Desktop/config2.txt). </span><br><span class="line">err=open /Users/palance/Desktop/config2.txt: no such file or directory</span><br><span class="line"></span><br><span class="line">ERROR: logging before flag.Parse: E0925 18:09:40.68587 76292 test1.go:50] </span><br><span class="line">FAILED to readFile(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">FAILED to os.Open(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">open /Users/palance/Desktop/config2.txt: no such file or directory</span><br><span class="line"></span><br><span class="line">ERROR: logging before flag.Parse: E0925 18:09:40.68588 76292 test1.go:66] </span><br><span class="line">FAILED to ReadConfig. err=</span><br><span class="line">FAILED to readFile(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">FAILED to os.Open(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">open /Users/palance/Desktop/config2.txt: no such file or directory</span><br></pre></td></tr></table></figure></p>
+<p>还是不理想，行号是有了，重复信息太多。改进一下：err message不再层层累加，只在log时输出。</p>
+<h1 id="精简log"><a href="#精简log" class="headerlink" title="精简log"></a>精简log</h1><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">content, err := readFile(c.Config1Path)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">    glog.Errorf(<span class="string">"FAILED to readFile(%v). err=%v"</span>, c.Config1Path, err)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果为：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">go run test1.go</span><br><span class="line">ERROR: logging before flag.Parse: E0925 18:15:44.514380   76373 test1.go:14] </span><br><span class="line">FAILED to os.Open(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">open /Users/palance/Desktop/config2.txt: no such file or directory</span><br><span class="line"></span><br><span class="line">ERROR: logging before flag.Parse: E0925 18:15:44.514474   76373 test1.go:49] </span><br><span class="line">FAILED to readFile(/Users/palance/Desktop/config2.txt). err=</span><br><span class="line">open /Users/palance/Desktop/config2.txt: no such file or directory</span><br><span class="line"></span><br><span class="line">ERROR: logging before flag.Parse: E0925 18:15:44.514493   76373 test1.go:65] </span><br><span class="line">FAILED to ReadConfig. err=</span><br><span class="line">open /Users/palance/Desktop/config2.txt: no such file or directory</span><br></pre></td></tr></table></figure></p>
+<p>这样err是由最初错误的生成点产生的，中途只是在log里添加辅助信息。依然不完美——log输出不是原子的，在多线程的环境中，上面的输出可能会被其它线程的log分隔很远，希望在一次错误输出里能呈现整个调用栈。</p>
+<h1 id="引入”github-com-pkg-errors”"><a href="#引入”github-com-pkg-errors”" class="headerlink" title="引入”github.com/pkg/errors”"></a>引入”github.com/pkg/errors”</h1><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span>(</span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"github.com/golang/glog"</span></span><br><span class="line">	<span class="string">"github.com/pkg/errors"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readFile</span><span class="params">(path <span class="keyword">string</span>)</span><span class="params">(buf []<span class="keyword">byte</span>, err error)</span></span>&#123;</span><br><span class="line">	f, err := os.Open(path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.Wrapf(err, <span class="string">"FAILED to os.Open(%v)"</span>, path)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	buf, err = ioutil.ReadAll(f)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.Wrapf(err, <span class="string">"FAILED to ioutil.ReadAll(%v)"</span>, path)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Config <span class="keyword">struct</span>&#123;</span><br><span class="line">	Config1Path <span class="keyword">string</span></span><br><span class="line">	Config2Path <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Config)</span><span class="title">LoadConfig</span><span class="params">()</span><span class="params">(err error)</span></span>&#123;</span><br><span class="line">	content, err := readFile(c.Config1Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.Wrapf(err, <span class="string">"FAILED to readFile(%v)"</span>, c.Config1Path)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line"></span><br><span class="line">	content, err = readFile(c.Config2Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.Wrapf(err, <span class="string">"FAILED to readFile(%v)"</span>, c.Config1Path)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	config := Config&#123;</span><br><span class="line">		Config1Path: <span class="string">"/Users/palance/Desktop/config1.txt"</span>,</span><br><span class="line">		Config2Path: <span class="string">"/Users/palance/Desktop/config2.txt"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	err := config.LoadConfig()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		glog.Errorf(<span class="string">"FAILED to ReadConfig. err=%+v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行结果如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">go run test1.go</span><br><span class="line">ERROR: logging before flag.Parse: E0925 19:22:16.053087   78023 test1.go:58] </span><br><span class="line">FAILED to ReadConfig. err=open /Users/palance/Desktop/config2.txt: no such file or directory</span><br><span class="line">FAILED to os.Open(/Users/palance/Desktop/config2.txt)</span><br><span class="line">main.readFile</span><br><span class="line">	/Users/palance/Desktop/test1.go:13</span><br><span class="line">main.(*Config).LoadConfig</span><br><span class="line">	/Users/palance/Desktop/test1.go:40</span><br><span class="line">main.main</span><br><span class="line">	/Users/palance/Desktop/test1.go:56</span><br><span class="line">runtime.main</span><br><span class="line">	/usr/local/go/src/runtime/proc.go:200</span><br><span class="line">runtime.goexit</span><br><span class="line">	/usr/local/go/src/runtime/asm_amd64.s:1337</span><br><span class="line">FAILED to readFile(/Users/palance/Desktop/config1.txt)</span><br><span class="line">main.(*Config).LoadConfig</span><br><span class="line">	/Users/palance/Desktop/test1.go:42</span><br><span class="line">main.main</span><br><span class="line">	/Users/palance/Desktop/test1.go:56</span><br><span class="line">runtime.main</span><br><span class="line">	/usr/local/go/src/runtime/proc.go:200</span><br><span class="line">runtime.goexit</span><br><span class="line">	/usr/local/go/src/runtime/asm_amd64.s:1337</span><br></pre></td></tr></table></figure></p>
+<p>原子性问题解决了，但还是太冗长，它把每一次Wrap时的调用栈都记录下来了，其实可以在打印的时候只显示最深的那一层，要么修改<code>github.com/pkg/errors</code>/<code>errors.go</code>/<code>func (w *withStack) Format(s fmt.State, verb rune)</code>；要么调用侧代码仅在最底层代码调用<code>Wrap</code>，上层改用<code>WithMessage</code>。方案一以后再讨论，这里先演示方案二。</p>
+<h1 id="再次精简log"><a href="#再次精简log" class="headerlink" title="再次精简log"></a>再次精简log</h1><p>在MVC结构层次分明的代码里，使用方案二还是比较容易的——通常在model层产生错误的时候使用Wrap。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span>(</span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"github.com/golang/glog"</span></span><br><span class="line">	<span class="string">"github.com/pkg/errors"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readFile</span><span class="params">(path <span class="keyword">string</span>)</span><span class="params">(buf []<span class="keyword">byte</span>, err error)</span></span>&#123;</span><br><span class="line">	f, err := os.Open(path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.Wrapf(err, <span class="string">"FAILED to os.Open path=%v"</span>, </span><br><span class="line">			path)	<span class="comment">// 在error的产生除使用Wrap</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	buf, err = ioutil.ReadAll(f)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.Wrapf(err, <span class="string">"FAILED to ioutil.ReadAll path=%v"</span>, </span><br><span class="line">			path)	<span class="comment">// 在error的产生处使用Wrap</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Config <span class="keyword">struct</span>&#123;</span><br><span class="line">	Config1Path <span class="keyword">string</span></span><br><span class="line">	Config2Path <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Config)</span><span class="title">LoadConfig</span><span class="params">()</span><span class="params">(err error)</span></span>&#123;</span><br><span class="line">	content, err := readFile(c.Config1Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.WithMessagef(err, <span class="string">"FAILED to readFile(%v)"</span>, </span><br><span class="line">			c.Config1Path)	<span class="comment">// 在error中转层仅附加Message</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line"></span><br><span class="line">	content, err = readFile(c.Config2Path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		err = errors.WithMessagef(err, <span class="string">"FAILED to readFile(%v)"</span>, </span><br><span class="line">			c.Config1Path)	<span class="comment">// 在error中转层仅附加Message</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	glog.V(<span class="number">8</span>).Infof(<span class="string">"content:%v"</span>, content)</span><br><span class="line">	<span class="comment">// parse content ...</span></span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	config := Config&#123;</span><br><span class="line">		Config1Path: <span class="string">"/Users/palance/Desktop/config1.txt"</span>,</span><br><span class="line">		Config2Path: <span class="string">"/Users/palance/Desktop/config2.txt"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	err := config.LoadConfig()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		glog.Errorf(<span class="string">"FAILED to ReadConfig. err=%+v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> go run test1.go</span><br><span class="line">ERROR: logging before flag.Parse: E0925 19:38:20.13575 78715 test1.go:58] </span><br><span class="line">FAILED to ReadConfig. err=open /Users/palance/Desktop/config2.txt: no such file or directory</span><br><span class="line">FAILED to os.Open path=/Users/palance/Desktop/config2.txt</span><br><span class="line">main.readFile</span><br><span class="line">	/Users/palance/Desktop/test1.go:13</span><br><span class="line">main.(*Config).LoadConfig</span><br><span class="line">	/Users/palance/Desktop/test1.go:40</span><br><span class="line">main.main</span><br><span class="line">	/Users/palance/Desktop/test1.go:56</span><br><span class="line">runtime.main</span><br><span class="line">	/usr/local/go/src/runtime/proc.go:200</span><br><span class="line">runtime.goexit</span><br><span class="line">	/usr/local/go/src/runtime/asm_amd64.s:1337</span><br><span class="line">FAILED to readFile(/Users/palance/Desktop/config1.txt)</span><br></pre></td></tr></table></figure></p>
+<p>不算特别完美，log和调用栈是分离的，视觉比较跳跃：先看第一行，再循着中间的调用栈结合底部的log跟踪调用过程。如果调用栈和附加信息比较多，要不断在中间的调用栈和底部的log之间切换。</p>
+<p>先这样吧，需要的信息都齐全了。以后自己改一个理想的版本。好消息是go1.13已经内置了<a href="https://golang.org/doc/go1.13#error_wrapping" target="_blank" rel="noopener">Error wrapping</a>，只需要<code>fmt.Errorf(&quot;error message err=%w&quot;, err)</code>即可完成Wrap，调用<code>UnWrap</code>得到内一层error，这要比github.com/pkg/errors更方便。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://zhuanlan.zhihu.com/p/82985617?utm_source=wechat_session&amp;utm_medium=social&amp;utm_oi=926941521738100736" target="_blank" rel="noopener">Golang error 的突围</a><br><a href="https://godoc.org/github.com/pkg/errors" target="_blank" rel="noopener">package errors</a><br><a href="https://github.com/pkg/errors/blob/master/example_test.go" target="_blank" rel="noopener">errors/example_test.go</a><br><a href="https://tonybai.com/2015/10/30/error-handling-in-go/" target="_blank" rel="noopener">Go语言错误处理</a><br><a href="https://blog.golang.org/error-handling-and-go" target="_blank" rel="noopener">Error handling and Go</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/06/2019/0906女儿9岁钢琴八级成长历程/" rel="next" title="女儿9岁钢琴八级的成长历程">
+                <i class="fa fa-chevron-left"></i> 女儿9岁钢琴八级的成长历程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/09/24/2019/0924GolangError/" data-title="优雅地处理golang error" data-url="http://palanceli.github.io/2019/09/24/2019/0924GolangError/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/13184524" alt="Palance Li">
+            
+              <p class="site-author-name" itemprop="name">Palance Li</p>
+              <p class="site-description motion-element" itemprop="description">学习，重生</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">215</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/palanceli" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:palanceli@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/zchongr" target="_blank" title="我的CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.cnblogs.com/palance/" target="_blank" title="我的博客园">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的博客园</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.jianshu.com/" target="_blank" title="我的简书">
+                      
+                        <i class="fa fa-fw fa-globe"></i>我的简书</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#源头生成错误信息，中间层层转手"><span class="nav-number">1.</span> <span class="nav-text">源头生成错误信息，中间层层转手</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源头生成错误信息，中间转手时追加辅助信息"><span class="nav-number">2.</span> <span class="nav-text">源头生成错误信息，中间转手时追加辅助信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在每个中转处添加log以跟踪调用行号"><span class="nav-number">3.</span> <span class="nav-text">在每个中转处添加log以跟踪调用行号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#精简log"><span class="nav-number">4.</span> <span class="nav-text">精简log</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引入”github-com-pkg-errors”"><span class="nav-number">5.</span> <span class="nav-text">引入”github.com/pkg/errors”</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#再次精简log"><span class="nav-number">6.</span> <span class="nav-text">再次精简log</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Palance Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"palanceli"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="custom_mathjax_source">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
